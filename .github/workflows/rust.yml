@@ -24,5 +24,6 @@ jobs:
         # cargo ls x86_64-unknown-linux-gnu
         cargo build --release
         cargo lto
+        ls -hlR target/
     - name: Run tests
       run: cargo test --release
