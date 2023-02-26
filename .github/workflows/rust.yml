@@ -25,6 +25,6 @@ jobs:
         cargo update
         cargo build --release
         cargo lto
-        ls -hlR target/
+        ls -hlR target/**/BL
     - name: Run tests
       run: cargo test --release
