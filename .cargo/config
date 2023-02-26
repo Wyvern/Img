@@ -172,7 +172,3 @@ rustdoc-args = ["--cfg", "docsrs"]
 [target.debug]
 
 [target.release]
-
-[target.x86_64-unknown-linux-gnu]
-linker = "clang"
-rustflags = ["-Zplt", "-Clink-arg=--ld-path=/usr/local/bin/mold"]
