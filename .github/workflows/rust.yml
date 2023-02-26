@@ -21,7 +21,7 @@ jobs:
         rustup default nightly
         rustup update
         alias target='rustc -vV | grep -i host | cut -d: -f2'
-        cargo ls
+        cargo ls target
         cargo build --release
         cargo lto
     - name: Run tests
