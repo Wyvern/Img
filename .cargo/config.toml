@@ -1,0 +1,178 @@
+[alias]
+rr = "run -r"
+br = "build -r"
+cf = "clippy -r --fix --allow-no-vcs"
+ndf = "run -r --no-default-features"
+a = "build -r --all-features"
+ar = "run -r --all-features"
+ss = "build --profile stats"
+lto = "build --profile lto"
+no = "build --profile no"
+bl = "build --lib -r"
+tr = "test -r"
+dr = "doc -r"
+ls = "build --profile lto -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
+src = "build --profile src -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
+
+[cargo-new]
+vcs = "none"
+
+[net]
+#offline = true     
+
+#dev
+[profile.dev]
+rustflags = ["-Cprefer-dynamic", "-Cdebug_assertions", "-Zdwarf-version=4"]
+rpath = true
+[profile.dev.package."*"]
+inherits = "release"
+[profile.dev.build-override]
+inherits = "release"
+
+#test
+[profile.test]
+inherits = "dev"
+[profile.test.package."*"]
+inherits = "release"
+[profile.test.build-override]
+inherits = "release"
+
+#bench
+[profile.bench.package."*"]
+inherits = "release"
+[profile.bench.build-override]
+inherits = "release"
+[profile.bench]
+inherits = "dev"
+
+#release
+[profile.release.build-override]
+inherits = "release"
+[profile.release.package."*"]
+inherits = "release"
+[profile.release]
+rustflags = ["-Cprefer-dynamic", "-Zcombine-cgu"]
+rpath = true
+strip = true
+#codegen-units = 1
+
+#lto
+[profile.lto]
+inherits = "release"
+rustflags = [
+    #"-Zpanic-in-drop=abort",
+    #"-Zvirtual-function-elimination","-Clto"
+]
+lto = true
+panic = "abort"
+[profile.lto.build-override]
+inherits = "release"
+[profile.lto.package."*"]
+inherits = "release"
+
+#src
+[profile.src]
+inherits = "release"
+#rustflags = ["-Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort","-Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem","-Zpanic-in-drop=abort"]
+lto = true
+panic = "abort"
+[profile.src.build-override]
+inherits = "release"
+[profile.src.package."*"]
+inherits = "release"
+
+#stats
+[profile.stats.build-override]
+inherits = "release"
+[profile.stats.package."*"]
+inherits = "release"
+[profile.stats]
+inherits = "release"
+rustflags = ["-Zperf-stats", "-Zmeta-stats"]
+
+#no
+[profile.no.build-override]
+inherits = "no"
+[profile.no.package."*"]
+inherits = "no"
+[profile.no]
+inherits = "release"
+rustflags = ["-Zparse-only", "-Zno-analysis", "-Zno-link", "-Zno-codegen"]
+
+[unstable]
+check-cfg = ["names", "values", "features", "output",
+#"cfgs"
+]
+avoid-dev-deps = true
+dual-proc-macros = true
+panic-abort-tests = true
+config-include = true
+sparse-registry = true
+bindeps = true
+binary-dep-depinfo = true
+profile-rustflags = true
+codegen-backend = true
+#doctest-in-workspace=true
+#doctest-xcompile=true
+
+
+[build]
+rustflags = [
+    "-Ctarget-feature=-crt-static",
+    "-Ctarget-cpu=native",
+    "-Csymbol-mangling-version=v0",
+    "-Coverflow-checks=no",
+    "-Copt-level=s",
+    "-Cno-redzone",
+    #"-Clinker-flavor=lld-link",
+
+    "-Cllvm-args=--enable-name-compression --debugify-quiet",
+    "-Clink-args=-fno-ident -fglobal-isel -fno-exceptions -fno-async-exceptions -fno-backtrace -gz -undefined -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables", #-fuse-ld=lld 
+
+    "-Ztune-cpu=native",
+    "-Zno-profiler-runtime",
+    "-Zthinlto",
+    "-Zplt",
+    "-Zdylib-lto",
+    "-Zno-generate-arange-section",
+    "-Zdep-info-omit-d-target",
+    "-Zpolonius",
+    "-Ztrim-diagnostic-paths",
+    "-Zoom=abort",
+    "-Zthir-unsafeck",
+    "-Zshare-generics",
+    "-Zgcc-ld=lld",
+    "-Zmerge-functions=trampolines",
+    "-Zpolymorphize",
+    "-Zinline-mir",
+    "-Zinline-in-all-cgus",
+    "-Zmir-opt-level=4",
+    "-Zpacked-bundled-libs",
+    "-Zteach",
+    "-Zmaximal-hir-to-mir-coverage",
+    "-Zno-jump-tables",
+    "-Zterminal-urls",
+    "-Zthreads=0",
+    #"-Zlink-directives=yes",
+    #"-Ztrait-solver=chalk|next",
+
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
+]
+#target="x86_64-apple-darwin"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[target.x86_64-apple-darwin]
+
+[target.debug]
+
+[target.release]
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = ["-Zplt", "-Clink-arg=--ld-path=/usr/local/bin/mold"]
