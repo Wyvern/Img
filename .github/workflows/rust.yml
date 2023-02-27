@@ -26,7 +26,7 @@ jobs:
         time cargo build --release
         time cargo lto
         ls -hlR target/**/BL
-        cargo tr -Fbatch try
+        time cargo tr -Fbatch try
         lscpu
         #lshw
         #free -m
