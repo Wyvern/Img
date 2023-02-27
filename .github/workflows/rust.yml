@@ -10,9 +10,9 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
-    runs-on: [ubuntu-latest, macos-latest]
+  Linux:
+    name: Building on Ubuntu. 
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -29,5 +29,42 @@ jobs:
         lscpu
         #lshw
         free -m
+    - name: Run tests
+      run: cargo test --release
+      
+  macOS:
+    name: Building on macOS. 
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build release
+      run: |
+        rustup default nightly
+        rustup update
+        rustup component add rust-src clippy
+        cargo update
+        time cargo build --release
+        time cargo lto
+        ls -hl target/**/BL
+        system_profiler | grep Processor
+        free -m
+    - name: Run tests
+      run: cargo test --release
+      
+  Windows:
+    name: Building on Windows. 
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build release
+      run: |
+        rustup default nightly
+        rustup update
+        rustup component add rust-src clippy
+        cargo update
+        cargo build --release
+        cargo lto
     - name: Run tests
       run: cargo test --release
