@@ -35,9 +35,9 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-          files: 
-            release/BL
-            lto/BL
+          files: |
+            target/release/BL
+            target/lto/BL
           
   macOS:
     name: Building on macOS. 
@@ -63,9 +63,9 @@ jobs:
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-          files: 
-            release/BL
-            lto/BL
+          files: |
+            target/release/BL
+            target/lto/BL
       
   Windows:
     name: Building on Windows. 
