@@ -33,8 +33,11 @@ jobs:
       run: cargo test --release
     - name: Release
       uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-          files: BL
+          files: 
+            target/release/BL
+            target/lto/BL
           
   macOS:
     name: Building on macOS. 
