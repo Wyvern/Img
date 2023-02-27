@@ -26,9 +26,8 @@ jobs:
         time cargo build --release
         time cargo lto
         ls -hlR target/**/BL
-        time cargo tr -Fbatch try
         lscpu
         #lshw
-        #free -m
+        free -m
     - name: Run tests
       run: cargo test --release
