@@ -33,7 +33,7 @@ jobs:
       run: cargo test --release
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/Nightly/')
       with:
           files: 
             target/release/BL
@@ -59,6 +59,13 @@ jobs:
         sysctl -a | grep brand
     - name: Run tests
       run: cargo test --release
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/Nightly')
+      with:
+          files: 
+            target/release/BL
+            target/lto/BL
       
   Windows:
     name: Building on Windows. 
