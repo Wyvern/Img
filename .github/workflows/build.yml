@@ -1,4 +1,4 @@
-name: BL
+name: Build
 
 on:
   push:
@@ -33,7 +33,7 @@ jobs:
       run: cargo test --release
     - name: Release
     - uses: softprops/action-gh-release@v1
-      with:
+    - with:
           files: BL
           
   macOS:
