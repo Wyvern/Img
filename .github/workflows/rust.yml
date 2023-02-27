@@ -67,7 +67,6 @@ jobs:
         cargo update
         cargo build --release
         cargo lto
-        dir /s
         systeminfo
     - name: Run tests
       run: cargo test --release
