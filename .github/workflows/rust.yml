@@ -2,9 +2,9 @@ name: BL
 
 on:
   push:
-    branches: [ "master", "stable" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "master", "stable" ]
+    branches: [ "master" ]
 
 env:
   CARGO_TERM_COLOR: always
