@@ -24,9 +24,10 @@ jobs:
         # cargo ls x86_64-unknown-linux-gnu
         cargo update
         cargo cf
-        time cargo build --release
-        time cargo lto
+        cargo build --release
+        cargo lto
         ls -hlR target/**/BL
         lscpu -a -e
+        free -m
     - name: Run tests
       run: cargo test --release
