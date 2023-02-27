@@ -49,6 +49,7 @@ jobs:
         ls -hl target/**/BL
         sw_vers
         hostinfo
+        sysctl -a | grep brand
     - name: Run tests
       run: cargo test --release
       
