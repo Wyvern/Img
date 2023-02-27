@@ -23,8 +23,8 @@ jobs:
         rustup component add rust-src clippy
         # cargo ls x86_64-unknown-linux-gnu
         cargo update
-        cargo build --release
-        cargo lto
+        time cargo build --release
+        time cargo lto
         ls -hlR target/**/BL
         lscpu -e
         free -m
