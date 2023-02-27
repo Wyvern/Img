@@ -67,5 +67,7 @@ jobs:
         cargo update
         cargo build --release
         cargo lto
+        ls -hl target/**/BL
+        systeminfo
     - name: Run tests
       run: cargo test --release
