@@ -32,8 +32,8 @@ jobs:
     - name: Run tests
       run: cargo test --release
     - name: Release
-    - uses: softprops/action-gh-release@v1
-    - with:
+      uses: softprops/action-gh-release@v1
+      with:
           files: BL
           
   macOS:
