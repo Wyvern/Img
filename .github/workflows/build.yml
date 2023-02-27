@@ -33,9 +33,9 @@ jobs:
       run: cargo test --release
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/Nightly')
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-          files: |
+        files: |
             target/release/BL
             target/lto/BL
           
@@ -61,9 +61,9 @@ jobs:
       run: cargo test --release
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/Nightly')
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-          files: |
+         files: |
             target/release/BL
             target/lto/BL
       
