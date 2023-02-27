@@ -170,7 +170,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [target.x86_64-apple-darwin]
 
 [target.x86_64-pc-windows-msvc]
-rustflags = ["-Zgcc-ld=link"]
+rustflags = ["-Zgcc-ld"]
 
 [target.debug]
 
