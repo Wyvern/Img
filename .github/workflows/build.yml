@@ -33,11 +33,11 @@ jobs:
       run: cargo test --release
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/Nightly/')
+      if: startsWith(github.ref, 'refs/tags/')
       with:
           files: 
-            target/release/BL
-            target/lto/BL
+            release/BL
+            lto/BL
           
   macOS:
     name: Building on macOS. 
@@ -61,11 +61,11 @@ jobs:
       run: cargo test --release
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/Nightly')
+      if: startsWith(github.ref, 'refs/tags/')
       with:
           files: 
-            target/release/BL
-            target/lto/BL
+            release/BL
+            lto/BL
       
   Windows:
     name: Building on Windows. 
