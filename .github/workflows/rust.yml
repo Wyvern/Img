@@ -29,6 +29,6 @@ jobs:
         lscpu
         #lshw
         free -m
-        hostname -I
+        hostinfo
     - name: Run tests
       run: cargo test --release
