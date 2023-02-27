@@ -26,7 +26,9 @@ jobs:
         time cargo build --release
         time cargo lto
         ls -hlR target/**/BL
-        lscpu -e
+        cat /proc/cpuinfo
+        lscpu
+        lshw
         free -m
     - name: Run tests
       run: cargo test --release
