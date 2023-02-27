@@ -31,7 +31,11 @@ jobs:
         free -m
     - name: Run tests
       run: cargo test --release
-      
+    - name: Release
+    - uses: softprops/action-gh-release@v1
+      with:
+          files: BL
+          
   macOS:
     name: Building on macOS. 
     runs-on: macos-latest
