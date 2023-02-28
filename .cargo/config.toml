@@ -59,10 +59,7 @@ strip = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = [
-    #"-Zpanic-in-drop=abort",
-    #"-Zvirtual-function-elimination","-Clto"
-]
+#rustflags = ["-Zvirtual-function-elimination","-Clto"]
 lto = true
 panic = "abort"
 [profile.lto.build-override]
@@ -72,14 +69,12 @@ inherits = "release"
 
 #src
 [profile.src]
-inherits = "release"
-#rustflags = ["-Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort","-Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem","-Zpanic-in-drop=abort"]
-lto = true
-panic = "abort"
+inherits = "lto"
+rustflags = ["-Zpanic-in-drop=abort"]
 [profile.src.build-override]
-inherits = "release"
+inherits = "lto"
 [profile.src.package."*"]
-inherits = "release"
+inherits = "lto"
 
 #stats
 [profile.stats.build-override]
@@ -100,8 +95,12 @@ inherits = "release"
 rustflags = ["-Zparse-only", "-Zno-analysis", "-Zno-link", "-Zno-codegen"]
 
 [unstable]
-check-cfg = ["names", "values", "features", "output",
-#"cfgs"
+check-cfg = [
+    "names",
+    "values",
+    "features",
+    "output",
+    #"cfgs"
 ]
 avoid-dev-deps = true
 dual-proc-macros = true
@@ -153,7 +152,6 @@ rustflags = [
     "-Zno-jump-tables",
     "-Zterminal-urls",
     "-Zthreads=0",
-    #"-Zlink-directives=yes",
     #"-Ztrait-solver=chalk|next",
 
     "-Aunused",
@@ -161,59 +159,12 @@ rustflags = [
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
-#target="x86_64-apple-darwin"
 
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [target.x86_64-apple-darwin]
-
-[target.x86_64-pc-windows-msvc]
-rustflags = [
-    "-Ctarget-feature=-crt-static",
-    "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
-    "-Coverflow-checks=no",
-    "-Copt-level=s",
-    "-Cno-redzone",
-    #"-Clinker-flavor=lld-link",
-
-    "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-exceptions -fno-backtrace -gz -undefined -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables", #-fuse-ld=lld 
-
-    "-Ztune-cpu=native",
-    "-Zno-profiler-runtime",
-    "-Zthinlto",
-    "-Zplt",
-    "-Zdylib-lto",
-    "-Zno-generate-arange-section",
-    "-Zdep-info-omit-d-target",
-    "-Zpolonius",
-    "-Ztrim-diagnostic-paths",
-    "-Zoom=abort",
-    "-Zthir-unsafeck",
-    "-Zshare-generics",
-    #"-Zgcc-ld=lld",
-    "-Zmerge-functions=trampolines",
-    "-Zpolymorphize",
-    "-Zinline-mir",
-    "-Zinline-in-all-cgus",
-    "-Zmir-opt-level=4",
-    "-Zpacked-bundled-libs",
-    "-Zteach",
-    "-Zmaximal-hir-to-mir-coverage",
-    "-Zno-jump-tables",
-    "-Zterminal-urls",
-    "-Zthreads=0",
-    #"-Zlink-directives=yes",
-    #"-Ztrait-solver=chalk|next",
-
-    "-Aunused",
-    "-Anonstandard_style",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
-]
 
 [target.debug]
 
