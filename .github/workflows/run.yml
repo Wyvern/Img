@@ -25,8 +25,8 @@ jobs:
         time cargo build --release
         time cargo lto
         time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
-        time ./target/lto/BL https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
-        ls -hl ./**/*.jpg
+        time cargo r --profile lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        ls -hl ./*/*.jpg
         lscpu
         #lshw
         free -m
@@ -55,8 +55,8 @@ jobs:
         time cargo build --release
         time cargo lto
         time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
-        time ./target/lto/BL https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
-        ls -hl ./**/*.jpg
+        time cargo r --profile lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        ls -hl ./*/*.jpg
         sw_vers
         hostinfo
         sysctl -a | grep brand
@@ -85,7 +85,7 @@ jobs:
         cargo build --release
         cargo lto
         cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
-        .\target\lto\BL https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        cargo r --profile lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
         dir .\*\*.jpg
         systeminfo
     - name: Run tests
