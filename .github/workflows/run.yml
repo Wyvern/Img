@@ -2,9 +2,9 @@ name: Run
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -25,7 +25,7 @@ jobs:
         time cargo build --release
         time cargo lto
         time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
-        time cargo r --lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        time ./target/lto/BL https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
         ls -hl ./**/*.jpg
         lscpu
         #lshw
@@ -55,7 +55,7 @@ jobs:
         time cargo build --release
         time cargo lto
         time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
-        time cargo r --lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        time ./target/lto/BL https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
         ls -hl ./**/*.jpg
         sw_vers
         hostinfo
@@ -84,8 +84,8 @@ jobs:
         cargo update
         cargo build --release
         cargo lto
-        time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
-        time cargo r --lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
+        .\target\lto\BL https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
         dir .\*\*.jpg
         systeminfo
     - name: Run tests
