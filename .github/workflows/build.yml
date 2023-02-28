@@ -25,6 +25,7 @@ jobs:
         cargo update
         time cargo build --release
         time cargo lto
+        time cargo ls
         ls -hl target/*/BL
         lscpu
         #lshw
@@ -53,6 +54,7 @@ jobs:
         cargo update
         time cargo build --release
         time cargo lto
+        time cargo ls
         ls -hl target/*/BL
         sw_vers
         hostinfo
@@ -81,6 +83,7 @@ jobs:
         cargo update
         cargo build --release
         cargo lto
+        cargo ls
         dir target/*/*.exe
         systeminfo
     - name: Run tests
