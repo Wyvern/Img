@@ -63,9 +63,9 @@ rustflags = ["-Cprefer-dynamic=n","-Zvirtual-function-elimination","-Clto"]
 lto = true
 panic = "abort"
 [profile.lto.build-override]
-inherits = "release"
+inherits = "lto"
 [profile.lto.package."*"]
-inherits = "release"
+inherits = "lto"
 
 #src
 [profile.src]
