@@ -59,7 +59,9 @@ strip = true
 #lto
 [profile.lto]
 inherits = "release"
-#rustflags = ["-Zvirtual-function-elimination","-Clto"]
+rustflags = ["-Cprefer-dynamic=n",
+#"-Zvirtual-function-elimination","-Clto"
+]
 lto = true
 panic = "abort"
 [profile.lto.build-override]
@@ -126,7 +128,7 @@ rustflags = [
     #"-Clinker-flavor=lld-link",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fglobal-isel -fno-exceptions -fno-async-exceptions -fno-backtrace -gz -undefined -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables", #-fuse-ld=lld 
+    "-Clink-args=-fno-ident -fno-exceptions -fno-backtrace -gz -undefined -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables", #-fuse-ld=lld 
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
