@@ -2,9 +2,9 @@ name: Run
 
 on:
   push:
-    #branches: [ "master" ]
+    branches: [ "none" ]
   pull_request:
-    #branches: [ "master" ]
+    branches: [ "none" ]
 
 env:
   CARGO_TERM_COLOR: always
