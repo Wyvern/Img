@@ -121,7 +121,7 @@ codegen-backend = true
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
+    #"-Csymbol-mangling-version=v0",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
