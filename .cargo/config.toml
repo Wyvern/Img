@@ -74,9 +74,9 @@ inherits = "release"
 inherits = "lto"
 rustflags = ["-Zpanic-in-drop=abort"]
 [profile.src.build-override]
-inherits = "release"
+inherits = "src"
 [profile.src.package."*"]
-inherits = "release"
+inherits = "src"
 
 #stats
 [profile.stats.build-override]
