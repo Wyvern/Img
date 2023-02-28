@@ -1,0 +1,92 @@
+name: Run
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  Linux:
+    name: Building on Ubuntu. 
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build release
+      run: |
+        rustup default nightly
+        rustup update
+        rustup component add rust-src clippy
+        cargo update
+        time cargo build --release
+        time cargo lto
+        time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
+        time cargo r --lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        ls -hl ./**/*.jpg
+        lscpu
+        #lshw
+        free -m
+    - name: Run tests
+      run: cargo test --release
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+         files: |
+            target/release/BL
+            target/lto/BL
+          
+  macOS:
+    name: Building on macOS. 
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build release
+      run: |
+        rustup default nightly
+        rustup update
+        rustup component add rust-src clippy
+        cargo update
+        time cargo build --release
+        time cargo lto
+        time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
+        time cargo r --lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        ls -hl ./**/*.jpg
+        sw_vers
+        hostinfo
+        sysctl -a | grep brand
+    - name: Run tests
+      run: cargo test --release
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+         files: |
+            target/release/BL
+            target/lto/BL
+      
+  Windows:
+    name: Building on Windows. 
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build release
+      run: |
+        rustup default nightly
+        rustup update
+        rustup component add rust-src clippy
+        cargo update
+        cargo build --release
+        cargo lto
+        time cargo rr https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6079-tang-an-qi/
+        time cargo r --lto https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-6078-wang-xin-yao/
+        dir .\*\*.jpg
+        systeminfo
+    - name: Run tests
+      run: cargo test --release
