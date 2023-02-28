@@ -25,6 +25,7 @@ jobs:
         cargo update
         time cargo build --release
         time cargo lto
+        cargo clean
         time cargo src x86_64-unknown-linux-gnu
         ls -hl target/*/BL
         lscpu
