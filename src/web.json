@@ -2,7 +2,7 @@
     {
         "Site":"girldreamy.com,girlsweetie.com,girlsexy247.com,bestgirlsexy.com,xasia.pics",
         "Img":"img.aligncenter.size-full",
-        "Src":"data-lazy-src",
+        "Src":"src",
         "Album":"div.elementor-post__text a[href]"
     },
     {
