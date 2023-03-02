@@ -59,7 +59,7 @@ strip = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = ["-Cprefer-dynamic=n",
+rustflags = ["-Cprefer-dynamic=n","-Zforce-unstable-if-unmarked",
 #"-Zvirtual-function-elimination","-Clto"
 ]
 lto = true
@@ -72,7 +72,7 @@ inherits = "release"
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Zpanic-in-drop=abort"]
+rustflags = ["-Zpanic-in-drop=abort","-Zforce-unstable-if-unmarked"]
 [profile.src.build-override]
 inherits = "src"
 [profile.src.package."*"]
