@@ -85,7 +85,8 @@ jobs:
         cargo build --release
         cargo lto
         cargo src x86_64-pc-windows-msvc
-        dir target/*/*/*.exe
+        dir target/*/*.exe
+        dir target/*/src/*.exe
         systeminfo
     - name: Run tests
       run: cargo test --release
