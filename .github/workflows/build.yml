@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "none" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "none" ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -25,7 +25,7 @@ jobs:
         time cargo build --release
         time cargo lto
         time cargo src x86_64-unknown-linux-gnu
-        ls -hl target/*/BL
+        ls -hl target/**/BL
         lscpu
         #lshw
         free -m
@@ -54,7 +54,7 @@ jobs:
         time cargo build --release
         time cargo lto
         time cargo src x86_64-apple-darwin
-        ls -hl target/*/BL
+        ls -hl target/**/BL
         sw_vers
         hostinfo
         sysctl -a | grep brand
