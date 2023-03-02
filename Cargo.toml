@@ -15,3 +15,6 @@ default=["download"]
 [dependencies]
 crabquery = { version = "*", default-features = false}
 json = { version = "*", default-features = false }
+
+[package.metadata.rust-analyzer]
+rustc_private=true
