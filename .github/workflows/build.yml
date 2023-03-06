@@ -37,7 +37,7 @@ jobs:
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
-        repo_token: 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
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/release/BL
         asset_name: Ubuntu
         tag: Nightly
@@ -69,7 +69,7 @@ jobs:
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
-        repo_token: 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
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/release/BL
         asset_name: macOS
         tag: Nightly
