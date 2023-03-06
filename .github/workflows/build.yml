@@ -38,17 +38,11 @@ jobs:
       uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: |
-            target/release/BL
-            target/lto/BL
-            target/x86_64-unknown-linux-gnu/src/BL  
-        asset_name: |
-          BL-rel
-          BL-lto
-          BL-src
+        file: target/**/BL 
         release_name: Ubuntu
         tag: Nightly
         overwrite: true
+        file_glob: true
         body: "Ubuntu Linux binary executable."
           
   macOS:
@@ -77,17 +71,11 @@ jobs:
       uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: |
-          target/release/BL
-          target/lto/BL
-          target/x86_64-apple-darwin/src/BL
-        asset_name: |
-          BL-rel
-          BL-lto
-          BL-src
+        file: target/**/BL
         release_name: macOS
         tag: Nightly
         overwrite: true
+        file_glob: true
         body: "macOS binary executable."
       
   Windows:
@@ -110,3 +98,13 @@ jobs:
         systeminfo
     - name: Run tests
       run: cargo test --release
+    - name: Upload files to a GitHub release
+      uses: svenstaro/upload-release-action@2.5.0
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/**/BL
+        release_name: Windows
+        tag: Nightly
+        overwrite: true
+        file_glob: true
+        body: "Windows binary executable."
