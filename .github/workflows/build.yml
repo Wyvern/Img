@@ -27,7 +27,7 @@ jobs:
         #time cargo build --release
         #time cargo lto
         time cargo src x86_64-unknown-linux-gnu
-        ls -hl target/**/BL
+        #ls -hl target/**/BL
         ls -hl target/*/*/BL
         lscpu
         #lshw
@@ -59,7 +59,7 @@ jobs:
         #time cargo build --release
         #time cargo lto
         time cargo src x86_64-apple-darwin
-        ls -hl target/**/BL
+        #ls -hl target/**/BL
         ls -hl target/*/*/BL
         sw_vers
         hostinfo
@@ -91,7 +91,7 @@ jobs:
         #cargo build --release
         #cargo lto
         cargo src x86_64-pc-windows-msvc
-        dir target/*/*.exe
+        #dir target/*/*.exe
         dir target/x86_64-pc-windows-msvc/*/*.exe
         systeminfo
     - name: Run tests
