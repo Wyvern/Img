@@ -32,13 +32,6 @@ jobs:
         free -m
     - name: Run tests
       run: cargo test --release
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-         files: |
-            target/release/BL
-            target/lto/BL
           
   macOS:
     name: Building on macOS. 
@@ -62,13 +55,6 @@ jobs:
         sysctl -a | grep brand
     - name: Run tests
       run: cargo test --release
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-         files: |
-            target/release/BL
-            target/lto/BL
       
   Windows:
     name: Building on Windows. 
