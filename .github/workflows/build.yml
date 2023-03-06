@@ -38,8 +38,15 @@ jobs:
       uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/release/BL
-        asset_name: Ubuntu
+        file: |
+            target/release/BL
+            target/lto/BL
+            target/x86_64-unknown-linux-gnu/src/BL  
+        asset_name: |
+          BL-rel
+          BL-lto
+          BL-src
+        release_name: Ubuntu
         tag: Nightly
         overwrite: true
         body: "Ubuntu Linux binary executable."
@@ -70,8 +77,15 @@ jobs:
       uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/release/BL
-        asset_name: macOS
+        file: |
+          target/release/BL
+          target/lto/BL
+          target/x86_64-apple-darwin/src/BL
+        asset_name: |
+          BL-rel
+          BL-lto
+          BL-src
+        release_name: macOS
         tag: Nightly
         overwrite: true
         body: "macOS binary executable."
