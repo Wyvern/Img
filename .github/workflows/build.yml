@@ -42,7 +42,6 @@ jobs:
         asset_name: Linux
         tag: Nightly
         overwrite: true
-        file_glob: true
         body: "Ubuntu Linux binary executable."
           
   macOS:
@@ -75,7 +74,6 @@ jobs:
         asset_name: macOS
         tag: Nightly
         overwrite: true
-        file_glob: true
         body: "macOS binary executable."
       
   Windows:
@@ -106,5 +104,4 @@ jobs:
         asset_name: Windows.exe
         tag: Nightly
         overwrite: true
-        file_glob: true
         body: "Windows binary executable."
