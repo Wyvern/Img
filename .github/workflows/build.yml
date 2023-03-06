@@ -39,7 +39,6 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/**/BL 
-        release_name: Ubuntu
         tag: Nightly
         overwrite: true
         file_glob: true
@@ -72,7 +71,6 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/**/BL
-        release_name: macOS
         tag: Nightly
         overwrite: true
         file_glob: true
@@ -102,8 +100,7 @@ jobs:
       uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/**/BL
-        release_name: Windows
+        file: target/*/*.exe
         tag: Nightly
         overwrite: true
         file_glob: true
