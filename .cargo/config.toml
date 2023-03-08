@@ -26,24 +26,28 @@ rustflags = ["-Cprefer-dynamic", "-Cdebug_assertions", "-Zdwarf-version=4"]
 rpath = true
 [profile.dev.package."*"]
 inherits = "release"
-debug=false
+debug = false
 [profile.dev.build-override]
 inherits = "release"
-debug=false
+debug = false
 
 #test
 [profile.test]
 inherits = "dev"
 [profile.test.package."*"]
 inherits = "release"
+debug = false
 [profile.test.build-override]
 inherits = "release"
+debug = false
 
 #bench
 [profile.bench.package."*"]
 inherits = "release"
+debug = false
 [profile.bench.build-override]
 inherits = "release"
+debug = false
 [profile.bench]
 inherits = "dev"
 
@@ -66,10 +70,13 @@ rustflags = ["-Cprefer-dynamic=n",
 ]
 lto = true
 panic = "abort"
+debug = false
 [profile.lto.build-override]
 inherits = "release"
+debug = false
 [profile.lto.package."*"]
 inherits = "release"
+debug = false
 
 #src
 [profile.src]
@@ -78,14 +85,18 @@ rustflags = [#"-Zpanic-in-drop=abort",
 "-Zforce-unstable-if-unmarked"]
 [profile.src.build-override]
 inherits = "src"
+debug = false
 [profile.src.package."*"]
 inherits = "src"
+debug = false
 
 #stats
 [profile.stats.build-override]
 inherits = "release"
+debug = false
 [profile.stats.package."*"]
 inherits = "release"
+debug = false
 [profile.stats]
 inherits = "release"
 rustflags = ["-Zperf-stats", "-Zmeta-stats"]
@@ -93,8 +104,10 @@ rustflags = ["-Zperf-stats", "-Zmeta-stats"]
 #no
 [profile.no.build-override]
 inherits = "no"
+debug = false
 [profile.no.package."*"]
 inherits = "no"
+debug = false
 [profile.no]
 inherits = "release"
 rustflags = ["-Zparse-only", "-Zno-analysis", "-Zno-link", "-Zno-codegen"]
