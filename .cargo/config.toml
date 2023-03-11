@@ -124,11 +124,11 @@ avoid-dev-deps = true
 dual-proc-macros = true
 panic-abort-tests = true
 config-include = true
-sparse-registry = true
 bindeps = true
 binary-dep-depinfo = true
 profile-rustflags = true
 codegen-backend = true
+direct-minimal-versions = true
 #doctest-in-workspace=true
 #doctest-xcompile=true
 
