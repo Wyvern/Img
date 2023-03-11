@@ -18,6 +18,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+       prefix-key:"Nightly"
+       shared-key:"Ubuntu"
+       key:""
     - name: Build release
       run: |
         rustup default nightly
@@ -33,9 +38,7 @@ jobs:
         #lshw
         free -m
     - name: Run tests
-      run: cargo no
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
+      run: cargo version
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
@@ -52,6 +55,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+        prefix-key:"Nightly"
+        shared-key:"macOS"
+        key:""
     - name: Build release
       run: |
         rustup default nightly
@@ -67,9 +75,7 @@ jobs:
         hostinfo
         sysctl -a | grep brand
     - name: Run tests
-      run: cargo no
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
+      run: cargo version
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
@@ -86,6 +92,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+        prefix-key:"Nightly"
+        shared-key:"Windows"
+        key:""
     - name: Build release
       run: |
         rustup default nightly
@@ -99,9 +110,7 @@ jobs:
         dir target/x86_64-pc-windows-msvc/*/*.exe
         systeminfo
     - name: Run tests
-      run: cargo no
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
+      run: cargo version
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
