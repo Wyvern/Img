@@ -37,7 +37,6 @@ jobs:
         #ls -hl target/**/BL
         ls -hl target/*/*/BL
         lscpu
-        #lshw
         free -m
         
     - name: Run tests
