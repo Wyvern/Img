@@ -18,13 +18,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
-    - name: Build release
+
+    - name: Rust Update
       run: |
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
+        
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+      
+    - name: Build Release
+      run: |
         cargo update
         #time cargo build --release
         #time cargo lto
@@ -34,6 +39,7 @@ jobs:
         lscpu
         #lshw
         free -m
+        
     - name: Run tests
       run: cargo version
     - name: Upload files to a GitHub release
@@ -52,13 +58,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
-    - name: Build release
+
+    - name: Rust Update
       run: |
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
+        
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+    
+    - name: Build Release
+      run: |
         cargo update
         #time cargo build --release
         #time cargo lto
@@ -68,6 +79,7 @@ jobs:
         sw_vers
         hostinfo
         sysctl -a | grep brand
+        
     - name: Run tests
       run: cargo version
     - name: Upload files to a GitHub release
@@ -86,13 +98,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
-    - name: Build release
+
+    - name: Rust Update
       run: |
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
+        
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+      
+    - name: Build release
+      run: |
         cargo update
         #cargo build --release
         #cargo lto
@@ -100,6 +117,7 @@ jobs:
         #dir target/*/*.exe
         dir target/x86_64-pc-windows-msvc/*/*.exe
         systeminfo
+        
     - name: Run tests
       run: cargo version
     - name: Upload files to a GitHub release
