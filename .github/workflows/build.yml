@@ -22,7 +22,6 @@ jobs:
       uses: Swatinem/rust-cache@v2.2.1
        prefix-key:"Nightly"
        shared-key:"Ubuntu"
-       key:""
     - name: Build release
       run: |
         rustup default nightly
@@ -59,7 +58,6 @@ jobs:
       uses: Swatinem/rust-cache@v2.2.1
         prefix-key:"Nightly"
         shared-key:"macOS"
-        key:""
     - name: Build release
       run: |
         rustup default nightly
@@ -96,7 +94,6 @@ jobs:
       uses: Swatinem/rust-cache@v2.2.1
         prefix-key:"Nightly"
         shared-key:"Windows"
-        key:""
     - name: Build release
       run: |
         rustup default nightly
