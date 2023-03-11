@@ -23,13 +23,13 @@ jobs:
       run: |
         rustup default nightly
         rustup update
+        rustup component add rust-src clippy
         
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2.2.1
       
     - name: Build Release
       run: |
-        rustup component add rust-src clippy
         cargo update
         #time cargo build --release
         #time cargo lto
