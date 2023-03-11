@@ -16,11 +16,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build release
+    - name: Rust Update
       run: |
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
+        
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+      
+    - name: Build release
+      run: |
         cargo update
         time cargo build --release
         time cargo lto
@@ -39,11 +45,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build release
+    - name: Rust Update
       run: |
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
+        
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+      
+    - name: Build release
+      run: |
         cargo update
         time cargo build --release
         time cargo lto
@@ -62,11 +74,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build release
+    - name: Rust Update
       run: |
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
+        
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
+      
+    - name: Build release
+      run: |
         cargo update
         cargo build --release
         cargo lto
