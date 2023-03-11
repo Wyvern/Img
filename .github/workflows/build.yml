@@ -18,8 +18,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
     - name: Build release
       run: |
         rustup default nightly
@@ -36,6 +34,8 @@ jobs:
         free -m
     - name: Run tests
       run: cargo no
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
@@ -52,8 +52,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
     - name: Build release
       run: |
         rustup default nightly
@@ -70,6 +68,8 @@ jobs:
         sysctl -a | grep brand
     - name: Run tests
       run: cargo no
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
@@ -86,8 +86,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
     - name: Build release
       run: |
         rustup default nightly
@@ -102,6 +100,8 @@ jobs:
         systeminfo
     - name: Run tests
       run: cargo no
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2.2.1
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
