@@ -39,6 +39,7 @@ jobs:
         
     - name: Run tests
       run: cargo version
+      
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
@@ -79,6 +80,7 @@ jobs:
         
     - name: Run tests
       run: cargo version
+      
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
@@ -117,6 +119,7 @@ jobs:
         
     - name: Run tests
       run: cargo version
+      
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.5.0
       with:
