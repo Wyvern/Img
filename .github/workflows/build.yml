@@ -32,7 +32,7 @@ jobs:
         #time cargo build --release
         #time cargo lto
         time cargo src x86_64-unknown-linux-gnu
-        ls -hl target/**/BL
+        ls -hl target/*/BL
         #ls -hl target/*/*/BL
         lscpu
         free -m
@@ -72,7 +72,7 @@ jobs:
         #time cargo build --release
         #time cargo lto
         time cargo src x86_64-apple-darwin
-        ls -hl target/**/BL
+        ls -hl target/*/BL
         #ls -hl target/*/*/BL
         sw_vers
         hostinfo
