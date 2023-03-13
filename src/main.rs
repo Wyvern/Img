@@ -102,7 +102,14 @@ fn parse(addr: &str) -> String {
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.as_str());
     let titles = page.select("title");
-    let title = titles[0].text().expect("NO title text.");
+    let title = titles
+        .first()
+        .unwrap_or_else(|| {
+            println!("Not a valid html page.");
+            process::exit(0);
+        })
+        .text()
+        .expect("NO title text.");
     let mut t = title.trim();
     if t.contains(['-', '_', '|', '–']) {
         t = t[..t.rfind(['-', '_', '|', '–']).unwrap()].trim();
@@ -153,7 +160,7 @@ fn parse(addr: &str) -> String {
     match (hasAlbum, !imgs.is_empty()) {
         (_, true) => {
             for img in imgs {
-                let src = img.attr(src.as_str()).expect("NO img[src] attr found.");
+                let src = img.attr(src.as_str()).expect("Invalid img[src] selector!");
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
@@ -404,17 +411,18 @@ mod tests {
         let res = get_html(addr);
         dbg!(&res);
     }
-    
+
     // https://girldreamy.com/
+
     #[test]
     fn try_it() {
-        let addr = "https://mmm.red/";
+        let addr = "https://bestgirlsexy.com/wp-content/uploads/2023/03/";
         parse(addr);
     }
 
     #[test]
     fn htmlq() {
-        let addr = "https://www.4kup.net/2022/10/xingyan-vol158-liu-yu-er.html";
+        let addr = "https://bestgirlsexy.com/ligui%e4%b8%bd%e6%9f%9c-2023-01-25-xin-xin-and-shio-shio-and-liang-liang/";
         let [_, host] = scheme_host(addr);
         let [img, src, mut next, album] = check_host(&host);
         let html = get_html(addr);

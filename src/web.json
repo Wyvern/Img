@@ -1,8 +1,14 @@
 [
     {
-        "Site":"girldreamy.com,girlsweetie.com,girlsexy247.com,bestgirlsexy.com,xasia.pics",
+        "Site":"girldreamy.com,girlsweetie.com,girlsexy247.com,xasia.pics",
         "Img":"img.aligncenter.size-full",
         "Src":"src",
+        "Album":"div.elementor-post__text a[href]"
+    },
+    {
+        "Site":"bestgirlsexy.com",
+        "Img":"img.aligncenter.size-full",
+        "Src":"data-src",
         "Album":"div.elementor-post__text a[href]"
     },
     {
