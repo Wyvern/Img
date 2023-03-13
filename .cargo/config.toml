@@ -168,7 +168,7 @@ rustflags = [
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
     "-Zterminal-urls",
-    #"-Zthreads=0",
+    "-Zthreads=0",
     #"-Ztrait-solver=chalk|next",
 
     "-Aunused",
