@@ -128,6 +128,7 @@ bindeps = true
 binary-dep-depinfo = true
 profile-rustflags = true
 codegen-backend = true
+gitoxide = { checkout = true, fetch = true, shallow_index = true, shallow_deps = true, internal_use_git2 = true }
 #doctest-in-workspace=true
 #doctest-xcompile=true
 
