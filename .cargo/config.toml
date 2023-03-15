@@ -170,6 +170,7 @@ rustflags = [
     "-Zno-jump-tables",
     "-Zterminal-urls",
     "-Zthreads=0",
+    "-Zlower-impl-trait-in-trait-to-assoc-ty",
     #"-Ztrait-solver=chalk|next",
 
     "-Aunused",
