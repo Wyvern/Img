@@ -56,7 +56,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3.4.0
 
     - name: Rust Update
       run: |
@@ -97,7 +98,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3.4.0
 
     - name: Rust Update
       run: |
