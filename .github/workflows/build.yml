@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3
       
     - name: Rust Update
       run: |
@@ -25,7 +25,7 @@ jobs:
         rustup component add rust-src clippy
         
     - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
+      uses: Swatinem/rust-cache@v2
       
     - name: Build Release
       run: |
@@ -57,7 +57,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3
 
     - name: Rust Update
       run: |
@@ -66,7 +66,7 @@ jobs:
         rustup component add rust-src clippy
         
     - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
+      uses: Swatinem/rust-cache@v2
     
     - name: Build Release
       run: |
@@ -99,7 +99,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3
 
     - name: Rust Update
       run: |
@@ -108,7 +108,7 @@ jobs:
         rustup component add rust-src clippy
         
     - name: Rust Cache
-      uses: Swatinem/rust-cache@v2.2.1
+      uses: Swatinem/rust-cache@v2
       
     - name: Build release
       run: |
