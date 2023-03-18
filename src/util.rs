@@ -1,7 +1,7 @@
 use std::{fmt::*, *};
 
 ///Output dbg!(expr) only in cfg!(test) || cfg!(debug_assertions) context
-pub fn test_dbg<T: Debug>(expr: T) -> T {
+pub fn tdbg<T: Debug>(expr: T) -> T {
     if cfg!(test) || cfg!(debug_assertions) {
         dbg!(expr)
     } else {

@@ -390,7 +390,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         }
     }
 
-    test_dbg(next)
+    tdbg(next)
 }
 
 ///WebSites Json config data
@@ -416,13 +416,13 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://bestgirlsexy.com/wp-content/uploads/2023/03/";
+        let addr = "https://mmm.red/";
         parse(addr);
     }
 
     #[test]
     fn htmlq() {
-        let addr = "https://bestgirlsexy.com/ligui%e4%b8%bd%e6%9f%9c-2023-01-25-xin-xin-and-shio-shio-and-liang-liang/";
+        let addr = "https://bestgirlsexy.com/ligui%e4%b8%bd%e6%9f%9c-2023-02-14-tu-zi/";
         let [_, host] = scheme_host(addr);
         let [img, src, mut next, album] = check_host(&host);
         let html = get_html(addr);
@@ -446,7 +446,7 @@ mod tests {
         let num = page.parse::<u16>().expect("Parse page number failed.");
         (0_u16..=4).map(|i| num - i).for_each(|p| {
             let mut idx = format!("{}{p}", &addr[..=addr.rfind('/').unwrap()]);
-            test_dbg(&idx);
+            tdbg(&idx);
             idx = parse(&idx);
             while !idx.is_empty() {
                 idx = parse(&idx);
