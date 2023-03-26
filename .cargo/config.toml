@@ -81,7 +81,7 @@ debug = false
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Zpanic-in-drop=abort",
+rustflags = [#"-Zpanic-in-drop=abort",
 "-Zforce-unstable-if-unmarked"]
 [profile.src.build-override]
 inherits = "src"
