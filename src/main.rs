@@ -111,9 +111,10 @@ fn parse(addr: &str) -> String {
         .text()
         .expect("NO title text.");
     let mut t = title.trim();
-    if t.contains(['-', '_', '|', '–']) {
-        t = t[..t.rfind(['-', '_', '|', '–']).unwrap()].trim();
-    }
+    // while t.contains(['-', '_', '|', '–']) {
+    //     t = t[..t.rfind(['-', '_', '|', '–']).unwrap()].trim();
+    // }
+    t = t[..t.rfind(['-', '_', '|', '–']).unwrap_or_else(|| t.len())].trim();
     let albums = if album.is_empty() {
         vec![]
     } else {
@@ -141,9 +142,9 @@ fn parse(addr: &str) -> String {
             .trim_end_matches(['-', '_', '|', '–'])
             .trim();
     };
-    if t.contains(['(', ',', '集']) {
-        t = t[..t.rfind(['(', ',', '集']).unwrap()].trim();
-    };
+
+    t = t[..t.rfind(['(', ',', '集']).unwrap_or_else(|| t.len())].trim();
+
     let canonicalize_url = |u: &str| {
         if !u.starts_with("http") {
             if u.starts_with("//") {
@@ -412,7 +413,7 @@ mod tests {
         dbg!(&res);
     }
 
-    // https://girldreamy.com/
+    // https://bestgirlsexy.com/
 
     #[test]
     fn try_it() {
