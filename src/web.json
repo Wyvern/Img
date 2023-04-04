@@ -1,7 +1,7 @@
 [
     {
-        "Site":"girldreamy.com,girlsweetie.com,girlsexy247.com,xasia.pics",
         "Img":"img.aligncenter.size-full",
+        "Site":"girldreamy.com,girlsweetie.com,girlsexy247.com,xasia.pics",
         "Src":"src",
         "Album":"div.elementor-post__text a[href]"
     },
@@ -170,6 +170,27 @@
     {
         "Site":"yaomitao.com",
         "Img":"img.aligncenter",
+        "Src":"src"
+    },
+    {
+        "Site":"meituss.com",
+        "Img":"li figure img",
+        "Src":"data-src"
+    },
+    {
+        "Site":"z227m.cc",
+        "Img":"div#read_tpc img",
+        "Src":"src"
+    },
+    {
+        "Site":"baobua.net",
+        "Img":"img.wp-image",
+        "Src":"src",
+        "Next":"span.page-numbers.current"
+    },
+    {
+        "Site":"sexygirl.cc",
+        "Img":"div.container img",
         "Src":"src"
     }
 ]

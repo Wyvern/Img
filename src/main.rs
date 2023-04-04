@@ -24,10 +24,9 @@ fn scheme_host(addr: &str) -> [String; 2] {
         process::exit(0);
     });
     let scheme = split.0;
-    if scheme.is_empty() || {
-        let lo = scheme.to_lowercase();
-        !(lo == "http" || lo == "https")
-    } {
+    if scheme.is_empty()
+        || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
+    {
         println!("Invalid http(s) protocol.");
         process::exit(0);
     }
@@ -114,7 +113,7 @@ fn parse(addr: &str) -> String {
     // while t.contains(['-', '_', '|', '–']) {
     //     t = t[..t.rfind(['-', '_', '|', '–']).unwrap()].trim();
     // }
-    t = t[..t.rfind(['-', '_', '|', '–']).unwrap_or_else(|| t.len())].trim();
+    t = t[..t.rfind(['-', '_', '|', '–','/']).unwrap_or_else(|| t.len())].trim();
     let albums = if album.is_empty() {
         vec![]
     } else {
@@ -139,7 +138,7 @@ fn parse(addr: &str) -> String {
     if t.to_lowercase().contains("page") {
         t = t[..t.to_lowercase().rfind("page").unwrap()]
             .trim()
-            .trim_end_matches(['-', '_', '|', '–'])
+            .trim_end_matches(['-', '_', '|', '–','/'])
             .trim();
     };
 
@@ -297,8 +296,13 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" {
             let items = element.parent().unwrap().children();
-            let mut tags = items.rsplit(|e| e.tag().unwrap() == "span");
-            let a = tags.next().unwrap();
+            let mut tags = items.split(|e| e.attr("class").unwrap().contains("current"));
+            let a = tags
+                .next_back()
+                .unwrap()
+                .iter()
+                .filter(|e| e.tag().unwrap() == "a")
+                .collect::<Vec<_>>();
             if a.is_empty() {
                 next = String::default();
             } else {
@@ -329,10 +333,10 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             } else {
                 next = s[0].children()[0].attr("href").unwrap()
             }
-        } else {
+        } else if element.tag().unwrap() == "div" && nexts.len() != 2 {
             let item = nexts[nexts.len() - 2..].iter().rfind(|&n| {
                 let mut t = n.text();
-                if t.is_some() && t.clone().unwrap().is_empty() {
+                if t.is_some() && t.as_deref().unwrap().is_empty() {
                     t.take();
                 }
                 match t {
@@ -368,6 +372,21 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     .expect("NO [href] attr found in <next> link."),
                 None => String::default(),
             };
+        } else {
+            let pos = nexts.iter().position(|e| {
+                cur.trim_end_matches("/")
+                    .ends_with(&e.attr("href").unwrap().trim())
+            });
+            match pos {
+                Some(p) => {
+                    if p < nexts.len() - 1 {
+                        next = nexts[p + 1].attr("href").unwrap()
+                    } else {
+                        next = String::default()
+                    }
+                }
+                None => next = String::default(),
+            }
         }
     }
     // if !next.is_empty() && !next[next.rfind('/').unwrap()..].contains(['_', '-', '?']) {
@@ -417,13 +436,13 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://mmm.red/";
+        let addr = "https://sexygirl.cc/a/14252602.html";
         parse(addr);
     }
 
     #[test]
     fn htmlq() {
-        let addr = "https://bestgirlsexy.com/ligui%e4%b8%bd%e6%9f%9c-2023-02-14-tu-zi/";
+        let addr = "https://www.meituss.com/418068/";
         let [_, host] = scheme_host(addr);
         let [img, src, mut next, album] = check_host(&host);
         let html = get_html(addr);
