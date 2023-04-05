@@ -90,8 +90,12 @@ strip = true
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [#"-Zpanic-in-drop=abort",
+rustflags = ["-Zpanic-in-drop=abort",
 "-Zforce-unstable-if-unmarked"]
+lto = true
+panic = "abort"
+debug = false
+strip = true
 [profile.src.build-override]
 inherits = "src"
 debug = false
