@@ -27,9 +27,11 @@ rpath = true
 [profile.dev.package."*"]
 inherits = "release"
 debug = false
+strip = true
 [profile.dev.build-override]
 inherits = "release"
 debug = false
+strip = true
 
 #test
 [profile.test]
@@ -37,17 +39,21 @@ inherits = "dev"
 [profile.test.package."*"]
 inherits = "release"
 debug = false
+strip = true
 [profile.test.build-override]
 inherits = "release"
 debug = false
+strip = true
 
 #bench
 [profile.bench.package."*"]
 inherits = "release"
 debug = false
+strip = true
 [profile.bench.build-override]
 inherits = "release"
 debug = false
+strip = true
 [profile.bench]
 inherits = "dev"
 
@@ -71,12 +77,15 @@ rustflags = ["-Cprefer-dynamic=n",
 lto = true
 panic = "abort"
 debug = false
+strip = true
 [profile.lto.build-override]
 inherits = "release"
 debug = false
+strip = true
 [profile.lto.package."*"]
 inherits = "release"
 debug = false
+strip = true
 
 #src
 [profile.src]
@@ -86,9 +95,11 @@ rustflags = [#"-Zpanic-in-drop=abort",
 [profile.src.build-override]
 inherits = "src"
 debug = false
+strip = true
 [profile.src.package."*"]
 inherits = "src"
 debug = false
+strip = true
 
 #stats
 [profile.stats.build-override]
