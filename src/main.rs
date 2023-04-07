@@ -4,6 +4,7 @@ mod util;
 use util::*;
 
 fn main() {
+    tdbg(123);
     let arg = env::args().nth(1).unwrap_or_else(|| {
         println!("Please input URL argument..");
         process::exit(0);
@@ -113,7 +114,10 @@ fn parse(addr: &str) -> String {
     // while t.contains(['-', '_', '|', '–']) {
     //     t = t[..t.rfind(['-', '_', '|', '–']).unwrap()].trim();
     // }
-    t = t[..t.rfind(['-', '_', '|', '–','/']).unwrap_or_else(|| t.len())].trim();
+    t = t[..t
+        .rfind(['-', '_', '|', '–', '/'])
+        .unwrap_or_else(|| t.len())]
+        .trim();
     let albums = if album.is_empty() {
         vec![]
     } else {
@@ -138,7 +142,7 @@ fn parse(addr: &str) -> String {
     if t.to_lowercase().contains("page") {
         t = t[..t.to_lowercase().rfind("page").unwrap()]
             .trim()
-            .trim_end_matches(['-', '_', '|', '–','/'])
+            .trim_end_matches(['-', '_', '|', '–', '/'])
             .trim();
     };
 
@@ -333,31 +337,34 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             } else {
                 next = s[0].children()[0].attr("href").unwrap()
             }
-        } else if element.tag().unwrap() == "div" && nexts.len() != 2 {
+        } else {
             let item = nexts[nexts.len() - 2..].iter().rfind(|&n| {
                 let mut t = n.text();
                 if t.is_some() && t.as_deref().unwrap().is_empty() {
                     t.take();
                 }
                 match t {
-                    Some(text) => {
-                        let l = text.to_lowercase();
-                        l.contains('下') || l.contains("next") || (n.attr("target").is_some())
+                    Some(mut text) => {
+                        text.make_ascii_lowercase();
+                        text.contains('下') || text.contains("next") || (n.attr("target").is_some())
                     }
                     None => {
                         t = n.attr("title");
                         match t {
-                            Some(title) => {
-                                let l = title.to_lowercase();
-                                l.contains('下') || l.contains("next")
+                            Some(mut title) => {
+                                title.make_ascii_lowercase();
+                                title.contains('下') || title.contains("next")
                             }
                             None => {
                                 let span = n.select("span.currenttext");
+                                if span.is_empty() {
+                                    return false;
+                                }
                                 t = span[0].text();
                                 match t {
-                                    Some(text) => {
-                                        let l = text.to_lowercase();
-                                        l.contains('下') || l.contains("next")
+                                    Some(mut text) => {
+                                        text.make_ascii_lowercase();
+                                        text.contains('下') || text.contains("next")
                                     }
                                     None => false,
                                 }
@@ -370,23 +377,23 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 Some(v) => v
                     .attr("href")
                     .expect("NO [href] attr found in <next> link."),
-                None => String::default(),
-            };
-        } else {
-            let pos = nexts.iter().position(|e| {
-                cur.trim_end_matches("/")
-                    .ends_with(&e.attr("href").unwrap().trim())
-            });
-            match pos {
-                Some(p) => {
-                    if p < nexts.len() - 1 {
-                        next = nexts[p + 1].attr("href").unwrap()
-                    } else {
-                        next = String::default()
+                None => {
+                    let pos = nexts.iter().position(|e| {
+                        cur.trim_end_matches("/")
+                            .ends_with(&e.attr("href").unwrap().trim())
+                    });
+                    match pos {
+                        Some(p) => {
+                            if p < nexts.len() - 1 {
+                                nexts[p + 1].attr("href").unwrap()
+                            } else {
+                                String::default()
+                            }
+                        }
+                        None => String::default(),
                     }
                 }
-                None => next = String::default(),
-            }
+            };
         }
     }
     // if !next.is_empty() && !next[next.rfind('/').unwrap()..].contains(['_', '-', '?']) {
@@ -436,7 +443,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://sexygirl.cc/a/14252602.html";
+        let addr = "https://girldreamy.com/";
         parse(addr);
     }
 

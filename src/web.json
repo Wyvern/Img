@@ -162,7 +162,7 @@
         "Album":"a.item-link div"
     },
     {
-        "Site":"xrmn01.cc",
+        "Site":"xrmn01.cc,xiuren5.com",
         "Img":"div.content img",
         "Src":"src",
         "Next":"div.page a[href]"
@@ -192,5 +192,11 @@
         "Site":"sexygirl.cc",
         "Img":"div.container img",
         "Src":"src"
+    },
+    {
+        "Site":"tuxiuren.com",
+        "Img":"div.entry-wrapper img",
+        "Src":"src",
+        "Next":"div.fenye a[href]"
     }
 ]
