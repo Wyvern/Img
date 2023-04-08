@@ -30,7 +30,7 @@
         "Src":"href"
     },
     {
-        "Site":"xgmn01.com",
+        "Site":"xgmn01.com,xgmn02.com",
         "Img":"article.article-content img",
         "Src":"src",
         "Next":"div.pagination a[href]"
@@ -162,7 +162,7 @@
         "Album":"a.item-link div"
     },
     {
-        "Site":"xrmn01.cc,xiuren5.com",
+        "Site":"xrmn01.cc,xrmnw.xyz,xiuren5.com",
         "Img":"div.content img",
         "Src":"src",
         "Next":"div.page a[href]"

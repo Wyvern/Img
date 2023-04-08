@@ -114,10 +114,7 @@ fn parse(addr: &str) -> String {
     // while t.contains(['-', '_', '|', '–']) {
     //     t = t[..t.rfind(['-', '_', '|', '–']).unwrap()].trim();
     // }
-    t = t[..t
-        .rfind(['-', '_', '|', '–', '/'])
-        .unwrap_or(t.len())]
-        .trim();
+    t = t[..t.rfind(['-', '_', '|', '–', '/']).unwrap_or(t.len())].trim();
     let albums = if album.is_empty() {
         vec![]
     } else {
@@ -307,11 +304,10 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 .iter()
                 .filter(|e| e.tag().unwrap() == "a")
                 .collect::<Vec<_>>();
-            if a.is_empty() {
-                next = String::default();
-            } else {
-                next = a[0].attr("href").unwrap();
-            }
+
+            next = a
+                .first()
+                .map_or(String::default(), |f| f.attr("href").unwrap());
         } else {
             next = nexts[0].attr("href").unwrap();
         }
@@ -320,25 +316,20 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         if element.tag().unwrap() == "div" && nexts.len() == 2 {
             let tags = element.children();
             let mut rest = tags.split(|tag| {
-                if tag.children().is_empty() {
+                tag.children().first().map_or(
                     tag.tag().unwrap() == "span"
-                } else {
-                    tag.children()[0]
-                        .attr("class")
-                        .unwrap()
-                        .contains("is-current")
-                }
+                        || tag.attr("class").is_some_and(|c| c.contains("current")),
+                    |f| f.attr("class").unwrap().contains("current"),
+                )
             });
             let s = rest.next_back().unwrap();
-            if s.is_empty() {
-                next = String::default()
-            } else if s[0].children().is_empty() {
-                next = s[0].attr("href").unwrap()
-            } else {
-                next = s[0].children()[0].attr("href").unwrap()
-            }
+            next = s.first().map_or(String::default(), |f| {
+                f.children()
+                    .first()
+                    .map_or(f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
+            });
         } else {
-            let item = nexts[nexts.len() - 2..].iter().rfind(|&n| {
+            let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
                 let mut t = n.text();
                 if t.is_some() && t.as_deref().unwrap().is_empty() {
                     t.take();
@@ -373,15 +364,14 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     }
                 }
             });
-            next = match item {
+            next = match last2 {
                 Some(v) => v
                     .attr("href")
                     .expect("NO [href] attr found in <next> link."),
                 None => {
-                    let pos = nexts.iter().position(|e| {
-                        cur.trim_end_matches('/')
-                            .ends_with(&e.attr("href").unwrap().trim())
-                    });
+                    let pos = nexts
+                        .iter()
+                        .rposition(|e| cur.trim().ends_with(&e.attr("href").unwrap().trim()));
                     match pos {
                         Some(p) => {
                             if p < nexts.len() - 1 {
@@ -443,7 +433,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://girldreamy.com/";
+        let addr = "https://www.xiuren5.com/XiuRen/12700_27.html";
         parse(addr);
     }
 
