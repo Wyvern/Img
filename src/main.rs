@@ -116,7 +116,7 @@ fn parse(addr: &str) -> String {
     // }
     t = t[..t
         .rfind(['-', '_', '|', '–', '/'])
-        .unwrap_or_else(|| t.len())]
+        .unwrap_or(t.len())]
         .trim();
     let albums = if album.is_empty() {
         vec![]
@@ -131,10 +131,10 @@ fn parse(addr: &str) -> String {
             imgs.len(),
             t
         ),
-        (true, false) => println!("Totally found {} 🗺️  in 📝: {} ", albums.len(), t),
-        (false, true) => println!("Totally found {} 🏞️  in 📝: {} ", imgs.len(), t),
+        (true, false) => println!("Totally found {} 🗺️  in 📄: {} ", albums.len(), t),
+        (false, true) => println!("Totally found {} 🏞️  in 📄: {} ", imgs.len(), t),
         (false, false) => {
-            println!("∅ 🏞️  found in 📝: {t}");
+            println!("∅ 🏞️  found in 📄: {t}");
             process::exit(0);
         }
     }
@@ -146,7 +146,7 @@ fn parse(addr: &str) -> String {
             .trim();
     };
 
-    t = t[..t.rfind(['(', ',', '集']).unwrap_or_else(|| t.len())].trim();
+    t = t[..t.rfind(['(', ',', '集']).unwrap_or(t.len())].trim();
 
     let canonicalize_url = |u: &str| {
         if !u.starts_with("http") {
@@ -379,7 +379,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     .expect("NO [href] attr found in <next> link."),
                 None => {
                     let pos = nexts.iter().position(|e| {
-                        cur.trim_end_matches("/")
+                        cur.trim_end_matches('/')
                             .ends_with(&e.attr("href").unwrap().trim())
                     });
                     match pos {
