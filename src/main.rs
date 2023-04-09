@@ -326,7 +326,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             next = s.first().map_or(String::default(), |f| {
                 f.children()
                     .first()
-                    .map_or(f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
+                    .map_or_else(|| f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
             });
         } else {
             let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
@@ -433,7 +433,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.xiuren5.com/XiuRen/12700_27.html";
+        let addr = "https://mrcong.com/xiaoyu-vol-965-yang-chen-chen-yangchenchenyome-92-photos/9";
         parse(addr);
     }
 

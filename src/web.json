@@ -116,7 +116,7 @@
         "Src":"href"
     },
     {
-        "Site":"buondua.com",
+        "Site":"buondua.com,xiutaku.com",
         "Img":"div.article-fulltext img",
         "Src":"src",
         "Next":"div.pagination-list"
