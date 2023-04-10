@@ -19,7 +19,7 @@ fn main() {
 }
 
 ///Get scheme and host info from valid url string
-fn scheme_host(addr: &str) -> [String; 2] {
+fn scheme_host(addr: &str) -> [&str; 2] {
     let split = addr.split_once("://").unwrap_or_else(|| {
         println!("Invalid URL address.");
         process::exit(0);
@@ -37,8 +37,7 @@ fn scheme_host(addr: &str) -> [String; 2] {
         println!("Invalid host info.");
         process::exit(0);
     }
-
-    [scheme.to_owned(), host.to_owned()]
+    [scheme, host]
 }
 
 ///Check host info and Generate img/src/next selector data
@@ -71,11 +70,12 @@ fn check_host(host: &str) -> [String; 4] {
 fn get_html(addr: &str) -> String {
     let [_, host] = scheme_host(addr);
     check_host(&host);
+
     let out = process::Command::new("curl")
         .args([
             addr,
             "-e",
-            host.as_str(),
+            host,
             "-A",
             "Mozilla Firefox",
             "-s",
@@ -123,13 +123,13 @@ fn parse(addr: &str) -> String {
     let hasAlbum = !album.is_empty() && !albums.is_empty();
     match (hasAlbum, !imgs.is_empty()) {
         (true, true) => println!(
-            "Totally found {} 🗺️  and {} 🏞️  in 📝: {} ",
+            "Totally found {} 📸 and {} 🏞️ in 📄: {} ",
             albums.len(),
             imgs.len(),
             t
         ),
-        (true, false) => println!("Totally found {} 🗺️  in 📄: {} ", albums.len(), t),
-        (false, true) => println!("Totally found {} 🏞️  in 📄: {} ", imgs.len(), t),
+        (true, false) => println!("Totally found {} 📸 in 📄: {} ", albums.len(), t),
+        (false, true) => println!("Totally found {} 🏞️ in 📄: {} ", imgs.len(), t),
         (false, false) => {
             println!("∅ 🏞️  found in 📄: {t}");
             process::exit(0);
