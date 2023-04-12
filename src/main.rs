@@ -69,7 +69,7 @@ fn check_host(host: &str) -> [String; 4] {
 ///Fetch web page generate html content
 fn get_html(addr: &str) -> String {
     let [_, host] = scheme_host(addr);
-    check_host(&host);
+    check_host(host);
 
     let out = process::Command::new("curl")
         .args([
@@ -97,7 +97,7 @@ fn get_html(addr: &str) -> String {
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
     let [scheme, host] = scheme_host(addr);
-    let [img, src, mut next, album] = check_host(&host);
+    let [img, src, mut next, album] = check_host(host);
     let html = get_html(addr);
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.as_str());
@@ -123,7 +123,7 @@ fn parse(addr: &str) -> String {
     let hasAlbum = !album.is_empty() && !albums.is_empty();
     match (hasAlbum, !imgs.is_empty()) {
         (true, true) => println!(
-            "Totally found {} 📸 and {} 🏞️ in 📄: {} ",
+            "Totally found {} 📸 and {} 🏞️  in 📄: {} ",
             albums.len(),
             imgs.len(),
             t
@@ -433,7 +433,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://mrcong.com/xiaoyu-vol-965-yang-chen-chen-yangchenchenyome-92-photos/9";
+        let addr = "https://mmm.red";
         parse(addr);
     }
 
@@ -441,7 +441,7 @@ mod tests {
     fn htmlq() {
         let addr = "https://www.meituss.com/418068/";
         let [_, host] = scheme_host(addr);
-        let [img, src, mut next, album] = check_host(&host);
+        let [img, src, mut next, album] = check_host(host);
         let html = get_html(addr);
         use process::*;
         let mut cmd = Command::new("htmlq")
