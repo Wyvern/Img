@@ -198,5 +198,11 @@
         "Img":"div.entry-wrapper img",
         "Src":"src",
         "Next":"div.fenye a[href]"
+    },
+    {
+        "Site":"ligui.org",
+        "Img":"div.info-imtg-box img",
+        "Src":"src",
+        "Next":"div.pagebar a[href]"
     }
 ]

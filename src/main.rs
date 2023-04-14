@@ -111,10 +111,7 @@ fn parse(addr: &str) -> String {
         .text()
         .expect("NO title text.");
     let mut t = title.trim();
-    // while t.contains(['-', '_', '|', '–']) {
-    //     t = t[..t.rfind(['-', '_', '|', '–']).unwrap()].trim();
-    // }
-    t = t[..t.rfind(['-', '_', '|', '–', '/']).unwrap_or(t.len())].trim();
+    t = t[..t.find(['-', '_', '|', '–', '/']).unwrap_or(t.len())].trim();
     let albums = if album.is_empty() {
         vec![]
     } else {
@@ -143,7 +140,7 @@ fn parse(addr: &str) -> String {
             .trim();
     };
 
-    t = t[..t.rfind(['(', ',', '集']).unwrap_or(t.len())].trim();
+    t = t[..t.rfind(['(', ',','第', '集']).unwrap_or(t.len())].trim();
 
     let canonicalize_url = |u: &str| {
         if !u.starts_with("http") {
@@ -433,7 +430,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://mmm.red";
+        let addr = "https://www.ligui.org/post/8717.html?page=62";
         parse(addr);
     }
 
