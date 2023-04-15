@@ -11,7 +11,7 @@ pub fn tdbg<T: Debug>(expr: T) -> T {
 
 #[macro_export]
 macro_rules! demo {
-    ([$attr:meta] $pub:vis & $lt:lifetime $name:ident:$type:ty = $l:literal | $e:expr , $s:stmt ; $pat:pat => $b:block | $p:path | $i:item | $t:tt ) => {};
+    ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat_param => $b:block | $p:path | $i:item | $t:tt ) => {$pat:pat $pat:pat_param};
 }
 
 macro_rules! impl_ref_elements {

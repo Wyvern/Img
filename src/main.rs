@@ -72,15 +72,7 @@ fn get_html(addr: &str) -> String {
     check_host(host);
 
     let out = process::Command::new("curl")
-        .args([
-            addr,
-            "-e",
-            host,
-            "-A",
-            "Mozilla Firefox",
-            "-s",
-            "-L",
-        ])
+        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
         .unwrap_or_else(|e| {
             println!("{e}");
@@ -111,7 +103,11 @@ fn parse(addr: &str) -> String {
         .text()
         .expect("NO title text.");
     let mut t = title.trim();
-    t = t[..t.find(['-', '_', '|', '–', '/']).unwrap_or(t.len())].trim();
+
+    (0..2).for_each(|_| {
+        t = t[..t.rfind(['-', '_', '|', '–', '/']).unwrap_or(t.len())].trim();
+    });
+
     let albums = if album.is_empty() {
         vec![]
     } else {
@@ -125,8 +121,8 @@ fn parse(addr: &str) -> String {
             imgs.len(),
             t
         ),
-        (true, false) => println!("Totally found {} 📸 in 📄: {} ", albums.len(), t),
-        (false, true) => println!("Totally found {} 🏞️ in 📄: {} ", imgs.len(), t),
+        (true, false) => println!("Totally found {} 📸  in 📄: {} ", albums.len(), t),
+        (false, true) => println!("Totally found {} 🏞️  in 📄: {} ", imgs.len(), t),
         (false, false) => {
             println!("∅ 🏞️  found in 📄: {t}");
             process::exit(0);
@@ -140,7 +136,7 @@ fn parse(addr: &str) -> String {
             .trim();
     };
 
-    t = t[..t.rfind(['(', ',','第', '集']).unwrap_or(t.len())].trim();
+    t = t[..t.rfind(['(', ',', '第', '集']).unwrap_or(t.len())].trim();
 
     let canonicalize_url = |u: &str| {
         if !u.starts_with("http") {
@@ -430,7 +426,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.ligui.org/post/8717.html?page=62";
+        let addr = "https://mmm.red/art/18906";
         parse(addr);
     }
 
