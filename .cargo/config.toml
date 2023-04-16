@@ -99,7 +99,7 @@ strip = true
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [#"-Zpanic-in-drop=abort",
+rustflags = ["-Zpanic-in-drop=abort",
 "-Zforce-unstable-if-unmarked"]
 lto = true
 panic = "abort"
@@ -176,28 +176,7 @@ rustflags = [
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
     "-Zthinlto",
-    "-Zplt",
-    "-Zdylib-lto",
-    "-Zno-generate-arange-section",
-    "-Zdep-info-omit-d-target",
-    "-Zpolonius",
-    "-Ztrim-diagnostic-paths",
-    "-Zoom=abort",
-    "-Zthir-unsafeck",
-    "-Zshare-generics",
-    "-Zgcc-ld=lld",
-    "-Zmerge-functions=trampolines",
-    #"-Zpolymorphize",
-    "-Zinline-mir",
-    "-Zinline-in-all-cgus",
-    "-Zmir-opt-level=4",
-    "-Zpacked-bundled-libs",
-    "-Zteach",
-    "-Zmaximal-hir-to-mir-coverage",
-    "-Zno-jump-tables",
-    "-Zterminal-urls",
-    "-Zthreads=0",
-    "-Zlower-impl-trait-in-trait-to-assoc-ty",
+    
     #"-Ztrait-solver=chalk|next",
 
     "-Aunused",
