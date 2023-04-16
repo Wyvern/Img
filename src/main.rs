@@ -128,13 +128,16 @@ fn parse(addr: &str) -> String {
             process::exit(0);
         }
     }
-
-    if t.to_lowercase().contains("page") {
-        t = t[..t.to_lowercase().rfind("page").unwrap()]
-            .trim()
-            .trim_end_matches(['-', '_', '|', '–', '/'])
-            .trim();
-    };
+    
+    #[cfg(any())]
+    {
+        if t.to_lowercase().contains("page") {
+            t = t[..t.to_lowercase().rfind("page").unwrap()]
+                .trim()
+                .trim_end_matches(['-', '_', '|', '–', '/'])
+                .trim();
+        }
+    }
 
     t = t[..t.rfind(['(', ',', '第', '集']).unwrap_or(t.len())].trim();
 
@@ -426,7 +429,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://mmm.red/art/18906";
+        let addr = "https://www.xiuren5.com/XiuRen/12799.html";
         parse(addr);
     }
 
