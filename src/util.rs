@@ -14,6 +14,24 @@ macro_rules! demo {
     ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat_param => $b:block | $p:path | $i:item | $t:tt ) => {$pat:pat $pat:pat_param};
 }
 
+#[macro_export]
+macro_rules! tdbg {
+    ($e:expr $(,)?) => {
+        if cfg!(test) || cfg!(debug_assertions) {
+            dbg!($e)
+        } else {
+            $e
+        }
+    };
+    ($($e:expr),+ $(,)?) => {
+        if cfg!(test) || cfg!(debug_assertions) {
+            ($($crate::dbg!($e)),+,)
+        } else {
+            ($($e),+,)
+        }
+    };
+}
+
 macro_rules! impl_ref_elements {
     () => {};
     ($T0:ident $($T:ident)*) => {

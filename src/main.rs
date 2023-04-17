@@ -4,7 +4,6 @@ mod util;
 use util::*;
 
 fn main() {
-    tdbg(123);
     let arg = env::args().nth(1).unwrap_or_else(|| {
         println!("Please input URL argument..");
         process::exit(0);
@@ -162,6 +161,7 @@ fn parse(addr: &str) -> String {
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
                 let file = canonicalize_url(src);
+                //tdbg!(&file);
                 download(t, &file);
             }
         }
@@ -189,7 +189,7 @@ fn parse(addr: &str) -> String {
                     use io::*;
                     let mut stdin = io::stdin();
                     let mut stdout = io::stdout();
-                    let mut t = alb.text().expect("NO Album title found.");
+                    let mut t = alb.text().expect("NO Album's title found.");
                     writeln!(
                         stdout,
                         "Do you want to download Album <{}/{}>: {}?",
@@ -215,7 +215,7 @@ fn parse(addr: &str) -> String {
                             parseAlbum()
                         }
                         _ => {
-                            println!("Cancel all albums download.");
+                            println!("Canceled all albums download.");
                             break;
                         }
                     }
@@ -249,7 +249,7 @@ fn download(dir: &str, src: &str) {
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
         let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
         let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -L -s");
-        //dbg!(&curl);
+        //tdbg!(&curl);
         if (dir.exists() && !dir.join(name).exists()) {
             #[cfg(feature = "curl")]
             process::Command::new("curl")
@@ -403,7 +403,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         }
     }
 
-    tdbg(next)
+    tdbg!(next)
 }
 
 ///WebSites Json config data
@@ -429,7 +429,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.xiuren5.com/XiuRen/12799.html";
+        let addr = "https://www.xiuren5.com/XiuRen/12808_26.html";
         parse(addr);
     }
 
@@ -459,7 +459,7 @@ mod tests {
         let num = page.parse::<u16>().expect("Parse page number failed.");
         (0_u16..=4).map(|i| num - i).for_each(|p| {
             let mut idx = format!("{}{p}", &addr[..=addr.rfind('/').unwrap()]);
-            tdbg(&idx);
+            tdbg!(&idx);
             idx = parse(&idx);
             while !idx.is_empty() {
                 idx = parse(&idx);

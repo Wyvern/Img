@@ -22,16 +22,14 @@ vcs = "none"
 
 #dev
 [profile.dev]
-rustflags = ["-Cprefer-dynamic", "-Zdwarf-version=4"]
+rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions", "-Zdwarf-version=4"]
 rpath = true
 [profile.dev.package."*"]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 [profile.dev.build-override]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 
@@ -40,24 +38,20 @@ strip = true
 inherits = "dev"
 [profile.test.package."*"]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 [profile.test.build-override]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 
 #bench
 [profile.bench.package."*"]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 [profile.bench.build-override]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 [profile.bench]
@@ -77,43 +71,39 @@ strip = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = ["-Cprefer-dynamic=n",
-#"-Zvirtual-function-elimination","-Clto"
+rustflags = [
+    "-Cprefer-dynamic=n",
+    #"-Zvirtual-function-elimination","-Clto"
 ]
 lto = true
 panic = "abort"
-debug-assertions = false
 debug = false
 strip = true
 [profile.lto.build-override]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 [profile.lto.package."*"]
 inherits = "release"
-debug-assertions = false
 debug = false
 strip = true
 
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [#"-Zpanic-in-drop=abort",
-"-Zforce-unstable-if-unmarked"]
+rustflags = [ #"-Zpanic-in-drop=abort",
+    "-Zforce-unstable-if-unmarked",
+]
 lto = true
 panic = "abort"
-debug-assertions = false
 debug = false
 strip = true
 [profile.src.build-override]
 inherits = "src"
-debug-assertions = false
 debug = false
 strip = true
 [profile.src.package."*"]
 inherits = "src"
-debug-assertions = false
 debug = false
 strip = true
 
