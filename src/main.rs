@@ -138,7 +138,7 @@ fn parse(addr: &str) -> String {
         }
     }
 
-    t = t[..t.rfind(['(', ',', '第', '集']).unwrap_or(t.len())].trim();
+    t = t[..t.rfind(['(', ',', '第']).unwrap_or(t.len())].trim();
 
     let canonicalize_url = |u: &str| {
         if !u.starts_with("http") {
@@ -416,6 +416,8 @@ fn website() -> json::JsonValue {
 
 #[cfg(test)]
 mod tests {
+    use std::borrow::Borrow;
+
     use super::*;
 
     #[test]
