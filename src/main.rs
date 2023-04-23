@@ -127,7 +127,7 @@ fn parse(addr: &str) -> String {
             process::exit(0);
         }
     }
-    
+
     #[cfg(any())]
     {
         if t.to_lowercase().contains("page") {
@@ -293,7 +293,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" {
             let items = element.parent().unwrap().children();
-            let mut tags = items.split(|e| e.attr("class").unwrap().contains("current"));
+
+            let mut tags = items.split(|e| e.attr("class").map_or(true, |c| c.contains("current")));
             let a = tags
                 .next_back()
                 .unwrap()
@@ -416,8 +417,6 @@ fn website() -> json::JsonValue {
 
 #[cfg(test)]
 mod tests {
-    use std::borrow::Borrow;
-
     use super::*;
 
     #[test]
@@ -431,7 +430,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.xiuren5.com/XiuRen/12808_26.html";
+        let addr = "https://www.xiuren5.vip/XiuRen/6730_14.html";
         parse(addr);
     }
 

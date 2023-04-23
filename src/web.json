@@ -162,7 +162,7 @@
         "Album":"a.item-link div"
     },
     {
-        "Site":"xrmn01.cc,xrmnw.xyz,xiuren5.com",
+        "Site":"xrmn01.cc,xrmnw.xyz,xiuren5.com,xiuren5.vip",
         "Img":"div.content img",
         "Src":"src",
         "Next":"div.page a[href]"
@@ -204,5 +204,17 @@
         "Img":"div.info-imtg-box img",
         "Src":"src",
         "Next":"div.pagebar a[href]"
+    },
+    {
+        "Site":"nsphb.com",
+        "Img":"div.article-content img",
+        "Src":"data-src",
+        "Next":"span.current"
+    },
+    {
+        "Site":"jaoren.com",
+        "Img":"div#post_content img",
+        "Src":"src",
+        "Next":"div.pagelist span"
     }
 ]
