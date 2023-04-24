@@ -53,7 +53,7 @@ jobs:
           
   macOS:
     name: Building on macOS. 
-    runs-on: macos-latest,
+    runs-on: macos-latest-xl
 
     steps:
     - name: Checkout
