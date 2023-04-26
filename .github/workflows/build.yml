@@ -62,7 +62,7 @@ jobs:
 
     - name: Rust Update
       run: |
-        brew uninstall rust && brew autoremove
+        brew uninstall rustup && brew autoremove
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
         rustup component add rust-src clippy
         
