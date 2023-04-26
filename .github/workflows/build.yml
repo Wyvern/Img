@@ -20,6 +20,7 @@ jobs:
       
     - name: Rust Update
       run: |
+        rustup self update
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
@@ -61,6 +62,7 @@ jobs:
 
     - name: Rust Update
       run: |
+        rustup self update
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
@@ -103,6 +105,7 @@ jobs:
 
     - name: Rust Update
       run: |
+        rustup self update
         rustup default nightly
         rustup update
         rustup component add rust-src clippy
