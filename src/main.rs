@@ -120,7 +120,7 @@ fn parse(addr: &str) -> String {
             imgs.len(),
             t
         ),
-        (true, false) => println!("Totally found {} 📸  in 📄: {} ", albums.len(), t),
+        (true, false) => println!("Totally found {} 📸 in 📄: {} ", albums.len(), t),
         (false, true) => println!("Totally found {} 🏞️  in 📄: {} ", imgs.len(), t),
         (false, false) => {
             println!("∅ 🏞️  found in 📄: {t}");
@@ -430,7 +430,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.xiuren5.vip/XiuRen/6730_14.html";
+        let addr = "https://bestgirlsexy.com/";
         parse(addr);
     }
 
