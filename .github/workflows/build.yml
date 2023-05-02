@@ -20,9 +20,9 @@ jobs:
       
     - name: Rust Update
       run: |
-        rustup self update
         rustup default nightly
         rustup update
+        rustup target add aarch64-unknown-linux-gnu
         rustup component add rust-src
         
     - name: Rust Cache
@@ -34,6 +34,7 @@ jobs:
         #time cargo build --release
         #time cargo lto
         time cargo src x86_64-unknown-linux-gnu
+        time cargo src aarch64-unknown-linux-gnu
         #ls -hl target/*/BL
         ls -hl target/*/*/BL
         lscpu
@@ -42,7 +43,7 @@ jobs:
     - name: Rust Versions
       run: rustup -V; cargo -Vv; rustc -Vv
       
-    - name: Upload files to a GitHub release
+    - name: Upload Linux x64 to a GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -51,6 +52,16 @@ jobs:
         tag: Nightly
         overwrite: true
         body: "Ubuntu Linux binary executable."
+
+    - name: Upload Linux-aarch64 to a GitHub release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/aarch64-unknown-linux-gnu/src/BL
+        asset_name: Linux-aarch64
+        tag: Nightly
+        overwrite: true
+        body: "Ubuntu Linux-aarch64 binary executable."
           
   macOS:
     name: Building on macOS. 
@@ -119,9 +130,9 @@ jobs:
 
     - name: Rust Update
       run: |
-        rustup self update
         rustup default nightly
         rustup update
+        rustup target add aarch64-pc-windows-msvc
         rustup component add rust-src
         
     - name: Rust Cache
@@ -133,6 +144,7 @@ jobs:
         #cargo build --release
         #cargo lto
         cargo src x86_64-pc-windows-msvc
+        cargo src aarch64-pc-windows-msvc
         #dir target/*/*.exe
         dir target/*/*/*.exe
         systeminfo
@@ -140,7 +152,7 @@ jobs:
     - name: Rust Versions
       run: rustup -V; cargo -Vv; rustc -Vv
       
-    - name: Upload files to a GitHub release
+    - name: Upload Windows-x64 to a GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -148,4 +160,14 @@ jobs:
         asset_name: Windows.exe
         tag: Nightly
         overwrite: true
-        body: "Windows binary executable."
+        body: "Windows x64 binary executable."
+
+    - name: Upload Windows-aarch64 to a GitHub release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/aarch64-pc-windows-msvc/src/BL.exe
+        asset_name: Windows-aarch64.exe
+        tag: Nightly
+        overwrite: true
+        body: "Windows aarch64 binary executable."
