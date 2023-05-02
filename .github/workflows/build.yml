@@ -34,6 +34,7 @@ jobs:
         #time cargo build --release
         #time cargo lto
         time cargo src x86_64-unknown-linux-gnu
+        apt-get install gcc-aarch64-linux-gnu
         time cargo src aarch64-unknown-linux-gnu
         #ls -hl target/*/BL
         ls -hl target/*/*/BL
