@@ -244,6 +244,7 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 [target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=apple-m1",
