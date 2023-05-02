@@ -22,7 +22,7 @@ jobs:
       run: |
         rustup default nightly
         rustup update
-        apt install gcc-aarch64-linux-gnu
+        sudo apt install gcc-aarch64-linux-gnu -y
         rustup target add aarch64-unknown-linux-gnu
         rustup component add rust-src
         
