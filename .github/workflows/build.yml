@@ -86,7 +86,7 @@ jobs:
     - name: Rust Versions
       run: rustup -V; cargo -Vv; rustc -Vv
       
-    - name: Upload files to a GitHub release
+    - name: Upload macOS x86-64 to a GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -96,12 +96,17 @@ jobs:
         overwrite: true
         body: "macOS x86-64 binary executable."
 
+        
+    - name: Upload macOS-aarch64 to a GitHub release
+      uses: svenstaro/upload-release-action@v2
+      with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/aarch64-apple-darwin/src/BL
         asset_name: macOS-aarch64
         tag: Nightly
         overwrite: true
         body: "macOS aarch64 binary executable."
+        
       
   Windows:
     name: Building on Windows. 
