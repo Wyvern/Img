@@ -54,15 +54,15 @@ jobs:
         overwrite: true
         body: "Ubuntu Linux binary executable."
 
-    - name: Upload Linux-aarch64 to a GitHub release
+    - name: Upload Linux-arm64e to a GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/aarch64-unknown-linux-gnu/src/BL
-        asset_name: Linux-aarch64
+        asset_name: Linux-arm64e
         tag: Nightly
         overwrite: true
-        body: "Ubuntu Linux-aarch64 binary executable."
+        body: "Ubuntu Linux-arm64e binary executable."
           
   macOS:
     name: Building on macOS. 
@@ -89,9 +89,11 @@ jobs:
         #time cargo lto
         time cargo src x86_64-apple-darwin
         time cargo src aarch64-apple-darwin
+        lipo -create target/aarch64-apple-darwin/release/BL target/x86_64-apple-darwin/release/BL -output BL-universial
         #ls -hl target/*/BL
         ls -hl target/x86_64-apple-darwin/*/BL
         ls -hl target/aarch64-apple-darwin/*/BL
+        ls -hl BL-universial
         sw_vers
         hostinfo
         sysctl -a | grep brand
@@ -104,21 +106,31 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/x86_64-apple-darwin/src/BL
-        asset_name: macOS-x86_64
+        asset_name: macOS-intel
         tag: Nightly
         overwrite: true
         body: "macOS x86-64 binary executable."
 
         
-    - name: Upload macOS-aarch64 to a GitHub release
+    - name: Upload macOS-arm64e to a GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/aarch64-apple-darwin/src/BL
-        asset_name: macOS-aarch64
+        asset_name: macOS-arm64e
         tag: Nightly
         overwrite: true
-        body: "macOS aarch64 binary executable."
+        body: "macOS arm64e binary executable."
+
+    - name: Upload macOS-universial to a GitHub release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: BL-universial
+        asset_name: macOS-universial
+        tag: Nightly
+        overwrite: true
+        body: "macOS universial binary executable."
         
       
   Windows:
@@ -163,12 +175,12 @@ jobs:
         overwrite: true
         body: "Windows x64 binary executable."
 
-    - name: Upload Windows-aarch64 to a GitHub release
+    - name: Upload Windows-arm64e to a GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/aarch64-pc-windows-msvc/src/BL.exe
-        asset_name: Windows-aarch64.exe
+        asset_name: Windows-arm64e.exe
         tag: Nightly
         overwrite: true
-        body: "Windows aarch64 binary executable."
+        body: "Windows arm64e binary executable."
