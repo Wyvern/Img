@@ -34,8 +34,8 @@ jobs:
         cargo update
         #time cargo build --release
         #time cargo lto
-        time cargo src x86_64-unknown-linux-gnu
-        time cargo src aarch64-unknown-linux-gnu
+        time cargo lto x86_64-unknown-linux-gnu
+        time cargo lto aarch64-unknown-linux-gnu
         #ls -hl target/*/BL
         ls -hl target/*/*/BL
         lscpu
