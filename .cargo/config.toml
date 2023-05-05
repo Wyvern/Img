@@ -12,7 +12,7 @@ bl = "build --lib -r"
 tr = "test -r"
 dr = "doc -r"
 ls = "build --profile lto -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
-src = "build --profile src -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
+src = "build --profile src -Zbuild-std --target "
 
 [cargo-new]
 vcs = "none"
@@ -73,7 +73,6 @@ strip = true
 inherits = "release"
 rustflags = [
     "-Cprefer-dynamic=n",
-    "-Zpanic-in-drop=abort",
     #"-Zvirtual-function-elimination","-Clto"
 ]
 lto = true
@@ -92,7 +91,7 @@ strip = true
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [ #"-Zpanic-in-drop=abort",
+rustflags = [ "-Zpanic-in-drop=abort",
     "-Zforce-unstable-if-unmarked",
 ]
 lto = true
