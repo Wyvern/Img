@@ -36,8 +36,6 @@ jobs:
         #time cargo lto
         time cargo src x86_64-unknown-linux-gnu
         time cargo src aarch64-unknown-linux-gnu
-        time cargo src x86_64-unknown-freebsd
-        time cargo src x86_64-unknown-netbsd
         #ls -hl target/*/BL
         ls -hl target/*/*/BL
         lscpu
