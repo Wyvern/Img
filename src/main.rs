@@ -426,11 +426,11 @@ mod tests {
         dbg!(&res);
     }
 
-    // https://bestgirlsexy.com/
+    // https://bestgirlsexy.com/ https://girldreamy.com/
 
     #[test]
     fn try_it() {
-        let addr = "https://bestgirlsexy.com/";
+        let addr = "https://www.beautyleg6.com/siwameitui/202305/1455_21.html";
         parse(addr);
     }
 

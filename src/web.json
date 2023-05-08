@@ -30,7 +30,7 @@
         "Src":"href"
     },
     {
-        "Site":"xgmn01.com,xgmn02.com",
+        "Site":"xgmn01.com,xgmn02.com,xgmn08.com",
         "Img":"article.article-content img",
         "Src":"src",
         "Next":"div.pagination a[href]"
@@ -216,5 +216,11 @@
         "Img":"div#post_content img",
         "Src":"src",
         "Next":"div.pagelist span"
+    },
+    {
+        "Site":"beautyleg6.com",
+        "Img":"div.contents img",
+        "Src":"src",
+        "Next":"div.page a[href]"
     }
 ]
