@@ -165,7 +165,8 @@
         "Site":"xrmn01.cc,xrmnw.xyz,xiuren5.com,xiuren5.vip",
         "Img":"div.content img",
         "Src":"src",
-        "Next":"div.page a[href]"
+        "Next":"div.page a[href]",
+        "Album":"ul.update_area_lists a"
     },
     {
         "Site":"yaomitao.com",

@@ -189,7 +189,10 @@ fn parse(addr: &str) -> String {
                     use io::*;
                     let mut stdin = io::stdin();
                     let mut stdout = io::stdout();
-                    let mut t = alb.text().expect("NO Album's title found.");
+                    let mut t = alb.attr("title").unwrap_or(
+                        alb.attr("alt")
+                            .unwrap_or(alb.text().expect("NO Album's Title found.")),
+                    );
                     writeln!(
                         stdout,
                         "Do you want to download Album <{}/{}>: {}?",
@@ -430,7 +433,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.beautyleg6.com/siwameitui/202305/1455_21.html";
+        let addr = "https://www.xiuren5.vip/new.html";
         parse(addr);
     }
 
