@@ -297,7 +297,11 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         if element.tag().unwrap() == "span" {
             let items = element.parent().unwrap().children();
 
-            let mut tags = items.split(|e| e.attr("class").map_or(true, |c| c.contains("current")));
+            let mut tags = items.split(|e| {
+                e.tag().unwrap() == "span"
+                    // && e.attr("class")
+                    //     .map_or(true, |c| c.contains("current") || c.contains("now-page"))
+            });
             let a = tags
                 .next_back()
                 .unwrap()
@@ -334,6 +338,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 if t.is_some() && t.as_deref().unwrap().is_empty() {
                     t.take();
                 }
+
                 match t {
                     Some(mut text) => {
                         text.make_ascii_lowercase();
@@ -433,7 +438,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.xiuren5.vip/new.html";
+        let addr = "https://www.rosi8.com/pic/46310_43.html";
         parse(addr);
     }
 

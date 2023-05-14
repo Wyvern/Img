@@ -223,5 +223,17 @@
         "Img":"div.contents img",
         "Src":"src",
         "Next":"div.page a[href]"
+    },
+    {
+        "Site":"kanmeitu1.cc",
+        "Img":"div.article-content img",
+        "Src":"src",
+        "Next":"div.th_page span.now-page"
+    },
+    {
+        "Site":"rosi8.com",
+        "Img":"div#picg img",
+        "Src":"src",
+        "Next":"div.pagelist a[href]"
     }
 ]
