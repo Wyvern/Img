@@ -187,6 +187,7 @@ rustflags = [
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zlower-impl-trait-in-trait-to-assoc-ty",
+    "-Zpanic-in-drop=abort",
     #"-Ztrait-solver=chalk|next",
 
     "-Aunused",
