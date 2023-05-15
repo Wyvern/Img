@@ -200,7 +200,7 @@ fn parse(addr: &str) -> String {
                         albums.len(),
                         t.trim()
                     );
-                    write!(stdout, "[Yes⏎/No/All/Cancel]: ");
+                    write!(stdout, "[Y{0}es⏎{1}N{0}o{1}A{0}ll{1}C{0}ancel]: ",char::from_u32(0x332).unwrap(),'|');
                     stdout.flush();
 
                     let mut input = String::new();
