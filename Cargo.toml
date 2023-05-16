@@ -3,15 +3,13 @@ name = "BL"
 version = "0.1.0"
 edition = "2021"
 
-
 [features]
-download=["curl"]
-curl=[]
-wget=[]
-batch=[]
-default=["download"]
-
+download = ["curl"]
+curl = []
+wget = []
+batch = []
+default = ["download"]
 
 [dependencies]
-crabquery = { version = "*", default-features = false}
+crabquery = { version = "*", default-features = false }
 json = { version = "*", default-features = false }
