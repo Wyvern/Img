@@ -73,6 +73,7 @@ strip = true
 inherits = "release"
 rustflags = [
     "-Cprefer-dynamic=n",
+    "-Zsplit-lto-unit",
     #"-Zvirtual-function-elimination","-Clto"
 ]
 lto = true
