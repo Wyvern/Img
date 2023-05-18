@@ -74,7 +74,8 @@ inherits = "release"
 rustflags = [
     "-Cprefer-dynamic=n",
     "-Zsplit-lto-unit",
-    #"-Zvirtual-function-elimination","-Clto"
+    "-Zstaticlib-allow-rdylib-deps",
+    "-Zstaticlib-prefer-dynamic",
 ]
 lto = true
 panic = "abort"
@@ -92,7 +93,7 @@ strip = true
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [ #"-Zpanic-in-drop=abort",
+rustflags = [ "-Zpanic-in-drop=abort",
     "-Zforce-unstable-if-unmarked",
 ]
 lto = true
