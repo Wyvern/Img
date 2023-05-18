@@ -235,5 +235,11 @@
         "Img":"div#picg img",
         "Src":"src",
         "Next":"div.pagelist a[href]"
+    },
+    {
+        "Site":"shxiaowu.com",
+        "Img":"div.main img",
+        "Src":"src",
+        "Next":"div.paging a[href]"
     }
 ]
