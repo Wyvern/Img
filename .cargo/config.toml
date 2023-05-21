@@ -74,7 +74,8 @@ inherits = "release"
 rustflags = [
     "-Cprefer-dynamic=n",
     "-Zsplit-lto-unit",
-    #"-Zvirtual-function-elimination","-Clto"
+    "-Zstaticlib-allow-rdylib-deps",
+    "-Zstaticlib-prefer-dynamic",
 ]
 lto = true
 panic = "abort"
