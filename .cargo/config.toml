@@ -256,8 +256,8 @@ rustflags = [
     "-Zpanic-in-drop=abort",
     #"-Ztrait-solver=chalk|next",
 
-    #"-Aunused",
-    #"-Anonstandard_style",
+    "-Aunused",
+    "-Anonstandard_style",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
