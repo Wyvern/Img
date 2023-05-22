@@ -438,7 +438,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://www.shxiaowu.com/plus/view-774340-60.html";
+        let addr = "https://www.umeitu.com/img/55828_48.html";
         parse(addr);
     }
 
