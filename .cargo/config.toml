@@ -63,15 +63,7 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = [
-    "-Cprefer-dynamic",
-    "-Zcombine-cgu",
-    "-Aunused",
-    "-Anonstandard_style",
-    "-Aunexpected_cfgs",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
-]
+rustflags = ["-Cprefer-dynamic", "-Zcombine-cgu"]
 rpath = true
 strip = true
 #codegen-units = 1
@@ -163,7 +155,7 @@ build-std = [
 ]
 build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 
-[host]
+[host.build]
 rustflags = [
     "-Cprefer-dynamic",
     "-Crpath",
@@ -189,7 +181,7 @@ rustflags = [
     "-Zoom=abort",
     "-Zthir-unsafeck",
     "-Zshare-generics",
-    "-Zgcc-ld=lld",
+    #"-Zgcc-ld=lld",
     "-Zmerge-functions=trampolines",
     "-Zinline-mir",
     "-Zinline-in-all-cgus",
@@ -204,6 +196,21 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     #"-Ztrait-solver=next",
+
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
+]
+[build]
+rustflags = [
+    "-Zgcc-ld=lld",
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
 ]
 
 [unstable.gitoxide]
@@ -226,8 +233,7 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.x86_64-pc-windows-msvc]
 #linker = "lld-link"
-rustflags = ["-Zgcc-ld"]
 
 [target.aarch64-pc-windows-msvc]
 #linker = "lld-link"
-rustflags = ["-Zgcc-ld","-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
