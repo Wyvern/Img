@@ -71,9 +71,9 @@ strip = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = ["-Cprefer-dynamic=n"]
+rustflags = ["-Cprefer-dynamic=n", "-Cpanic=abort"]
 lto = true
-panic = "abort"
+#panic = "abort"
 debug = false
 strip = true
 [profile.lto.build-override]
