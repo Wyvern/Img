@@ -176,7 +176,7 @@ rustflags = [
     "-Zoom=abort",
     "-Zthir-unsafeck",
     "-Zshare-generics",
-    "-Zgcc-ld=lld",
+    #"-Zgcc-ld=lld",
     "-Zmerge-functions=trampolines",
     "-Zinline-mir",
     "-Zinline-in-all-cgus",
@@ -196,7 +196,7 @@ rustflags = [
 [build]
 rustflags = [
     "-Zgcc-ld=lld",
-
+    "-Clink-args=-fno-async-exceptions",
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
