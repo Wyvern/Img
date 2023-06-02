@@ -177,6 +177,7 @@ rustflags = [
     "-Zlower-impl-trait-in-trait-to-assoc-ty",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Zpanic-in-drop=abort",
     #"-Ztrait-solver=next",
 ]
 
