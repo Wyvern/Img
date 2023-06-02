@@ -178,9 +178,7 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     #"-Ztrait-solver=next",
-]
-[host.clippy]
-rustflags = [
+
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
