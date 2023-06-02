@@ -88,7 +88,10 @@ strip = true
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Zforce-unstable-if-unmarked"]
+rustflags = [
+    "-Zpanic-in-drop=abort",
+    "-Zforce-unstable-if-unmarked",
+]
 lto = true
 panic = "abort"
 debug = false
@@ -186,7 +189,7 @@ rustflags = [
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zlower-impl-trait-in-trait-to-assoc-ty",
-    "-Zpanic-in-drop=abort",
+    #"-Zpanic-in-drop=abort",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     #"-Ztrait-solver=next",
