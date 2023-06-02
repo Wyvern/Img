@@ -179,16 +179,19 @@ rustflags = [
     "-Zstaticlib-prefer-dynamic",
     #"-Ztrait-solver=next",
 ]
-
-[build]
+[host.clippy]
 rustflags = [
-    "-Zgcc-ld=lld",
-    "-Zpanic-in-drop=abort",
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
+]
+
+[build]
+rustflags = [
+    "-Zgcc-ld=lld",
+    "-Zpanic-in-drop=abort",
 ]
 
 [unstable.gitoxide]
@@ -208,11 +211,6 @@ rustflags = [
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
     "-Zpanic-in-drop=abort",
-    "-Aunused",
-    "-Anonstandard_style",
-    "-Aunexpected_cfgs",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
 ]
 
 [target.aarch64-unknown-linux-gnu]
@@ -222,30 +220,15 @@ rustflags = [
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
     "-Zpanic-in-drop=abort",
-    "-Aunused",
-    "-Anonstandard_style",
-    "-Aunexpected_cfgs",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
 ]
 
 [target.x86_64-pc-windows-msvc]
 rustflags = [
     "-Zpanic-in-drop=abort",
-    "-Aunused",
-    "-Anonstandard_style",
-    "-Aunexpected_cfgs",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
 ]
 [target.aarch64-pc-windows-msvc]
 rustflags = [
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
     "-Zpanic-in-drop=abort",
-    "-Aunused",
-    "-Anonstandard_style",
-    "-Aunexpected_cfgs",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
 ]
