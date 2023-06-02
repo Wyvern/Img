@@ -132,12 +132,7 @@ inherits = "release"
 rustflags = ["-Zparse-only", "-Zno-analysis", "-Zno-link", "-Zno-codegen"]
 
 [unstable]
-check-cfg = [
-    "names",
-    "values",
-    "features",
-    "output",
-]
+check-cfg = ["names", "values", "features", "output"]
 avoid-dev-deps = true
 dual-proc-macros = true
 panic-abort-tests = true
@@ -147,7 +142,7 @@ binary-dep-depinfo = true
 profile-rustflags = true
 codegen-backend = true
 target-applies-to-host = true
-host-config=true
+host-config = true
 
 build-std = [
     "core",
@@ -173,7 +168,7 @@ rustflags = [
     #"-Clinker-flavor=lld-link",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-async-exceptions -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables", #-fuse-ld=lld 
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-async-exceptions -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
@@ -232,14 +227,13 @@ rustflags = [
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
 rustflags = [
-    "-Ctarget-cpu=apple-m1",
-    "-Ztune-cpu=apple-m1",
-]
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+
+    "-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 [target.x86_64-pc-windows-msvc]
-linker = "lld-link"
+#linker = "lld-link"
+rustflags = ["-Zgcc-ld=msvc"]
+
 
 [target.aarch64-pc-windows-msvc]
-rustflags = [
-    "-Ctarget-cpu=apple-m1",
-    "-Ztune-cpu=apple-m1",
-]
+rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
