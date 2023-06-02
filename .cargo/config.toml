@@ -88,10 +88,7 @@ strip = true
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [
-    "-Zpanic-in-drop=abort",
-    "-Zforce-unstable-if-unmarked",
-]
+rustflags = ["-Zforce-unstable-if-unmarked"]
 lto = true
 panic = "abort"
 debug = false
@@ -189,7 +186,6 @@ rustflags = [
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zlower-impl-trait-in-trait-to-assoc-ty",
-    #"-Zpanic-in-drop=abort",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     #"-Ztrait-solver=next",
@@ -198,7 +194,7 @@ rustflags = [
 [build]
 rustflags = [
     "-Zgcc-ld=lld",
-
+    "-Zpanic-in-drop=abort",
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
@@ -222,7 +218,7 @@ rustflags = [
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
-
+    "-Zpanic-in-drop=abort",
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
@@ -236,7 +232,7 @@ rustflags = [
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
-
+    "-Zpanic-in-drop=abort",
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
@@ -246,6 +242,7 @@ rustflags = [
 
 [target.x86_64-pc-windows-msvc]
 rustflags = [
+    "-Zpanic-in-drop=abort",
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
@@ -256,7 +253,7 @@ rustflags = [
 rustflags = [
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
-
+    "-Zpanic-in-drop=abort",
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
