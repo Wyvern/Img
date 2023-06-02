@@ -71,12 +71,7 @@ strip = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = [
-    "-Cprefer-dynamic=n",
-    "-Zsplit-lto-unit",
-    "-Zstaticlib-allow-rdylib-deps",
-    "-Zstaticlib-prefer-dynamic",
-]
+rustflags = ["-Cprefer-dynamic=n", "-Zsplit-lto-unit"]
 lto = true
 panic = "abort"
 debug = false
@@ -201,7 +196,7 @@ rustflags = [
 [build]
 rustflags = [
     "-Zgcc-ld=lld",
-    
+
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
