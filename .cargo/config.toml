@@ -88,9 +88,7 @@ strip = true
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [ #"-Zpanic-in-drop=abort",
-    "-Zforce-unstable-if-unmarked",
-]
+rustflags = ["-Zpanic-in-drop=abort", "-Zforce-unstable-if-unmarked"]
 lto = true
 panic = "abort"
 debug = false
@@ -196,7 +194,7 @@ rustflags = [
 [build]
 rustflags = [
     "-Zgcc-ld=lld",
-    "-Clink-args=-fno-async-exceptions",
+
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
