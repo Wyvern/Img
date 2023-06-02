@@ -231,8 +231,8 @@ linker = "aarch64-linux-gnu-gcc"
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.x86_64-pc-windows-msvc]
-#linker = "lld-link"
-rustflags = ["-Zgcc-ld=ld"]
+linker = "lld-link"
+rustflags = ["-Zgcc-ld"]
 
 [target.aarch64-pc-windows-msvc]
-rustflags = ["-Zgcc-ld=ld", "-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = ["-Zgcc-ld", "-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
