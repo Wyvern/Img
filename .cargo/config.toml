@@ -176,7 +176,7 @@ rustflags = [
     "-Zoom=abort",
     "-Zthir-unsafeck",
     "-Zshare-generics",
-    #"-Zgcc-ld=lld",
+    "-Zgcc-ld=lld",
     "-Zmerge-functions=trampolines",
     "-Zinline-mir",
     "-Zinline-in-all-cgus",
