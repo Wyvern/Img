@@ -190,6 +190,12 @@ rustflags = [
 rustflags = [
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
+
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
 ]
 
 [unstable.gitoxide]
