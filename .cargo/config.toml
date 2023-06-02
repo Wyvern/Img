@@ -194,7 +194,6 @@ rustflags = [
 
 [build]
 rustflags = [
-    "-Zsplit-lto-unit",
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
     "-Aunused",
