@@ -155,7 +155,7 @@ build-std = [
 ]
 build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 
-[host.build]
+[host]
 rustflags = [
     "-Cprefer-dynamic",
     "-Crpath",
@@ -203,6 +203,7 @@ rustflags = [
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
+
 [build]
 rustflags = [
     "-Zgcc-ld=lld",
@@ -225,15 +226,53 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [target.aarch64-apple-darwin]
-rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = [
+    "-Zgcc-ld=lld",
+    "-Ctarget-cpu=apple-m1",
+    "-Ztune-cpu=apple-m1",
+
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
+]
 
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
-rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = [
+    "-Zgcc-ld=lld",
+    "-Ctarget-cpu=apple-m1",
+    "-Ztune-cpu=apple-m1",
+
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
+]
 
 [target.x86_64-pc-windows-msvc]
 #linker = "lld-link"
+rustflags = [
+    "-Ctarget-cpu=apple-m1",
+    "-Ztune-cpu=apple-m1",
 
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
+]
 [target.aarch64-pc-windows-msvc]
 #linker = "lld-link"
-rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = [
+    "-Ctarget-cpu=apple-m1",
+    "-Ztune-cpu=apple-m1",
+
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
+]
