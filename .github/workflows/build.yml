@@ -92,8 +92,8 @@ jobs:
         time cargo src aarch64-apple-darwin
         lipo -create target/aarch64-apple-darwin/src/BL target/x86_64-apple-darwin/src/BL -output BL-Universal
         ls -hl target/**/BL
-        ls -hl target/x86_64-apple-darwin/*/BL
-        ls -hl target/aarch64-apple-darwin/*/BL
+        #ls -hl target/x86_64-apple-darwin/*/BL
+        #ls -hl target/aarch64-apple-darwin/*/BL
         ls -hl BL-Universal
         sw_vers
         hostinfo
