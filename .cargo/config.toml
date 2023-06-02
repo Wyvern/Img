@@ -224,14 +224,15 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.x86_64-unknown-linux-gnu]
 rustflags = [
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -fomit-frame-pointer -fno-unwind-tables",
 ]
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.x86_64-pc-windows-msvc]
-linker = "lld-link"
+#linker = "lld-link"
+rustflags = ["-Zgcc-ld=ld"]
 
 [target.aarch64-pc-windows-msvc]
-rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = ["-Zgcc-ld=ld", "-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
