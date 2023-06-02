@@ -152,6 +152,7 @@ build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 rustflags = [
     "-Cprefer-dynamic",
     "-Crpath",
+    "-Cpanic=abort",
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
     "-Csymbol-mangling-version=v0",
@@ -188,6 +189,7 @@ rustflags = [
     "-Zlower-impl-trait-in-trait-to-assoc-ty",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Zsplit-lto-unit",
     #"-Ztrait-solver=next",
 ]
 
