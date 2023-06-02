@@ -71,7 +71,7 @@ strip = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = ["-Cprefer-dynamic=n", "-Cpanic=abort"]
+rustflags = ["-Cprefer-dynamic=n"]
 lto = true
 #panic = "abort"
 debug = false
