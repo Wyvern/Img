@@ -213,6 +213,13 @@ internal_use_git2 = true
 
 
 [build]
+rustflags = [
+    "-Aunused",
+    "-Anonstandard_style",
+    "-Aunexpected_cfgs",
+    "-Frust_2018_idioms",
+    "-Frust_2018_compatibility",
+]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -227,7 +234,8 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.x86_64-pc-windows-msvc]
 linker = "lld-link"
+rustflags = ["-Zgcc-ld"]
 
 [target.aarch64-pc-windows-msvc]
 linker = "lld-link"
-rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = ["-Zgcc-ld", "-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
