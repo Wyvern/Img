@@ -196,17 +196,12 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     #"-Ztrait-solver=next",
-
-    "-Aunused",
-    "-Anonstandard_style",
-    "-Aunexpected_cfgs",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
 ]
 
 [build]
 rustflags = [
     "-Zgcc-ld=lld",
+    
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
@@ -253,11 +248,7 @@ rustflags = [
 ]
 
 [target.x86_64-pc-windows-msvc]
-#linker = "lld-link"
 rustflags = [
-    "-Ctarget-cpu=apple-m1",
-    "-Ztune-cpu=apple-m1",
-
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
@@ -265,7 +256,6 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 [target.aarch64-pc-windows-msvc]
-#linker = "lld-link"
 rustflags = [
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
