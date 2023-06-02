@@ -189,12 +189,12 @@ rustflags = [
     "-Zlower-impl-trait-in-trait-to-assoc-ty",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zsplit-lto-unit",
     #"-Ztrait-solver=next",
 ]
 
 [build]
 rustflags = [
+    "-Zsplit-lto-unit",
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
     "-Aunused",
