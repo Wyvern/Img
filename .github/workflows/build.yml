@@ -20,12 +20,14 @@ jobs:
       
     - name: Rust Update
       run: |
-        rustup default nightly
-        rustup update
-        sudo apt update -y
-        sudo apt install gcc-aarch64-linux-gnu -y
-        rustup target add aarch64-unknown-linux-gnu
-        rustup component add rust-src
+          brew uninstall rustup && brew autoremove
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
+          rustup target add aarch64-apple-darwin
+          rustup component add rust-src
+          sudo apt update -y
+          sudo apt install gcc-aarch64-linux-gnu -y
+          rustup target add aarch64-unknown-linux-gnu
+          rustup component add rust-src
         
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
@@ -143,6 +145,10 @@ jobs:
 
     - name: Rust Update
       run: |
+        brew uninstall rustup && brew autoremove
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
+        rustup target add aarch64-apple-darwin
+        rustup component add rust-src
         rustup default nightly
         rustup update
         rustup target add aarch64-pc-windows-msvc
