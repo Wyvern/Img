@@ -146,7 +146,6 @@ jobs:
 
     - name: Rust Update
       run: |
-        brew uninstall rustup && brew autoremove
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
         rustup target add aarch64-apple-darwin
         rustup component add rust-src
@@ -165,8 +164,8 @@ jobs:
         #cargo lto
         cargo src x86_64-pc-windows-msvc
         cargo src aarch64-pc-windows-msvc
-        #dir target/*/*.exe
-        dir target/*/*/*.exe
+        dir target/*/*.exe
+        #dir target/*/*/*.exe
         systeminfo
         
     - name: Rust Versions
