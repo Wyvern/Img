@@ -164,8 +164,9 @@ jobs:
         #cargo lto
         cargo src x86_64-pc-windows-msvc
         cargo src aarch64-pc-windows-msvc
-        dir target/*/*.exe
+        #dir target/*/*.exe
         #dir target/*/*/*.exe
+        #dir target/**/*.exe
         systeminfo
         
     - name: Rust Versions
