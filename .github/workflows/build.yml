@@ -150,7 +150,6 @@ jobs:
         rustup target add aarch64-apple-darwin
         rustup component add rust-src
         rustup default nightly
-        rustup update
         rustup target add aarch64-pc-windows-msvc
         rustup component add rust-src
         
