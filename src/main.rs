@@ -112,8 +112,8 @@ fn parse(addr: &str) -> String {
     } else {
         page.select(album.as_str())
     };
-    let hasAlbum = !album.is_empty() && !albums.is_empty();
-    match (hasAlbum, !imgs.is_empty()) {
+    let has_album = !album.is_empty() && !albums.is_empty();
+    match (has_album, !imgs.is_empty()) {
         (true, true) => println!(
             "Totally found {} 📸 and {} 🏞️  in 📄: {} ",
             albums.len(),
@@ -153,7 +153,7 @@ fn parse(addr: &str) -> String {
             u.to_owned()
         }
     };
-    match (hasAlbum, !imgs.is_empty()) {
+    match (has_album, !imgs.is_empty()) {
         (_, true) => {
             for img in imgs {
                 let src = img.attr(src.as_str()).expect("Invalid img[src] selector!");
@@ -169,7 +169,7 @@ fn parse(addr: &str) -> String {
             let mut all = false;
 
             for (i, alb) in albums.iter().enumerate() {
-                let mut parseAlbum = || {
+                let mut parse_album = || {
                     let mut href = alb.attr("href").unwrap_or_else(|| {
                         alb.parent()
                             .unwrap()
@@ -184,7 +184,7 @@ fn parse(addr: &str) -> String {
                 };
 
                 if all {
-                    parseAlbum();
+                    parse_album();
                 } else {
                     use io::*;
                     let mut stdin = io::stdin();
@@ -211,11 +211,11 @@ fn parse(addr: &str) -> String {
                     input.make_ascii_lowercase();
 
                     match input.trim() {
-                        "y" | "yes" | "" => parseAlbum(),
+                        "y" | "yes" | "" => parse_album(),
                         "n" | "no" => continue,
                         "a" | "all" => {
                             all = true;
-                            parseAlbum()
+                            parse_album()
                         }
                         _ => {
                             println!("Canceled all albums download.");
@@ -435,7 +435,7 @@ mod tests {
     }
 
     // https://bestgirlsexy.com/ https://girldreamy.com/
-
+    
     #[test]
     fn try_it() {
         let addr = "https://goddess247.com/";
