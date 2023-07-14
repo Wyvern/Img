@@ -146,7 +146,7 @@ jobs:
 
     - name: Rust Update
       run: |
-        rustup uninstall
+        rustup uninstall stable
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
         rustup target add aarch64-apple-darwin
         rustup component add rust-src
