@@ -104,8 +104,11 @@ fn parse(addr: &str) -> String {
     let mut t = title.trim();
 
     (0..2).for_each(|_| {
-        t = t[..t.rfind(['-', '_', '|', '–', '/']).unwrap_or(t.len())].trim();
+        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim();
     });
+
+    let slash2dot = t.replace('/', "·");
+    t = slash2dot.as_ref();
 
     let albums = if album.is_empty() {
         vec![]
@@ -200,7 +203,12 @@ fn parse(addr: &str) -> String {
                         albums.len(),
                         t.trim()
                     );
-                    write!(stdout, "[Y{0}es⏎{1}N{0}o{1}A{0}ll{1}C{0}ancel]: ",char::from_u32(0x332).unwrap(),'|');
+                    write!(
+                        stdout,
+                        "[Y{0}es⏎{1}N{0}o{1}A{0}ll{1}C{0}ancel]: ",
+                        char::from_u32(0x332).unwrap(),
+                        '|'
+                    );
                     stdout.flush();
 
                     let mut input = String::new();
@@ -240,9 +248,9 @@ fn parse(addr: &str) -> String {
 fn download(dir: &str, src: &str) {
     #[cfg(all(feature = "download", any(not(test), feature = "batch")))]
     {
-        let dir = path::Path::new(dir);
-        if (!dir.exists()) {
-            fs::create_dir(dir).unwrap_or_else(|e| {
+        let path = path::Path::new(dir);
+        if (!path.exists()) {
+            fs::create_dir(path).unwrap_or_else(|e| {
                 println!("{e}");
                 process::exit(0);
             });
@@ -253,10 +261,10 @@ fn download(dir: &str, src: &str) {
         let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
         let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -L -s");
         //tdbg!(&curl);
-        if (dir.exists() && !dir.join(name).exists()) {
+        if (path.exists() && !path.join(name).exists()) {
             #[cfg(feature = "curl")]
             process::Command::new("curl")
-                .current_dir(dir)
+                .current_dir(path)
                 .args([
                     src,
                     "-o",
@@ -273,7 +281,7 @@ fn download(dir: &str, src: &str) {
 
             #[cfg(feature = "wget")]
             process::Command::new("wget")
-                .current_dir(dir)
+                .current_dir(path)
                 .args([
                     &src,
                     format!("--referer={host}").as_str(),
@@ -299,8 +307,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 
             let mut tags = items.split(|e| {
                 e.tag().unwrap() == "span"
-                    // && e.attr("class")
-                    //     .map_or(true, |c| c.contains("current") || c.contains("now-page"))
+                // && e.attr("class")
+                //     .map_or(true, |c| c.contains("current") || c.contains("now-page"))
             });
             let a = tags
                 .next_back()
@@ -438,7 +446,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://goddess247.com/";
+        let addr = "https://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
 

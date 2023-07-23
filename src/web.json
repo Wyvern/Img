@@ -222,7 +222,8 @@
         "Site":"beautyleg6.com",
         "Img":"div.contents img",
         "Src":"src",
-        "Next":"div.page a[href]"
+        "Next":"div.page a[href]",
+        "Album":"div.t a[href]"
     },
     {
         "Site":"kanmeitu1.cc",
