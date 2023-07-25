@@ -251,7 +251,7 @@ fn download(dir: &str, src: &str) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
-                println!("{e}");
+                println!("Create Dir error: `{e}`");
                 process::exit(0);
             });
         }
