@@ -205,7 +205,7 @@ fn parse(addr: &str) -> String {
                     );
                     write!(
                         stdout,
-                        "[Y{0}es⏎{1}N{0}o{1}A{0}ll{1}C{0}ancel]: ",
+                        "[ Y{0}es⏎ {1} N{0}o {1} A{0}ll {1} C{0}ancel ]: ",
                         char::from_u32(0x332).unwrap(),
                         '|'
                     );
@@ -227,6 +227,7 @@ fn parse(addr: &str) -> String {
                         }
                         _ => {
                             println!("Canceled all albums download.");
+                            next = String::default();
                             break;
                         }
                     }
