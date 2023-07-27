@@ -205,9 +205,9 @@ fn parse(addr: &str) -> String {
                     );
                     write!(
                         stdout,
-                        "[ Y{0}es⏎ {1} N{0}o {1} A{0}ll {1} C{0}ancel ]: ",
+                        "[ Y{0}es⏎{1}N{0}o{1}A{0}ll{1}C{0}ancel ]: ",
                         char::from_u32(0x332).unwrap(),
-                        '|'
+                        " | "
                     );
                     stdout.flush();
 
@@ -220,7 +220,10 @@ fn parse(addr: &str) -> String {
 
                     match input.trim() {
                         "y" | "yes" | "" => parse_album(),
-                        "n" | "no" => continue,
+                        "n" | "no" => {
+                            next = String::default();
+                            continue;
+                        }
                         "a" | "all" => {
                             all = true;
                             parse_album()
@@ -230,7 +233,7 @@ fn parse(addr: &str) -> String {
                             next = String::default();
                             break;
                         }
-                    }
+                    };
                 }
             }
         }
