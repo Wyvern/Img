@@ -22,7 +22,7 @@ vcs = "none"
 
 #dev
 [profile.dev]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions", "-Zdwarf-version=4"]
+rustflags = ["-Cdebug-assertions", "-Zdwarf-version=4"]
 rpath = true
 [profile.dev.package."*"]
 inherits = "release"
@@ -63,7 +63,7 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic", "-Zcombine-cgu"]
+rustflags = ["-Zcombine-cgu"]
 rpath = true
 strip = true
 #codegen-units = 1
