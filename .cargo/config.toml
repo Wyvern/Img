@@ -177,7 +177,6 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdual-proc-macros",
 
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
@@ -238,7 +237,6 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdual-proc-macros",
     
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
@@ -291,7 +289,6 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdual-proc-macros",
     
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
@@ -343,7 +340,6 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdual-proc-macros",
     
     "-Zpanic-in-drop=abort",
 
@@ -391,7 +387,6 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdual-proc-macros",
     
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
