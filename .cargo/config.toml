@@ -66,14 +66,14 @@ inherits = "release"
 rustflags = ["-Cprefer-dynamic","-Zcombine-cgu"]
 rpath = true
 strip = true
-#codegen-units = 1
+codegen-units = 1
 
 #lto
 [profile.lto]
 inherits = "release"
 rustflags = ["-Cprefer-dynamic=n"]
 lto = true
-#panic = "abort"
+panic = "abort"
 debug = false
 strip = true
 [profile.lto.build-override]
