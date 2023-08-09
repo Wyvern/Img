@@ -23,7 +23,6 @@ vcs = "none"
 #dev
 [profile.dev]
 rustflags = ["-Cprefer-dynamic","-Cdebug-assertions", "-Zdwarf-version=4"]
-rpath = true
 [profile.dev.package."*"]
 inherits = "release"
 debug = false
@@ -38,22 +37,14 @@ strip = true
 inherits = "dev"
 [profile.test.package."*"]
 inherits = "release"
-debug = false
-strip = true
 [profile.test.build-override]
 inherits = "release"
-debug = false
-strip = true
 
 #bench
 [profile.bench.package."*"]
 inherits = "release"
-debug = false
-strip = true
 [profile.bench.build-override]
 inherits = "release"
-debug = false
-strip = true
 [profile.bench]
 inherits = "dev"
 
@@ -64,7 +55,6 @@ inherits = "release"
 inherits = "release"
 [profile.release]
 rustflags = ["-Cprefer-dynamic","-Zcombine-cgu"]
-rpath = true
 strip = true
 codegen-units = 1
 
@@ -74,41 +64,25 @@ inherits = "release"
 rustflags = ["-Cprefer-dynamic=n"]
 lto = true
 panic = "abort"
-debug = false
-strip = true
 [profile.lto.build-override]
 inherits = "release"
-debug = false
-strip = true
 [profile.lto.package."*"]
 inherits = "release"
-debug = false
-strip = true
 
 #src
 [profile.src]
 inherits = "lto"
 rustflags = ["-Zforce-unstable-if-unmarked"]
-lto = true
-panic = "abort"
-debug = false
-strip = true
 [profile.src.build-override]
 inherits = "src"
-debug = false
-strip = true
 [profile.src.package."*"]
 inherits = "src"
-debug = false
-strip = true
 
 #stats
 [profile.stats.build-override]
 inherits = "release"
-debug = false
 [profile.stats.package."*"]
 inherits = "release"
-debug = false
 [profile.stats]
 inherits = "release"
 rustflags = ["-Zperf-stats", "-Zmeta-stats"]
@@ -116,10 +90,8 @@ rustflags = ["-Zperf-stats", "-Zmeta-stats"]
 #no
 [profile.no.build-override]
 inherits = "no"
-debug = false
 [profile.no.package."*"]
 inherits = "no"
-debug = false
 [profile.no]
 inherits = "release"
 rustflags = ["-Zparse-only", "-Zno-analysis", "-Zno-link", "-Zno-codegen"]
@@ -136,8 +108,6 @@ profile-rustflags = true
 codegen-backend = true
 #target-applies-to-host = true
 #host-config = true
-
-
 
 [build]
 rustflags = [
