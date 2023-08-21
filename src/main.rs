@@ -18,7 +18,7 @@ fn main() {
 }
 
 ///Get scheme and host info from valid url string
-fn scheme_host(addr: &str) -> [&str; 2] {
+fn check_host(addr: &str) -> [&str; 2] {
     let split = addr.split_once("://").unwrap_or_else(|| {
         println!("Invalid URL address.");
         process::exit(0);
@@ -39,9 +39,9 @@ fn scheme_host(addr: &str) -> [&str; 2] {
     [scheme, host]
 }
 
-///Check host info and Generate img/src/next selector data
-fn check_host(host: &str) -> [String; 4] {
-    let data = &website();
+///Get host info and Generate img/src/next/album selector data
+fn host_info(host: &str) -> [String; 4] {
+    let data = website();
     let site = data
         .members()
         .find(|&s| {
@@ -66,10 +66,9 @@ fn check_host(host: &str) -> [String; 4] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> String {
-    let [_, host] = scheme_host(addr);
-    check_host(host);
-
+fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
+    let scheme_host @ [_, host] = check_host(addr);
+    let host_info = host_info(host);
     let out = process::Command::new("curl")
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
@@ -82,14 +81,12 @@ fn get_html(addr: &str) -> String {
         println!("Get html failed, please check url address.");
         process::exit(0);
     }
-    res
+    (res, host_info, scheme_host)
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let [scheme, host] = scheme_host(addr);
-    let [img, src, mut next, album] = check_host(host);
-    let html = get_html(addr);
+    let (html, [img, src, mut next, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.as_str());
     let titles = page.select("title");
@@ -457,9 +454,7 @@ mod tests {
     #[test]
     fn htmlq() {
         let addr = "https://www.meituss.com/418068/";
-        let [_, host] = scheme_host(addr);
-        let [img, src, mut next, album] = check_host(host);
-        let html = get_html(addr);
+        let (html, [img, src, mut next, album], [_, host]) = get_html(addr);
         use process::*;
         let mut cmd = Command::new("htmlq")
             .args([img])
