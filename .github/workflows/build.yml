@@ -2,191 +2,180 @@ name: Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   Linux:
-    name: Building on Ubuntu. 
+    name: Building on Ubuntu.
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      
-    - name: Rust Update
-      run: |
-          brew uninstall rustup && brew autoremove
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
-          rustup target add aarch64-apple-darwin
-          rustup component add rust-src
-          sudo apt update -y
-          sudo apt install gcc-aarch64-linux-gnu -y
-          rustup target add aarch64-unknown-linux-gnu
-          rustup component add rust-src
-        
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2
-      
-    - name: Build Release
-      run: |
-        cargo update
-        #time cargo build --release
-        #time cargo lto
-        time cargo src x86_64-unknown-linux-gnu
-        time cargo src aarch64-unknown-linux-gnu
-        #ls -hl target/*/BL
-        ls -hl target/*/*/BL
-        lscpu
-        free -m
-        
-    - name: Rust Versions
-      run: rustup -V; cargo -Vv; rustc -Vv
-      
-    - name: Upload Linux x64 to a GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/x86_64-unknown-linux-gnu/src/BL
-        asset_name: Linux
-        tag: Nightly
-        overwrite: true
-        body: "Ubuntu Linux binary executable."
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Upload Linux-AArch64 to a GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/aarch64-unknown-linux-gnu/src/BL
-        asset_name: Linux-AArch64
-        tag: Nightly
-        overwrite: true 
-        body: "Ubuntu Linux-AArch64 binary executable."
-          
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: aarch64-unknown-linux-gnu
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Release
+        run: |
+          sudo apt install gcc-aarch64-linux-gnu -y
+          cargo update
+          #time cargo build --release
+          #time cargo lto
+          time cargo src x86_64-unknown-linux-gnu
+          time cargo src aarch64-unknown-linux-gnu
+          #ls -hl target/*/BL
+          ls -hl target/*/*/BL
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Linux x64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-linux-gnu/src/BL
+          asset_name: Linux
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux binary executable."
+
+      - name: Upload Linux-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-linux-gnu/src/BL
+          asset_name: Linux-AArch64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-AArch64 binary executable."
+
   macOS:
-    name: Building on macOS. 
+    name: Building on macOS.
     runs-on: macos-13
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Rust Update
-      run: |
-        brew uninstall rustup && brew autoremove
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
-        rustup target add aarch64-apple-darwin
-        rustup component add rust-src
-        rustup update
-        
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2
-    
-    - name: Build Release
-      run: |
-        cargo update
-        #time cargo build --release
-        #time cargo lto
-        time cargo src x86_64-apple-darwin
-        time cargo src aarch64-apple-darwin
-        lipo -create target/aarch64-apple-darwin/src/BL target/x86_64-apple-darwin/src/BL -output BL-Universal
-        #ls -hl target/*/BL
-        ls -hl target/*/*/BL
-        ls -hl BL-Universal
-        sw_vers
-        hostinfo
-        sysctl -a | grep brand
-        
-    - name: Rust Versions
-      run: rustup -V; cargo -Vv; rustc -Vv
-      
-    - name: Upload macOS x86-64 to a GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/x86_64-apple-darwin/src/BL
-        asset_name: macOS-Intel
-        tag: Nightly
-        overwrite: true
-        body: "macOS x86-64 binary executable."
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: aarch64-apple-darwin
+          components: rust-src
 
-        
-    - name: Upload macOS-AArch64 to a GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/aarch64-apple-darwin/src/BL
-        asset_name: macOS-AArch64
-        tag: Nightly
-        overwrite: true
-        body: "macOS AArch64 binary executable."
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
 
-    - name: Upload macOS-Universal to a GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: BL-Universal
-        asset_name: macOS-Universal
-        tag: Nightly
-        overwrite: true
-        body: "macOS Universal binary executable."
-        
-      
+      - name: Build Release
+        run: |
+          cargo update
+          #time cargo build --release
+          #time cargo lto
+          time cargo src x86_64-apple-darwin
+          time cargo src aarch64-apple-darwin
+          lipo -create target/aarch64-apple-darwin/src/BL target/x86_64-apple-darwin/src/BL -output BL-Universal
+          #ls -hl target/*/BL
+          ls -hl target/*/*/BL
+          ls -hl BL-Universal
+          sw_vers
+          hostinfo
+          sysctl -a | grep brand
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload macOS x86-64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-apple-darwin/src/BL
+          asset_name: macOS-Intel
+          tag: Nightly
+          overwrite: true
+          body: "macOS x86-64 binary executable."
+
+      - name: Upload macOS-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-apple-darwin/src/BL
+          asset_name: macOS-AArch64
+          tag: Nightly
+          overwrite: true
+          body: "macOS AArch64 binary executable."
+
+      - name: Upload macOS-Universal to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: BL-Universal
+          asset_name: macOS-Universal
+          tag: Nightly
+          overwrite: true
+          body: "macOS Universal binary executable."
+
   Windows:
-    name: Building on Windows. 
+    name: Building on Windows.
     runs-on: windows-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Rust Update
-      run: |
-        rustup uninstall stable
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs|sh -s -- --default-toolchain nightly -y 
-        rustup target add aarch64-apple-darwin
-        rustup component add rust-src
-        rustup target add aarch64-pc-windows-msvc
-        rustup component add rust-src
-        
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v2
-      
-    - name: Build release
-      run: |
-        cargo update
-        #cargo build --release
-        #cargo lto
-        cargo src x86_64-pc-windows-msvc
-        cargo src aarch64-pc-windows-msvc
-        #dir target/*/*.exe
-        #dir target/*/*/*.exe
-        #dir target/**/*.exe
-        systeminfo
-        
-    - name: Rust Versions
-      run: rustup -V; cargo -Vv; rustc -Vv
-      
-    - name: Upload Windows-x64 to a GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/x86_64-pc-windows-msvc/src/BL.exe
-        asset_name: Windows.exe
-        tag: Nightly
-        overwrite: true
-        body: "Windows x64 binary executable."
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: aarch64-pc-windows-msvc
+          components: rust-src
 
-    - name: Upload Windows-AArch64 to a GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/aarch64-pc-windows-msvc/src/BL.exe
-        asset_name: Windows-AArch64.exe
-        tag: Nightly
-        overwrite: true
-        body: "Windows AArch64 binary executable."
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build release
+        run: |
+          cargo update
+          #cargo build --release
+          #cargo lto
+          cargo src x86_64-pc-windows-msvc
+          cargo src aarch64-pc-windows-msvc
+          #dir target/*/*.exe
+          #dir target/*/*/*.exe
+          #dir target/**/*.exe
+          systeminfo
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Windows-x64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-pc-windows-msvc/src/BL.exe
+          asset_name: Windows.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows x64 binary executable."
+
+      - name: Upload Windows-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-pc-windows-msvc/src/BL.exe
+          asset_name: Windows-AArch64.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows AArch64 binary executable."
