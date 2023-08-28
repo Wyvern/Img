@@ -72,7 +72,7 @@ inherits = "release"
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Zforce-unstable-if-unmarked"]
+rustflags = ["-Zforce-unstable-if-unmarked","-Zno-trait-vptr","-Zvirtual-function-elimination"]
 [profile.src.build-override]
 inherits = "src"
 [profile.src.package."*"]
