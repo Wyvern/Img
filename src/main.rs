@@ -277,6 +277,8 @@ fn download(dir: &str, src: &str) {
                     "-L",
                     //"--location-trusted",
                     "-s",
+                    #[cfg(feature = "retry")]
+                    "--retry 3"
                 ])
                 .spawn();
 
@@ -446,7 +448,7 @@ mod tests {
     // https://bestgirlsexy.com/ https://girldreamy.com/
 
     #[test]
-    fn try_it() {
+    fn try_it(){
         let addr = "https://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }

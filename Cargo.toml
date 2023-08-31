@@ -2,13 +2,15 @@
 name = "BL"
 version = "0.1.0"
 edition = "2021"
+resolver = "2"
 
 [features]
-download = ["curl"]
-curl = []
-wget = []
-batch = []
-default = ["download"]
+default=["download"]
+download=["curl"]
+curl=[]
+wget=[]
+batch=[]
+retry=[]
 
 [dependencies]
 crabquery = { version = "*", default-features = false }
