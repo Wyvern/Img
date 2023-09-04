@@ -57,12 +57,12 @@ inherits = "release"
 rustflags = ["-Cprefer-dynamic","-Zcombine-cgu"]
 strip = true
 codegen-units = 1
+lto = true
 
 #lto
 [profile.lto]
 inherits = "release"
 rustflags = ["-Cprefer-dynamic=n"]
-lto = true
 panic = "abort"
 [profile.lto.build-override]
 inherits = "release"
@@ -147,6 +147,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Ztrait-solver=next-coherence",
 
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
@@ -207,6 +208,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Ztrait-solver=next-coherence",
     
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
@@ -259,6 +261,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Ztrait-solver=next-coherence",
     
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
@@ -310,6 +313,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Ztrait-solver=next-coherence",
     
     "-Zpanic-in-drop=abort",
 
@@ -357,6 +361,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Ztrait-solver=next-coherence",
     
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
