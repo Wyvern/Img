@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -35,7 +35,7 @@ jobs:
           #time cargo lto
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
-          find . -iname bl -type f | xargs ls -hl
+          find ./target -iname bl -type f | xargs ls -hl
           lscpu
           free -m
 
@@ -68,7 +68,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -87,7 +87,7 @@ jobs:
           time cargo src x86_64-apple-darwin
           time cargo src aarch64-apple-darwin
           lipo -create target/aarch64-apple-darwin/src/BL target/x86_64-apple-darwin/src/BL -output BL-Universal
-          find . -iname bl -type f | xargs ls -hl
+          find ./target -iname bl -type f | xargs ls -hl
           ls -hl BL-Universal
           sw_vers
           hostinfo
@@ -132,7 +132,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
