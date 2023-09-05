@@ -248,5 +248,11 @@
         "Img":"div.vipimglist img",
         "Src":"src",
         "Next":"div.page_navi a[href]"
+    },
+    {
+        "Site":"ribi.me",
+        "Img":"div.container img.img-fluid",
+        "Src":"src",
+        "Album":"li.breadcrumb-item a[href]"
     }
 ]

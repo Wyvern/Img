@@ -1,4 +1,4 @@
-use std::*;
+use std::{borrow::*, iter::*, mem::*, ops::*, *};
 
 mod util;
 use util::*;
@@ -115,15 +115,15 @@ fn parse(addr: &str) -> String {
     let has_album = !album.is_empty() && !albums.is_empty();
     match (has_album, !imgs.is_empty()) {
         (true, true) => println!(
-            "Totally found {} 📸 and {} 🏞️  in 📄: {} ",
+            "Totally found {} 📸 and {} 🏞️  in 【📄: {}】",
             albums.len(),
             imgs.len(),
             t
         ),
-        (true, false) => println!("Totally found {} 📸 in 📄: {} ", albums.len(), t),
-        (false, true) => println!("Totally found {} 🏞️  in 📄: {} ", imgs.len(), t),
+        (true, false) => println!("Totally found {} 📸 in 【📄: {}】", albums.len(), t),
+        (false, true) => println!("Totally found {} 🏞️  in 【📄: {}】", imgs.len(), t),
         (false, false) => {
-            println!("∅ 🏞️  found in 📄: {t}");
+            println!("∅ 🏞️  found in 【📄: {t}】");
             process::exit(0);
         }
     }
@@ -278,7 +278,7 @@ fn download(dir: &str, src: &str) {
                     //"--location-trusted",
                     "-s",
                     #[cfg(feature = "retry")]
-                    "--retry 3"
+                    "--retry 3",
                 ])
                 .spawn();
 
@@ -448,8 +448,8 @@ mod tests {
     // https://bestgirlsexy.com/ https://girldreamy.com/
 
     #[test]
-    fn try_it(){
-        let addr = "https://www.beautyleg6.com/siwameitui/";
+    fn try_it() {
+        let addr = "https://ribi.me/text/59457/1";
         parse(addr);
     }
 
