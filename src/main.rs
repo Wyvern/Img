@@ -3,11 +3,13 @@ use std::{borrow::*, iter::*, mem::*, ops::*, *};
 mod util;
 use util::*;
 
-static B: &str = "\x1b[1m";
 static N: &str = "\x1b[0m";
+static B: &str = "\x1b[1m";
+static I: &str = "\x1b[3m";
+static U: &str = "\x1b[4m";
 static R: &str = "\x1b[31m";
 static G: &str = "\x1b[32m";
-static Y: &str = "\x1b[93m";
+static Y: &str = "\x1b[33m";
 
 fn main() {
     let arg = env::args().nth(1).unwrap_or_else(|| {
@@ -126,11 +128,7 @@ fn parse(addr: &str) -> String {
             imgs.len(),
             t
         ),
-        (true, false) => println!(
-            "{B}Totally found {} 📸 in 📄:{G} {}{N}",
-            albums.len(),
-            t
-        ),
+        (true, false) => println!("{B}Totally found {} 📸 in 📄:{G} {}{N}", albums.len(), t),
         (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {}{N}", imgs.len(), t),
         (false, false) => {
             println!("{B}∅ 🏞️  found in 📄:{G} {t}{N}");
@@ -205,7 +203,7 @@ fn parse(addr: &str) -> String {
                     );
                     writeln!(
                         stdout,
-                        "{B}Do you want to download Album <{}/{}>: {G}{}?{N}",
+                        "{B}Do you want to download Album <{I}{U}{}/{}{N}>: {B}{G}{}?{N}",
                         i + 1,
                         albums.len(),
                         t.trim()
@@ -493,6 +491,11 @@ mod tests {
                 idx = parse(&idx);
             }
         });
+    }
+
+    #[test]
+    fn color() {
+        (0..=47).for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m Demo Text {N}"))
     }
 
     #[test]
