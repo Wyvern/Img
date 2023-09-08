@@ -3,6 +3,12 @@ use std::{borrow::*, iter::*, mem::*, ops::*, *};
 mod util;
 use util::*;
 
+static B: &str = "\x1b[1m";
+static N: &str = "\x1b[0m";
+static R: &str = "\x1b[31m";
+static G: &str = "\x1b[32m";
+static Y: &str = "\x1b[93m";
+
 fn main() {
     let arg = env::args().nth(1).unwrap_or_else(|| {
         println!("Please input URL argument..");
@@ -20,20 +26,20 @@ fn main() {
 ///Get scheme and host info from valid url string
 fn check_host(addr: &str) -> [&str; 2] {
     let split = addr.split_once("://").unwrap_or_else(|| {
-        println!("Invalid URL address.");
+        println!("{R}Invalid URL address.{N}");
         process::exit(0);
     });
     let scheme = split.0;
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        println!("Invalid http(s) protocol.");
+        println!("{R}Invalid http(s) protocol.{N}");
         process::exit(0);
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() {
-        println!("Invalid host info.");
+        println!("{R}Invalid host info.{N}");
         process::exit(0);
     }
     [scheme, host]
@@ -52,7 +58,7 @@ fn host_info(host: &str) -> [String; 4] {
                 .any(|s| s == host.trim_start_matches("www."))
         })
         .unwrap_or_else(|| {
-            println!("Unsupported website.. 🌏[{host}]💥");
+            println!("Unsupported website.. {B}{R}🌏[{host}]💥{N}");
             process::exit(0);
         });
     let next = site["Next"].as_str().unwrap_or("");
@@ -73,12 +79,12 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
         .unwrap_or_else(|e| {
-            println!("{e}");
+            println!("{R}{e}{N}");
             process::exit(0);
         });
     let res = String::from_utf8_lossy(&out.stdout).to_string();
     if res.is_empty() {
-        println!("Get html failed, please check url address.");
+        println!("{R}Get html failed, please check url address.{N}");
         process::exit(0);
     }
     (res, host_info, scheme_host)
@@ -93,7 +99,7 @@ fn parse(addr: &str) -> String {
     let title = titles
         .first()
         .unwrap_or_else(|| {
-            println!("Not a valid html page.");
+            println!("{R}Not a valid html page.{N}");
             process::exit(0);
         })
         .text()
@@ -115,15 +121,19 @@ fn parse(addr: &str) -> String {
     let has_album = !album.is_empty() && !albums.is_empty();
     match (has_album, !imgs.is_empty()) {
         (true, true) => println!(
-            "Totally found {} 📸 and {} 🏞️  in 【📄: {}】",
+            "{B}Totally found {} 📸 and {} 🏞️  in 📄:{G} {}{N}",
             albums.len(),
             imgs.len(),
             t
         ),
-        (true, false) => println!("Totally found {} 📸 in 【📄: {}】", albums.len(), t),
-        (false, true) => println!("Totally found {} 🏞️  in 【📄: {}】", imgs.len(), t),
+        (true, false) => println!(
+            "{B}Totally found {} 📸 in 📄:{G} {}{N}",
+            albums.len(),
+            t
+        ),
+        (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {}{N}", imgs.len(), t),
         (false, false) => {
-            println!("∅ 🏞️  found in 【📄: {t}】");
+            println!("{B}∅ 🏞️  found in 📄:{G} {t}{N}");
             process::exit(0);
         }
     }
@@ -195,22 +205,22 @@ fn parse(addr: &str) -> String {
                     );
                     writeln!(
                         stdout,
-                        "Do you want to download Album <{}/{}>: {}?",
+                        "{B}Do you want to download Album <{}/{}>: {G}{}?{N}",
                         i + 1,
                         albums.len(),
                         t.trim()
                     );
                     write!(
                         stdout,
-                        "[ Y{0}es⏎{1}N{0}o{1}A{0}ll{1}C{0}ancel ]: ",
-                        char::from_u32(0x332).unwrap(),
-                        " | "
+                        "{B}{Y}[ Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel ]: {N}",
+                        u = char::from_u32(0x332).unwrap(),
+                        s = " | ",
                     );
                     stdout.flush();
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
-                        println!("{e}");
+                        println!("{R}{e}{N}");
                         process::exit(0);
                     });
                     input.make_ascii_lowercase();
@@ -226,7 +236,7 @@ fn parse(addr: &str) -> String {
                             parse_album()
                         }
                         _ => {
-                            println!("Canceled all albums download.");
+                            println!("{B}Canceled all albums download.{N}");
                             next = String::default();
                             break;
                         }
@@ -252,7 +262,7 @@ fn download(dir: &str, src: &str) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
-                println!("Create Dir error: `{e}`");
+                println!("Create Dir error: {R}`{e}`{N}");
                 process::exit(0);
             });
         }
@@ -429,7 +439,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 ///WebSites Json config data
 fn website() -> json::JsonValue {
     json::parse(include_str!("web.json")).unwrap_or_else(|e| {
-        println!("{e}");
+        println!("{R}{e}{N}");
         process::exit(0);
     })
 }
@@ -449,7 +459,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://ribi.me/text/59457/1";
+        let addr = "https://mmm.red/";
         parse(addr);
     }
 
