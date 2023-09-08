@@ -3,6 +3,7 @@ use std::{borrow::*, iter::*, mem::*, ops::*, *};
 mod util;
 use util::*;
 
+///Colorized terminal constants
 static N: &str = "\x1b[0m";
 static B: &str = "\x1b[1m";
 static I: &str = "\x1b[3m";
@@ -210,7 +211,7 @@ fn parse(addr: &str) -> String {
                     );
                     write!(
                         stdout,
-                        "{B}{Y}[ Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel ]: {N}",
+                        "{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = " | ",
                     );
