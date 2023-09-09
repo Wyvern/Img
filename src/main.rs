@@ -61,7 +61,7 @@ fn host_info(host: &str) -> [String; 4] {
                 .any(|s| s == host.trim_start_matches("www."))
         })
         .unwrap_or_else(|| {
-            println!("Unsupported website.. {B}{R}🌏[{host}]💥{N}");
+            println!("Unsupported website.. {B}{R}🌏 {host} 💥{N}");
             process::exit(0);
         });
     let next = site["Next"].as_str().unwrap_or("");
@@ -458,7 +458,7 @@ mod tests {
 
     #[test]
     fn try_it() {
-        let addr = "https://mmm.red/";
+        let addr = "https://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
 
