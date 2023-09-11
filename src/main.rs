@@ -204,7 +204,7 @@ fn parse(addr: &str) -> String {
                     );
                     writeln!(
                         stdout,
-                        "{B}Do you want to download Album <{I}{U}{}/{}{N}>: {B}{G}{}?{N}",
+                        "{B}Do you want to download Album <{I}{U}{}/{}{N}>: {B}{G}{} ?{N}",
                         i + 1,
                         albums.len(),
                         t.trim()
@@ -454,8 +454,8 @@ mod tests {
         dbg!(&res);
     }
 
-    // https://bestgirlsexy.com/ https://girldreamy.com/
-
+    // https://bestgirlsexy.com/ https://girldreamy.com/ https://mmm.red/
+   
     #[test]
     fn try_it() {
         let addr = "https://www.beautyleg6.com/siwameitui/";
