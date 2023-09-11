@@ -1,11 +1,12 @@
 [alias]
 rr = "run -r"
 br = "build -r"
+z = "rustc -- -Z"
 cf = "clippy -r --fix --allow-no-vcs"
-ndf = "run -r --no-default-features"
-a = "build -r --all-features"
-ar = "run -r --all-features"
-ss = "build --profile stats"
+fx = "fix -r --allow-no-vcs"
+ndf = "r -r --no-default-features"
+all = "r -r --all-features"
+s = "b --profile stats"
 lto = "build --profile lto"
 no = "build --profile no"
 bl = "build --lib -r"
@@ -147,6 +148,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
 
     "-Zgcc-ld=lld",
@@ -155,6 +157,7 @@ rustflags = [
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
+    "-Funused_crate_dependencies",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
@@ -208,6 +211,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
+    "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
     
     "-Zgcc-ld=lld",
@@ -218,6 +222,7 @@ rustflags = [
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
+    "-Funused_crate_dependencies",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]

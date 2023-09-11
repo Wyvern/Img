@@ -26,12 +26,10 @@ fn main() {
     }
 }
 
-///Get scheme and host info from valid url string
+///Get `scheme` and `host` info from valid url string
 fn check_host(addr: &str) -> [&str; 2] {
-    let split = addr.split_once("://").unwrap_or_else(|| {
-        println!("{R}Invalid URL address.{N}");
-        process::exit(0);
-    });
+    let split = addr.split_once("://").unwrap_or(("http", addr));
+
     let scheme = split.0;
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
@@ -48,7 +46,7 @@ fn check_host(addr: &str) -> [&str; 2] {
     [scheme, host]
 }
 
-///Get host info and Generate img/src/next/album selector data
+///Get `host` info and Generate `img/src/next/album` selector data
 fn host_info(host: &str) -> [String; 4] {
     let data = website();
     let site = data
@@ -306,7 +304,7 @@ fn download(dir: &str, src: &str) {
     }
 }
 
-///Check next page info
+///Check `next` page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next: String;
     if nexts.is_empty() {
@@ -435,7 +433,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     tdbg!(next)
 }
 
-///WebSites Json config data
+///WebSites `Json` config data
 fn website() -> json::JsonValue {
     json::parse(include_str!("web.json")).unwrap_or_else(|e| {
         println!("{R}{e}{N}");
@@ -455,7 +453,7 @@ mod tests {
     }
 
     // https://bestgirlsexy.com/ https://girldreamy.com/ https://mmm.red/
-   
+
     #[test]
     fn try_it() {
         let addr = "https://www.beautyleg6.com/siwameitui/";
