@@ -157,7 +157,6 @@ rustflags = [
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
-    "-Funused_crate_dependencies",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
@@ -222,7 +221,6 @@ rustflags = [
     "-Aunused",
     "-Anonstandard_style",
     "-Aunexpected_cfgs",
-    "-Funused_crate_dependencies",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
