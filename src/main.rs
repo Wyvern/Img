@@ -4,11 +4,12 @@ mod util;
 use util::*;
 
 ///Colorized terminal constants
-mod Color{
+mod Color {
     pub static N: &str = "\x1b[0m";
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
+    pub static C: &str = "\x1b[30m";
     pub static R: &str = "\x1b[31m";
     pub static G: &str = "\x1b[32m";
     pub static Y: &str = "\x1b[33m";
@@ -80,6 +81,7 @@ fn host_info(host: &str) -> [String; 4] {
 fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
+    println!("{C}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
@@ -458,19 +460,19 @@ mod tests {
 
     // https://bestgirlsexy.com/ https://girldreamy.com/ https://mmm.red/
 
-    #[test] 
+    #[test]
     fn try_it() {
         let addr = "https://www.beautyleg6.com/siwameitui/";
-        parse(addr);
+        parse("mmm.red");
     }
 
     #[test]
     fn htmlq() {
-        let addr = "https://www.meituss.com/418068/";
+        let addr = "https://mmm.red/";
         let (html, [img, src, mut next, album], [_, host]) = get_html(addr);
         use process::*;
         let mut cmd = Command::new("htmlq")
-            .args([img])
+            .args([if album.is_empty() { img } else { album }])
             .stdin(Stdio::piped())
             //.stdout(Stdio::piped())
             .spawn()
