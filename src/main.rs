@@ -4,13 +4,17 @@ mod util;
 use util::*;
 
 ///Colorized terminal constants
-static N: &str = "\x1b[0m";
-static B: &str = "\x1b[1m";
-static I: &str = "\x1b[3m";
-static U: &str = "\x1b[4m";
-static R: &str = "\x1b[31m";
-static G: &str = "\x1b[32m";
-static Y: &str = "\x1b[33m";
+mod Color{
+    pub static N: &str = "\x1b[0m";
+    pub static B: &str = "\x1b[1m";
+    pub static I: &str = "\x1b[3m";
+    pub static U: &str = "\x1b[4m";
+    pub static R: &str = "\x1b[31m";
+    pub static G: &str = "\x1b[32m";
+    pub static Y: &str = "\x1b[33m";
+}
+
+use Color::*;
 
 fn main() {
     let arg = env::args().nth(1).unwrap_or_else(|| {
@@ -454,7 +458,7 @@ mod tests {
 
     // https://bestgirlsexy.com/ https://girldreamy.com/ https://mmm.red/
 
-    #[test]
+    #[test] 
     fn try_it() {
         let addr = "https://www.beautyleg6.com/siwameitui/";
         parse(addr);
