@@ -468,10 +468,10 @@ mod tests {
 
     #[test]
     fn htmlq() {
-        let addr = "https://mmm.red/";
+        let addr = "https://www.beautyleg6.com/siwameitui/";
         let (html, [img, src, mut next, album], [_, host]) = get_html(addr);
         use process::*;
-        let mut cmd = Command::new("htmlq")
+        let cmd = Command::new("htmlq")
             .args([if album.is_empty() { img } else { album }])
             .stdin(Stdio::piped())
             //.stdout(Stdio::piped())
