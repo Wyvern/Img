@@ -122,7 +122,7 @@ rustflags = [
     "-Cno-redzone",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
@@ -149,7 +149,7 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zdebuginfo-compression=zlib",
-    "-Ztrait-solver=next-coherence",
+    #"-Ztrait-solver=next-coherence",
 
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
@@ -184,7 +184,7 @@ rustflags = [
     "-Cno-redzone",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
@@ -211,7 +211,7 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zdebuginfo-compression=zlib",
-    "-Ztrait-solver=next-coherence",
+    #"-Ztrait-solver=next-coherence",
     
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
@@ -238,7 +238,7 @@ rustflags = [
     "-Cno-redzone",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
@@ -264,7 +264,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Ztrait-solver=next-coherence",
+    #"-Ztrait-solver=next-coherence",
     
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
@@ -290,7 +290,7 @@ rustflags = [
     "-Cno-redzone",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
@@ -316,7 +316,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Ztrait-solver=next-coherence",
+    #"-Ztrait-solver=next-coherence",
     
     "-Zpanic-in-drop=abort",
 
@@ -338,7 +338,7 @@ rustflags = [
     "-Cno-redzone",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
@@ -364,7 +364,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Ztrait-solver=next-coherence",
+    #"-Ztrait-solver=next-coherence",
     
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
