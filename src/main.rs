@@ -4,16 +4,45 @@ mod util;
 use util::*;
 
 ///Colorized terminal constants
+/**
+    The 8 actual colors within the ranges (30-37, 40-47, 90-97, 100-107) are defined by the ANSI standard as follows:
+    Last Digit 	Color
+    0 	black
+    1 	red
+    2 	green
+    3 	yellow
+    4 	blue
+    5 	magenta
+    6 	cyan
+    7 	white
+
+    Some common SGR parameters are shown below:
+    Parameter 	Effect
+    0 	reset all SGR effects to their default
+    1 	bold or increased intensity
+    2 	faint or decreased intensity
+    4 	singly underlined
+    5 	slow blink
+    30-37 	foreground color (8 colors)
+    38;5;x 	foreground color (256 colors, non-standard)
+    38;2;r;g;b 	foreground color (RGB, non-standard)
+    40-47 	background color (8 colors)
+    48;5;x 	background color (256 colors, non-standard)
+    48;2;r;g;b 	background color (RGB, non-standard)
+    90-97 	bright foreground color (non-standard)
+    100-107 	bright background color (non-standard)
+*/
 mod Color {
     pub static N: &str = "\x1b[0m";
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
-    pub static R: &str = "\x1b[31m";
-    pub static G: &str = "\x1b[32m";
-    pub static Y: &str = "\x1b[33m";
-    pub static HL: &str = "\x1b[43m";
-    pub static BG: &str = "\x1b[45m";
+    pub static R: &str = "\x1b[91m";
+    pub static G: &str = "\x1b[92m";
+    pub static Y: &str = "\x1b[93m";
+    pub static HL: &str = "\x1b[103m";
+    pub static BG: &str = "\x1b[100m";
+    pub static MARK: &str = "\x1b]1337;SetMark\x07";
 }
 
 use Color::*;
@@ -82,7 +111,7 @@ fn host_info(host: &str) -> [String; 4] {
 fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
-    println!("{BG}Downloading 📄 ...{N}");
+    println!("{MARK}{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
@@ -216,7 +245,7 @@ fn parse(addr: &str) -> String {
                     );
                     write!(
                         stdout,
-                        "{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
+                        "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = " | ",
                     );
@@ -469,14 +498,14 @@ mod tests {
 
     #[test]
     fn htmlq() {
-        let addr = "www.beautyleg6.com/siwameitui/202309/1495.html";
+        let addr = "https://mmm.red";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
         [img, album].iter().enumerate().for_each(|(i, sel)| {
             let cmd = Command::new("htmlq")
                 .args([{
                     println!(
-                        "\n{B}{s} Selector: {HL} {sel} {N}",
+                        "\n{MARK}{B}{s} Selector: {HL} {sel} {N}",
                         s = if i == 0 { "Image" } else { "Album" }
                     );
                     sel
@@ -511,7 +540,9 @@ mod tests {
     fn color() {
         (0..=47)
             .filter(|x| !(10..=20).contains(x) && !(22..=29).contains(x) && !(38..=40).contains(x))
-            .for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m Demo Text {N}"))
+            .for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m Demo Text {N}"));
+        (0..=107).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[{c}m Demo Text {N}"));
+        
     }
 
     #[test]
