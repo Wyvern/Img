@@ -9,10 +9,11 @@ mod Color {
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
-    pub static C: &str = "\x1b[30m";
     pub static R: &str = "\x1b[31m";
     pub static G: &str = "\x1b[32m";
     pub static Y: &str = "\x1b[33m";
+    pub static HL: &str = "\x1b[43m";
+    pub static BG: &str = "\x1b[45m";
 }
 
 use Color::*;
@@ -81,7 +82,7 @@ fn host_info(host: &str) -> [String; 4] {
 fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
-    println!("{C}Downloading 📄 ...{N}");
+    println!("{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
@@ -453,34 +454,42 @@ mod tests {
 
     #[test]
     fn html() {
-        let addr = "https://hotgirl.biz/xiuren-no-6069-%e9%a1%be%e4%b9%94%e6%a5%a0/";
-        let res = get_html(addr);
-        dbg!(&res);
+        let addr = "mmm.red";
+        let (html, ..) = get_html(addr);
+        dbg!(&html);
     }
-
-    // https://bestgirlsexy.com/ https://girldreamy.com/ https://mmm.red/
 
     #[test]
     fn try_it() {
+        // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
+
         let addr = "https://www.beautyleg6.com/siwameitui/";
-        parse("mmm.red");
+        parse(addr);
     }
 
     #[test]
     fn htmlq() {
-        let addr = "https://www.beautyleg6.com/siwameitui/";
-        let (html, [img, src, mut next, album], [_, host]) = get_html(addr);
+        let addr = "www.beautyleg6.com/siwameitui/202309/1495.html";
+        let (html, [img, .., album], _) = get_html(addr);
         use process::*;
-        let cmd = Command::new("htmlq")
-            .args([if album.is_empty() { img } else { album }])
-            .stdin(Stdio::piped())
-            //.stdout(Stdio::piped())
-            .spawn()
-            .expect("Execute htmlq failed.");
-        let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
-        use io::*;
-        stdin.write_all(html.as_bytes()).expect("Failed to write.");
-        cmd.wait_with_output().expect("Failed to get piped stdout.");
+        [img, album].iter().enumerate().for_each(|(i, sel)| {
+            let cmd = Command::new("htmlq")
+                .args([{
+                    println!(
+                        "\n{B}{s} Selector: {HL} {sel} {N}",
+                        s = if i == 0 { "Image" } else { "Album" }
+                    );
+                    sel
+                }])
+                .stdin(Stdio::piped())
+                //.stdout(Stdio::piped())
+                .spawn()
+                .expect("Execute htmlq failed.");
+            let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
+            use io::*;
+            stdin.write_all(html.as_bytes()).expect("Failed to write.");
+            cmd.wait_with_output().expect("Failed to get piped stdout.");
+        });
     }
 
     #[test]
@@ -500,7 +509,9 @@ mod tests {
 
     #[test]
     fn color() {
-        (0..=47).for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m Demo Text {N}"))
+        (0..=47)
+            .filter(|x| !(10..=20).contains(x) && !(22..=29).contains(x) && !(38..=40).contains(x))
+            .for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m Demo Text {N}"))
     }
 
     #[test]
