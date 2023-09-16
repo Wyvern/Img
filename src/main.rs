@@ -37,6 +37,7 @@ mod Color {
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
+    pub static UU: &str = "\x1b[21m";
     pub static R: &str = "\x1b[91m";
     pub static G: &str = "\x1b[92m";
     pub static Y: &str = "\x1b[93m";
@@ -113,7 +114,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let host_info = host_info(host);
     println!("{MARK}{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
-        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
+        .args(&[addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
         .unwrap_or_else(|e| {
             println!("{R}{e}{N}");
@@ -309,7 +310,7 @@ fn download(dir: &str, src: &str) {
             #[cfg(feature = "curl")]
             process::Command::new("curl")
                 .current_dir(path)
-                .args([
+                .args(&[
                     src,
                     "-o",
                     name,
@@ -328,7 +329,7 @@ fn download(dir: &str, src: &str) {
             #[cfg(feature = "wget")]
             process::Command::new("wget")
                 .current_dir(path)
-                .args([
+                .args(&[
                     &src,
                     format!("--referer={host}").as_str(),
                     "-U",
@@ -503,7 +504,7 @@ mod tests {
         use process::*;
         [img, album].iter().enumerate().for_each(|(i, sel)| {
             let cmd = Command::new("htmlq")
-                .args([{
+                .args(&[{
                     println!(
                         "\n{MARK}{B}{s} Selector: {HL} {sel} {N}",
                         s = if i == 0 { "Image" } else { "Album" }
@@ -538,16 +539,33 @@ mod tests {
 
     #[test]
     fn color() {
-        let text="The quick brown fox jumps over the lazy dog";
+        let text = "The quick brown fox jumps over the lazy dog";
         (0u8..10)
             .chain((21..22))
             .chain((30..=37))
             .chain((40..=47))
-            .for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}"));
+            .chain((90..=97))
+            .chain((100..=107))
+            .for_each(|c| {
+                match c {
+                    0 => println!("{B}{UU}Basic Style:{N}"),
+                    30 => println!("{B}{UU}\n8-color regular foreground:{N}"),
+                    40 => println!("{B}{UU}\n8-color regular background:{N}"),
+                    90 => println!("{B}{UU}\n8-color bright foreground:{N}"),
+                    100 => println!("{B}{UU}\n8-color bright background:{N}"),
+                    _ => (),
+                }
+                println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}")
+            });
 
-        (0u8..=255).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}"));
+        #[cfg(any())]
+        {
+            println!("{B}{UU}\n256-color foreground:{N}");
+            (0u8..=255).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}"));
 
-        (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
+            println!("{B}{UU}\n256-color background:{N}");
+            (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
+        }
     }
 
     #[test]
