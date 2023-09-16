@@ -8,7 +8,6 @@ mod Color {
     pub static B: &str = "\x1b[1m";
     pub static U: &str = "\x1b[4m";
 }
-
 use Color::*;
 
 fn main() {
@@ -18,37 +17,34 @@ fn main() {
 
     match (arg1, arg2) {
         (None, None) => {
-            _8color(text);
-            _256color(text)
+            color8(text);
+            color256(text)
         }
-        (Some(v), None) if v.parse::<u16>() == Ok(8) => _8color(text),
+        (Some(v), None) if v.parse::<u16>() == Ok(8) => color8(text),
 
-        (Some(v), None) if v.parse::<u16>() == Ok(256) => _256color(text),
+        (Some(v), None) if v.parse::<u16>() == Ok(256) => color256(text),
 
         (Some(v1), Some(v2)) => match (v1.parse::<u16>(), v2.parse::<u16>()) {
-            (Ok(8), Ok(8)) => _8color(text),
             (Ok(8), Ok(256)) => {
-                _8color(text);
-                _256color(text);
+                color8(text);
+                color256(text);
             }
             (Ok(256), Ok(8)) => {
-                _256color(text);
-                _8color(text);
+                color256(text);
+                color8(text);
             }
-            (Ok(256), Ok(256)) => _256color(text),
-            _ => {
-                println!("Please input 8/256 color options.");
-                process::exit(0);
-            }
+            (Ok(256), _) => match v2.as_str() {
+                "fg" => color256_fg(text),
+                "bg" => color256_bg(text),
+                _ => exit(),
+            },
+            _ => exit(),
         },
-        _ => {
-            println!("Please input 8/256 color options.");
-            process::exit(0);
-        }
+        _ => exit(),
     }
 }
 
-fn _8color(text: &str) {
+fn color8(text: &str) {
     (0u8..10)
         .chain((21..22))
         .chain((30..=37))
@@ -68,13 +64,22 @@ fn _8color(text: &str) {
         });
 }
 
-fn _256color(text: &str) {
-    #[cfg(all())]
-    {
-        println!("{B}{U}\n256-color foreground:{N}");
-        (0u8..=255).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}"));
+fn color256(text: &str) {
+    color256_fg(text);
+    color256_bg(text);
+}
 
-        println!("{B}{U}\n256-color background:{N}");
-        (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
-    }
+fn color256_fg(text: &str) {
+    println!("{B}{U}\n256-color foreground:{N}");
+    (0u8..=255).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}"));
+}
+
+fn color256_bg(text: &str) {
+    println!("{B}{U}\n256-color background:{N}");
+    (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
+}
+
+fn exit() {
+    println!("Please input 8/256 fg/bg color options.");
+    process::exit(0);
 }

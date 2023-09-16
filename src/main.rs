@@ -1,4 +1,4 @@
-use std::{borrow::*, iter::*, mem::*, ops::*, *};
+use std::*;
 
 mod util;
 use util::*;
@@ -45,13 +45,11 @@ mod Color {
     pub static BG: &str = "\x1b[100m";
     pub static MARK: &str = "\x1b]1337;SetMark\x07";
 }
-
 use Color::*;
 
 fn main() {
     let arg = env::args().nth(1).unwrap_or_else(|| {
-        println!("Please input URL argument..");
-        process::exit(0);
+        exit(format_args!("Please input URL argument.."));
     });
 
     let mut next = parse(&arg);
@@ -70,14 +68,12 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        println!("{R}Invalid http(s) protocol.{N}");
-        process::exit(0);
+        exit(format_args!("{R}Invalid http(s) protocol.{N}"));
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() {
-        println!("{R}Invalid host info.{N}");
-        process::exit(0);
+        exit(format_args!("{R}Invalid host info.{N}"));
     }
     [scheme, host]
 }
@@ -95,8 +91,7 @@ fn host_info(host: &str) -> [String; 4] {
                 .any(|s| s == host.trim_start_matches("www."))
         })
         .unwrap_or_else(|| {
-            println!("Unsupported website.. {B}{R}🌏 {host} 💥{N}");
-            process::exit(0);
+            exit(format_args!("Unsupported website.. {B}{R}🌏 {host} 💥{N}"));
         });
     let next = site["Next"].as_str().unwrap_or("");
     let album = site["Album"].as_str().unwrap_or("");
@@ -117,13 +112,13 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
         .args(&[addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
         .unwrap_or_else(|e| {
-            println!("{R}{e}{N}");
-            process::exit(0);
+            exit(format_args!("{R} `{e}` {N}"));
         });
     let res = String::from_utf8_lossy(&out.stdout).to_string();
     if res.is_empty() {
-        println!("{R}Get html failed, please check url address.{N}");
-        process::exit(0);
+        exit(format_args!(
+            "{R}Get HTML failed, please check url address.{N}"
+        ));
     }
     (res, host_info, scheme_host)
 }
@@ -137,8 +132,7 @@ fn parse(addr: &str) -> String {
     let title = titles
         .first()
         .unwrap_or_else(|| {
-            println!("{R}Not a valid html page.{N}");
-            process::exit(0);
+            exit(format_args!("{R}Not a valid HTML page.{N}"));
         })
         .text()
         .expect("NO title text.");
@@ -167,8 +161,7 @@ fn parse(addr: &str) -> String {
         (true, false) => println!("{B}Totally found {} 📸 in 📄:{G} {}{N}", albums.len(), t),
         (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {}{N}", imgs.len(), t),
         (false, false) => {
-            println!("{B}∅ 🏞️  found in 📄:{G} {t}{N}");
-            process::exit(0);
+            exit(format_args!("{B}∅ 🏞️  found in 📄:{G} {t}{N}"));
         }
     }
 
@@ -254,8 +247,7 @@ fn parse(addr: &str) -> String {
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
-                        println!("{R}{e}{N}");
-                        process::exit(0);
+                        exit(format_args!("{R} `{e}` {N}"));
                     });
                     input.make_ascii_lowercase();
 
@@ -296,8 +288,7 @@ fn download(dir: &str, src: &str) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
-                println!("Create Dir error: {R}`{e}`{N}");
-                process::exit(0);
+                exit(format_args!("Create Dir error:{R} `{e}` {N}"));
             });
         }
 
@@ -473,9 +464,14 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 ///WebSites `Json` config data
 fn website() -> json::JsonValue {
     json::parse(include_str!("web.json")).unwrap_or_else(|e| {
-        println!("{R}{e}{N}");
-        process::exit(0);
+        exit(format_args!("{R} `{e}` {N}"));
     })
+}
+
+///General `exit(msg: ...)` function
+fn exit(msg: fmt::Arguments<'_>) -> ! {
+    println!("{msg}");
+    process::exit(0);
 }
 
 #[cfg(test)]
@@ -540,29 +536,40 @@ mod tests {
     #[test]
     fn color() {
         let text = "The quick brown fox jumps over the lazy dog";
-        (0u8..10)
-            .chain((21..22))
-            .chain((30..=37))
-            .chain((40..=47))
-            .chain((90..=97))
-            .chain((100..=107))
-            .for_each(|c| {
-                match c {
-                    0 => println!("{B}{UU}Basic Style:{N}"),
-                    30 => println!("{B}{UU}\n8-color regular foreground:{N}"),
-                    40 => println!("{B}{UU}\n8-color regular background:{N}"),
-                    90 => println!("{B}{UU}\n8-color bright foreground:{N}"),
-                    100 => println!("{B}{UU}\n8-color bright background:{N}"),
-                    _ => (),
-                }
-                println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}")
-            });
+        color8(text);
+        color256(text);
 
-        #[cfg(any())]
-        {
+        fn color8(text: &str) {
+            (0u8..10)
+                .chain((21..22))
+                .chain((30..=37))
+                .chain((40..=47))
+                .chain((90..=97))
+                .chain((100..=107))
+                .for_each(|c| {
+                    match c {
+                        0 => println!("{B}{UU}Basic Style:{N}"),
+                        30 => println!("{B}{UU}\n8-color regular foreground:{N}"),
+                        40 => println!("{B}{UU}\n8-color regular background:{N}"),
+                        90 => println!("{B}{UU}\n8-color bright foreground:{N}"),
+                        100 => println!("{B}{UU}\n8-color bright background:{N}"),
+                        _ => (),
+                    }
+                    println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}")
+                });
+        }
+
+        fn color256(text: &str) {
+            color256_fg(text);
+            color256_bg(text);
+        }
+
+        fn color256_fg(text: &str) {
             println!("{B}{UU}\n256-color foreground:{N}");
             (0u8..=255).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}"));
+        }
 
+        fn color256_bg(text: &str) {
             println!("{B}{UU}\n256-color background:{N}");
             (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
         }
