@@ -538,11 +538,16 @@ mod tests {
 
     #[test]
     fn color() {
-        (0..=47)
-            .filter(|x| !(10..=20).contains(x) && !(22..=29).contains(x) && !(38..=40).contains(x))
-            .for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m Demo Text {N}"));
-        (0..=107).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[{c}m Demo Text {N}"));
-        
+        let text="The quick brown fox jumps over the lazy dog";
+        (0u8..10)
+            .chain((21..22))
+            .chain((30..=37))
+            .chain((40..=47))
+            .for_each(|c| println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}"));
+
+        (0u8..=255).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}"));
+
+        (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
     }
 
     #[test]
