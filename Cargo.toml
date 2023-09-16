@@ -3,15 +3,20 @@ name = "BL"
 version = "0.1.0"
 edition = "2021"
 resolver = "2"
+default-run = "BL"
 
 [features]
-default=["download"]
-download=["curl"]
-curl=[]
-wget=[]
-batch=[]
-retry=[]
+default = ["download"]
+download = ["curl"]
+curl = []
+wget = []
+batch = []
+retry = []
 
 [dependencies]
 crabquery = { version = "*", default-features = false }
 json = { version = "*", default-features = false }
+
+[[bin]]
+name = "color"
+path = "src/color.rs"
