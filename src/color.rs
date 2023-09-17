@@ -10,7 +10,7 @@ fn main() {
     let arg1 = env::args().nth(1);
     let arg2 = env::args().nth(2);
     let text = "The quick brown fox jumps over the lazy dog";
-    let msg = "Please input 8/256 fg/bg color options.";
+    let msg = "Please input `8/256` `fg/bg` color options.";
     match (arg1, arg2) {
         (None, None) => {
             color8(text);
