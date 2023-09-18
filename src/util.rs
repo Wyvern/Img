@@ -97,35 +97,35 @@ mod Color {
             .chain((100..=107))
             .for_each(|c| {
                 match c {
-                    0 => println!("{B}{U}Basic Style:{N}"),
-                    30 => println!("{B}{U}\n8-color regular foreground:{N}"),
-                    40 => println!("{B}{U}\n8-color regular background:{N}"),
-                    90 => println!("{B}{U}\n8-color bright foreground:{N}"),
-                    100 => println!("{B}{U}\n8-color bright background:{N}"),
+                    0 => println!("\n{B}{U}Basic Style:{N}"),
+                    30 => println!("\n{B}{U}8-color regular foreground:{N}"),
+                    40 => println!("\n{B}{U}8-color regular background:{N}"),
+                    90 => println!("\n{B}{U}8-color bright foreground:{N}"),
+                    100 => println!("\n{B}{U}8-color bright background:{N}"),
                     _ => (),
                 }
-                println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}")
+                println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
             });
     }
-
+    
     pub fn color256(text: &str) {
         color256_fg(text);
         color256_bg(text);
     }
 
     pub fn color256_fg(text: &str) {
-        println!("{B}{U}\n256-color foreground:{N}");
+        println!("\n{B}{U}256-color foreground:{N}");
         (0u8..=255).for_each(|c| println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}"));
     }
 
     pub fn color256_bg(text: &str) {
-        println!("{B}{U}\n256-color background:{N}");
+        println!("\n{B}{U}256-color background:{N}");
         (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
     }
 }
 pub use Color::*;
 
-///General `exit(msg: ...)` function
+///Generic `exit(msg: ...)` function
 pub fn exit(msg: fmt::Arguments<'_>) -> ! {
     println!("{msg}");
     process::exit(0);

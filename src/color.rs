@@ -10,7 +10,7 @@ fn main() {
     let arg1 = env::args().nth(1);
     let arg2 = env::args().nth(2);
     let text = "The quick brown fox jumps over the lazy dog";
-    let msg = "Please input `8/256` `fg/bg` color options.";
+    let msg = "Please input `8/256` `f[g]/b[g]` color options.";
     match (arg1, arg2) {
         (None, None) => {
             color8(text);
@@ -28,8 +28,8 @@ fn main() {
                 color8(text);
             }
             (Ok(256), _) => match v2.as_str() {
-                "fg" => color256_fg(text),
-                "bg" => color256_bg(text),
+                "f" | "fg" => color256_fg(text),
+                "b" | "bg" => color256_bg(text),
                 _ => exit(format_args!("{msg}")),
             },
             _ => exit(format_args!("{msg}")),

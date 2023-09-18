@@ -438,7 +438,7 @@ mod tests {
     #[test]
     fn try_it() {
         // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-
+        
         let addr = "https://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
