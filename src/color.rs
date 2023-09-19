@@ -9,16 +9,25 @@ use util::*;
 fn main() {
     let arg1 = env::args().nth(1);
     let arg2 = env::args().nth(2);
+    let arg3 = env::args().nth(3);
+    let arg4 = env::args().nth(4);
+    if env::args().len() > 5 {
+        exit()
+    }
     let text = "The quick brown fox jumps over the lazy dog";
-    let msg = "Please input `8/256` `f[g]/b[g]` color options.";
-    match (arg1, arg2) {
-        (None, None) => {
+    match (
+        arg1.as_deref(),
+        arg2.as_deref(),
+        arg3.as_deref(),
+        arg4.as_deref(),
+    ) {
+        (None, None, None, None) => {
             color8(text);
             color256(text)
         }
-        (Some(v), None) if v.parse::<u16>() == Ok(8) => color8(text),
-        (Some(v), None) if v.parse::<u16>() == Ok(256) => color256(text),
-        (Some(v1), Some(v2)) => match (v1.parse::<u16>(), v2.parse::<u16>()) {
+        (Some(v), None, None, None) if v.parse::<u16>() == Ok(8) => color8(text),
+        (Some(v), None, None, None) if v.parse::<u16>() == Ok(256) => color256(text),
+        (Some(v1), Some(v2), None, None) => match (v1.parse::<u16>(), v2.parse::<u16>()) {
             (Ok(8), Ok(256)) => {
                 color8(text);
                 color256(text);
@@ -27,13 +36,37 @@ fn main() {
                 color256(text);
                 color8(text);
             }
-            (Ok(256), _) => match v2.as_str() {
+            (Ok(256), _) => match v2 {
                 "f" | "fg" => color256_fg(text),
                 "b" | "bg" => color256_bg(text),
-                _ => exit(format_args!("{msg}")),
+                _ => exit(),
             },
-            _ => exit(format_args!("{msg}")),
+            _ => exit(),
         },
-        _ => exit(format_args!("{msg}")),
+        (Some("rgb") | Some("RGB"), Some(r), Some(g), Some(b)) => {
+            let (r, g, b) = (r.parse::<u8>(), g.parse::<u8>(), b.parse::<u8>());
+            if (r.is_ok() && g.is_ok() && b.is_ok()) {
+                color_rgb_fg(
+                    r.as_ref().unwrap(),
+                    g.as_ref().unwrap(),
+                    b.as_ref().unwrap(),
+                    text,
+                );
+                color_rgb_bg(
+                    r.as_ref().unwrap(),
+                    g.as_ref().unwrap(),
+                    b.as_ref().unwrap(),
+                    text,
+                )
+            } else {
+                exit();
+            }
+        }
+        _ => exit(),
     }
+}
+
+fn exit() {
+    println!("Please input `8/256` `{{f,b}}[g]` or `RGB r g b` [0..255] color options.");
+    process::exit(0);
 }

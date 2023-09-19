@@ -438,7 +438,7 @@ mod tests {
     #[test]
     fn try_it() {
         // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-        
+
         let addr = "https://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
@@ -487,20 +487,8 @@ mod tests {
     fn color() {
         let text = "The quick brown fox jumps over the lazy dog";
         color8(text);
-        color256(text);
-    }
-
-    #[test]
-    fn pause() {
-        use io::*;
-        let mut stdin = io::stdin();
-        let mut stdout = io::stdout();
-
-        write!(stdout, "Press any key to continue...");
-        stdout.flush();
-
-        // Read a single byte and discard
-        //let _ = stdin.read(&mut []).unwrap();
-        stdin.read(&mut []);
+        // color256(text);
+        // color_rgb_fg_full();
+        // color_rgb_bg_full();
     }
 }

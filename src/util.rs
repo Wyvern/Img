@@ -107,7 +107,7 @@ mod Color {
                 println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
             });
     }
-    
+
     pub fn color256(text: &str) {
         color256_fg(text);
         color256_bg(text);
@@ -122,11 +122,54 @@ mod Color {
         println!("\n{B}{U}256-color background:{N}");
         (0u8..=255).for_each(|c| println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}"));
     }
+
+    pub fn color_rgb_fg(r: &u8, g: &u8, b: &u8, text: &str) {
+        println!("\n{B}{U}RGB-color foreground:{N}");
+        println!("\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m {text} {N}");
+    }
+
+    pub fn color_rgb_bg(r: &u8, g: &u8, b: &u8, text: &str) {
+        println!("\n{B}{U}RGB-color background:{N}");
+        println!("\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m {text} {N}");
+    }
+
+    pub fn color_rgb_fg_full() {
+        (0u8..=255).for_each(|r| {
+            (0u8..=255).for_each(|g| {
+                (0u8..=255).for_each(|b| {
+                    println!("\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m Full-range foreground RGB-color {N}");
+                });super::pause()
+            });
+        });
+    }
+
+    pub fn color_rgb_bg_full() {
+        (0u8..=255).for_each(|r| {
+            (0u8..=255).for_each(|g| {
+                (0u8..=255).for_each(|b| {
+                    println!("\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m Full-range background RGB-color {N}");
+                });super::pause()
+            })
+        });
+    }
 }
 pub use Color::*;
 
 ///Generic `exit(msg: ...)` function
-pub fn exit(msg: fmt::Arguments<'_>) -> ! {
+pub fn exit(msg: Arguments<'_>) -> ! {
     println!("{msg}");
     process::exit(0);
+}
+
+// #[test]
+fn pause() {
+    use io::*;
+    let mut input = io::stdin();
+    let mut output = io::stdout();
+
+    write!(output, "Press any key to continue...");
+    output.flush();
+
+    let mut handle = input.lock();
+    handle.read_line(&mut String::default());
 }
