@@ -485,9 +485,8 @@ mod tests {
 
     #[test]
     fn color() {
-        let text = "The quick brown fox jumps over the lazy dog";
-        color8(text);
-        // color256(text);
+        color8(TEXT);
+        // color256(TEXT);
         // color_rgb_fg_full();
         // color_rgb_bg_full();
     }

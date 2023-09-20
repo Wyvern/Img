@@ -89,11 +89,9 @@ mod Color {
     pub static BG: &str = "\x1b[100m";
     pub static FG: &str = "\x1b[97m";
     pub static MARK: &str = "\x1b]1337;SetMark\x07";
-
-    use std::io::*;
+    pub static TEXT: &str = "The quick brown fox jumps over the lazy dog";
 
     pub fn color8(text: &str) {
-        let mut o = stdout();
         (0u8..10)
             .chain((21..22))
             .chain((30..=37))
@@ -102,16 +100,15 @@ mod Color {
             .chain((100..=107))
             .for_each(|c| {
                 match c {
-                    0 => writeln!(o, "\n{B}{U}Basic Style:{N}"),
-                    30 => writeln!(o, "\n{B}{U}8-color regular foreground:{N}"),
-                    40 => writeln!(o, "\n{B}{U}8-color regular background:{N}"),
-                    90 => writeln!(o, "\n{B}{U}8-color bright foreground:{N}"),
-                    100 => writeln!(o, "\n{B}{U}8-color bright background:{N}"),
-                    _ => Ok(()),
+                    0 => println!("\n{B}{U}Basic Style:{N}"),
+                    30 => println!("\n{B}{U}8-color regular foreground:{N}"),
+                    40 => println!("\n{B}{U}8-color regular background:{N}"),
+                    90 => println!("\n{B}{U}8-color bright foreground:{N}"),
+                    100 => println!("\n{B}{U}8-color bright background:{N}"),
+                    _ => (),
                 };
-                writeln!(o, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
+                println!("\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
             });
-        o.flush();
     }
 
     pub fn color256(text: &str) {
@@ -120,79 +117,57 @@ mod Color {
     }
 
     pub fn color256_fg(text: &str) {
-        let mut o = stdout();
-        writeln!(o, "\n{B}{U}256-color foreground:{N}");
+        println!("\n{B}{U}256-color foreground:{N}");
         (0u8..=255).for_each(|c| {
-            writeln!(o, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
+            println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
         });
-        o.flush();
     }
 
     pub fn color256_bg(text: &str) {
-        let mut o = stdout();
-        writeln!(o, "\n{B}{U}256-color background:{N}");
+        println!("\n{B}{U}256-color background:{N}");
         (0u8..=255).for_each(|c| {
-            writeln!(o, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
+            println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
         });
-        o.flush();
     }
 
     pub fn color_256_fg(c: &u8, text: &str) {
-        let mut o = stdout();
-        writeln!(o, "\n{B}{U}256-color foreground:{N}");
-        writeln!(o, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
-        o.flush();
+        println!("\n{B}{U}256-color foreground:{N}");
+        println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
     }
 
     pub fn color_256_bg(c: &u8, text: &str) {
-        let mut o = stdout();
-        writeln!(o, "\n{B}{U}256-color background:{N}");
-        writeln!(o, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
-        o.flush();
+        println!("\n{B}{U}256-color background:{N}");
+        println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
     }
 
     pub fn color_rgb_fg(r: &u8, g: &u8, b: &u8, text: &str) {
-        let mut o = stdout();
-        writeln!(o, "\n{B}{U}RGB-color foreground:{N}");
-        writeln!(
-            o,
-            "\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m {text} {N}"
-        );
-        o.flush();
+        println!("\n{B}{U}RGB-color foreground:{N}");
+        println!("\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m {text} {N}");
     }
 
     pub fn color_rgb_bg(r: &u8, g: &u8, b: &u8, text: &str) {
-        let mut o = stdout();
-        writeln!(o, "\n{B}{U}RGB-color background:{N}");
-        writeln!(
-            o,
-            "\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m {text} {N}"
-        );
-        o.flush();
+        println!("\n{B}{U}RGB-color background:{N}");
+        println!("\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m {text} {N}");
     }
 
     pub fn color_rgb_fg_full() {
-        let mut o = stdout();
         (0u8..=255).for_each(|r| {
             (0u8..=255).for_each(|g| {
                 (0u8..=255).for_each(|b| {
-                    writeln!(o,"\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m Full-range foreground RGB-color {N}");
+                    println!("\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m Full-range foreground RGB-color {N}");
                 });super::pause()
             });
         });
-        o.flush();
     }
 
     pub fn color_rgb_bg_full() {
-        let mut o = stdout();
         (0u8..=255).for_each(|r| {
             (0u8..=255).for_each(|g| {
                 (0u8..=255).for_each(|b| {
-                    writeln!(o,"\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m Full-range background RGB-color {N}");
+                    println!("\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m Full-range background RGB-color {N}");
                 });super::pause()
             })
         });
-        o.flush();
     }
 }
 pub use Color::*;

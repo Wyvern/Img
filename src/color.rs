@@ -16,7 +16,7 @@ fn main() {
     if env::args().len() > 5 {
         exit()
     }
-    let text = "The quick brown fox jumps over the lazy dog";
+
     match (
         arg1.as_deref(),
         arg2.as_deref(),
@@ -24,19 +24,19 @@ fn main() {
         arg4.as_deref(),
     ) {
         (None, None, None, None) => {
-            color8(text);
-            color256(text)
+            color8(TEXT);
+            color256(TEXT)
         }
-        (Some(v), None, None, None) if v.parse::<u8>() == Ok(8) => color8(text),
-        (Some(v), None, None, None) if v.parse::<u16>() == Ok(256) => color256(text),
+        (Some(v), None, None, None) if v.parse::<u8>() == Ok(8) => color8(TEXT),
+        (Some(v), None, None, None) if v.parse::<u16>() == Ok(256) => color256(TEXT),
         (Some(v1), Some(v2), None, None) => match (v1.parse::<u16>(), v2.parse::<u8>()) {
             (Ok(256), Ok(c)) => {
-                color_256_fg(&c, text);
-                color_256_bg(&c, text);
+                color_256_fg(&c, TEXT);
+                color_256_bg(&c, TEXT);
             }
             (Ok(256), _) => match v2 {
-                "f" | "fg" => color256_fg(text),
-                "b" | "bg" => color256_bg(text),
+                "f" | "fg" => color256_fg(TEXT),
+                "b" | "bg" => color256_bg(TEXT),
                 _ => exit(),
             },
             _ => exit(),
@@ -49,8 +49,8 @@ fn main() {
                     g.as_ref().unwrap(),
                     b.as_ref().unwrap(),
                 );
-                color_rgb_fg(r, g, b, text);
-                color_rgb_bg(r, g, b, text)
+                color_rgb_fg(r, g, b, TEXT);
+                color_rgb_bg(r, g, b, TEXT)
             } else {
                 exit();
             }
