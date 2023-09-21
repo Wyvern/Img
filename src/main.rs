@@ -63,9 +63,9 @@ fn host_info(host: &str) -> [String; 4] {
 fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
-    println!("{MARK}{BG}Downloading 📄 ...{N}");
+    println!("{BLINK}{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
-        .args(&[addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
+        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
         .unwrap_or_else(|e| {
             exit(format_args!("{R} `{e}` {N}"));
@@ -107,15 +107,15 @@ fn parse(addr: &str) -> String {
         page.select(album.as_str())
     };
     let has_album = !album.is_empty() && !albums.is_empty();
+    print!("{C}");
     match (has_album, !imgs.is_empty()) {
         (true, true) => println!(
-            "{B}Totally found {} 📸 and {} 🏞️  in 📄:{G} {}{N}",
+            "{B}Totally found {} 📸 and {} 🏞️  in 📄:{G} {t}{N}",
             albums.len(),
             imgs.len(),
-            t
         ),
-        (true, false) => println!("{B}Totally found {} 📸 in 📄:{G} {}{N}", albums.len(), t),
-        (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {}{N}", imgs.len(), t),
+        (true, false) => println!("{B}Totally found {} 📸 in 📄:{G} {t}{N}", albums.len(),),
+        (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {t}{N}", imgs.len(),),
         (false, false) => {
             exit(format_args!("{B}∅ 🏞️  found in 📄:{G} {t}{N}"));
         }
@@ -257,7 +257,7 @@ fn download(dir: &str, src: &str) {
             #[cfg(feature = "curl")]
             process::Command::new("curl")
                 .current_dir(path)
-                .args(&[
+                .args([
                     src,
                     "-o",
                     name,
@@ -450,7 +450,7 @@ mod tests {
         use process::*;
         [img, album].iter().enumerate().for_each(|(i, sel)| {
             let cmd = Command::new("htmlq")
-                .args(&[{
+                .args([{
                     println!(
                         "\n{MARK}{B}{s} Selector: {HL} {sel} {N}",
                         s = if i == 0 { "Image" } else { "Album" }
@@ -490,7 +490,6 @@ mod tests {
         // color256(TEXT);
         // color_rgb_fg_full();
         // color_rgb_bg_full();
-        dbg!(&(time::Instant::now()-begin));
+        dbg!(&(time::Instant::now() - begin));
     }
-
 }
