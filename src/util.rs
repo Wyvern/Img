@@ -93,7 +93,7 @@ mod Color {
 
     pub fn color8(text: &str) {
         (0u8..10)
-            .chain((21..22))
+            .chain((21..=21))
             .chain((30..=37))
             .chain((40..=47))
             .chain((90..=97))

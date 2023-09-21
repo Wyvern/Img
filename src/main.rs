@@ -485,9 +485,12 @@ mod tests {
 
     #[test]
     fn color() {
+        let begin = time::Instant::now();
         color8(TEXT);
         // color256(TEXT);
         // color_rgb_fg_full();
         // color_rgb_bg_full();
+        dbg!(&(time::Instant::now()-begin));
     }
+
 }
