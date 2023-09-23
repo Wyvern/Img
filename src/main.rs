@@ -5,7 +5,7 @@ use util::*;
 
 fn main() {
     let arg = env::args().nth(1).unwrap_or_else(|| {
-        exit(format_args!("Please input URL argument.."));
+        exit(format_args!("{R}Please input URL argument..{N}"));
     });
 
     let mut next = parse(&arg);
@@ -73,7 +73,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let res = String::from_utf8_lossy(&out.stdout).to_string();
     if res.is_empty() {
         exit(format_args!(
-            "{R}Get HTML failed, please check url address.{N}"
+            "{C}{R}Get HTML failed, please check url address.{N}"
         ));
     }
     (res, host_info, scheme_host)
@@ -426,7 +426,7 @@ fn website() -> json::JsonValue {
 }
 
 #[cfg(test)]
-mod tests {
+mod BL {
     use super::*;
 
     #[test]
@@ -434,14 +434,6 @@ mod tests {
         let addr = "mmm.red";
         let (html, ..) = get_html(addr);
         dbg!(&html);
-    }
-
-    #[test]
-    fn try_it() {
-        // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-        
-        let addr = "http://www.beautyleg6.com/siwameitui/";
-        parse("mmm.red");
     }
 
     #[test]
@@ -470,7 +462,15 @@ mod tests {
     }
 
     #[test]
-    fn run() {
+    fn r#try() {
+        // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
+
+        let addr = "http://www.beautyleg6.com/siwameitui/";
+        parse(addr);
+    }
+    
+    #[test]
+    fn range() {
         let mut addr = "https://girldreamy.com/category/china/xiuren/page/30";
         let page = &addr[addr.rfind('/').unwrap() + 1..];
         let num = page.parse::<u16>().expect("Parse page number failed.");
@@ -482,15 +482,5 @@ mod tests {
                 idx = parse(&idx);
             }
         });
-    }
-
-    #[test]
-    fn color() {
-        let begin = time::Instant::now();
-        color8(TEXT);
-        // color256(TEXT);
-        // color_rgb_fg_full();
-        // color_rgb_bg_full();
-        dbg!(&(time::Instant::now() - begin));
     }
 }

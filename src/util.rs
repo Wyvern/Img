@@ -80,7 +80,7 @@ mod Color {
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
-    pub static C: &str = "\x1b[F";
+    pub static C: &str = "\x1b[F"; //Clear/Reset
     pub static BLINK: &str = "\x1b[5m";
     pub static UU: &str = "\x1b[21m";
     pub static R: &str = "\x1b[91m";
