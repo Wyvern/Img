@@ -82,6 +82,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
     let (html, [img, src, mut next, album], [scheme, host]) = get_html(addr);
+    print!("{C}");
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.as_str());
     let titles = page.select("title");
@@ -107,7 +108,7 @@ fn parse(addr: &str) -> String {
         page.select(album.as_str())
     };
     let has_album = !album.is_empty() && !albums.is_empty();
-    print!("{C}");
+
     match (has_album, !imgs.is_empty()) {
         (true, true) => println!(
             "{B}Totally found {} 📸 and {} 🏞️  in 📄:{G} {t}{N}",
@@ -438,9 +439,9 @@ mod tests {
     #[test]
     fn try_it() {
         // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-
-        let addr = "https://www.beautyleg6.com/siwameitui/";
-        parse(addr);
+        
+        let addr = "http://www.beautyleg6.com/siwameitui/";
+        parse("mmm.red");
     }
 
     #[test]

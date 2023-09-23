@@ -80,8 +80,8 @@ mod Color {
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
+    pub static C: &str = "\x1b[F";
     pub static BLINK: &str = "\x1b[5m";
-    pub static C: &str = "\x1b[A\x1b[2K";
     pub static UU: &str = "\x1b[21m";
     pub static R: &str = "\x1b[91m";
     pub static G: &str = "\x1b[92m";
@@ -90,6 +90,8 @@ mod Color {
     pub static HL: &str = "\x1b[103m";
     pub static BG: &str = "\x1b[100m";
     pub static FG: &str = "\x1b[97m";
+    pub static SAVE: &str = "\x1b[s"; //"\x1b7" save cursor & attrs
+    pub static REST: &str = "\x1b[u"; //"\x1b8" unsave cursor & attrs
     pub static MARK: &str = "\x1b]1337;SetMark\x07";
     pub static TEXT: &str = "The quick brown fox jumps over the lazy dog";
 
