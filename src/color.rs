@@ -7,15 +7,15 @@ mod util;
 use util::*;
 
 fn main() {
+    if env::args().len() > 5 {
+        exit()
+    }
     let (arg1, arg2, arg3, arg4) = (
         env::args().nth(1),
         env::args().nth(2),
         env::args().nth(3),
         env::args().nth(4),
     );
-    if env::args().len() > 5 {
-        exit()
-    }
     let args = if cfg!(test) {
         (Some("rgb"), Some("ab"), Some("cd"), Some("ef"))
     } else {

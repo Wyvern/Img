@@ -68,21 +68,21 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
         .unwrap_or_else(|e| {
-            exit(format_args!("{R} `{e}` {N}"));
+            exit(format_args!("{C}{R} `{e}` {N}"));
         });
-    let res = String::from_utf8_lossy(&out.stdout).to_string();
+    print!("{C}");
+    let res = String::from_utf8_lossy(&out.stdout);
     if res.is_empty() {
         exit(format_args!(
-            "{C}{R}Get HTML failed, please check url address.{N}"
+            "{R}Get HTML failed, please check url address.{N}"
         ));
     }
-    (res, host_info, scheme_host)
+    (res.to_string(), host_info, scheme_host)
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
     let (html, [img, src, mut next, album], [scheme, host]) = get_html(addr);
-    print!("{C}");
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.as_str());
     let titles = page.select("title");
@@ -468,7 +468,7 @@ mod BL {
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
-    
+
     #[test]
     fn range() {
         let mut addr = "https://girldreamy.com/category/china/xiuren/page/30";
