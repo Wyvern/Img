@@ -148,10 +148,9 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdrop-tracking",
-    "-Zdrop-tracking-mir",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
+    "-Zno-trait-vptr",
 
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
@@ -212,10 +211,9 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdrop-tracking",
-    "-Zdrop-tracking-mir",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
+    "-Zno-trait-vptr",
     
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
@@ -269,8 +267,6 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zno-trait-vptr",
-    "-Zdrop-tracking",
-    "-Zdrop-tracking-mir",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
     
@@ -325,8 +321,6 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zno-trait-vptr",
-    "-Zdrop-tracking",
-    "-Zdrop-tracking-mir",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
     
@@ -377,8 +371,6 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zno-trait-vptr",
-    "-Zdrop-tracking",
-    "-Zdrop-tracking-mir",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
     
