@@ -4,15 +4,17 @@ mod util;
 use util::*;
 
 fn main() {
+    if env::args().len() > 2 {
+        exit(format_args!("{R}Usage: `Command <URL>`{N}"));
+    }
     let arg = env::args().nth(1).unwrap_or_else(|| {
-        exit(format_args!("{R}Please input URL argument..{N}"));
+        exit(format_args!("{R}Please input <URL> argument.{N}"));
     });
 
-    let mut next = parse(&arg);
+    let mut next = parse(arg.as_str());
 
     while !next.is_empty() {
-        //dbg!(&next);
-        next = parse(&next);
+        next = parse(next.as_str());
     }
 }
 
@@ -47,7 +49,7 @@ fn host_info(host: &str) -> [String; 4] {
                 .any(|s| s == host.trim_start_matches("www."))
         })
         .unwrap_or_else(|| {
-            exit(format_args!("Unsupported website.. {B}{R}🌏 {host} 💥{N}"));
+            exit(format_args!("Unsupported website. {B}{R}🌏 {host} 💥{N}"));
         });
     let next = site["Next"].as_str().unwrap_or("");
     let album = site["Album"].as_str().unwrap_or("");
@@ -277,7 +279,7 @@ fn download(dir: &str, src: &str) {
             #[cfg(feature = "wget")]
             process::Command::new("wget")
                 .current_dir(path)
-                .args(&[
+                .args([
                     &src,
                     format!("--referer={host}").as_str(),
                     "-U",
@@ -464,7 +466,7 @@ mod BL {
     #[test]
     fn r#try() {
         // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
