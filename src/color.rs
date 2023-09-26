@@ -10,21 +10,12 @@ fn main() {
     if env::args().len() > 5 {
         exit()
     }
-    let args = [
-        env::args().nth(1),
-        env::args().nth(2),
-        env::args().nth(3),
-        env::args().nth(4),
-    ];
+    let args: [_; 4] = array::from_fn(|i| env::args().nth(i + 1));
     let _args = if cfg!(test) {
-        [Some("rgb"), Some("ab"), Some("cd"), Some("ef")]
+        let mut s = "256 ab".split_whitespace();
+        array::from_fn(|_| s.next())
     } else {
-        [
-            args[0].as_deref(),
-            args[1].as_deref(),
-            args[2].as_deref(),
-            args[3].as_deref(),
-        ]
+        array::from_fn(|i| args[i].as_deref())
     };
 
     match _args {
@@ -35,13 +26,14 @@ fn main() {
         [Some(v), None, None, None] if v.parse::<u8>() == Ok(8) => color8(TEXT),
         [Some(v), None, None, None] if v.parse::<u16>() == Ok(256) => color256(TEXT),
         [Some(v1), Some(v2), None, None] => match (
-            v1.parse::<u16>(),
+            v1.parse::<u16>().as_ref(),
             v2.parse::<u8>()
-                .or_else(|_| u8::from_str_radix(v2.trim_start_matches("0x"), 16)),
+                .or_else(|_| u8::from_str_radix(v2.trim_start_matches("0x"), 16))
+                .as_ref(),
         ) {
             (Ok(256), Ok(c)) => {
-                color_256_fg(&c, TEXT);
-                color_256_bg(&c, TEXT);
+                color_256_fg(c, TEXT);
+                color_256_bg(c, TEXT);
             }
             (Ok(256), _) => match v2 {
                 "fg" => color256_fg(TEXT),
@@ -51,13 +43,14 @@ fn main() {
             _ => exit(),
         },
         [Some("rgb") | Some("RGB"), Some(r), Some(g), Some(b)] => {
-            let dec_or_hex = |v: &str| {
-                v.parse::<u8>()
-                    .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
-            };
-            let [r, g, b] = [dec_or_hex(r), dec_or_hex(g), dec_or_hex(b)];
-            match [r, g, b] {
-                [Ok(ref r), Ok(ref g), Ok(ref b)] => {
+            match [r, g, b]
+                .map(|v| {
+                    v.parse::<u8>()
+                        .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
+                })
+                .as_ref()
+            {
+                [Ok(r), Ok(g), Ok(b)] => {
                     color_rgb_fg(r, g, b, TEXT);
                     color_rgb_bg(r, g, b, TEXT);
                 }

@@ -10,7 +10,7 @@ fn main() {
     let arg = env::args().nth(1).unwrap_or_else(|| {
         exit(format_args!("{R}Please input <URL> argument.{N}"));
     });
-
+    
     let mut next = parse(arg.as_str());
 
     while !next.is_empty() {
