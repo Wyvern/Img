@@ -71,9 +71,9 @@ rustflags = [
 ]
 panic = "abort"
 [profile.lto.build-override]
-inherits = "release"
+inherits = "lto"
 [profile.lto.package."*"]
-inherits = "release"
+inherits = "lto"
 
 #src
 [profile.src]
