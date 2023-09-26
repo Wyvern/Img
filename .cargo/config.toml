@@ -23,7 +23,7 @@ vcs = "none"
 
 #dev
 [profile.dev]
-rustflags = ["-Cprefer-dynamic","-Cdebug-assertions", "-Zdwarf-version=4"]
+rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions", "-Zdwarf-version=4"]
 [profile.dev.package."*"]
 inherits = "release"
 debug = false
@@ -55,7 +55,7 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic","-Zcombine-cgu"]
+rustflags = ["-Cprefer-dynamic", "-Zcombine-cgu"]
 strip = true
 codegen-units = 1
 lto = true
@@ -63,7 +63,12 @@ lto = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = ["-Cprefer-dynamic=n"]
+rustflags = [
+    "-Clto=fat",
+    "-Cprefer-dynamic=n",
+    "-Zsplit-lto-unit",
+    "-Zvirtual-function-elimination",
+]
 panic = "abort"
 [profile.lto.build-override]
 inherits = "release"
@@ -73,7 +78,7 @@ inherits = "release"
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Zforce-unstable-if-unmarked","-Zno-trait-vptr"]
+rustflags = ["-Zforce-unstable-if-unmarked", "-Zno-trait-vptr"]
 [profile.src.build-override]
 inherits = "src"
 [profile.src.package."*"]
@@ -126,8 +131,8 @@ rustflags = [
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
-    "-Zthinlto",
     "-Zplt",
+    "-Zthinlto",
     "-Zdylib-lto",
     "-Zno-generate-arange-section",
     "-Zdep-info-omit-d-target",
@@ -144,13 +149,13 @@ rustflags = [
     "-Zteach",
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
+    "-Zno-trait-vptr",
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
-    "-Zno-trait-vptr",
 
     "-Zgcc-ld=lld",
     "-Zpanic-in-drop=abort",
@@ -189,8 +194,8 @@ rustflags = [
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
-    "-Zthinlto",
     "-Zplt",
+    "-Zthinlto",
     "-Zdylib-lto",
     "-Zno-generate-arange-section",
     "-Zdep-info-omit-d-target",
@@ -207,14 +212,14 @@ rustflags = [
     "-Zteach",
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
+    "-Zno-trait-vptr",
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
-    "-Zno-trait-vptr",
-    
+
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
@@ -244,8 +249,8 @@ rustflags = [
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
-    "-Zthinlto",
     "-Zplt",
+    "-Zthinlto",
     "-Zdylib-lto",
     "-Zno-generate-arange-section",
     "-Zdep-info-omit-d-target",
@@ -262,14 +267,14 @@ rustflags = [
     "-Zteach",
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
+    "-Zno-trait-vptr",
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zno-trait-vptr",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
-    
+
     "-Zgcc-ld=lld",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
@@ -298,8 +303,8 @@ rustflags = [
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
-    "-Zthinlto",
     "-Zplt",
+    "-Zthinlto",
     "-Zdylib-lto",
     "-Zno-generate-arange-section",
     "-Zdep-info-omit-d-target",
@@ -316,14 +321,14 @@ rustflags = [
     "-Zteach",
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
+    "-Zno-trait-vptr",
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zno-trait-vptr",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
-    
+
     "-Zpanic-in-drop=abort",
 
     "-Aunused",
@@ -348,8 +353,8 @@ rustflags = [
 
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
-    "-Zthinlto",
     "-Zplt",
+    "-Zthinlto",
     "-Zdylib-lto",
     "-Zno-generate-arange-section",
     "-Zdep-info-omit-d-target",
@@ -366,14 +371,14 @@ rustflags = [
     "-Zteach",
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
+    "-Zno-trait-vptr",
     "-Zterminal-urls",
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zno-trait-vptr",
     "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
-    
+
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
     "-Zpanic-in-drop=abort",
