@@ -28,7 +28,7 @@ fn main() {
         [Some(v1), Some(v2), None, None] => match (
             v1.parse::<u16>().as_ref(),
             v2.parse::<u8>()
-                .or_else(|_| u8::from_str_radix(v2.trim_start_matches("0x"), 16))
+                .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16))
                 .as_ref(),
         ) {
             (Ok(256), Ok(c)) => {
