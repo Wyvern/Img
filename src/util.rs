@@ -134,24 +134,24 @@ mod Color {
         });
     }
 
-    pub fn color_256_fg(c: &u8, text: &str) {
+    pub fn color_256_fg(c: u8, text: &str) {
         println!("\n{B}{U}256-color foreground:{N}");
         println!("\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
     }
 
-    pub fn color_256_bg(c: &u8, text: &str) {
+    pub fn color_256_bg(c: u8, text: &str) {
         println!("\n{B}{U}256-color background:{N}");
         println!("\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
     }
 
-    pub fn color_rgb_fg(r: &u8, g: &u8, b: &u8, text: &str) {
+    pub fn color_rgb_fg(rgb: [u8; 3], text: &str) {
         println!("\n{B}{U}RGB-color foreground:{N}");
-        println!("\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m {text} {N}");
+        println!("\"\\x1b[38;2;{0};{1};{2}m\": - \x1b[38;2;{0};{1};{2}m {text} {N}",rgb[0],rgb[1],rgb[2]);
     }
 
-    pub fn color_rgb_bg(r: &u8, g: &u8, b: &u8, text: &str) {
+    pub fn color_rgb_bg(rgb: [u8; 3], text: &str) {
         println!("\n{B}{U}RGB-color background:{N}");
-        println!("\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m {text} {N}");
+        println!("\"\\x1b[48;2;{0};{1};{2}m\": - \x1b[48;2;{0};{1};{2}m {text} {N}",rgb[0],rgb[1],rgb[2]);
     }
 
     pub fn color_rgb_fg_full() {

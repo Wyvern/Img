@@ -10,7 +10,7 @@ fn main() {
     let arg = env::args().nth(1).unwrap_or_else(|| {
         exit(format_args!("{R}Please input <URL> argument.{N}"));
     });
-    
+
     let mut next = parse(arg.as_str());
 
     while !next.is_empty() {
@@ -70,15 +70,16 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
         .output()
         .unwrap_or_else(|e| {
-            exit(format_args!("{C}{R} `{e}` {N}"));
+            exit(format_args!("{C}curl:{R} `{e}` {N}"));
         });
     print!("{C}");
-    let res = String::from_utf8_lossy(&out.stdout);
-    if res.is_empty() {
+    if out.stdout.is_empty(){
         exit(format_args!(
-            "{R}Get HTML failed, please check url address.{N}"
+            "{R}Get HTML failed with curl - {}\nPlease check network connection.{N}",
+            out.status
         ));
     }
+    let res = String::from_utf8_lossy(&out.stdout);
     (res.to_string(), host_info, scheme_host)
 }
 
@@ -458,15 +459,15 @@ mod BL {
                 .expect("Execute htmlq failed.");
             let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
             use io::*;
-            stdin.write_all(html.as_bytes()).expect("Failed to write.");
-            cmd.wait_with_output().expect("Failed to get piped stdout.");
+            stdin.write_all(html.as_bytes()).expect("Failed to write stdin.");
+            cmd.wait_with_output().expect("Failed to get stdout.");
         });
     }
 
     #[test]
     fn r#try() {
         // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }

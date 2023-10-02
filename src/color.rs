@@ -29,7 +29,6 @@ fn main() {
             v1.parse::<u16>().as_ref(),
             v2.parse::<u8>()
                 .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16))
-                .as_ref(),
         ) {
             (Ok(256), Ok(c)) => {
                 color_256_fg(c, TEXT);
@@ -43,16 +42,13 @@ fn main() {
             _ => exit(),
         },
         [Some("rgb") | Some("RGB"), Some(r), Some(g), Some(b)] => {
-            match [r, g, b]
-                .map(|v| {
-                    v.parse::<u8>()
-                        .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
-                })
-                .as_ref()
-            {
+            match [r, g, b].map(|v| {
+                v.parse::<u8>()
+                    .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
+            }) {
                 [Ok(r), Ok(g), Ok(b)] => {
-                    color_rgb_fg(r, g, b, TEXT);
-                    color_rgb_bg(r, g, b, TEXT);
+                    color_rgb_fg([r, g, b], TEXT);
+                    color_rgb_bg([r, g, b], TEXT);
                 }
                 _ => exit(),
             }
@@ -62,7 +58,7 @@ fn main() {
 }
 
 fn exit() {
-    println!("Please input `8|256` `256 {B}<color>{N} [0-255]` `256 {{{B}{FG}fg,{BG}bg{N}}}` or `RGB {B}{R}r {G}g {BLUE}b{N} [0-255]{{3}}` color options.");
+    println!("Usage: Color {NL}`8|256` {NL}`256 {B}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {B}{R}r {G}g {BLUE}b{N} [0-255]{{3}}` \n options.",NL="\n\t");
     process::exit(0);
 }
 
