@@ -67,16 +67,16 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let host_info = host_info(host);
     println!("{BLINK}{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
-        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-L"])
+        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-S", "-L"])
         .output()
         .unwrap_or_else(|e| {
             exit(format_args!("{C}curl:{R} `{e}` {N}"));
         });
     print!("{C}");
-    if out.stdout.is_empty(){
+    if out.stdout.is_empty() {
         exit(format_args!(
-            "{R}Get HTML failed with curl - {}\nPlease check network connection.{N}",
-            out.status
+            "Get HTML failed - {R}{}{N}",
+            String::from_utf8(out.stderr).unwrap()
         ));
     }
     let res = String::from_utf8_lossy(&out.stdout);
@@ -255,7 +255,7 @@ fn download(dir: &str, src: &str) {
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
         let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
-        let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -L -s");
+        let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -L -s -f");
         //tdbg!(&curl);
         if (path.exists() && !path.join(name).exists()) {
             #[cfg(feature = "curl")]
@@ -272,6 +272,7 @@ fn download(dir: &str, src: &str) {
                     "-L",
                     //"--location-trusted",
                     "-s",
+                    "-f",
                     #[cfg(feature = "retry")]
                     "--retry 3",
                 ])
@@ -459,7 +460,9 @@ mod BL {
                 .expect("Execute htmlq failed.");
             let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
             use io::*;
-            stdin.write_all(html.as_bytes()).expect("Failed to write stdin.");
+            stdin
+                .write_all(html.as_bytes())
+                .expect("Failed to write stdin.");
             cmd.wait_with_output().expect("Failed to get stdout.");
         });
     }
