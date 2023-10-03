@@ -76,7 +76,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     if out.stdout.is_empty() {
         exit(format_args!(
             "Get HTML failed - {R}{}{N}",
-            String::from_utf8(out.stderr).unwrap()
+            String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
         ));
     }
     let res = String::from_utf8_lossy(&out.stdout);
