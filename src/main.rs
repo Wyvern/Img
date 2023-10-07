@@ -67,7 +67,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let host_info = host_info(host);
     println!("{BLINK}{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
-        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-s", "-S", "-L"])
+        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-sSf", "-L"])
         .output()
         .unwrap_or_else(|e| {
             exit(format_args!("{C}curl:{R} `{e}` {N}"));
@@ -470,7 +470,7 @@ mod BL {
     #[test]
     fn r#try() {
         // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
