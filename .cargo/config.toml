@@ -434,7 +434,7 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(all(target_arch="aarch64",target_os="linux"))']
+[target.'cfg(all(target_arch="aarch64",target_family="unix"))']
 linker = "aarch64-linux-gnu-gcc"
 rustflags = [
     "-Zunstable-options",
