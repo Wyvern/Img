@@ -11,6 +11,7 @@ fn main() {
         exit()
     }
     let args: [_; 4] = array::from_fn(|i| env::args().nth(i + 1));
+
     let _args = if cfg!(test) {
         let mut s = "256 ab".split_whitespace();
         array::from_fn(|_| s.next())
