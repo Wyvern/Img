@@ -229,7 +229,7 @@ rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple")))']
 rustflags = [
-    "-Clinker-flavor=darwin-lld",
+    "-Clinker-flavor=darwin-lld-cc",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
 ]
