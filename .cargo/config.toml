@@ -229,7 +229,6 @@ rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple")))']
 rustflags = [
-    "-Clinker-flavor=darwin-lld-cc",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
 ]
@@ -239,7 +238,6 @@ rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(all(target_arch="aarch64",target_env="msvc"))']
 rustflags = [
-    "-Clinker-flavor=msvc-lld",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
 ]
@@ -250,7 +248,6 @@ rustflags = ["-Clinker-flavor=gnu-lld-cc"]
 [target.'cfg(all(target_arch="aarch64",target_os="linux"))']
 linker = "aarch64-linux-gnu-gcc"
 rustflags = [
-    "-Clinker-flavor=gnu-lld-cc",
     "-Ctarget-cpu=apple-m1",
     "-Ztune-cpu=apple-m1",
 ]
