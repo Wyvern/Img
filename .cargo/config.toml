@@ -288,7 +288,7 @@ rustflags = [
     "-Copt-level=s",
     "-Cno-redzone",
     "-Clink-self-contained=+linker",
-    "-Clinker-flavor=darwin-lld-cc",
+    "-Clinker-flavor=gnu-lld-cc",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
@@ -423,7 +423,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdebuginfo-compression=zlib",
+    # "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
     "-Zpanic-in-drop=abort",
 
@@ -471,7 +471,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Zdebuginfo-compression=zlib",
+    # "-Zdebuginfo-compression=zlib",
     "-Ztrait-solver=next-coherence",
 
     "-Ctarget-cpu=apple-m1",
