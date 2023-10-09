@@ -120,7 +120,6 @@ host-config = true
 [build]
 rustflags = [
     "-Ctarget-feature=-crt-static",
-    "-Ctarget-cpu=native",
     "-Csymbol-mangling-version=v0",
     "-Coverflow-checks=no",
     "-Copt-level=s",
@@ -129,7 +128,6 @@ rustflags = [
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
-    "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
     "-Zplt",
     "-Zthinlto",
