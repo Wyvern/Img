@@ -237,7 +237,7 @@ rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(target_os="linux")']
-rustflags = ["-Clinker-flavor=gnu-lld-cc"]
+rustflags = ["-Clinker-flavor=gnu-lld"]
 
 [target.'cfg(target_arch="aarch64")']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
