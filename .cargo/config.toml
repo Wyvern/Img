@@ -192,7 +192,7 @@ rustflags = [
     "-Clink-self-contained=+linker",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-async-exceptions -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Zunstable-options",
     "-Ztune-cpu=native",
