@@ -228,13 +228,13 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(target_os="macos"))']
+[target.'cfg(target_vendor="apple"))']
 rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
 [target.'cfg(target_env="msvc")']
 rustflags = ["-Clinker-flavor=msvc-lld"]
 
-[target.'cfg(target_family="unix")']
+[target.'cfg(target_os="linux")']
 rustflags = ["-Clinker-flavor=gnu-lld-cc"]
 
 [target.'cfg(target_arch="aarch64")']
