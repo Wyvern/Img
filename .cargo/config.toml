@@ -236,7 +236,7 @@ rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 [target.'cfg(target_env="msvc")']
 rustflags = ["-Clinker-flavor=msvc-lld"]
 
-[target.'cfg(any(target_os="linux",target_os="android",target_os="freebsd"))']
+[target.'cfg(any(target_env="gnu",target_env="musl"))']
 rustflags = ["-Clinker-flavor=gnu-lld-cc"]
 
 [target.'cfg(target_family="wasm")']
