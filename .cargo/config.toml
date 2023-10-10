@@ -228,7 +228,7 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(target_vendor="apple"))']
+[target.'cfg(target_os="macos"))']
 rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
 [target.'cfg(target_env="msvc")']
