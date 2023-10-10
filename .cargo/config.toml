@@ -230,14 +230,17 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(any(target_family="unix"))']
-rustflags = ["-Clinker-flavor=gnu-lld-cc"]
-
 [target.'cfg(target_vendor="apple"))']
 rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
 [target.'cfg(target_env="msvc")']
 rustflags = ["-Clinker-flavor=msvc-lld"]
+
+[target.'cfg(any(target_os="linux",target_os="android",target_os="freebsd"))']
+rustflags = ["-Clinker-flavor=gnu-lld-cc"]
+
+[target.'cfg(target_family="wasm")']
+rustflags = ["-Clinker-flavor=wasm-lld-cc"]
 
 [target.'cfg(target_arch="aarch64")']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
