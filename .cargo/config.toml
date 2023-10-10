@@ -188,6 +188,7 @@ rustflags = [
     "-Copt-level=s",
     "-Cno-redzone",
     "-Clink-self-contained=+linker",
+    "-Clinker-flavor=gnu-lld-cc",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions  -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
@@ -228,17 +229,14 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(target_vendor="apple"))']
+[target.'cfg(target_os="macos"))']
 rustflags = ["-Clinker-flavor=darwin-lld-cc"]
-
-[target.'cfg(target_arch="aarch64")']
-rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.'cfg(target_env="msvc")']
 rustflags = ["-Clinker-flavor=msvc-lld"]
 
-[target.'cfg(all(target_env="gnu",target_family="unix"))']
-rustflags = ["-Clinker-flavor=gnu-lld-cc"]
+[target.'cfg(target_arch="aarch64")']
+rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
