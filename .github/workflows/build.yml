@@ -29,17 +29,11 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt install gcc-aarch64-linux-gnu build-essential pkg-config -y
-
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          export HOMEBREW_NO_ANALYTICS=1
-          (echo; echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"') >> /home/runner/.bashrc
-          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-          brew install --cask android-ndk
+          sudo apt update && sudo apt upgrade
+          sudo apt install gcc-aarch64-linux-gnu build-essential pkg-config google-android-ndk-installer -y
 
           cargo update
-          
+
           time cargo src x86_64-linux-android
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
