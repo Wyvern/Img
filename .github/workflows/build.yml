@@ -21,7 +21,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-unknown-linux-gnu,x86_64-linux-android
+          targets: aarch64-unknown-linux-gnu
           components: rust-src
 
       - name: Rust Cache
@@ -30,11 +30,10 @@ jobs:
       - name: Build Release
         run: |
           sudo apt update
-          sudo apt install gcc-aarch64-linux-gnu build-essential pkg-config google-android-ndk-installer -y
+          sudo apt install gcc-aarch64-linux-gnu -y
 
           cargo update
 
-          time cargo src x86_64-linux-android
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
 
