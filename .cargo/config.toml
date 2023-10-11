@@ -240,7 +240,7 @@ rustflags = ["-Clinker-flavor=msvc-lld"]
 rustflags = ["-Clinker-flavor=gnu-lld-cc"]
 
 [target.'cfg(any(target_os="freebsd"))']
-rustflags = ["-Clinker-flavor=ld.lld"]
+rustflags = ["-Cdefault-linker-libraries"]
 
 [target.'cfg(target_family="wasm")']
 rustflags = ["-Clinker-flavor=wasm-lld-cc"]
