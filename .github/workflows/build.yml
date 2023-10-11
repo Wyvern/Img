@@ -29,7 +29,8 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt install gcc-aarch64-linux-gnu -y
+          sudo apt install gcc-aarch64-linux-gnu pkg-config -y
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew casks install android-ndk
           cargo update
           time cargo src x86_64-linux-android
