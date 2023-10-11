@@ -22,7 +22,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           targets: aarch64-unknown-linux-gnu,riscv64gc-unknown-linux-gnu
-          components: rust-src,rust-std-riscv64gc-unknown-linux-gnu
+          components: rust-src
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
