@@ -21,7 +21,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,x86_64-unknown-freebsd
           components: rust-src
 
       - name: Rust Cache
@@ -31,6 +31,7 @@ jobs:
         run: |
           sudo apt install gcc-aarch64-linux-gnu -y
           cargo update
+          time cargo src x86_64-unknown-freebsd
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
           find ./target -iname bl -type f | xargs ls -hl
