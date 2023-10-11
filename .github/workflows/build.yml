@@ -29,13 +29,12 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt install gcc-aarch64-linux-gnu android-tools-adb android-tools-fastboot -y
+          sudo apt install gcc-aarch64-linux-gnu -y
+          cargo install cargo-ndk
           cargo update
-          #time cargo build --release
-          #time cargo lto
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
-          time cargo src x86_64-linux-android
+          time cargo ndk src x86_64-linux-android
           find ./target -iname bl -type f | xargs ls -hl
           lscpu
           free -m
