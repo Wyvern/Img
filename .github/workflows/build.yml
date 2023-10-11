@@ -21,7 +21,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-unknown-linux-gnu,x86_64-linux-android
+          targets: aarch64-unknown-linux-gnu,riscv64-linux-android
           components: rust-src
 
       - name: Rust Cache
@@ -30,11 +30,10 @@ jobs:
       - name: Build Release
         run: |
           sudo apt install gcc-aarch64-linux-gnu -y
-          cargo install cargo-ndk
           cargo update
+          time cargo src riscv64-linux-android
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
-          time cargo ndk src x86_64-linux-android
           find ./target -iname bl -type f | xargs ls -hl
           lscpu
           free -m
@@ -62,15 +61,15 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-AArch64 binary executable."
 
-      - name: Upload Android to a GitHub release
+      - name: Upload riscv64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-linux-android/src/BL
-          asset_name: Android
+          file: target/riscv64-linux-android/src/BL
+          asset_name: riscv64
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Android binary executable."
+          body: "Ubuntu riscv64 binary executable."
 
   macOS:
     name: Building on macOS.
