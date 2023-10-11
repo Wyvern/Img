@@ -21,7 +21,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,x86_64-linux-android
           components: rust-src
 
       - name: Rust Cache
@@ -35,6 +35,7 @@ jobs:
           #time cargo lto
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
+          time cargo src x86_64-linux-android
           find ./target -iname bl -type f | xargs ls -hl
           lscpu
           free -m
@@ -42,7 +43,7 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload Linux x64 to a GitHub release
+      - name: Upload Linux to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,6 +63,16 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-AArch64 binary executable."
 
+      - name: Upload Android to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-linux-android/src/BL
+          asset_name: Android
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Android binary executable."
+          
   macOS:
     name: Building on macOS.
     runs-on: macos-13
