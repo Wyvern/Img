@@ -29,7 +29,8 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt install gcc-aarch64-linux-gnu pkg-config x86_64-linux-android-clang -y
+          sudo apt install gcc-aarch64-linux-gnu -y
+          brew casks install android-ndk
           cargo update
           time cargo src x86_64-linux-android
           time cargo src x86_64-unknown-linux-gnu
