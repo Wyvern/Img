@@ -21,8 +21,8 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-unknown-linux-gnu,riscv64-linux-android
-          components: rust-src,rust-std-riscv64-linux-android
+          targets: aarch64-unknown-linux-gnu,riscv64gc-unknown-linux-gnu
+          components: rust-src,rust-std-riscv64gc-unknown-linux-gnu
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo apt install gcc-aarch64-linux-gnu -y
           cargo update
-          time cargo src riscv64-linux-android
+          time cargo src riscv64gc-unknown-linux-gnu
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
           find ./target -iname bl -type f | xargs ls -hl
@@ -61,15 +61,15 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-AArch64 binary executable."
 
-      - name: Upload riscv64 to a GitHub release
+      - name: Upload Linux-riscv64gc to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/riscv64-linux-android/src/BL
-          asset_name: riscv64
+          file: target/riscv64gc-unknown-linux-gnu/src/BL
+          asset_name: Linux-riscv64
           tag: Nightly
           overwrite: true
-          body: "Ubuntu riscv64 binary executable."
+          body: "Ubuntu Linux-riscv64gc binary executable."
 
   macOS:
     name: Building on macOS.
