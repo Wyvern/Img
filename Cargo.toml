@@ -3,7 +3,7 @@ name = "BL"
 version = "1.0.0"
 edition = "2021"
 resolver = "2"
-default-run = "BL"
+# default-run = "BL"
 
 [features]
 default = ["download"]
@@ -17,6 +17,6 @@ retry = []
 crabquery = { version = "*", default-features = false }
 json = { version = "*", default-features = false }
 
-[[bin]]
+[[example]]
 name = "color"
 path = "src/color.rs"

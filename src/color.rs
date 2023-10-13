@@ -12,14 +12,11 @@ fn main() {
     }
     let args: [_; 4] = array::from_fn(|i| env::args().nth(i + 1));
 
-    let _args = if cfg!(test) {
-        let mut s = "256 ab".split_whitespace();
-        array::from_fn(|_| s.next())
-    } else {
-        array::from_fn(|i| args[i].as_deref())
-    };
+    analyze_args(array::from_fn(|i| args[i].as_deref()));
+}
 
-    match _args {
+fn analyze_args(args: [Option<&str>; 4]) {
+    match args {
         [None, None, None, None] => {
             color8(TEXT);
             color256(TEXT)
@@ -29,7 +26,7 @@ fn main() {
         [Some(v1), Some(v2), None, None] => match (
             v1.parse::<u16>().as_ref(),
             v2.parse::<u8>()
-                .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16))
+                .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16)),
         ) {
             (Ok(256), Ok(c)) => {
                 color_256_fg(c, TEXT);
@@ -69,7 +66,9 @@ mod color {
 
     #[test]
     fn run() {
-        main()
+        let mut s = "256 ab ".split_whitespace();
+        let args = array::from_fn(|_| s.next());
+        analyze_args(args);
     }
 
     #[test]
