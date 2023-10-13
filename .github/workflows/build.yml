@@ -26,9 +26,6 @@ jobs:
           targets: aarch64-unknown-linux-gnu
           components: rust-src
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
@@ -82,9 +79,6 @@ jobs:
         with:
           targets: aarch64-apple-darwin
           components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -150,12 +144,9 @@ jobs:
           targets: aarch64-pc-windows-msvc
           components: rust-src
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-        
+
       - name: Build release
         run: |
           cargo update
