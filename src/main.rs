@@ -67,7 +67,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
     let host_info = host_info(host);
     println!("{BLINK}{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
-        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-sSf", "-L"])
+        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-fsSL"])
         .output()
         .unwrap_or_else(|e| {
             exit(format_args!("{C}curl:{R} `{e}` {N}"));
@@ -255,7 +255,7 @@ fn download(dir: &str, src: &str) {
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
         let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
-        let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -L -s -f");
+        let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
         //tdbg!(&curl);
         if (path.exists() && !path.join(name).exists()) {
             #[cfg(feature = "curl")]
@@ -269,10 +269,8 @@ fn download(dir: &str, src: &str) {
                     host,
                     "-A",
                     "Mozilla Firefox",
-                    "-L",
+                    "-fsL",
                     //"--location-trusted",
-                    "-s",
-                    "-f",
                     #[cfg(feature = "retry")]
                     "--retry 3",
                 ])
@@ -470,7 +468,7 @@ mod BL {
     #[test]
     fn r#try() {
         // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }

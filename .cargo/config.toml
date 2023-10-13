@@ -170,6 +170,7 @@ rustflags = [
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
+incremental = true
 
 [unstable.gitoxide]
 checkout = true
