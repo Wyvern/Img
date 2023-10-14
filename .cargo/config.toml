@@ -65,7 +65,7 @@ rustflags = ["-Cprefer-dynamic", "-Zcombine-cgu"]
 strip = true
 lto = true
 rpath = true
-codegen-units = 1
+# codegen-units = 1
 
 #lto
 [profile.lto]
