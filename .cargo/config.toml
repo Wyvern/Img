@@ -27,7 +27,6 @@ rustflags = [
     "-Cprefer-dynamic",
     "-Cdebug-assertions",
     "-Zdwarf-version=4",
-    "-Zdebuginfo-compression=zlib",
 ]
 rpath = true
 [profile.dev.package."*"]
@@ -134,7 +133,7 @@ rustflags = [
     "-Clink-self-contained=+linker",
 
     "-Cllvm-args=--enable-name-compression --debugify-quiet",
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-async-exceptions -fno-backtrace -gz -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-async-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Zunstable-options",
     "-Ztune-cpu=native",
@@ -163,6 +162,7 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Ztrait-solver=next-coherence",
+    "-Zdebuginfo-compression=zstd",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -225,6 +225,7 @@ rustflags = [
     "-Zno-trait-vptr",
     "-Ztrait-solver=next-coherence",
     "-Zpanic-in-drop=abort",
+    "-Zdebuginfo-compression=zstd",
 
     "-Aunused",
     "-Anonstandard_style",
