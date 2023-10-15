@@ -68,7 +68,7 @@ inherits = "release"
 rustflags = [
     "-Clto=fat",
     "-Cprefer-dynamic=n",
-    # "-Clinker-plugin-lto",
+    "-Clinker-plugin-lto",
     "-Zsplit-lto-unit",
     "-Zvirtual-function-elimination",
 ]
@@ -159,7 +159,7 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Ztrait-solver=next-coherence",
-    "-Zdebuginfo-compression=zstd",
+    # "-Zdebuginfo-compression=zstd",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -223,7 +223,7 @@ rustflags = [
     "-Zno-trait-vptr",
     "-Ztrait-solver=next-coherence",
     "-Zpanic-in-drop=abort",
-    "-Zdebuginfo-compression=zstd",
+    # "-Zdebuginfo-compression=zstd",
 
     "-Aunused",
     "-Anonstandard_style",
