@@ -23,11 +23,7 @@ vcs = "none"
 
 #dev
 [profile.dev]
-rustflags = [
-    "-Cprefer-dynamic",
-    "-Cdebug-assertions",
-    "-Zdwarf-version=4",
-]
+rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions", "-Zdwarf-version=4"]
 rpath = true
 [profile.dev.package."*"]
 inherits = "release"
@@ -72,7 +68,7 @@ inherits = "release"
 rustflags = [
     "-Clto=fat",
     "-Cprefer-dynamic=n",
-    "-Clinker-plugin-lto",
+    # "-Clinker-plugin-lto",
     "-Zsplit-lto-unit",
     "-Zvirtual-function-elimination",
 ]
