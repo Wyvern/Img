@@ -1,7 +1,7 @@
 use std::*;
 
 use crabquery as _;
-use json as _;
+use serde_json as _;
 
 mod util;
 use util::*;

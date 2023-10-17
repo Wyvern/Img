@@ -13,10 +13,12 @@ wget = []
 batch = []
 retry = []
 
-[dependencies]
-crabquery = { version = "*", default-features = false }
-json = { version = "*", default-features = false }
-
 [[example]]
 name = "color"
 path = "src/color.rs"
+
+[dependencies]
+crabquery = { version = "*", default-features = false }
+serde_json = { version = "*", default-features = false, features = ["std"] }
+
+

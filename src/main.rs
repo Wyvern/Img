@@ -11,10 +11,10 @@ fn main() {
         exit(format_args!("{R}Please input <URL> argument.{N}"));
     });
 
-    let mut next = parse(arg.as_str());
+    let mut next = parse(&arg);
 
     while !next.is_empty() {
-        next = parse(next.as_str());
+        next = parse(&next);
     }
 }
 
@@ -40,7 +40,9 @@ fn check_host(addr: &str) -> [&str; 2] {
 fn host_info(host: &str) -> [String; 4] {
     let data = website();
     let site = data
-        .members()
+        .as_array()
+        .expect("Json file parse error.")
+        .iter()
         .find(|&s| {
             s["Site"]
                 .as_str()
@@ -56,7 +58,7 @@ fn host_info(host: &str) -> [String; 4] {
     [
         site["Img"].as_str().unwrap().to_owned(),
         site["Src"].as_str().unwrap().to_owned(),
-        next.to_string(),
+        next.to_owned(),
         album.to_owned(),
     ]
 }
@@ -87,7 +89,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
 fn parse(addr: &str) -> String {
     let (html, [img, src, mut next, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
-    let imgs = page.select(img.as_str());
+    let imgs = page.select(&img);
     let titles = page.select("title");
     let title = titles
         .first()
@@ -108,7 +110,7 @@ fn parse(addr: &str) -> String {
     let albums = if album.is_empty() {
         vec![]
     } else {
-        page.select(album.as_str())
+        page.select(&album)
     };
     let has_album = !album.is_empty() && !albums.is_empty();
 
@@ -147,12 +149,12 @@ fn parse(addr: &str) -> String {
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
             for img in imgs {
-                let src = img.attr(src.as_str()).expect("Invalid img[src] selector!");
+                let src = img.attr(&src).expect("Invalid img[src] selector!");
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
                 let file = canonicalize_url(src);
-                //tdbg!(&file);
+                // tdbg!(&file);
                 download(t, &file);
             }
         }
@@ -426,8 +428,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 }
 
 ///WebSites `Json` config data
-fn website() -> json::JsonValue {
-    json::parse(include_str!("web.json")).unwrap_or_else(|e| {
+fn website() -> serde_json::Value {
+    serde_json::from_str(include_str!("web.json")).unwrap_or_else(|e| {
         exit(format_args!("{R} `{e}` {N}"));
     })
 }
