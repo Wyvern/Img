@@ -187,8 +187,20 @@ fn parse(addr: &str) -> String {
                     let mut stdin = io::stdin();
                     let mut stdout = io::stdout();
                     let mut t = alb.attr("title").unwrap_or(
-                        alb.attr("alt")
-                            .unwrap_or(alb.text().expect("NO Album's Title found.")),
+                        alb.attr("alt").unwrap_or(
+                            alb.text()
+                                .and_then(|x| {
+                                    if x.trim().is_empty() {
+                                        alb.children()
+                                            .first()
+                                            .expect("NO children found in album element.")
+                                            .attr("alt")
+                                    } else {
+                                        Some(x)
+                                    }
+                                })
+                                .expect("NO Album's Title found."),
+                        ),
                     );
                     writeln!(
                         stdout,
@@ -467,7 +479,7 @@ mod BL {
 
     #[test]
     fn r#try() {
-        // https://bestgirlsexy.com https://girldreamy.com https://mmm.red
+        // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
 
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);

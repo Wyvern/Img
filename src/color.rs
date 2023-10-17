@@ -66,7 +66,7 @@ mod color {
 
     #[test]
     fn run() {
-        let mut s = "256 ab ".split_whitespace();
+        let mut s = "256 a ".split_whitespace();
         let args = array::from_fn(|_| s.next());
         analyze_args(args);
     }
