@@ -125,17 +125,11 @@ fn parse(addr: &str) -> String {
         }
     }
 
-    #[cfg(any())]
-    {
-        if t.to_lowercase().contains("page") {
-            t = t[..t.to_lowercase().rfind("page").unwrap()]
-                .trim()
-                .trim_end_matches(['-', '_', '|', '–', '/'])
-                .trim();
-        }
-    }
-
-    t = t[..t.rfind(['(', ',', '第']).unwrap_or(t.len())].trim();
+    t = if t.contains("page") || t.contains('页') {
+        t[..t.rfind("page").or_else(|| t.rfind('第')).unwrap_or(t.len())].trim()
+    } else {
+        t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
+    };
 
     let canonicalize_url = |u: &str| {
         if !u.starts_with("http") {
@@ -263,8 +257,9 @@ fn download(dir: &str, src: &str) {
                 exit(format_args!("Create Dir error:{R} `{e}` {N}"));
             });
         }
-
+        dbg!(&src);
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
+        dbg!(&name);
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
         let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
         let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
@@ -480,7 +475,7 @@ mod BL {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
