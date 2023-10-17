@@ -257,9 +257,7 @@ fn download(dir: &str, src: &str) {
                 exit(format_args!("Create Dir error:{R} `{e}` {N}"));
             });
         }
-        dbg!(&src);
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
-        dbg!(&name);
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
         let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
         let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
