@@ -1,3 +1,5 @@
+#![feature(lazy_cell)]
+
 use std::*;
 
 mod util;
@@ -37,9 +39,9 @@ fn check_host(addr: &str) -> [&str; 2] {
 }
 
 ///Get `host` info and Generate `img/src/next/album` selector data
-fn host_info(host: &str) -> [String; 4] {
-    let data = website();
-    let site = data
+fn host_info(host: &str) -> [&str; 4] {
+    static JSON: sync::LazyLock<serde_json::Value> = sync::LazyLock::new(|| website());
+    let site = JSON
         .as_array()
         .expect("Json file parse error.")
         .iter()
@@ -54,11 +56,11 @@ fn host_info(host: &str) -> [String; 4] {
             exit(format_args!("Unsupported website. {B}{R}🌏 {host} 💥{N}"));
         });
 
-    ["Img", "Src", "Next", "Album"].map(|key| site[key].as_str().unwrap_or("").to_owned())
+    ["Img", "Src", "Next", "Album"].map(|key| site[key].as_str().unwrap_or(""))
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
+fn get_html(addr: &str) -> (String, [&str; 4], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
     println!("{BLINK}{BG}Downloading 📄 ...{N}");
@@ -83,7 +85,7 @@ fn get_html(addr: &str) -> (String, [String; 4], [&str; 2]) {
 fn parse(addr: &str) -> String {
     let (html, [img, src, mut next, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
-    let imgs = page.select(&img);
+    let imgs = page.select(img);
     let titles = page.select("title");
     let title = titles
         .first()
@@ -104,7 +106,7 @@ fn parse(addr: &str) -> String {
     let albums = if album.is_empty() {
         vec![]
     } else {
-        page.select(&album)
+        page.select(album)
     };
     let has_album = !album.is_empty() && !albums.is_empty();
 
@@ -143,7 +145,7 @@ fn parse(addr: &str) -> String {
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
             for img in imgs {
-                let src = img.attr(&src).expect("Invalid img[src] selector!");
+                let src = img.attr(src).expect("Invalid img[src] selector!");
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
@@ -164,7 +166,7 @@ fn parse(addr: &str) -> String {
                             .expect("NO a[@href] attr found.")
                     });
                     let album_url = canonicalize_url(&href);
-                    next = parse(&album_url);
+                    let mut next = parse(&album_url);
                     while !next.is_empty() {
                         next = parse(&next);
                     }
@@ -216,7 +218,7 @@ fn parse(addr: &str) -> String {
                     match input.trim() {
                         "y" | "yes" | "" => parse_album(),
                         "n" | "no" => {
-                            next = String::default();
+                            next = "";
                             continue;
                         }
                         "a" | "all" => {
@@ -225,7 +227,7 @@ fn parse(addr: &str) -> String {
                         }
                         _ => {
                             println!("{B}Canceled all albums download.{N}");
-                            next = String::default();
+                            next = "";
                             break;
                         }
                     };
@@ -236,7 +238,7 @@ fn parse(addr: &str) -> String {
     }
 
     if (!next.is_empty()) {
-        let nexts = page.select(&next);
+        let nexts = page.select(next);
         check_next(nexts, addr)
     } else {
         String::default()
