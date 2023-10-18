@@ -53,14 +53,8 @@ fn host_info(host: &str) -> [String; 4] {
         .unwrap_or_else(|| {
             exit(format_args!("Unsupported website. {B}{R}🌏 {host} 💥{N}"));
         });
-    let next = site["Next"].as_str().unwrap_or("");
-    let album = site["Album"].as_str().unwrap_or("");
-    [
-        site["Img"].as_str().unwrap().to_owned(),
-        site["Src"].as_str().unwrap().to_owned(),
-        next.to_owned(),
-        album.to_owned(),
-    ]
+
+    ["Img", "Src", "Next", "Album"].map(|key| site[key].as_str().unwrap_or("").to_owned())
 }
 
 ///Fetch web page generate html content
@@ -475,7 +469,7 @@ mod BL {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }

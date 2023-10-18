@@ -16,9 +16,8 @@ retry = []
 [[example]]
 name = "color"
 path = "src/color.rs"
+test = true
 
 [dependencies]
 crabquery = { version = "*", default-features = false }
-serde_json = { version = "*", default-features = false, features = ["std"] }
-
-
+serde_json = { version = "*", default-features = false, features = ["alloc"] }
