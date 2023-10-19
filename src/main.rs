@@ -1,9 +1,6 @@
-#![feature(lazy_cell)]
-
-use std::*;
+use {std::*, util::*};
 
 mod util;
-use util::*;
 
 fn main() {
     if env::args().len() > 2 {
@@ -13,10 +10,10 @@ fn main() {
         exit(format_args!("{R}Please input <URL> argument.{N}"));
     });
 
-    let mut next = parse(&arg);
+    let mut next_page = parse(&arg);
 
-    while !next.is_empty() {
-        next = parse(&next);
+    while !next_page.is_empty() {
+        next_page = parse(&next_page);
     }
 }
 
@@ -40,8 +37,13 @@ fn check_host(addr: &str) -> [&str; 2] {
 
 ///Get `host` info and Generate `img/src/next/album` selector data
 fn host_info(host: &str) -> [&str; 4] {
-    static JSON: sync::LazyLock<serde_json::Value> = sync::LazyLock::new(|| website());
+    use {serde_json::*, sync::*};
+
+    // static JSON: LazyLock<Value> = LazyLock::new(|| website());
+    static JSON: OnceLock<Value> = OnceLock::new();
+
     let site = JSON
+        .get_or_init(|| website())
         .as_array()
         .expect("Json file parse error.")
         .iter()
@@ -83,7 +85,7 @@ fn get_html(addr: &str) -> (String, [&str; 4], [&str; 2]) {
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (html, [img, src, mut next, album], [scheme, host]) = get_html(addr);
+    let (html, [img, src, mut next_sel, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
     let imgs = page.select(img);
     let titles = page.select("title");
@@ -166,9 +168,9 @@ fn parse(addr: &str) -> String {
                             .expect("NO a[@href] attr found.")
                     });
                     let album_url = canonicalize_url(&href);
-                    let mut next = parse(&album_url);
-                    while !next.is_empty() {
-                        next = parse(&next);
+                    let mut next_page = parse(&album_url);
+                    while !next_page.is_empty() {
+                        next_page = parse(&next_page);
                     }
                 };
 
@@ -218,7 +220,7 @@ fn parse(addr: &str) -> String {
                     match input.trim() {
                         "y" | "yes" | "" => parse_album(),
                         "n" | "no" => {
-                            next = "";
+                            next_sel = "";
                             continue;
                         }
                         "a" | "all" => {
@@ -227,7 +229,7 @@ fn parse(addr: &str) -> String {
                         }
                         _ => {
                             println!("{B}Canceled all albums download.{N}");
-                            next = "";
+                            next_sel = "";
                             break;
                         }
                     };
@@ -237,8 +239,8 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    if (!next.is_empty()) {
-        let nexts = page.select(next);
+    if (!next_sel.is_empty()) {
+        let nexts = page.select(next_sel);
         check_next(nexts, addr)
     } else {
         String::default()
@@ -296,9 +298,9 @@ fn download(dir: &str, src: &str) {
 
 ///Check `next` page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
-    let mut next: String;
+    let mut next_link: String;
     if nexts.is_empty() {
-        next = String::default();
+        next_link = String::default();
         //println!("NO next page <element> found.")
     } else if nexts.len() == 1 {
         let element = &nexts[0];
@@ -317,11 +319,11 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 .filter(|e| e.tag().unwrap() == "a")
                 .collect::<Vec<_>>();
 
-            next = a
+            next_link = a
                 .first()
                 .map_or(String::default(), |f| f.attr("href").unwrap());
         } else {
-            next = nexts[0].attr("href").unwrap();
+            next_link = nexts[0].attr("href").unwrap();
         }
     } else {
         let element = &nexts[0];
@@ -335,7 +337,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 )
             });
             let s = rest.next_back().unwrap();
-            next = s.first().map_or(String::default(), |f| {
+            next_link = s.first().map_or(String::default(), |f| {
                 f.children()
                     .first()
                     .map_or_else(|| f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
@@ -377,7 +379,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     }
                 }
             });
-            next = match last2 {
+            next_link = match last2 {
                 Some(v) => v
                     .attr("href")
                     .expect("NO [href] attr found in <next> link."),
@@ -402,25 +404,25 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     // if !next.is_empty() && !next[next.rfind('/').unwrap()..].contains(['_', '-', '?']) {
     //     next = String::default();
     // }
-    if !next.is_empty() && !next.starts_with("http") {
-        if next.trim() == "/" || next.trim() == "#" {
-            next = String::default();
+    if !next_link.is_empty() && !next_link.starts_with("http") {
+        if next_link.trim() == "/" || next_link.trim() == "#" {
+            next_link = String::default();
         } else {
-            next = format!(
+            next_link = format!(
                 "{}{}",
-                if next.starts_with("//") {
+                if next_link.starts_with("//") {
                     &cur[..cur.find("//").unwrap()]
-                } else if next.starts_with('/') {
+                } else if next_link.starts_with('/') {
                     &cur[..cur[10..].find('/').unwrap() + 10]
                 } else {
                     &cur[..=cur.rfind('/').unwrap()]
                 },
-                next
+                next_link
             );
         }
     }
 
-    tdbg!(next)
+    tdbg!(next_link)
 }
 
 ///WebSites `Json` config data
@@ -471,7 +473,7 @@ mod BL {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }

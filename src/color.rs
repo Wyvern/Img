@@ -1,10 +1,6 @@
-use std::*;
-
-use crabquery as _;
-use serde_json as _;
+use {crabquery as _, serde_json as _, std::*, util::*};
 
 mod util;
-use util::*;
 
 fn main() {
     if env::args().len() > 5 {
