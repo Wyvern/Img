@@ -48,17 +48,14 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
         .expect("Json file parse error.")
         .iter()
         .find(|&s| {
-            s["Site"]
-                .as_str()
-                .unwrap()
-                .split_terminator(',')
-                .any(|s| s == host.trim_start_matches("www."))
-        })
-        .unwrap_or_else(|| {
-            exit!("Unsupported website: {U}{host}");
+            s["Site"].as_str().map_or(false, |s| {
+                s.split_terminator(',')
+                    .any(|s| s == host.trim_start_matches("www."))
+            })
         });
-
-    ["Img", "Next", "Album"].map(|key| site[key].as_str())
+    site.map_or([None; 3], |s| {
+        ["Img", "Next", "Album"].map(|key| s[key].as_str())
+    })
 }
 
 ///Fetch web page generate html content
@@ -147,7 +144,7 @@ fn parse(addr: &str) -> String {
             } else if u.starts_with('/') {
                 format!("{scheme}://{host}{u}")
             } else {
-                format!("{}/{u}", &addr[..addr.rfind('/').unwrap()])
+                format!("{}/{u}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
             }
         } else {
             u.to_owned()
@@ -156,7 +153,10 @@ fn parse(addr: &str) -> String {
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
             for img in imgs {
-                let src = img.attr(src).expect("Invalid img[{src}] selector!");
+                let src = img.attr(src).expect("Invalid img[src] selector!");
+                if src.starts_with("data:image/") {
+                    continue;
+                }
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
@@ -449,16 +449,21 @@ mod BL {
 
     #[test]
     fn htmlq() {
-        let addr = "https://mmm.red";
+        let addr = "bing.com";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
         [img, album].iter().enumerate().for_each(|(i, sel)| {
+            let sel = if i == 0 {
+                Some(sel.unwrap_or("img[src]"))
+            } else {
+                *sel
+            };
             if sel.is_some() {
                 let selector = sel.unwrap();
                 let name = if i == 0 { "Image" } else { "Album" };
                 let cmd = Command::new("htmlq")
                     .args([{
-                        println!("\n{MARK}{B}{name} Selector: {HL} {selector} {N}",);
+                        println!("{MARK}{B}{name} Selector: {HL} {selector} {N}",);
                         selector
                     }])
                     .stdin(Stdio::piped())
