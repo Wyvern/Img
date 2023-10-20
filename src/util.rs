@@ -1,51 +1,5 @@
 use std::*;
 
-///Output dbg!(expr) only in cfg!(test) || cfg!(debug_assertions) context
-fn tdbg<T: fmt::Debug>(expr: T) -> T {
-    if cfg!(test) || cfg!(debug_assertions) {
-        dbg!(expr)
-    } else {
-        expr
-    }
-}
-
-//#[macro_export]
-macro_rules! demo {
-    ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat_param => $b:block | $p:path | $i:item | $t:tt ) => {$pat:pat $pat:pat_param};
-}
-
-#[macro_export]
-macro_rules! tdbg {
-    ($e:expr $(,)?) => {
-        if cfg!(test) || cfg!(debug_assertions) {
-            dbg!($e)
-        } else {
-            $e
-        }
-    };
-    ($($e:expr),+ $(,)?) => {
-        if cfg!(test) || cfg!(debug_assertions) {
-            ($($crate::dbg!($e)),+,)
-        } else {
-            ($($e),+,)
-        }
-    };
-}
-
-macro_rules! impl_ref_elements {
-    () => {};
-    ($T0:ident $($T:ident)*) => {
-        impl<$T0, $($T,)*> RefElements for ($T0,$($T,)*) {
-            type Refs<'a> = (&'a $T0, $(&'a $T,)*) where Self:'a;
-            fn ref_elements(&self)->Self::Refs<'_> {
-                let &(ref $T0,$(ref $T,)*) = self;
-                ($T0,$($T,)*)
-            }
-        }
-        impl_ref_elements!{$($T)*}
-    }
-}
-
 ///Colorized terminal constants
 /**
     The 8 actual colors within the ranges (30-37, 40-47, 90-97, 100-107) are defined by the ANSI standard as follows:
@@ -182,12 +136,51 @@ mod Color {
 }
 pub use Color::*;
 
-///Generic `exit(msg: ...)` function
-pub fn exit(msg: fmt::Arguments<'_>) -> ! {
-    println!("{msg}");
-    process::exit(0);
-}
+mod macros {
+    #[macro_export]
+    macro_rules! exit {
+        ($l:literal $(,$e:expr)*) => {{
+            println!("{R}{B}{}{N}", format_args!($l $(,$e)*));
+            process::exit(0);
+        }}
+    }
 
+    #[macro_export]
+    macro_rules! tdbg {
+        ($e:expr $(,)?) => {
+            if cfg!(test) || cfg!(debug_assertions) {
+                dbg!($e)
+            } else {
+                $e
+            }
+        };
+        ($($e:expr),+ $(,)?) => {
+            if cfg!(test) || cfg!(debug_assertions) {
+                ($($crate::dbg!($e)),+,)
+            } else {
+                ($($e),+,)
+            }
+        }
+    }
+
+    macro_rules! demo {
+    ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat_param => $b:block | $p:path | $i:item | $t:tt ) => {$pat:pat $pat:pat_param};
+    }
+    
+    macro_rules! impl_ref_elements {
+    () => {};
+    ($T0:ident $($T:ident)*) => {
+        impl<$T0, $($T,)*> RefElements for ($T0,$($T,)*) {
+            type Refs<'a> = (&'a $T0, $(&'a $T,)*) where Self:'a;
+            fn ref_elements(&self)->Self::Refs<'_> {
+                let &(ref $T0,$(ref $T,)*) = self;
+                ($T0,$($T,)*)
+            }
+        }
+        impl_ref_elements!{$($T)*}
+    }
+}
+}
 // #[test]
 fn pause() {
     use io::*;

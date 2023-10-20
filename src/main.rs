@@ -4,10 +4,10 @@ mod util;
 
 fn main() {
     if env::args().len() > 2 {
-        exit(format_args!("{R}Usage: `Command <URL>`{N}"));
+        exit!("Usage: `Command <URL>`");
     }
     let arg = env::args().nth(1).unwrap_or_else(|| {
-        exit(format_args!("{R}Please input <URL> argument.{N}"));
+        exit!("Please input <URL> argument.");
     });
 
     let mut next_page = parse(&arg);
@@ -25,18 +25,18 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        exit(format_args!("{R}Invalid http(s) protocol.{N}"));
+        exit!("Invalid http(s) protocol.");
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() {
-        exit(format_args!("{R}Invalid host info.{N}"));
+        exit!("Invalid host info.");
     }
     [scheme, host]
 }
 
 ///Get `host` info and Generate `img/src/next/album` selector data
-fn host_info(host: &str) -> [&str; 4] {
+fn host_info(host: &str) -> [Option<&str>; 4] {
     use {serde_json::*, sync::*};
 
     // static JSON: LazyLock<Value> = LazyLock::new(|| website());
@@ -55,14 +55,14 @@ fn host_info(host: &str) -> [&str; 4] {
                 .any(|s| s == host.trim_start_matches("www."))
         })
         .unwrap_or_else(|| {
-            exit(format_args!("Unsupported website. {B}{R}🌏 {host} 💥{N}"));
+            exit!("Unsupported website: {U}{host}");
         });
 
-    ["Img", "Src", "Next", "Album"].map(|key| site[key].as_str().unwrap_or(""))
+    ["Img", "Src", "Next", "Album"].map(|key| site[key].as_str())
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (String, [&str; 4], [&str; 2]) {
+fn get_html(addr: &str) -> (String, [Option<&str>; 4], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
     println!("{BLINK}{BG}Downloading 📄 ...{N}");
@@ -70,14 +70,14 @@ fn get_html(addr: &str) -> (String, [&str; 4], [&str; 2]) {
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-fsSL"])
         .output()
         .unwrap_or_else(|e| {
-            exit(format_args!("{C}curl:{R} `{e}` {N}"));
+            exit!("{C}curl: {e}");
         });
     print!("{C}");
     if out.stdout.is_empty() {
-        exit(format_args!(
-            "Get HTML failed - {R}{}{N}",
+        exit!(
+            "Get HTML failed - {}",
             String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
-        ));
+        );
     }
     let res = String::from_utf8_lossy(&out.stdout);
     (res.to_string(), host_info, scheme_host)
@@ -87,12 +87,12 @@ fn get_html(addr: &str) -> (String, [&str; 4], [&str; 2]) {
 fn parse(addr: &str) -> String {
     let (html, [img, src, mut next_sel, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
-    let imgs = page.select(img);
+    let imgs = page.select(img.unwrap_or("img"));
     let titles = page.select("title");
     let title = titles
         .first()
         .unwrap_or_else(|| {
-            exit(format_args!("{R}Not a valid HTML page.{N}"));
+            exit!("Not a valid HTML page.");
         })
         .text()
         .expect("NO title text.");
@@ -105,23 +105,23 @@ fn parse(addr: &str) -> String {
     let slash2dot = t.replace('/', "·");
     t = slash2dot.as_ref();
 
-    let albums = if album.is_empty() {
-        vec![]
-    } else {
-        page.select(album)
-    };
-    let has_album = !album.is_empty() && !albums.is_empty();
+    let albums = album.and_then(|x| Some(page.select(x)));
+
+    let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
 
     match (has_album, !imgs.is_empty()) {
         (true, true) => println!(
             "{B}Totally found {} 📸 and {} 🏞️  in 📄:{G} {t}{N}",
-            albums.len(),
+            albums.as_ref().unwrap().len(),
             imgs.len(),
         ),
-        (true, false) => println!("{B}Totally found {} 📸 in 📄:{G} {t}{N}", albums.len(),),
-        (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {t}{N}", imgs.len(),),
+        (true, false) => println!(
+            "{B}Totally found {} 📸 in 📄:{G} {t}{N}",
+            albums.as_ref().unwrap().len(),
+        ),
+        (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {t}{N}", imgs.len()),
         (false, false) => {
-            exit(format_args!("{B}∅ 🏞️  found in 📄:{G} {t}{N}"));
+            exit!("∅ 🏞️  found in 📄:{G} {t}");
         }
     }
 
@@ -147,7 +147,9 @@ fn parse(addr: &str) -> String {
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
             for img in imgs {
-                let src = img.attr(src).expect("Invalid img[src] selector!");
+                let src = img
+                    .attr(src.unwrap_or("src"))
+                    .expect("Invalid img[src] selector!");
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
@@ -159,7 +161,7 @@ fn parse(addr: &str) -> String {
         (true, false) => {
             let mut all = false;
 
-            for (i, alb) in albums.iter().enumerate() {
+            for (i, alb) in albums.as_ref().unwrap().iter().enumerate() {
                 let mut parse_album = || {
                     let mut href = alb.attr("href").unwrap_or_else(|| {
                         alb.parent()
@@ -200,7 +202,7 @@ fn parse(addr: &str) -> String {
                         stdout,
                         "{B}Do you want to download Album <{I}{U}{}/{}{N}>: {B}{G}{} ?{N}",
                         i + 1,
-                        albums.len(),
+                        albums.as_ref().unwrap().len(),
                         t.trim()
                     );
                     write!(
@@ -213,14 +215,14 @@ fn parse(addr: &str) -> String {
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
-                        exit(format_args!("{R} `{e}` {N}"));
+                        exit!("`{e}`");
                     });
                     input.make_ascii_lowercase();
 
                     match input.trim() {
                         "y" | "yes" | "" => parse_album(),
                         "n" | "no" => {
-                            next_sel = "";
+                            next_sel = None;
                             continue;
                         }
                         "a" | "all" => {
@@ -229,7 +231,7 @@ fn parse(addr: &str) -> String {
                         }
                         _ => {
                             println!("{B}Canceled all albums download.{N}");
-                            next_sel = "";
+                            next_sel = None;
                             break;
                         }
                     };
@@ -239,12 +241,7 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    if (!next_sel.is_empty()) {
-        let nexts = page.select(next_sel);
-        check_next(nexts, addr)
-    } else {
-        String::default()
-    }
+    next_sel.map_or_else(<_>::default, |n| check_next(page.select(n), addr))
 }
 
 ///Perform photo download operation
@@ -254,7 +251,7 @@ fn download(dir: &str, src: &str) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
-                exit(format_args!("Create Dir error:{R} `{e}` {N}"));
+                exit!("Create Dir Error: `{e}`");
             });
         }
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
@@ -285,7 +282,7 @@ fn download(dir: &str, src: &str) {
             process::Command::new("wget")
                 .current_dir(path)
                 .args([
-                    &src,
+                    src,
                     format!("--referer={host}").as_str(),
                     "-U",
                     "Mozilla Firefox",
@@ -428,7 +425,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     serde_json::from_str(include_str!("web.json")).unwrap_or_else(|e| {
-        exit(format_args!("{R} `{e}` {N}"));
+        exit!("`{e}`");
     })
 }
 
@@ -449,31 +446,32 @@ mod BL {
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
         [img, album].iter().enumerate().for_each(|(i, sel)| {
-            let cmd = Command::new("htmlq")
-                .args([{
-                    println!(
-                        "\n{MARK}{B}{s} Selector: {HL} {sel} {N}",
-                        s = if i == 0 { "Image" } else { "Album" }
-                    );
-                    sel
-                }])
-                .stdin(Stdio::piped())
-                //.stdout(Stdio::piped())
-                .spawn()
-                .expect("Execute htmlq failed.");
-            let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
-            use io::*;
-            stdin
-                .write_all(html.as_bytes())
-                .expect("Failed to write stdin.");
-            cmd.wait_with_output().expect("Failed to get stdout.");
+            if sel.is_some() {
+                let selector = sel.unwrap();
+                let name = if i == 0 { "Image" } else { "Album" };
+                let cmd = Command::new("htmlq")
+                    .args([{
+                        println!("\n{MARK}{B}{name} Selector: {HL} {selector} {N}",);
+                        selector
+                    }])
+                    .stdin(Stdio::piped())
+                    //.stdout(Stdio::piped())
+                    .spawn()
+                    .expect("Execute htmlq failed.");
+                let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
+                use io::*;
+                stdin
+                    .write_all(html.as_bytes())
+                    .expect("Failed to write stdin.");
+                cmd.wait_with_output().expect("Failed to get stdout.");
+            }
         });
     }
 
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
