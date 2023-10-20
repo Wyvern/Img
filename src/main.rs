@@ -29,7 +29,7 @@ fn check_host(addr: &str) -> [&str; 2] {
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
-    if host.is_empty() {
+    if host.is_empty() || !host.contains(".") {
         exit!("Invalid host info.");
     }
     [scheme, host]
@@ -449,34 +449,32 @@ mod BL {
 
     #[test]
     fn htmlq() {
-        let addr = "bing.com";
+        let addr = "mmm.red";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
-        [img, album].iter().enumerate().for_each(|(i, sel)| {
-            let sel = if i == 0 {
-                Some(sel.unwrap_or("img[src]"))
-            } else {
-                *sel
-            };
-            if sel.is_some() {
-                let selector = sel.unwrap();
-                let name = if i == 0 { "Image" } else { "Album" };
-                let cmd = Command::new("htmlq")
-                    .args([{
-                        println!("{MARK}{B}{name} Selector: {HL} {selector} {N}",);
-                        selector
-                    }])
-                    .stdin(Stdio::piped())
-                    //.stdout(Stdio::piped())
-                    .spawn()
-                    .expect("Execute htmlq failed.");
-                let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
-                use io::*;
-                stdin
-                    .write_all(html.as_bytes())
-                    .expect("Failed to write stdin.");
-                cmd.wait_with_output().expect("Failed to get stdout.");
-            }
+
+        let hq = |sel: &str| {
+            let cmd = Command::new("htmlq")
+                .args([sel])
+                .stdin(Stdio::piped())
+                //.stdout(Stdio::piped())
+                .spawn()
+                .expect("Execute htmlq failed.");
+            let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
+            use io::*;
+            stdin
+                .write_all(html.as_bytes())
+                .expect("Failed to write stdin.");
+            cmd.wait_with_output().expect("Failed to get stdout.");
+        };
+
+        let sel = img.unwrap_or("img[src]");
+        println!("{MARK}{B}Image Selector: {HL} {sel} {N}",);
+        hq(sel);
+
+        album.map_or((), |a| {
+            println!("{MARK}{B}Album Selector: {HL} {a} {N}",);
+            hq(a)
         });
     }
 
