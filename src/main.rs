@@ -36,7 +36,7 @@ fn check_host(addr: &str) -> [&str; 2] {
 }
 
 ///Get `host` info and Generate `img/src/next/album` selector data
-fn host_info(host: &str) -> [Option<&str>; 4] {
+fn host_info(host: &str) -> [Option<&str>; 3] {
     use {serde_json::*, sync::*};
 
     // static JSON: LazyLock<Value> = LazyLock::new(|| website());
@@ -58,11 +58,11 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
             exit!("Unsupported website: {U}{host}");
         });
 
-    ["Img", "Src", "Next", "Album"].map(|key| site[key].as_str())
+    ["Img", "Next", "Album"].map(|key| site[key].as_str())
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (String, [Option<&str>; 4], [&str; 2]) {
+fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
     println!("{BLINK}{BG}Downloading 📄 ...{N}");
@@ -85,9 +85,18 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 4], [&str; 2]) {
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (html, [img, src, mut next_sel, album], [scheme, host]) = get_html(addr);
+    let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
-    let imgs = page.select(img.unwrap_or("img"));
+    let imgs = page.select(img.unwrap_or("img[src]"));
+    let src = img
+        .and_then(|i| {
+            if i.trim_end().ends_with("]") {
+                Some(&i[i.rfind('[').unwrap() + 1..i.rfind(']').unwrap()])
+            } else {
+                None
+            }
+        })
+        .unwrap_or("src");
     let titles = page.select("title");
     let title = titles
         .first()
@@ -147,9 +156,7 @@ fn parse(addr: &str) -> String {
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
             for img in imgs {
-                let src = img
-                    .attr(src.unwrap_or("src"))
-                    .expect("Invalid img[src] selector!");
+                let src = img.attr(src).expect("Invalid img[{src}] selector!");
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
@@ -473,7 +480,7 @@ mod BL {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
 
         let addr = "http://www.beautyleg6.com/siwameitui/";
-        parse(addr);
+        parse("mmm.red");
     }
 
     #[test]

@@ -6,8 +6,7 @@
     },
     {
         "Site": "bestgirlsexy.com",
-        "Img": "img.aligncenter.size-full",
-        "Src": "data-src",
+        "Img": "img.aligncenter.size-full[data-src]",
         "Album": "div.elementor-post__text a[href]"
     },
     {
@@ -23,8 +22,7 @@
     },
     {
         "Site": "xiuren.org",
-        "Img": "span.photoThum a",
-        "Src": "href"
+        "Img": "span.photoThum a[href]"
     },
     {
         "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgyw.pro",
@@ -62,7 +60,6 @@
     {
         "Site": "xia44.com,zei77.com,zan63.com,tai69.com,zei99.com,zai66.com,yan44.com,zei33.com,wai77.com,zan23.com,wai55.com,xie69.com",
         "Img": "div.spotlight.text-center[data-src]",
-        "Src": "data-src",
         "Next": "div.single-nav-links span"
     },
     {
@@ -92,13 +89,11 @@
     },
     {
         "Site": "nudegirls4u.com",
-        "Img": "a.rgg-simplelightbox.size-medium.rgg-img[href]",
-        "Src": "href"
+        "Img": "a.rgg-simplelightbox.size-medium.rgg-img[href]"
     },
     {
         "Site": "hotgirl.biz",
-        "Img": "div.thecontent a",
-        "Src": "href"
+        "Img": "div.thecontent a[href]"
     },
     {
         "Site": "buondua.com,xiutaku.com",
@@ -127,18 +122,15 @@
     },
     {
         "Site": "asigirl.com",
-        "Img": "div#asigirl-gallery a",
-        "Src": "href"
+        "Img": "div#asigirl-gallery a[href]"
     },
     {
         "Site": "xlust.org",
-        "Img": "div#rl-gallery-1 a",
-        "Src": "href"
+        "Img": "div#rl-gallery-1 a[href]"
     },
     {
         "Site": "mmm.red",
-        "Img": "div[data-fancybox=\"gallery\"] img",
-        "Src": "data-original",
+        "Img": "div[data-fancybox=\"gallery\"] img[data-original]",
         "Album": "a.item-link div"
     },
     {
@@ -153,8 +145,7 @@
     },
     {
         "Site": "meituss.com",
-        "Img": "li figure img",
-        "Src": "data-src"
+        "Img": "li figure img[data-src]"
     },
     {
         "Site": "z227m.cc",
@@ -181,8 +172,7 @@
     },
     {
         "Site": "nsphb.com",
-        "Img": "div.article-content img",
-        "Src": "data-src",
+        "Img": "div.article-content img[data-src]",
         "Next": "span.current"
     },
     {
