@@ -88,7 +88,10 @@ fn parse(addr: &str) -> String {
     let src = img
         .and_then(|i| {
             if i.trim_end().ends_with("]") {
-                Some(&i[i.rfind('[').unwrap() + 1..i.rfind(']').unwrap()])
+                Some(
+                    &i[i.rfind('[').expect("NO '[' found in img selector.") + 1
+                        ..i.rfind(']').unwrap()],
+                )
             } else {
                 None
             }
@@ -111,7 +114,7 @@ fn parse(addr: &str) -> String {
     let slash2dot = t.replace('/', "·");
     t = slash2dot.as_ref();
 
-    let albums = album.and_then(|x| Some(page.select(x)));
+    let albums = album.and_then(|a| Some(page.select(a)));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
 
@@ -483,7 +486,7 @@ mod BL {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
 
         let addr = "http://www.beautyleg6.com/siwameitui/";
-        parse("mmm.red");
+        parse(addr);
     }
 
     #[test]

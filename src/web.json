@@ -218,7 +218,7 @@
     },
     {
         "Site": "xiurennvs.xyz",
-        "Img": "div.gh-content figure img",
-        "Album": "article.post a[href]"
+        "Img": "figure.kg-card img",
+        "Album": "figure.story-image a[href]"
     }
 ]
