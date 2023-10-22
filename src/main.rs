@@ -29,7 +29,7 @@ fn check_host(addr: &str) -> [&str; 2] {
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
-    if host.is_empty() || !host.contains(".") {
+    if host.is_empty() || !host.contains('.') {
         exit!("Invalid host info.");
     }
     [scheme, host]
@@ -43,7 +43,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
     static JSON: OnceLock<Value> = OnceLock::new();
 
     let site = JSON
-        .get_or_init(|| website())
+        .get_or_init(website)
         .as_array()
         .expect("Json file parse error.")
         .iter()
@@ -87,7 +87,7 @@ fn parse(addr: &str) -> String {
     let imgs = page.select(img.unwrap_or("img[src]"));
     let src = img
         .and_then(|i| {
-            if i.trim_end().ends_with("]") {
+            if i.trim_end().ends_with(']') {
                 Some(
                     &i[i.rfind('[').expect("NO '[' found in img selector.") + 1
                         ..i.rfind(']').unwrap()],
@@ -114,7 +114,7 @@ fn parse(addr: &str) -> String {
     let slash2dot = t.replace('/', "·");
     t = slash2dot.as_ref();
 
-    let albums = album.and_then(|a| Some(page.select(a)));
+    let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
 
@@ -452,7 +452,7 @@ mod BL {
 
     #[test]
     fn htmlq() {
-        let addr = "mmm.red";
+        let addr = "live.com";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
 
@@ -471,20 +471,20 @@ mod BL {
             cmd.wait_with_output().expect("Failed to get stdout.");
         };
 
-        let sel = img.unwrap_or("img[src]");
-        println!("{MARK}{B}Image Selector: {HL} {sel} {N}",);
-        hq(sel);
+        let i = img.unwrap_or("img[src]");
+        println!("{MARK}{B}Image Selector: {HL} {i} {N}",);
+        hq(i);
 
-        album.map_or((), |a| {
+        if let Some(a) = album {
             println!("{MARK}{B}Album Selector: {HL} {a} {N}",);
             hq(a)
-        });
+        }
     }
 
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
