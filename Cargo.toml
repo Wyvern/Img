@@ -1,9 +1,9 @@
 [package]
-name = "BL"
+name = "Img"
 version = "1.0.0"
 edition = "2021"
 resolver = "2"
-# default-run = "BL"
+# default-run = "Img"
 
 [features]
 default = ["download"]

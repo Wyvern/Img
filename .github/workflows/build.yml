@@ -39,7 +39,7 @@ jobs:
           time cargo src x86_64-unknown-linux-gnu
           time cargo src aarch64-unknown-linux-gnu
 
-          find ./target -iname bl -type f | xargs ls -hl
+          find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
 
@@ -50,7 +50,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-gnu/src/BL
+          file: target/x86_64-unknown-linux-gnu/src/Img
           asset_name: Linux
           tag: Nightly
           overwrite: true
@@ -60,7 +60,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-gnu/src/BL
+          file: target/aarch64-unknown-linux-gnu/src/Img
           asset_name: Linux-AArch64
           tag: Nightly
           overwrite: true
@@ -90,9 +90,9 @@ jobs:
           #time cargo lto
           time cargo src x86_64h-apple-darwin
           time cargo src aarch64-apple-darwin
-          lipo -create target/aarch64-apple-darwin/src/BL target/x86_64h-apple-darwin/src/BL -output BL-Universal
-          find ./target -iname bl -type f | xargs ls -hl
-          ls -hl BL-Universal
+          lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+          find ./target -iname img -type f | xargs ls -hl
+          ls -hl Img-Universal
           sw_vers
           hostinfo
           sysctl -a | grep brand
@@ -104,7 +104,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64h-apple-darwin/src/BL
+          file: target/x86_64h-apple-darwin/src/Img
           asset_name: macOS-x86_64h
           tag: Nightly
           overwrite: true
@@ -114,7 +114,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-apple-darwin/src/BL
+          file: target/aarch64-apple-darwin/src/Img
           asset_name: macOS-AArch64
           tag: Nightly
           overwrite: true
@@ -124,7 +124,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: BL-Universal
+          file: Img-Universal
           asset_name: macOS-Universal
           tag: Nightly
           overwrite: true
@@ -154,7 +154,7 @@ jobs:
           #cargo lto
           cargo src x86_64-pc-windows-msvc
           cargo src aarch64-pc-windows-msvc
-          cmd /r dir /s target\BL.exe
+          cmd /r dir /s target\Img.exe
           systeminfo
 
       - name: Rust Versions
@@ -164,7 +164,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-windows-msvc/src/BL.exe
+          file: target/x86_64-pc-windows-msvc/src/Img.exe
           asset_name: Windows.exe
           tag: Nightly
           overwrite: true
@@ -174,7 +174,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-pc-windows-msvc/src/BL.exe
+          file: target/aarch64-pc-windows-msvc/src/Img.exe
           asset_name: Windows-AArch64.exe
           tag: Nightly
           overwrite: true

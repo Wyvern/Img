@@ -72,7 +72,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     print!("{C}");
     if out.stdout.is_empty() {
         exit!(
-            "Get HTML failed - {}",
+            "Fetch `{addr}` failed - {}",
             String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
         );
     }
@@ -170,7 +170,7 @@ fn parse(addr: &str) -> String {
                 //     .rfind("?id=")
                 //     .and_then(|id| src.find('&').or(Some(src.len())))
                 //     .or(src.rfind('?')).unwrap_or(src.len())];
-                src = &src[..src.rfind('?').unwrap_or(src.len())];
+                src = &src[..src.find('&').unwrap_or(src.len())];
                 let file = canonicalize_url(src);
                 // tdbg!(&file);
                 download(t, &file);
@@ -273,7 +273,28 @@ fn download(dir: &str, src: &str) {
             return;
         }
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
+        let ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
+
+        let mut name_ext = String::default();
+        if ext.is_none() {
+            let header = process::Command::new("curl")
+                .args([src, "-e", host, "-A", "Mozilla Firefox", "-fsLI"])
+                .output()
+                .unwrap_or_else(|e| exit!("Get {src} header info failed: {e}"));
+
+            let info = String::from_utf8_lossy(&header.stdout);
+            let ct = "Content-Type: image/";
+            let res = info
+                .lines()
+                .find(|l| l.starts_with(ct))
+                .unwrap_or_else(|| exit!("NO `{ct}` of `{src}` found."));
+
+            let image_type = &res[res.find('/').unwrap() + 1
+                ..res.find('+').or_else(|| res.find(';')).unwrap_or(res.len())];
+            name_ext = [name, image_type].join(".");
+        };
+
         let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
         let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
         //tdbg!(&curl);
@@ -284,7 +305,7 @@ fn download(dir: &str, src: &str) {
                 .args([
                     src,
                     "-o",
-                    name,
+                    if name_ext.is_empty() { name } else { &name_ext },
                     "-e",
                     host,
                     "-A",
@@ -464,17 +485,19 @@ fn save_to_file(data: &str) {
             .decode_slice(&data[data.find(',').unwrap() + 1..], &mut buf)
             .unwrap_or_else(|e| exit!("{e}"));
         buf.truncate(size);
-        fs::write([name, ext].join("."), buf);
+        fs::write([name, ext].join("."), buf)
+            .unwrap_or_else(|e| exit!("Write base64 encoded file {name}.{ext} failed: {e}"));
     } else {
         fs::write(
             [name, ext].join("."),
             url_escape::decode(&data[data.find(',').unwrap() + 1..]).as_bytes(),
-        );
+        )
+        .unwrap_or_else(|e| exit!("Write URL escaped file {name}.{ext} failed: {e}"));
     };
 }
 
 #[cfg(test)]
-mod BL {
+mod img {
     use super::*;
 
     #[test]
