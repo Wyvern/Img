@@ -157,11 +157,19 @@ fn parse(addr: &str) -> String {
         (_, true) => {
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
+
                 if src.starts_with("data:image/") {
+                    #[cfg(feature = "embed")]
+                    download(t, &src);
                     continue;
                 }
+
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                // src = &src[..src
+                //     .rfind("?id=")
+                //     .and_then(|id| src.find('&').or(Some(src.len())))
+                //     .or(src.rfind('?')).unwrap_or(src.len())];
                 src = &src[..src.rfind('?').unwrap_or(src.len())];
                 let file = canonicalize_url(src);
                 // tdbg!(&file);
@@ -192,22 +200,11 @@ fn parse(addr: &str) -> String {
                     use io::*;
                     let mut stdin = io::stdin();
                     let mut stdout = io::stdout();
-                    let mut t = alb.attr("title").unwrap_or(
-                        alb.attr("alt").unwrap_or(
-                            alb.text()
-                                .and_then(|x| {
-                                    if x.trim().is_empty() {
-                                        alb.children()
-                                            .first()
-                                            .expect("NO children found in album element.")
-                                            .attr("alt")
-                                    } else {
-                                        Some(x)
-                                    }
-                                })
-                                .expect("NO Album's Title found."),
-                        ),
-                    );
+
+                    let mut t = alb.attr("title").unwrap_or_else(|| {
+                        alb.attr("alt")
+                            .unwrap_or_else(|| alb.text().expect("NO album title can be found."))
+                    });
                     writeln!(
                         stdout,
                         "{B}Do you want to download Album <{I}{U}{}/{}{N}>: {B}{G}{} ?{N}",
@@ -263,6 +260,17 @@ fn download(dir: &str, src: &str) {
             fs::create_dir(path).unwrap_or_else(|e| {
                 exit!("Create Dir Error: `{e}`");
             });
+        }
+
+        if src.starts_with("data:image/") {
+            #[cfg(feature = "embed")]
+            {
+                let cur = env::current_dir().unwrap();
+                env::set_current_dir(path);
+                save_to_file(src);
+                env::set_current_dir(cur);
+            }
+            return;
         }
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
@@ -439,6 +447,31 @@ fn website() -> serde_json::Value {
     })
 }
 
+#[cfg(feature = "embed")]
+fn save_to_file(data: &str) {
+    let ext =
+        &data[data.find('/').unwrap() + 1..data.find('+').or_else(|| data.find(';')).unwrap()];
+
+    let t = &format!("{:?}", time::Instant::now());
+    let name = &t[t.find(':').unwrap() + 2..t.len() - 2];
+
+    use base64::*;
+
+    if data.contains(";base64,") {
+        let mut buf = vec![0; data.len()];
+        let size = engine::general_purpose::STANDARD
+            .decode_slice(&data[data.find(',').unwrap() + 1..], &mut buf)
+            .unwrap_or_else(|e| exit!("{e}"));
+        buf.truncate(size);
+        fs::write([name, ext].join("."), buf);
+    } else {
+        fs::write(
+            [name, ext].join("."),
+            url_escape::decode(&data[data.find(',').unwrap() + 1..]).as_bytes(),
+        );
+    };
+}
+
 #[cfg(test)]
 mod BL {
     use super::*;
@@ -452,7 +485,7 @@ mod BL {
 
     #[test]
     fn htmlq() {
-        let addr = "live.com";
+        let addr = "bing.com";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
 
@@ -484,9 +517,17 @@ mod BL {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
+    }
+
+    #[test]
+    #[cfg(feature = "embed")]
+    fn embed_test() {
+        let data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
+
+        save_to_file(data);
     }
 
     #[test]

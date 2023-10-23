@@ -1,4 +1,4 @@
-use {crabquery as _, serde_json as _, std::*, util::*};
+use {std::*, util::*};
 
 mod util;
 

@@ -219,6 +219,6 @@
     {
         "Site": "xiurennvs.xyz",
         "Img": "figure.kg-card img",
-        "Album": "figure.story-image a[href]"
+        "Album": "figure.story-image img[alt]"
     }
 ]

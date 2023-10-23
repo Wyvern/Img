@@ -12,6 +12,7 @@ curl = []
 wget = []
 batch = []
 retry = []
+embed = ["dep:base64", "dep:url-escape"]
 
 [[example]]
 name = "color"
@@ -19,5 +20,7 @@ path = "src/color.rs"
 test = true
 
 [dependencies]
-crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
+base64 = { version = "*", default-features = false, optional = true }
+crabquery = { version = "*", default-features = false }
+url-escape = { version = "*", default-features = false, optional = true }
