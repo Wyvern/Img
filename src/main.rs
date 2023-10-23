@@ -447,6 +447,7 @@ fn website() -> serde_json::Value {
     })
 }
 
+///Save inline/embed data:image/..+..;.., base64/url-escaped content to file.
 #[cfg(feature = "embed")]
 fn save_to_file(data: &str) {
     let ext =
