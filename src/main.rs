@@ -253,7 +253,7 @@ fn parse(addr: &str) -> String {
 
 ///Perform photo download operation
 fn download(dir: &str, src: &str) {
-    #[cfg(all(feature = "download", any(not(test), feature = "batch")))]
+    // #[cfg(all(feature = "download", any(not(test), feature = "batch")))]
     {
         let path = path::Path::new(dir);
         if (!path.exists()) {
@@ -273,25 +273,28 @@ fn download(dir: &str, src: &str) {
             return;
         }
         let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
-        let ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
+        let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
 
         let mut name_ext = String::default();
-        if ext.is_none() {
-            let header = process::Command::new("curl")
+        if has_ext.is_none() {
+            let cmd = process::Command::new("curl")
                 .args([src, "-e", host, "-A", "Mozilla Firefox", "-fsLI"])
                 .output()
                 .unwrap_or_else(|e| exit!("Get {src} header info failed: {e}"));
 
-            let info = String::from_utf8_lossy(&header.stdout);
+            let header = String::from_utf8_lossy(&cmd.stdout);
             let ct = "Content-Type: image/";
-            let res = info
+            let info = header
                 .lines()
                 .find(|l| l.starts_with(ct))
                 .unwrap_or_else(|| exit!("NO `{ct}` of `{src}` found."));
 
-            let image_type = &res[res.find('/').unwrap() + 1
-                ..res.find('+').or_else(|| res.find(';')).unwrap_or(res.len())];
+            let image_type = &info[info.find('/').unwrap() + 1
+                ..info
+                    .find('+')
+                    .or_else(|| info.find(';'))
+                    .unwrap_or(info.len())];
             name_ext = [name, image_type].join(".");
         };
         #[cfg(any())]
@@ -325,6 +328,8 @@ fn download(dir: &str, src: &str) {
                 .args([
                     src,
                     format!("--referer={host}").as_str(),
+                    "-O",
+                    if name_ext.is_empty() { name } else { &name_ext },
                     "-U",
                     "Mozilla Firefox",
                     "-q",
