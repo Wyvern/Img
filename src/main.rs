@@ -294,10 +294,12 @@ fn download(dir: &str, src: &str) {
                 ..res.find('+').or_else(|| res.find(';')).unwrap_or(res.len())];
             name_ext = [name, image_type].join(".");
         };
-
-        let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
-        let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
-        //tdbg!(&curl);
+        #[cfg(any())]
+        {
+            let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
+            let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
+            tdbg!(&curl);
+        }
         if (path.exists() && !path.join(name).exists()) {
             #[cfg(feature = "curl")]
             process::Command::new("curl")
