@@ -106,7 +106,7 @@ inherits = "release"
 rustflags = ["-Zparse-only", "-Zno-analysis", "-Zno-link", "-Zno-codegen"]
 
 [unstable]
-check-cfg = ["names", "values", "features", "output"]
+check-cfg = true
 avoid-dev-deps = true
 dual-proc-macros = true
 panic-abort-tests = true
