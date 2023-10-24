@@ -153,14 +153,19 @@ fn parse(addr: &str) -> String {
             u.to_owned()
         }
     };
+
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
+            let mut skipped = 0u16;
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
 
                 if src.starts_with("data:image/") {
-                    #[cfg(feature = "embed")]
-                    download(t, &src);
+                    if cfg!(feature = "embed") {
+                        download(t, &src);
+                    } else {
+                        skipped += 1;
+                    }
                     continue;
                 }
 
@@ -174,6 +179,9 @@ fn parse(addr: &str) -> String {
                 let file = canonicalize_url(src);
                 // tdbg!(&file);
                 download(t, &file);
+            }
+            if skipped > 0 {
+                println!("{B}Skipped {skipped} embed/inline [src] content.{N}");
             }
         }
         (true, false) => {
@@ -253,8 +261,7 @@ fn parse(addr: &str) -> String {
 
 ///Perform photo download operation
 fn download(dir: &str, src: &str) {
-    // #[cfg(all(feature = "download", any(not(test), feature = "batch")))]
-    {
+    if cfg!(all(feature = "download", any(not(test), feature = "batch"))) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
@@ -303,38 +310,41 @@ fn download(dir: &str, src: &str) {
             let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
             tdbg!(&curl);
         }
-        if (path.exists() && !path.join(name).exists()) {
-            #[cfg(feature = "curl")]
-            process::Command::new("curl")
-                .current_dir(path)
-                .args([
-                    src,
-                    "-o",
-                    if name_ext.is_empty() { name } else { &name_ext },
-                    "-e",
-                    host,
-                    "-A",
-                    "Mozilla Firefox",
-                    "-fsL",
-                    //"--location-trusted",
-                    #[cfg(feature = "retry")]
-                    "--retry 3",
-                ])
-                .spawn();
+        if (path.exists()
+            && !path
+                .join(if name_ext.is_empty() { name } else { &name_ext })
+                .exists())
+        {
+            if cfg!(feature = "curl") {
+                process::Command::new("curl")
+                    .current_dir(path)
+                    .args([
+                        src,
+                        "-o",
+                        if name_ext.is_empty() { name } else { &name_ext },
+                        "-e",
+                        host,
+                        "-A",
+                        "Mozilla Firefox",
+                        "-fsL",
+                    ])
+                    .spawn();
+            }
 
-            #[cfg(feature = "wget")]
-            process::Command::new("wget")
-                .current_dir(path)
-                .args([
-                    src,
-                    format!("--referer={host}").as_str(),
-                    "-O",
-                    if name_ext.is_empty() { name } else { &name_ext },
-                    "-U",
-                    "Mozilla Firefox",
-                    "-q",
-                ])
-                .spawn();
+            if cfg!(feature = "wget") {
+                process::Command::new("wget")
+                    .current_dir(path)
+                    .args([
+                        src,
+                        format!("--referer={host}").as_str(),
+                        "-O",
+                        if name_ext.is_empty() { name } else { &name_ext },
+                        "-U",
+                        "Mozilla Firefox",
+                        "-q",
+                    ])
+                    .spawn();
+            }
         }
     }
 }
@@ -478,29 +488,41 @@ fn website() -> serde_json::Value {
 ///Save inline/embed data:image/..+..;.., base64/url-escaped content to file.
 #[cfg(feature = "embed")]
 fn save_to_file(data: &str) {
-    let ext =
-        &data[data.find('/').unwrap() + 1..data.find('+').or_else(|| data.find(';')).unwrap()];
+    let ext = &data[data.find('/').unwrap() + 1
+        ..data
+            .find('+')
+            .or_else(|| data.find(';'))
+            .unwrap_or(data.len())];
 
     let t = &format!("{:?}", time::Instant::now());
     let name = &t[t.find(':').unwrap() + 2..t.len() - 2];
 
     use base64::*;
 
-    if data.contains(";base64,") {
-        let mut buf = vec![0; data.len()];
-        let size = engine::general_purpose::STANDARD
-            .decode_slice(&data[data.find(',').unwrap() + 1..], &mut buf)
-            .unwrap_or_else(|e| exit!("{e}"));
-        buf.truncate(size);
-        fs::write([name, ext].join("."), buf)
-            .unwrap_or_else(|e| exit!("Write base64 encoded file {name}.{ext} failed: {e}"));
-    } else {
-        fs::write(
-            [name, ext].join("."),
-            url_escape::decode(&data[data.find(',').unwrap() + 1..]).as_bytes(),
-        )
-        .unwrap_or_else(|e| exit!("Write URL escaped file {name}.{ext} failed: {e}"));
-    };
+    let full_name = [name, ext].join(".");
+    if !path::Path::new(&full_name).exists() {
+        {
+            if data.contains(";base64,") {
+                let mut buf = vec![0; data.len()];
+                let size = engine::general_purpose::STANDARD
+                    .decode_slice(&data[data.find(',').unwrap() + 1..], &mut buf)
+                    .unwrap_or_else(|e| exit!("{e}"));
+                buf.truncate(size);
+                fs::write(full_name, buf)
+            } else {
+                fs::write(
+                    full_name,
+                    url_escape::decode(&data[data.find(',').unwrap() + 1..]).as_bytes(),
+                )
+            }
+        }
+        .unwrap_or_else(|e| {
+            exit!(
+                "Write {} to file {name}.{ext} failed: {e}",
+                &data[..data.find(',').unwrap()]
+            )
+        });
+    }
 }
 
 #[cfg(test)]
@@ -516,7 +538,7 @@ mod img {
 
     #[test]
     fn htmlq() {
-        let addr = "bing.com";
+        let addr = "apple.com";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
 
@@ -555,7 +577,7 @@ mod img {
 
     #[test]
     #[cfg(feature = "embed")]
-    fn embed_test() {
+    fn embed() {
         let data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
 
         save_to_file(data);
