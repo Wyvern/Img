@@ -25,12 +25,12 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        exit!("Invalid http(s) protocol.");
+        exit!("{}: Invalid http(s) protocol.", scheme);
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() || !host.contains('.') {
-        exit!("Invalid host info.");
+        exit!("{}: Invalid host info.", host);
     }
     [scheme, host]
 }
@@ -67,12 +67,13 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-fsSL"])
         .output()
         .unwrap_or_else(|e| {
-            exit!("{C}curl: {e}");
+            exit!("{C}curl: {}", e);
         });
     print!("{C}");
     if out.stdout.is_empty() {
         exit!(
-            "Fetch `{addr}` failed - {}",
+            "Fetch `{}` failed - {}",
+            addr,
             String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
         );
     }
@@ -265,7 +266,7 @@ fn download(dir: &str, src: &str) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
-                exit!("Create Dir Error: `{e}`");
+                exit!("Create Dir Error: `{}`", e);
             });
         }
 
@@ -279,7 +280,11 @@ fn download(dir: &str, src: &str) {
             }
             return;
         }
-        let name = src[src.rfind('/').unwrap() + 1..].trim_start_matches(['-', '_']);
+        let name = src[src
+            .rfind('/')
+            .unwrap_or_else(|| exit!("Invalid Url: {}", src))
+            + 1..]
+            .trim_start_matches(['-', '_']);
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
         let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
 
@@ -518,8 +523,9 @@ fn save_to_file(data: &str) {
         }
         .unwrap_or_else(|e| {
             exit!(
-                "Write {} to file {name}.{ext} failed: {e}",
-                &data[..data.find(',').unwrap()]
+                "Write {} to file {name}.{ext} failed: {}",
+                &data[..data.find(',').unwrap()],
+                e
             )
         });
     }
@@ -570,7 +576,7 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }

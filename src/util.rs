@@ -29,7 +29,7 @@ use std::*;
     90-97 	bright foreground color (non-standard)
     100-107 	bright background color (non-standard)
 */
-mod Color {
+mod color {
     pub static N: &str = "\x1b[0m";
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
@@ -134,13 +134,13 @@ mod Color {
         });
     }
 }
-pub use Color::*;
+pub use color::*;
 
 mod macros {
     #[macro_export]
     macro_rules! exit {
         ($l:literal $(,$e:expr)*) => {{
-            println!("{R}{B}{}{N}", format_args!($l $(,$e)*));
+            println!("{B}{}{N}", format_args!($l $(,format_args!("{R}{}{N}{B}",$e))*));
             process::exit(0);
         }}
     }
@@ -166,7 +166,7 @@ mod macros {
     macro_rules! demo {
     ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat_param => $b:block | $p:path | $i:item | $t:tt ) => {$pat:pat $pat:pat_param};
     }
-    
+
     macro_rules! impl_ref_elements {
     () => {};
     ($T0:ident $($T:ident)*) => {
