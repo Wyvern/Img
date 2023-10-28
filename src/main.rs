@@ -3,17 +3,24 @@ use {std::*, util::*};
 mod util;
 
 fn main() {
-    if env::args().len() > 2 {
+    if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         exit!("Usage: `Command <URL>`");
     }
-    let arg = env::args().nth(1).unwrap_or_else(|| {
+    let arg = if cfg!(test) {
+        env::args().skip(3).nth(1)
+    } else {
+        env::args().nth(1)
+    }
+    .unwrap_or_else(|| {
         exit!("Please input <URL> argument.");
     });
 
     let mut next_page = parse(&arg);
 
-    while !next_page.is_empty() {
-        next_page = parse(&next_page);
+    if cfg!(not(test)) {
+        while !next_page.is_empty() {
+            next_page = parse(&next_page);
+        }
     }
 }
 
@@ -578,9 +585,15 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        
+        // let addr=env::args().skip(3).nth(1);
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
+    }
+
+    #[test]
+    fn run() {
+        main();
     }
 
     #[test]

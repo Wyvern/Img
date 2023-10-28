@@ -3,10 +3,17 @@ use {std::*, util::*};
 mod util;
 
 fn main() {
-    if env::args().len() > 5 {
+    if env::args().len() > if cfg!(test) { 5 + 3 } else { 5 } {
         exit()
     }
-    let args: [_; 4] = array::from_fn(|i| env::args().nth(i + 1));
+
+    let args: [_; 4] = array::from_fn(|i| {
+        if cfg!(test) {
+            env::args().skip(3).nth(i + 1)
+        } else {
+            env::args().nth(i + 1)
+        }
+    });
 
     analyze_args(array::from_fn(|i| args[i].as_deref()));
 }
@@ -62,9 +69,7 @@ mod color {
 
     #[test]
     fn run() {
-        let mut s = "256 ab ".split_whitespace();
-        let args = array::from_fn(|_| s.next());
-        analyze_args(args);
+        main();
     }
 
     #[test]
