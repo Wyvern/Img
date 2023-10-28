@@ -172,10 +172,6 @@ fn parse(addr: &str) -> String {
 
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                // src = &src[..src
-                //     .rfind("?id=")
-                //     .and_then(|id| src.find('&').or(Some(src.len())))
-                //     .or(src.rfind('?')).unwrap_or(src.len())];
                 src = &src[..src.find('&').unwrap_or(src.len())];
                 let file = canonicalize_url(src);
                 // tdbg!(&file);
@@ -211,8 +207,18 @@ fn parse(addr: &str) -> String {
                     let mut stdout = io::stdout();
 
                     let mut t = alb.attr("title").unwrap_or_else(|| {
-                        alb.attr("alt")
-                            .unwrap_or_else(|| alb.text().expect("NO album title can be found."))
+                        alb.attr("alt").unwrap_or_else(|| {
+                            alb.text().map_or_else(
+                                || exit!("NO album title can be found."),
+                                |x| {
+                                    if x.trim().is_empty() {
+                                        exit!("Album title is empty.")
+                                    } else {
+                                        x
+                                    }
+                                },
+                            )
+                        })
                     });
                     writeln!(
                         stdout,
@@ -301,12 +307,11 @@ fn download(dir: &str, src: &str) {
                 .lines()
                 .find(|l| l.starts_with(ct))
                 .unwrap_or_else(|| exit!("NO `{ct}` of `{src}` found."));
-
-            let image_type = &info[info.find('/').unwrap() + 1
-                ..info
-                    .find('+')
-                    .or_else(|| info.find(';'))
-                    .unwrap_or(info.len())];
+            let offset = &info[info.find('/').unwrap() + 1..];
+            let image_type = &offset[..offset
+                .find('+')
+                .or_else(|| offset.find(';'))
+                .unwrap_or(offset.len())];
             name_ext = [name, image_type].join(".");
         };
         #[cfg(any())]
@@ -493,32 +498,29 @@ fn website() -> serde_json::Value {
 ///Save inline/embed data:image/..+..;.., base64/url-escaped content to file.
 #[cfg(feature = "embed")]
 fn save_to_file(data: &str) {
-    let ext = &data[data.find('/').unwrap() + 1
-        ..data
-            .find('+')
-            .or_else(|| data.find(';'))
-            .unwrap_or(data.len())];
+    let mut offset = &data[data.find('/').unwrap() + 1..];
+    let ext = &offset[..offset
+        .find('+')
+        .or_else(|| offset.find(';'))
+        .unwrap_or(offset.len())];
 
     let t = &format!("{:?}", time::Instant::now());
-    let name = &t[t.find(':').unwrap() + 2..t.len() - 2];
+    let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
 
     use base64::*;
-
+    offset = &offset[offset.find(',').unwrap() + 1..];
     let full_name = [name, ext].join(".");
     if !path::Path::new(&full_name).exists() {
         {
             if data.contains(";base64,") {
-                let mut buf = vec![0; data.len()];
+                let mut buf = vec![0; offset.len()];
                 let size = engine::general_purpose::STANDARD
-                    .decode_slice(&data[data.find(',').unwrap() + 1..], &mut buf)
+                    .decode_slice(offset, &mut buf)
                     .unwrap_or_else(|e| exit!("{e}"));
                 buf.truncate(size);
                 fs::write(full_name, buf)
             } else {
-                fs::write(
-                    full_name,
-                    url_escape::decode(&data[data.find(',').unwrap() + 1..]).as_bytes(),
-                )
+                fs::write(full_name, url_escape::decode(offset).as_bytes())
             }
         }
         .unwrap_or_else(|e| {
