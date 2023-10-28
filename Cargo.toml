@@ -9,8 +9,7 @@ resolver = "2"
 default = ["curl"]
 curl = []
 wget = []
-batch = []
-retry = []
+download = []
 embed = ["dep:base64", "dep:url-escape"]
 
 [[example]]

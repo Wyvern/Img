@@ -275,7 +275,7 @@ fn parse(addr: &str) -> String {
 
 ///Perform photo download operation
 fn download(dir: &str, src: &str) {
-    if cfg!(any(not(test), feature = "batch")) {
+    if cfg!(any(not(test), feature = "download")) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
@@ -284,8 +284,7 @@ fn download(dir: &str, src: &str) {
         }
 
         if src.starts_with("data:image/") {
-            #[cfg(feature = "embed")]
-            {
+            if cfg!(feature = "embed") {
                 let cur = env::current_dir().unwrap();
                 env::set_current_dir(path);
                 save_to_file(src);
@@ -503,8 +502,10 @@ fn website() -> serde_json::Value {
 }
 
 ///Save inline/embed data:image/..+..;.., base64/url-escaped content to file.
-#[cfg(feature = "embed")]
 fn save_to_file(data: &str) {
+    if cfg!(not(feature = "embed")) {
+        return;
+    }
     let mut offset = &data[data.find('/').unwrap() + 1..];
     let ext = &offset[..offset
         .find('+')
@@ -513,30 +514,32 @@ fn save_to_file(data: &str) {
 
     let t = &format!("{:?}", time::Instant::now());
     let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
-
-    use base64::*;
-    offset = &offset[offset.find(',').unwrap() + 1..];
-    let full_name = [name, ext].join(".");
-    if !path::Path::new(&full_name).exists() {
-        {
-            if data.contains(";base64,") {
-                let mut buf = vec![0; offset.len()];
-                let size = engine::general_purpose::STANDARD
-                    .decode_slice(offset, &mut buf)
-                    .unwrap_or_else(|e| exit!("{e}"));
-                buf.truncate(size);
-                fs::write(full_name, buf)
-            } else {
-                fs::write(full_name, url_escape::decode(offset).as_bytes())
+    #[cfg(feature = "embed")]
+    {
+        use base64::*;
+        offset = &offset[offset.find(',').unwrap() + 1..];
+        let full_name = [name, ext].join(".");
+        if !path::Path::new(&full_name).exists() {
+            {
+                if data.contains(";base64,") {
+                    let mut buf = vec![0; offset.len()];
+                    let size = engine::general_purpose::STANDARD
+                        .decode_slice(offset, &mut buf)
+                        .unwrap_or_else(|e| exit!("{e}"));
+                    buf.truncate(size);
+                    fs::write(full_name, buf)
+                } else {
+                    fs::write(full_name, url_escape::decode(offset).as_bytes())
+                }
             }
+            .unwrap_or_else(|e| {
+                exit!(
+                    "Write {} to file {name}.{ext} failed: {}",
+                    &data[..data.find(',').unwrap()],
+                    e
+                )
+            });
         }
-        .unwrap_or_else(|e| {
-            exit!(
-                "Write {} to file {name}.{ext} failed: {}",
-                &data[..data.find(',').unwrap()],
-                e
-            )
-        });
     }
 }
 
@@ -585,7 +588,6 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        // let addr=env::args().skip(3).nth(1);
 
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
@@ -597,19 +599,38 @@ mod img {
     }
 
     #[test]
-    #[cfg(feature = "embed")]
     fn embed() {
+        if cfg!(not(feature = "embed")) {
+            return;
+        }
         let data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
 
         save_to_file(data);
     }
 
     #[test]
-    fn range() {
-        let mut addr = "https://girldreamy.com/category/china/xiuren/page/30";
-        let page = &addr[addr.rfind('/').unwrap() + 1..];
-        let num = page.parse::<u16>().expect("Parse page number failed.");
-        (0_u16..=4).map(|i| num - i).for_each(|p| {
+    fn batch() {
+        if cfg!(not(feature = "download")) {
+            return;
+        }
+        let addr = env::args()
+            .skip(3)
+            .nth(1)
+            .unwrap_or("https://girldreamy.com/category/china/xiuren/page/30".into());
+        let count = env::args()
+            .skip(3)
+            .nth(2)
+            .unwrap_or("1".into())
+            .parse::<u16>()
+            .unwrap_or_else(|x| {
+                println!("Invalid batch count: {x}");
+                0
+            });
+        tdbg!(&addr,count);
+
+        let num = &addr[addr.rfind('/').unwrap() + 1..].parse::<u16>().expect("Parse page number failed.");
+
+        (0_u16..count).map(|i| num - i).for_each(|p| {
             let mut idx = format!("{}{p}", &addr[..=addr.rfind('/').unwrap()]);
             tdbg!(&idx);
             idx = parse(&idx);
