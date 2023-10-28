@@ -588,7 +588,7 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
@@ -627,10 +627,10 @@ mod img {
                 0
             });
         tdbg!(&addr,count);
-
+        
         let num = &addr[addr.rfind('/').unwrap() + 1..].parse::<u16>().expect("Parse page number failed.");
 
-        (0_u16..count).map(|i| num - i).for_each(|p| {
+        (0..count).map(|i| num - i).for_each(|p| {
             let mut idx = format!("{}{p}", &addr[..=addr.rfind('/').unwrap()]);
             tdbg!(&idx);
             idx = parse(&idx);
