@@ -275,7 +275,7 @@ fn parse(addr: &str) -> String {
 
 ///Perform photo download operation
 fn download(dir: &str, src: &str) {
-    if cfg!(all(feature = "download", any(not(test), feature = "batch"))) {
+    if cfg!(any(not(test), feature = "batch")) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {

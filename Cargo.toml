@@ -6,8 +6,7 @@ resolver = "2"
 # default-run = "Img"
 
 [features]
-default = ["download"]
-download = ["curl"]
+default = ["curl"]
 curl = []
 wget = []
 batch = []
