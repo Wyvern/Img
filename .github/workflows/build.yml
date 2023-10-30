@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Purge Ubuntu tracker
         run: |
-          apt purge tracker* -y
+          sudo apt-get purge tracker* -y
 
       - name: Checkout
         uses: actions/checkout@v4
