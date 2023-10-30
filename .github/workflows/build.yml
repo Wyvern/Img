@@ -147,13 +147,20 @@ jobs:
     steps:
       - name: Stop windows services
         run: |
-          sc stop "WSearch"
           sc config "WSearch" start=disabled
           sc stop "DPS"
-          sc stop "WdiServiceHost"
-          sc stop "WdiSystemHost"
           sc stop "CISVC"
           sc stop "pla"
+          sc config "WinDefend" start=disabled
+          sc config "DiagTrack" start=disabled
+          sc config "diagsvc" start=disabled
+          sc config "WdiServiceHost" start=disabled
+          sc config "WdiSystemHost" start=disabled
+          sc config "WpcMonSvc" start=disabled
+          sc config "PcaSvc" start=disabled
+          sc config "TroubleshootingSvc" start=disabled
+          sc config "mpssvc" start=disabled
+          sc config "WerSvc" start=disabled
 
       - name: Checkout
         uses: actions/checkout@v4
