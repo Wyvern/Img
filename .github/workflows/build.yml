@@ -85,6 +85,7 @@ jobs:
 
       - name: Build Release
         run: |
+          sudo mdutil -a -i off
           cargo update
           #time cargo build --release
           #time cargo lto
