@@ -71,6 +71,10 @@ jobs:
     runs-on: macos-13
 
     steps:
+      - name: Disable macos spotlight index
+        run: |
+            sudo mdutil -a -i off
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -85,7 +89,6 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo mdutil -a -i off
           cargo update
           #time cargo build --release
           #time cargo lto
@@ -136,6 +139,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Disable/Stop windows search index
+        run: |
+          sc stop "WSearch"
+          sc config "WSearch" start=disabled
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -150,8 +158,6 @@ jobs:
 
       - name: Build release
         run: |
-          sc stop "WSearch"
-          sc config "WSearch" start=disabled
           cargo update
           #cargo build --release
           #cargo lto
