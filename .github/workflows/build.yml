@@ -80,8 +80,6 @@ jobs:
       - name: Disable macos spotlight index & XProtect
         run: |
             sudo mdutil -a -i off
-            sudo launchctl stop system/com.apple.XProtect.daemon.scan
-            sudo launchctl stop system/com.apple.XProtect.daemon.scan.startup
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -152,15 +150,12 @@ jobs:
           sc config "WSearch" start=disabled
           sc stop "DPS"
           sc stop "pla"
-          sc config "WinDefend" start=disabled
           sc config "DiagTrack" start=disabled
           sc config "diagsvc" start=disabled
           sc config "WdiServiceHost" start=disabled
           sc config "WdiSystemHost" start=disabled
-          sc config "WpcMonSvc" start=disabled
           sc config "PcaSvc" start=disabled
           sc config "TroubleshootingSvc" start=disabled
-          sc config "mpssvc" start=disabled
           sc config "WerSvc" start=disabled
 
       - name: Checkout
