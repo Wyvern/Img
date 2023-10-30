@@ -160,7 +160,8 @@ jobs:
           Get-Service -ErrorAction SilentlyContinue|? name -Like "*TELEMETRY*" | ? status -eq "running" | Stop-Service
           Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | Set-Service -StartMode Disabled
           Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | ? status -eq "running" | Stop-Service
-          
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*Diagnostic*" | Set-Service -StartMode Disabled
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*Diagnostic*" | ? status -eq "running" | Stop-Service
 
       - name: Checkout
         uses: actions/checkout@v4
