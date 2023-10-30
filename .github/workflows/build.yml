@@ -155,11 +155,11 @@ jobs:
           sc config "WerSvc" start=disabled
           sc stop "DPS"
           sc stop "pla"
-          
-          Get-Service |? name -Like "*TELEMETRY*" | Set-Service -StartMode Disabled
-          Get-Service |? name -Like "*TELEMETRY*" | ? status -eq "running" | Stop-Service
-          Get-Service |? name -Like "*CEIP*" | Set-Service -StartMode Disabled
-          Get-Service |? name -Like "*CEIP*" | ? status -eq "running" | Stop-Service
+
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*TELEMETRY*" | Set-Service -StartMode Disabled
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*TELEMETRY*" | ? status -eq "running" | Stop-Service
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | Set-Service -StartMode Disabled
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | ? status -eq "running" | Stop-Service
           
 
       - name: Checkout
