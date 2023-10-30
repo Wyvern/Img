@@ -17,9 +17,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Purge Ubuntu tracker
+      - name: Purge Ubuntu
         run: |
-          sudo apt-get purge tracker* -y
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport watchdog popularity-contest
+
+          sudo systemctl mask systemd-journald.service systemd-journald.socket
 
       - name: Checkout
         uses: actions/checkout@v4
