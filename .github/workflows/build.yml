@@ -18,7 +18,7 @@ jobs:
 
     steps:
       steps:
-      - name: Disable Ubuntu tracker
+      - name: Purge Ubuntu tracker
         run: |
           apt purge tracker* -y
 
