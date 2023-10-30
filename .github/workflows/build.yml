@@ -17,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      steps:
+      - name: Disable Ubuntu tracker
+        run: |
+          apt purge tracker* -y
+
       - name: Checkout
         uses: actions/checkout@v4
 
