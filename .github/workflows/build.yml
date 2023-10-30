@@ -80,7 +80,6 @@ jobs:
       - name: Disable macos spotlight index & XProtect
         run: |
             sudo mdutil -a -i off
-            sudo launchctl stop gui/501/com.apple.XProtect.agent.scan.startup
             sudo launchctl stop system/com.apple.XProtect.daemon.scan
             sudo launchctl stop system/com.apple.XProtect.daemon.scan.startup
 
