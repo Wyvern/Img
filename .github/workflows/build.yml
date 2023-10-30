@@ -145,10 +145,34 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Disable/Stop windows search index
+      - name: Stop windows services
         run: |
           sc stop "WSearch"
           sc config "WSearch" start=disabled
+          sc stop "PeerDistSvc"
+          sc stop "DPS"
+          sc stop "WdiServiceHost"
+          sc stop "WdiSystemHost"
+          sc stop "CISVC"
+          sc stop "pla"
+          sc stop "Spooler"
+          sc stop "wercplsupport"
+          sc stop "PcaSvc"
+          sc stop "SDRSVC"
+          sc stop "WbioSrvc"
+          sc stop "WerSvc"
+          sc stop "bthserv"
+          sc stop "DiagTrack"
+          sc stop "diagsvc"
+          sc stop "diagnosticshub.standardcollector.service"
+          sc stop "WpcMonSvc"
+          sc stop "TroubleshootingSvc"
+          sc stop "Sense"
+          sc stop "WdNisSvc"
+          sc stop "WinDefend"
+          sc stop "mpssvc"
+          sc stop "TapiSrv"
+          sc stop "fsssvc"
 
       - name: Checkout
         uses: actions/checkout@v4
