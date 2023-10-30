@@ -160,12 +160,6 @@ jobs:
           sc stop "diagnosticshub.standardcollector.service"
           sc stop "WpcMonSvc"
           sc stop "TroubleshootingSvc"
-          sc stop "Sense"
-          sc stop "WdNisSvc"
-          sc stop "WinDefend"
-          sc stop "mpssvc"
-          sc stop "TapiSrv"
-          sc stop "fsssvc"
 
       - name: Checkout
         uses: actions/checkout@v4
