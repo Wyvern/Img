@@ -145,16 +145,16 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Stop windows services
+      - name: Disable windows services
         run: |
           sc config "WSearch" start=disabled
-          sc stop "DPS"
-          sc stop "pla"
           sc config "DiagTrack" start=disabled
           sc config "WdiServiceHost" start=disabled
           sc config "WdiSystemHost" start=disabled
           sc config "PcaSvc" start=disabled
           sc config "WerSvc" start=disabled
+          sc stop "DPS"
+          sc stop "pla"
 
       - name: Checkout
         uses: actions/checkout@v4
