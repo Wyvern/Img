@@ -77,7 +77,7 @@ jobs:
     runs-on: macos-13
 
     steps:
-      - name: Disable macos spotlight index & XProtect
+      - name: Disable macos spotlight index
         run: |
             sudo mdutil -a -i off
 
@@ -151,11 +151,9 @@ jobs:
           sc stop "DPS"
           sc stop "pla"
           sc config "DiagTrack" start=disabled
-          sc config "diagsvc" start=disabled
           sc config "WdiServiceHost" start=disabled
           sc config "WdiSystemHost" start=disabled
           sc config "PcaSvc" start=disabled
-          sc config "TroubleshootingSvc" start=disabled
           sc config "WerSvc" start=disabled
 
       - name: Checkout
