@@ -154,9 +154,6 @@ jobs:
           sc stop "WdiSystemHost"
           sc stop "CISVC"
           sc stop "pla"
-          sc stop "Spooler"
-          sc stop "DiagTrack"
-          sc stop "diagsvc"
 
       - name: Checkout
         uses: actions/checkout@v4
