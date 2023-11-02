@@ -170,7 +170,7 @@ rustflags = [
 [build]
 rustflags = ["-Zpanic-in-drop=abort"]
 incremental = true
-rustc-wrapper = "sccache"
+rustc-workspace-wrapper = "sccache"
 
 [unstable.gitoxide]
 checkout = true
