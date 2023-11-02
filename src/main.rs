@@ -185,7 +185,7 @@ fn parse(addr: &str) -> String {
                 download(t, &file);
             }
             if skipped > 0 {
-                println!("{B}Skipped {skipped} embed/inline [src] content from album: {G}{t}{N}");
+                println!("{B}Skipped {skipped} embed/inline [src] content from 📄: {G}{t}{N}");
             }
         }
         (true, false) => {
