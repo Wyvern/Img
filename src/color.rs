@@ -75,7 +75,7 @@ mod color {
     #[test]
     fn show() {
         let begin = time::Instant::now();
-        // color8(TEXT);
+        color8(TEXT);
         // color256(TEXT);
         // color_rgb_fg_full();
         // color_rgb_bg_full();
