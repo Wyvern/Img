@@ -588,7 +588,7 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
@@ -613,12 +613,11 @@ mod img {
         if cfg!(not(feature = "download")) {
             return;
         }
-        let addr = env::args()
-            .skip(3)
+        let mut skip3 = env::args().skip(3);
+        let addr = skip3
             .nth(1)
             .unwrap_or("https://girldreamy.com/category/china/xiuren/page/30".into());
-        let count = env::args()
-            .skip(3)
+        let count = skip3
             .nth(2)
             .unwrap_or("1".into())
             .parse::<u16>()
@@ -626,9 +625,11 @@ mod img {
                 println!("Invalid batch count: {x}");
                 0
             });
-        tdbg!(&addr,count);
-        
-        let num = &addr[addr.rfind('/').unwrap() + 1..].parse::<u16>().expect("Parse page number failed.");
+        tdbg!(&addr, count);
+
+        let num = &addr[addr.rfind('/').unwrap() + 1..]
+            .parse::<u16>()
+            .expect("Parse page number failed.");
 
         (0..count).map(|i| num - i).for_each(|p| {
             let mut idx = format!("{}{p}", &addr[..=addr.rfind('/').unwrap()]);
