@@ -167,7 +167,10 @@ fn parse(addr: &str) -> String {
             let mut skipped = 0u16;
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
-
+                if src.trim().is_empty() {
+                    skipped += 1;
+                    continue;
+                }
                 if src.starts_with("data:image/") {
                     if cfg!(feature = "embed") {
                         download(t, &src);
@@ -185,7 +188,7 @@ fn parse(addr: &str) -> String {
                 download(t, &file);
             }
             if skipped > 0 {
-                println!("{B}Skipped {skipped} embed/inline [src] content from 📄: {G}{t}{N}");
+                println!("{B}Skipped {skipped} embed/empty img[src] content from 📄: {G}{t}{N}");
             }
         }
         (true, false) => {
@@ -308,11 +311,17 @@ fn download(dir: &str, src: &str) {
                 .unwrap_or_else(|e| exit!("Get {src} header info failed: {e}"));
 
             let header = String::from_utf8_lossy(&cmd.stdout);
-            let ct = "Content-Type: image/";
+            let ct = "content-type: image/";
             let info = header
                 .lines()
-                .find(|l| l.starts_with(ct))
-                .unwrap_or_else(|| exit!("NO `{ct}` of `{src}` found."));
+                .find(|l| l.to_lowercase().starts_with(ct))
+                .unwrap_or_else(|| {
+                    println!("NO `{ct}` header info found for `{src}`");
+                    ""
+                });
+            if info.is_empty() {
+                return;
+            }
             let offset = &info[info.find('/').unwrap() + 1..];
             let image_type = &offset[..offset
                 .find('+')
@@ -556,7 +565,7 @@ mod img {
 
     #[test]
     fn htmlq() {
-        let addr = "apple.com";
+        let addr = "visualstudio.com";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
 
@@ -572,7 +581,15 @@ mod img {
             stdin
                 .write_all(html.as_bytes())
                 .expect("Failed to write stdin.");
-            cmd.wait_with_output().expect("Failed to get stdout.");
+            cmd.wait_with_output().and_then(|o| {
+                if !o.stdout.is_empty() {
+                    println!(
+                        "Totally found {} <img>",
+                        String::from_utf8_lossy(o.stdout.as_ref()).lines().count()
+                    );
+                }
+                Ok(())
+            });
         };
 
         let i = img.unwrap_or("img[src]");
