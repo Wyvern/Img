@@ -164,6 +164,8 @@ fn parse(addr: &str) -> String {
 
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
+            use collections::*;
+            let mut urls = HashSet::new();
             let mut skipped = 0u16;
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
@@ -179,16 +181,22 @@ fn parse(addr: &str) -> String {
                     }
                     continue;
                 }
+                if !urls.insert(src.to_owned()) {
+                    skipped += 1;
+                    continue;
+                }
                 // tdbg!(&src);
+
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.find('&').unwrap_or(src.len())];
+
                 let file = canonicalize_url(src);
                 // tdbg!(&file);
                 download(t, &file);
             }
             if skipped > 0 {
-                println!("{B}Skipped {skipped} embed/empty img[src] content from 📄: {G}{t}{N}");
+                println!("{B}Skipped {skipped} {U}embed/empty/duplicated{N} 🏞️");
             }
         }
         (true, false) => {

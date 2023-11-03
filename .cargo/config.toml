@@ -119,7 +119,7 @@ target-applies-to-host = true
 host-config = true
 trim-paths = true
 
-[host]
+[build]
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
@@ -166,9 +166,6 @@ rustflags = [
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
-
-[build]
-rustflags = ["-Zpanic-in-drop=abort"]
 incremental = true
 rustc-workspace-wrapper = "sccache"
 
