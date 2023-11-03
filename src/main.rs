@@ -169,7 +169,7 @@ fn parse(addr: &str) -> String {
             let mut skipped = 0u16;
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
-                if src.trim().is_empty() {
+                if src.trim().is_empty() || !urls.insert(src.to_owned()) {
                     skipped += 1;
                     continue;
                 }
@@ -179,10 +179,6 @@ fn parse(addr: &str) -> String {
                     } else {
                         skipped += 1;
                     }
-                    continue;
-                }
-                if !urls.insert(src.to_owned()) {
-                    skipped += 1;
                     continue;
                 }
                 // tdbg!(&src);
@@ -584,15 +580,14 @@ mod img {
             stdin
                 .write_all(html.as_bytes())
                 .expect("Failed to write stdin.");
-            cmd.wait_with_output().and_then(|o| {
+            if let Ok(o) = cmd.wait_with_output() {
                 if !o.stdout.is_empty() {
                     println!(
                         "Totally found {} <img>",
                         String::from_utf8_lossy(o.stdout.as_ref()).lines().count()
                     );
                 }
-                Ok(())
-            });
+            }
         };
 
         let i = img.unwrap_or("img[src]");
