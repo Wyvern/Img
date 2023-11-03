@@ -179,7 +179,7 @@ fn parse(addr: &str) -> String {
                     }
                     continue;
                 }
-
+                // tdbg!(&src);
                 let mut src = src.as_str();
                 src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                 src = &src[..src.find('&').unwrap_or(src.len())];
@@ -315,13 +315,8 @@ fn download(dir: &str, src: &str) {
             let info = header
                 .lines()
                 .find(|l| l.to_lowercase().starts_with(ct))
-                .unwrap_or_else(|| {
-                    println!("NO `{ct}` header info found for `{src}`");
-                    ""
-                });
-            if info.is_empty() {
-                return;
-            }
+                .unwrap_or_else(|| exit!("NO `{}` header info found for `{}`", ct, src));
+
             let offset = &info[info.find('/').unwrap() + 1..];
             let image_type = &offset[..offset
                 .find('+')
