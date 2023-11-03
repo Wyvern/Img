@@ -319,8 +319,10 @@ fn download(dir: &str, src: &str) {
             let info = header
                 .lines()
                 .find(|l| l.to_lowercase().starts_with(ct))
-                .unwrap_or_else(|| exit!("NO `{}` header info found for `{}`", ct, src));
-
+                .unwrap_or_else(|| "");
+            if info.is_empty() {
+                return;
+            }
             let offset = &info[info.find('/').unwrap() + 1..];
             let image_type = &offset[..offset
                 .find('+')
