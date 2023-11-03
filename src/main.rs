@@ -319,7 +319,7 @@ fn download(dir: &str, src: &str) {
             let info = header
                 .lines()
                 .find(|l| l.to_lowercase().starts_with(ct))
-                .unwrap_or_else(|| "");
+                .unwrap_or("");
             if info.is_empty() {
                 return;
             }
