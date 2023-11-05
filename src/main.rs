@@ -32,7 +32,7 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        exit!("{}: Invalid http(s) protocol.", scheme);
+        exit!("`{}`: Invalid {U}http(s){N} protocol", scheme);
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
@@ -319,7 +319,10 @@ fn download(dir: &str, src: &str) {
             let info = header
                 .lines()
                 .find(|l| l.to_lowercase().starts_with(ct))
-                .unwrap_or("");
+                .unwrap_or({
+                    tdbg!(src);
+                    ""
+                });
             if info.is_empty() {
                 return;
             }
@@ -605,7 +608,7 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
+        
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }

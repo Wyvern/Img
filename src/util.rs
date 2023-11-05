@@ -160,8 +160,15 @@ mod macros {
     #[macro_export]
     macro_rules! exit {
         ($l:literal $(,$e:expr)*) => {{
-            println!("{B}{}{N}", format_args!($l $(,format_args!("{R}{}{N}{B}",$e))*));
+            pl!($l $(,$e)*);
             process::exit(0);
+        }}
+    }
+
+    #[macro_export]
+    macro_rules! pl {
+        ($l:literal $(,$e:expr)*) => {{
+            println!("{B}{}{N}", format_args!($l $(,format_args!("{R}{}{N}{B}",$e))*));
         }}
     }
 
