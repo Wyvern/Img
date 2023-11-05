@@ -10,6 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "true"
   RUSTC-WORKSPACE-WRAPPER: "sccache"
+  SCCACHE_DIRECT: true
 
 jobs:
   Linux:
@@ -79,7 +80,7 @@ jobs:
     steps:
       - name: Disable macos spotlight index
         run: |
-            sudo mdutil -a -i off
+          sudo mdutil -a -i off
 
       - name: Checkout
         uses: actions/checkout@v4
