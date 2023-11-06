@@ -524,7 +524,7 @@ fn save_to_file(data: &str) {
         .find('+')
         .or_else(|| offset.find(';'))
         .unwrap_or(offset.len())];
-
+    
     let t = &format!("{:?}", time::Instant::now());
     let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
     #[cfg(feature = "embed")]
