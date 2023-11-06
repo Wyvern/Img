@@ -192,7 +192,14 @@ fn parse(addr: &str) -> String {
                 download(t, &file);
             }
             if skipped > 0 {
-                println!("{B}Skipped {skipped} {U}embed/empty/duplicated{N} 🏞️");
+                println!(
+                    "{B}Skipped {skipped} {U}{}empty/duplicated{N} 🏞️",
+                    if cfg!(feature = "embed") {
+                        ""
+                    } else {
+                        "embed/"
+                    }
+                );
             }
         }
         (true, false) => {
@@ -319,7 +326,7 @@ fn download(dir: &str, src: &str) {
             let info = header
                 .lines()
                 .find(|l| l.to_lowercase().starts_with(ct))
-                .unwrap_or({
+                .unwrap_or_else(|| {
                     tdbg!(src);
                     ""
                 });
@@ -608,7 +615,7 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
