@@ -9,7 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "true"
-  RUSTC-WRAPPER: "sccache"
+  RUSTC-WORKSPACE-WRAPPER: "sccache"
   SCCACHE_DIRECT: true
 
 jobs:
