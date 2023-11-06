@@ -166,7 +166,7 @@ rustflags = [
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
-# incremental = true
+incremental = true
 rustc-workspace-wrapper = "sccache"
 
 [unstable.gitoxide]

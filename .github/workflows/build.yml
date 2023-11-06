@@ -8,9 +8,9 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SCCACHE_GHA_ENABLED: "true"
+  SCCACHE_GHA_ENABLED: on
   RUSTC-WORKSPACE-WRAPPER: "sccache"
-  SCCACHE_DIRECT: true
+  SCCACHE_DIRECT: "true"
 
 jobs:
   Linux:
@@ -35,6 +35,13 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
+
+      - name: Configure sccache
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
       - name: Build Release
         run: |
@@ -93,6 +100,13 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
+
+      - name: Configure sccache
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
       - name: Build Release
         run: |
@@ -175,6 +189,13 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
+
+      - name: Configure sccache
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
       - name: Build release
         run: |
