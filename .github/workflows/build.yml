@@ -10,7 +10,6 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: on
   RUSTC-WORKSPACE-WRAPPER: "sccache"
-  SCCACHE_DIRECT: "true"
 
 jobs:
   Linux:
@@ -34,7 +33,7 @@ jobs:
           components: rust-src
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+        uses: mozilla-actions/sccache-action@0.5.4
 
       - name: Configure sccache
         uses: actions/github-script@v6
@@ -99,7 +98,7 @@ jobs:
           components: rust-src
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+        uses: mozilla-actions/sccache-action0.5.4
 
       - name: Configure sccache
         uses: actions/github-script@v6
@@ -188,7 +187,7 @@ jobs:
           components: rust-src
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+        uses: mozilla-actions/sccache-action0.5.4
 
       - name: Configure sccache
         uses: actions/github-script@v6
