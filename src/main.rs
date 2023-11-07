@@ -322,10 +322,10 @@ fn download(dir: &str, src: &str) {
                 .unwrap_or_else(|e| exit!("Get {src} header info failed: {e}"));
 
             let header = String::from_utf8_lossy(&cmd.stdout);
-            let ct = "content-type: image/";
+            let ct = "content-type: image";
             let info = header
                 .lines()
-                .find(|l| l.to_lowercase().starts_with(ct))
+                .find(|l| l[..l.find('/').unwrap_or(l.len())].eq_ignore_ascii_case(ct))
                 .unwrap_or_else(|| {
                     tdbg!(src);
                     ""
@@ -615,7 +615,7 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        
+
         let addr = "http://www.beautyleg6.com/siwameitui/";
         parse(addr);
     }
