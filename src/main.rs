@@ -325,7 +325,7 @@ fn download(dir: &str, src: &str) {
             let ct = "content-type: image";
             let info = header
                 .lines()
-                .find(|l| l[..l.find('/').unwrap_or(l.len())].eq_ignore_ascii_case(ct))
+                .find(|l| l[..ct.len().min(l.len())].eq_ignore_ascii_case(ct))
                 .unwrap_or_else(|| {
                     tdbg!(src);
                     ""
