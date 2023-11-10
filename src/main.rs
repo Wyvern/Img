@@ -4,7 +4,7 @@ mod util;
 
 fn main() {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
-        exit!("Usage: `Command <URL>`");
+        quit!("Usage: `Command <URL>`");
     }
     let arg = if cfg!(test) {
         env::args().skip(3).nth(1)
@@ -12,7 +12,7 @@ fn main() {
         env::args().nth(1)
     }
     .unwrap_or_else(|| {
-        exit!("Please input <URL> argument.");
+        quit!("Please input <URL> argument.");
     });
 
     let mut next_page = parse(&arg);
@@ -32,12 +32,12 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        exit!("`{}`: Invalid {U}http(s){N} protocol", scheme);
+        quit!("`{}`: Invalid {U}http(s){N} protocol", scheme);
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() || !host.contains('.') {
-        exit!("{}: Invalid host info.", host);
+        quit!("{}: Invalid host info.", host);
     }
     [scheme, host]
 }
@@ -74,11 +74,11 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         .args([addr, "-e", host, "-A", "Mozilla Firefox", "-fsSL"])
         .output()
         .unwrap_or_else(|e| {
-            exit!("{C}curl: {}", e);
+            quit!("{C}curl: {}", e);
         });
     print!("{C}");
     if out.stdout.is_empty() {
-        exit!(
+        quit!(
             "Fetch `{}` failed - {}",
             addr,
             String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
@@ -109,7 +109,7 @@ fn parse(addr: &str) -> String {
     let title = titles
         .first()
         .unwrap_or_else(|| {
-            exit!("Not a valid HTML page.");
+            quit!("Not a valid HTML page.");
         })
         .text()
         .expect("NO title text.");
@@ -138,7 +138,7 @@ fn parse(addr: &str) -> String {
         ),
         (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {t}{N}", imgs.len()),
         (false, false) => {
-            exit!("∅ 🏞️  found in 📄:{G} {t}");
+            quit!("∅ 🏞️  found in 📄:{G} {t}");
         }
     }
 
@@ -230,10 +230,10 @@ fn parse(addr: &str) -> String {
                     let mut t = alb.attr("title").unwrap_or_else(|| {
                         alb.attr("alt").unwrap_or_else(|| {
                             alb.text().map_or_else(
-                                || exit!("NO album title can be found."),
+                                || quit!("NO album title can be found."),
                                 |x| {
                                     if x.trim().is_empty() {
-                                        exit!("Album title is empty.")
+                                        quit!("Album title is empty.")
                                     } else {
                                         x
                                     }
@@ -258,7 +258,7 @@ fn parse(addr: &str) -> String {
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
-                        exit!("`{e}`");
+                        quit!("`{e}`");
                     });
                     input.make_ascii_lowercase();
 
@@ -293,7 +293,7 @@ fn download(dir: &str, src: &str) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
             fs::create_dir(path).unwrap_or_else(|e| {
-                exit!("Create Dir Error: `{}`", e);
+                quit!("Create Dir Error: `{}`", e);
             });
         }
 
@@ -308,7 +308,7 @@ fn download(dir: &str, src: &str) {
         }
         let name = src[src
             .rfind('/')
-            .unwrap_or_else(|| exit!("Invalid Url: {}", src))
+            .unwrap_or_else(|| quit!("Invalid Url: {}", src))
             + 1..]
             .trim_start_matches(['-', '_']);
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
@@ -319,7 +319,7 @@ fn download(dir: &str, src: &str) {
             let cmd = process::Command::new("curl")
                 .args([src, "-e", host, "-A", "Mozilla Firefox", "-fsLI"])
                 .output()
-                .unwrap_or_else(|e| exit!("Get {src} header info failed: {e}"));
+                .unwrap_or_else(|e| quit!("Get {src} header info failed: {e}"));
 
             let header = String::from_utf8_lossy(&cmd.stdout);
             let ct = "content-type: image";
@@ -517,7 +517,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     serde_json::from_str(include_str!("web.json")).unwrap_or_else(|e| {
-        exit!("`{e}`");
+        quit!("`{e}`");
     })
 }
 
@@ -545,7 +545,7 @@ fn save_to_file(data: &str) {
                     let mut buf = vec![0; offset.len()];
                     let size = engine::general_purpose::STANDARD
                         .decode_slice(offset, &mut buf)
-                        .unwrap_or_else(|e| exit!("{e}"));
+                        .unwrap_or_else(|e| quit!("{e}"));
                     buf.truncate(size);
                     fs::write(full_name, buf)
                 } else {
@@ -553,7 +553,7 @@ fn save_to_file(data: &str) {
                 }
             }
             .unwrap_or_else(|e| {
-                exit!(
+                quit!(
                     "Write {} to file {name}.{ext} failed: {}",
                     &data[..data.find(',').unwrap()],
                     e
@@ -565,6 +565,8 @@ fn save_to_file(data: &str) {
 
 #[cfg(test)]
 mod img {
+    use std::fmt::Display;
+
     use super::*;
 
     #[test]
@@ -612,12 +614,14 @@ mod img {
         }
     }
 
-    #[test]
+    #[test]//cargo ti img::r#try
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
-        let addr = "http://www.beautyleg6.com/siwameitui/";
-        parse(addr);
+        let addr = env::args()
+            .skip(3)
+            .nth(1)
+            .unwrap_or("http://www.beautyleg6.com/siwameitui/".into());
+        parse(&addr);
     }
 
     #[test]

@@ -158,7 +158,7 @@ pub use color::*;
 
 mod macros {
     #[macro_export]
-    macro_rules! exit {
+    macro_rules! quit {
         ($l:literal $(,$e:expr)*) => {{
             pl!($l $(,$e)*);
             process::exit(0);
