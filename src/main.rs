@@ -565,8 +565,6 @@ fn save_to_file(data: &str) {
 
 #[cfg(test)]
 mod img {
-    use std::fmt::Display;
-
     use super::*;
 
     #[test]
@@ -614,14 +612,14 @@ mod img {
         }
     }
 
-    #[test]//cargo ti img::r#try
+    #[test] //cargo ti img::r#try
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-        let addr = env::args()
-            .skip(3)
-            .nth(1)
-            .unwrap_or("http://www.beautyleg6.com/siwameitui/".into());
-        parse(&addr);
+        let arg = env::args().skip(3).nth(1);
+        let addr = arg
+            .as_deref()
+            .unwrap_or("http://www.beautyleg6.com/siwameitui/");
+        parse(addr);
     }
 
     #[test]
