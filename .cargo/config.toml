@@ -118,6 +118,7 @@ codegen-backend = true
 target-applies-to-host = true
 host-config = true
 trim-paths = true
+gc = true
 
 [build]
 rustflags = [
