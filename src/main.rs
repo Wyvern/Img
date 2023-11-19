@@ -76,7 +76,13 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         .unwrap_or_else(|e| {
             quit!("{C}curl: {}", e);
         });
-    print!("{C}");
+    {
+        use io::*;
+        let mut o = io::stdout();
+        write!(o, "{C}");
+        o.flush();
+    }
+
     if out.stdout.is_empty() {
         quit!(
             "Fetch `{}` failed - {}",
@@ -96,15 +102,13 @@ fn parse(addr: &str) -> String {
     let src = img
         .and_then(|i| {
             if i.trim_end().ends_with(']') {
-                Some(
-                    &i[i.rfind('[').expect("NO '[' found in img selector.") + 1
-                        ..i.rfind(']').unwrap()],
-                )
+                Some(&i[i.rfind('[').expect("NO '[' found in img selector.") + 1..i.len() - 1])
             } else {
                 None
             }
         })
         .unwrap_or("src");
+
     let titles = page.select("title");
     let title = titles
         .first()

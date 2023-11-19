@@ -220,5 +220,10 @@
         "Site": "xiurennvs.xyz",
         "Img": "figure.kg-card img",
         "Album": "figure.story-image img[alt]"
+    },
+    {
+        "Site": "lootiu.com",
+        "Img": "div.contentme img",
+        "Next":"div.pagination-list a"
     }
 ]
