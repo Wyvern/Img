@@ -173,38 +173,31 @@ fn parse(addr: &str) -> String {
             let mut skipped = 0u16;
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
-                if src.trim().is_empty() || !urls.insert(src.to_owned()) {
+                if src.trim().is_empty() || !urls.insert(src) {
                     skipped += 1;
                     continue;
                 }
-                if src.starts_with("data:image/") {
-                    if cfg!(feature = "embed") {
-                        download(t, &src);
-                    } else {
-                        skipped += 1;
-                    }
-                    continue;
-                }
                 // tdbg!(&src);
-
-                let mut src = src.as_str();
-                src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                src = &src[..src.find('&').unwrap_or(src.len())];
-
-                let file = canonicalize_url(src);
-                // tdbg!(&file);
-                download(t, &file);
             }
             if skipped > 0 {
-                println!(
-                    "{B}Skipped {skipped} {U}{}empty/duplicated{N} 🏞️",
-                    if cfg!(feature = "embed") {
-                        ""
-                    } else {
-                        "embed/"
-                    }
-                );
+                println!("{B}Skipped {skipped} {U}Empty/Duplicated{N} 🏞️");
             }
+            download(
+                t,
+                urls.into_iter().map(|url| {
+                    if url.starts_with("data:image/") {
+                        url
+                    } else {
+                        let mut src = url.as_str();
+                        src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                        src = &src[..src.find('&').unwrap_or(src.len())];
+
+                        // tdbg!(&src);
+                        canonicalize_url(src)
+                    }
+                }),
+                host,
+            );
         }
         (true, false) => {
             let mut all = false;
@@ -292,7 +285,7 @@ fn parse(addr: &str) -> String {
 }
 
 ///Perform photo download operation
-fn download(dir: &str, src: &str) {
+fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if cfg!(any(not(test), feature = "download")) {
         let path = path::Path::new(dir);
         if (!path.exists()) {
@@ -301,90 +294,87 @@ fn download(dir: &str, src: &str) {
             });
         }
 
-        if src.starts_with("data:image/") {
-            if cfg!(feature = "embed") {
-                let cur = env::current_dir().unwrap();
-                env::set_current_dir(path);
-                save_to_file(src);
-                env::set_current_dir(cur);
+        let mut curl = process::Command::new("curl");
+        curl.current_dir(dir).args(["-Z"]);
+        let mut skip_embed = 0u16;
+
+        for url in urls {
+            if url.starts_with("data:image/") {
+                if cfg!(feature = "embed") {
+                    let cur = env::current_dir().unwrap();
+                    env::set_current_dir(path);
+                    save_to_file(url.as_str());
+                    env::set_current_dir(cur);
+                } else {
+                    skip_embed += 1;
+                }
+                continue;
             }
-            return;
+
+            let name = url[url
+                .rfind('/')
+                .unwrap_or_else(|| quit!("Invalid Url: {}", url))
+                + 1..]
+                .trim_start_matches(['-', '_']);
+            let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
+
+            let mut name_ext = String::default();
+            if has_ext.is_none() {
+                let cmd = process::Command::new("curl")
+                    .args([url.as_str(), "-e", host, "-A", "Mozilla Firefox", "-fsLI"])
+                    .output()
+                    .unwrap_or_else(|e| quit!("Get {url} header info failed: {e}"));
+
+                let header = String::from_utf8_lossy(&cmd.stdout);
+                let ct = "content-type: image";
+                let info = header
+                    .lines()
+                    .find(|l| l[..ct.len().min(l.len())].eq_ignore_ascii_case(ct))
+                    .unwrap_or_else(|| {
+                        tdbg!(url.as_str());
+                        ""
+                    });
+                if info.is_empty() {
+                    continue;
+                }
+                let offset = &info[info.find('/').unwrap() + 1..];
+                let image_type = &offset[..offset
+                    .find('+')
+                    .or_else(|| offset.find(';'))
+                    .unwrap_or(offset.len())];
+                name_ext = [name, image_type].join(".");
+            };
+
+            if (path.exists()
+                && !path
+                    .join(if name_ext.is_empty() { name } else { &name_ext })
+                    .exists())
+            {
+                curl.args([
+                    url.as_str(),
+                    "-o",
+                    if name_ext.is_empty() { name } else { &name_ext },
+                ]);
+            }
         }
-        let name = src[src
-            .rfind('/')
-            .unwrap_or_else(|| quit!("Invalid Url: {}", src))
-            + 1..]
-            .trim_start_matches(['-', '_']);
-        let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
-        let host = &src[..src[10..].find('/').unwrap_or(src.len() - 10) + 10];
-
-        let mut name_ext = String::default();
-        if has_ext.is_none() {
-            let cmd = process::Command::new("curl")
-                .args([src, "-e", host, "-A", "Mozilla Firefox", "-fsLI"])
-                .output()
-                .unwrap_or_else(|e| quit!("Get {src} header info failed: {e}"));
-
-            let header = String::from_utf8_lossy(&cmd.stdout);
-            let ct = "content-type: image";
-            let info = header
-                .lines()
-                .find(|l| l[..ct.len().min(l.len())].eq_ignore_ascii_case(ct))
-                .unwrap_or_else(|| {
-                    tdbg!(src);
-                    ""
-                });
-            if info.is_empty() {
-                return;
-            }
-            let offset = &info[info.find('/').unwrap() + 1..];
-            let image_type = &offset[..offset
-                .find('+')
-                .or_else(|| offset.find(';'))
-                .unwrap_or(offset.len())];
-            name_ext = [name, image_type].join(".");
-        };
-        #[cfg(any())]
-        {
-            let wget = format!("wget {src} -O {name} --referer={host} -U \"Mozilla Firefox\" -q");
-            let curl = format!("curl {src} -o {name} -e {host} -A \"Mozilla Firefox\" -fsL");
-            tdbg!(&curl);
+        if skip_embed > 0 {
+            println!("{B}Skipped {skip_embed} {U}Embed{N} 🏞️");
         }
-        if (path.exists()
-            && !path
-                .join(if name_ext.is_empty() { name } else { &name_ext })
-                .exists())
-        {
-            if cfg!(feature = "curl") {
-                process::Command::new("curl")
-                    .current_dir(path)
-                    .args([
-                        src,
-                        "-o",
-                        if name_ext.is_empty() { name } else { &name_ext },
-                        "-e",
-                        host,
-                        "-A",
-                        "Mozilla Firefox",
-                        "-fsL",
-                    ])
-                    .spawn();
-            }
-
-            if cfg!(feature = "wget") {
-                process::Command::new("wget")
-                    .current_dir(path)
-                    .args([
-                        src,
-                        format!("--referer={host}").as_str(),
-                        "-O",
-                        if name_ext.is_empty() { name } else { &name_ext },
-                        "-U",
-                        "Mozilla Firefox",
-                        "-q",
-                    ])
-                    .spawn();
-            }
+        // tdbg!(curl.get_args());
+        if cfg!(feature = "curl") {
+            curl.args([
+                "--parallel-immediate",
+                "-e",
+                host,
+                "-A",
+                "Mozilla Firefox",
+                if cfg!(debug_assertions) {
+                    "-fsSL"
+                } else {
+                    "-fsL"
+                },
+            ])
+            .spawn();
         }
     }
 }
@@ -616,7 +606,7 @@ mod img {
         }
     }
 
-    #[test] //cargo ti img::r#try
+    #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
         let arg = env::args().skip(3).nth(1);

@@ -8,7 +8,6 @@ resolver = "2"
 [features]
 default = ["curl"]
 curl = []
-wget = []
 download = []
 embed = ["dep:base64", "dep:url-escape"]
 
