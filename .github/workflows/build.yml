@@ -85,7 +85,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-apple-darwin
+          targets: aarch64-apple-darwin,arm64e-apple-darwin
           components: rust-src
 
       - name: Run rust-cache
@@ -96,9 +96,13 @@ jobs:
           cargo update
           #time cargo build --release
           #time cargo lto
+
           time cargo src x86_64h-apple-darwin
           time cargo src aarch64-apple-darwin
+          time cargo src arm64e-apple-darwin
+
           lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+          
           find ./target -iname img -type f | xargs ls -hl
           ls -hl Img-Universal
           sw_vers
@@ -127,6 +131,16 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "macOS AArch64 binary executable."
+
+      - name: Upload macOS-Arm64e to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/arm64e-apple-darwin/src/Img
+          asset_name: macOS-Arm64e
+          tag: Nightly
+          overwrite: true
+          body: "macOS Arm64e binary executable."
 
       - name: Upload macOS-Universal to a GitHub release
         uses: svenstaro/upload-release-action@v2
