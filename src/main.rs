@@ -71,7 +71,15 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let host_info = host_info(host);
     println!("{BLINK}{BG}Downloading 📄 ...{N}");
     let out = process::Command::new("curl")
-        .args([addr, "-e", host, "-A", "Mozilla Firefox", "-fsSL"])
+        .args([
+            addr,
+            "--compressed",
+            "-e",
+            host,
+            "-A",
+            "Mozilla Firefox",
+            "-fsSL",
+        ])
         .output()
         .unwrap_or_else(|e| {
             quit!("{C}curl: {}", e);
@@ -286,96 +294,103 @@ fn parse(addr: &str) -> String {
 
 ///Perform photo download operation
 fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
-    if cfg!(any(not(test), feature = "download")) {
-        let path = path::Path::new(dir);
-        if (!path.exists()) {
-            fs::create_dir(path).unwrap_or_else(|e| {
-                quit!("Create Dir Error: `{}`", e);
-            });
+    if cfg!(all(test, not(feature = "download"))) {
+        return;
+    }
+
+    let path = path::Path::new(dir);
+    if (!path.exists()) {
+        fs::create_dir(path).unwrap_or_else(|e| {
+            quit!("Create Dir Error: `{}`", e);
+        });
+    }
+
+    let mut curl = process::Command::new("curl");
+    curl.current_dir(dir).args(["-Z"]);
+    let mut skip_embed = 0u16;
+
+    for url in urls {
+        if url.starts_with("data:image/") {
+            if cfg!(feature = "embed") {
+                let cur = env::current_dir().unwrap();
+                env::set_current_dir(path);
+                save_to_file(url.as_str());
+                env::set_current_dir(cur);
+            } else {
+                skip_embed += 1;
+            }
+            continue;
         }
 
-        let mut curl = process::Command::new("curl");
-        curl.current_dir(dir).args(["-Z"]);
-        let mut skip_embed = 0u16;
+        let name = url[url
+            .rfind('/')
+            .unwrap_or_else(|| quit!("Invalid Url: {}", url))
+            + 1..]
+            .trim_start_matches(['-', '_']);
+        let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
 
-        for url in urls {
-            if url.starts_with("data:image/") {
-                if cfg!(feature = "embed") {
-                    let cur = env::current_dir().unwrap();
-                    env::set_current_dir(path);
-                    save_to_file(url.as_str());
-                    env::set_current_dir(cur);
-                } else {
-                    skip_embed += 1;
-                }
+        let mut name_ext = String::default();
+        if has_ext.is_none() {
+            let cmd = process::Command::new("curl")
+                .args([
+                    url.as_str(),
+                    "-e",
+                    host,
+                    "-A",
+                    "Mozilla Firefox",
+                    "-fsSIL",
+                    "-w",
+                    "%{content_type}",
+                ])
+                .output()
+                .unwrap_or_else(|e| quit!("Get {url} content header info failed: {e}"));
+
+            let header = String::from_utf8_lossy(&cmd.stdout);
+            let info = header.lines().last().unwrap_or("");
+
+            if info.is_empty() {
                 continue;
             }
+            let offset = &info[info.find('/').unwrap() + 1..];
+            let image_type = &offset[..offset
+                .find('+')
+                .or_else(|| offset.find(';'))
+                .unwrap_or(offset.len())];
+            name_ext = [name, image_type].join(".");
+        };
 
-            let name = url[url
-                .rfind('/')
-                .unwrap_or_else(|| quit!("Invalid Url: {}", url))
-                + 1..]
-                .trim_start_matches(['-', '_']);
-            let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
-
-            let mut name_ext = String::default();
-            if has_ext.is_none() {
-                let cmd = process::Command::new("curl")
-                    .args([url.as_str(), "-e", host, "-A", "Mozilla Firefox", "-fsLI"])
-                    .output()
-                    .unwrap_or_else(|e| quit!("Get {url} header info failed: {e}"));
-
-                let header = String::from_utf8_lossy(&cmd.stdout);
-                let ct = "content-type: image";
-                let info = header
-                    .lines()
-                    .find(|l| l[..ct.len().min(l.len())].eq_ignore_ascii_case(ct))
-                    .unwrap_or_else(|| {
-                        tdbg!(url.as_str());
-                        ""
-                    });
-                if info.is_empty() {
-                    continue;
-                }
-                let offset = &info[info.find('/').unwrap() + 1..];
-                let image_type = &offset[..offset
-                    .find('+')
-                    .or_else(|| offset.find(';'))
-                    .unwrap_or(offset.len())];
-                name_ext = [name, image_type].join(".");
-            };
-
-            if (path.exists()
-                && !path
-                    .join(if name_ext.is_empty() { name } else { &name_ext })
-                    .exists())
-            {
-                curl.args([
-                    url.as_str(),
-                    "-o",
-                    if name_ext.is_empty() { name } else { &name_ext },
-                ]);
-            }
-        }
-        if skip_embed > 0 {
-            println!("{B}Skipped {skip_embed} {U}Embed{N} 🏞️");
-        }
-        // tdbg!(curl.get_args());
-        if cfg!(feature = "curl") {
+        if (path.exists()
+            && !path
+                .join(if name_ext.is_empty() { name } else { &name_ext })
+                .exists())
+        {
             curl.args([
-                "--parallel-immediate",
-                "-e",
-                host,
-                "-A",
-                "Mozilla Firefox",
-                if cfg!(debug_assertions) {
-                    "-fsSL"
-                } else {
-                    "-fsL"
-                },
-            ])
-            .spawn();
+                url.as_str(),
+                "-o",
+                if name_ext.is_empty() { name } else { &name_ext },
+            ]);
         }
+    }
+    if skip_embed > 0 {
+        println!("{B}Skipped {skip_embed} {U}Embed{N} 🏞️");
+    }
+    // tdbg!(curl.get_args());
+    if cfg!(feature = "curl") {
+        curl.args([
+            "--parallel-immediate",
+            "--compressed",
+            "-e",
+            host,
+            "-A",
+            "Mozilla Firefox",
+            if cfg!(debug_assertions) {
+                "-fsSL"
+            } else {
+                "-fsL"
+            },
+        ])
+        .spawn()
+        .inspect_err(|e| pl!("{e}"));
     }
 }
 
@@ -609,10 +624,12 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
+
         let arg = env::args().skip(3).nth(1);
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
+
         parse(addr);
     }
 
