@@ -85,7 +85,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-apple-darwin,arm64e-apple-darwin
+          targets: aarch64-apple-darwin
           components: rust-src
 
       - name: Run rust-cache
@@ -102,7 +102,7 @@ jobs:
           time cargo src arm64e-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
-          
+
           find ./target -iname img -type f | xargs ls -hl
           ls -hl Img-Universal
           sw_vers
