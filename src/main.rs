@@ -375,6 +375,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         println!("{B}Skipped {skip_embed} {U}Embed{N} 🏞️");
     }
     // tdbg!(curl.get_args());
+    if curl.get_args().len() == 1 {
+        return;
+    }
     if cfg!(feature = "curl") {
         curl.args([
             "--parallel-immediate",
