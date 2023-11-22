@@ -8,6 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: on
+  RUSTC_WORKSPACE_WRAPPER: "sccache"
 
 jobs:
   Linux:
@@ -30,8 +32,8 @@ jobs:
           targets: aarch64-unknown-linux-gnu
           components: rust-src
 
-      - name: Run rust-cache
-        uses: Swatinem/rust-cache@v2
+      - name: Run sccache
+        uses: mozilla-actions/sccache-action@main
 
       - name: Build Release
         run: |
@@ -88,8 +90,8 @@ jobs:
           targets: aarch64-apple-darwin
           components: rust-src
 
-      - name: Run rust-cache
-        uses: Swatinem/rust-cache@v2
+      - name: Run sccache
+        uses: mozilla-actions/sccache-action@main
 
       - name: Build Release
         run: |
@@ -184,8 +186,8 @@ jobs:
           targets: aarch64-pc-windows-msvc
           components: rust-src
 
-      - name: Run rust-cache
-        uses: Swatinem/rust-cache@v2
+      - name: Run sccache
+        uses: mozilla-actions/sccache-action@main
 
       - name: Build release
         run: |
