@@ -140,15 +140,15 @@ fn parse(addr: &str) -> String {
 
     match (has_album, !imgs.is_empty()) {
         (true, true) => println!(
-            "{B}Totally found {} 📸 and {} 🏞️  in 📄:{G} {t}{N}",
+            "{B}Totally found <{}> 📸 and <{}> 🏞️  in 📄:{G} {t}{N}",
             albums.as_ref().unwrap().len(),
             imgs.len(),
         ),
         (true, false) => println!(
-            "{B}Totally found {} 📸 in 📄:{G} {t}{N}",
+            "{B}Totally found <{}> 📸 in 📄:{G} {t}{N}",
             albums.as_ref().unwrap().len(),
         ),
-        (false, true) => println!("{B}Totally found {} 🏞️  in 📄:{G} {t}{N}", imgs.len()),
+        (false, true) => println!("{B}Totally found <{}> 🏞️  in 📄:{G} {t}{N}", imgs.len()),
         (false, false) => {
             quit!("∅ 🏞️  found in 📄:{G} {t}");
         }
@@ -188,7 +188,7 @@ fn parse(addr: &str) -> String {
                 // tdbg!(&src);
             }
             if skipped > 0 {
-                println!("{B}Skipped {skipped} {U}Empty/Duplicated{N} 🏞️");
+                println!("{B}Skipped <{skipped}> {U}Empty/Duplicated{N} 🏞️");
             }
             download(
                 t,
