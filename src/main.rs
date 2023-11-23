@@ -37,7 +37,7 @@ fn check_host(addr: &str) -> [&str; 2] {
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() || !host.contains('.') {
-        quit!("{}: Invalid host info.", host);
+        quit!("`{}`: Invalid host info.", host);
     }
     [scheme, host]
 }

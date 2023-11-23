@@ -235,10 +235,13 @@ rustflags = [
 ]
 
 [target.'cfg(target_vendor="apple"))']
-rustflags = ["-Clinker-flavor=darwin-lld-cc"]
+rustflags = [
+    "-Clinker-flavor=darwin-lld-cc",
+    "-Clink-args=-fno-async-exceptions",
+]
 
 [target.'cfg(target_env="msvc")']
-rustflags = ["-Clinker-flavor=msvc-lld"]
+rustflags = ["-Clinker-flavor=msvc-lld", "-Clink-args=-fno-async-exceptions"]
 
 [target.'cfg(any(target_env="gnu",target_env="musl"))']
 rustflags = ["-Clinker-flavor=gnu-lld-cc"]
