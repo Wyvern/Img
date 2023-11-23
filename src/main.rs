@@ -107,15 +107,13 @@ fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.unwrap_or("img[src]"));
-    let src = img
-        .and_then(|i| {
-            if i.trim_end().ends_with(']') {
-                Some(&i[i.rfind('[').expect("NO '[' found in img selector.") + 1..i.len() - 1])
-            } else {
-                None
-            }
-        })
-        .unwrap_or("src");
+    let src = img.map_or("src", |i| {
+        if i.trim_end().ends_with(']') {
+            &i[i.rfind('[').expect("NO '[' found in <img> selector.") + 1..i.len() - 1]
+        } else {
+            "src"
+        }
+    });
 
     let titles = page.select("title");
     let title = titles
@@ -216,12 +214,16 @@ fn parse(addr: &str) -> String {
                         alb.parent()
                             .unwrap()
                             .attr("href")
-                            .expect("NO a[@href] attr found.")
+                            .expect("NO album a[@href] attr found.")
                     });
-                    let album_url = canonicalize_url(&href);
-                    let mut next_page = parse(&album_url);
-                    while !next_page.is_empty() {
-                        next_page = parse(&next_page);
+                    if !href.is_empty() {
+                        let album_url = canonicalize_url(&href);
+                        let mut next_page = parse(&album_url);
+                        if cfg!(not(test)) {
+                            while !next_page.is_empty() {
+                                next_page = parse(&next_page);
+                            }
+                        }
                     }
                 };
 
@@ -306,16 +308,17 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     let mut curl = process::Command::new("curl");
-    curl.current_dir(dir).args(["-Z"]);
+    curl.current_dir(path).args(["-Z"]);
     let mut skip_embed = 0u16;
 
     for url in urls {
         if url.starts_with("data:image/") {
             if cfg!(feature = "embed") {
-                let cur = env::current_dir().unwrap();
-                env::set_current_dir(path);
-                save_to_file(url.as_str());
-                env::set_current_dir(cur);
+                env::current_dir().map(|cur| {
+                    env::set_current_dir(path);
+                    save_to_file(url.as_str());
+                    env::set_current_dir(cur);
+                });
             } else {
                 skip_embed += 1;
             }
@@ -331,7 +334,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         let mut name_ext = String::default();
         if has_ext.is_none() {
-            let cmd = process::Command::new("curl")
+            process::Command::new("curl")
                 .args([
                     url.as_str(),
                     "-e",
@@ -339,30 +342,32 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     "-A",
                     "Mozilla Firefox",
                     "-fsSIL",
+                    "--compressed",
                     "-w",
                     "%{content_type}",
                 ])
                 .output()
-                .unwrap_or_else(|e| quit!("Get {url} content header info failed: {e}"));
-
-            let header = String::from_utf8_lossy(&cmd.stdout);
-            let info = header.lines().last().unwrap_or("");
-
-            if info.is_empty() {
-                continue;
-            }
-            let offset = &info[info.find('/').unwrap() + 1..];
-            let image_type = &offset[..offset
-                .find('+')
-                .or_else(|| offset.find(';'))
-                .unwrap_or(offset.len())];
-            name_ext = [name, image_type].join(".");
+                .map_or_else(
+                    |e| pl!("Get {url} content header info failed: {e}"),
+                    |o| {
+                        let header = String::from_utf8_lossy(&o.stdout);
+                        let info = header.lines().last().map(|ct| {
+                            ct.find('/').map(|slash| {
+                                let offset = &ct[slash + 1..];
+                                let image_type = &offset[..offset
+                                    .find('+')
+                                    .or_else(|| offset.find(';'))
+                                    .unwrap_or(offset.len())];
+                                name_ext = [name, image_type].join(".");
+                            })
+                        });
+                    },
+                );
         };
 
-        if (path.exists()
-            && !path
-                .join(if name_ext.is_empty() { name } else { &name_ext })
-                .exists())
+        if !path
+            .join(if name_ext.is_empty() { name } else { &name_ext })
+            .exists()
         {
             curl.args([
                 url.as_str(),
@@ -376,6 +381,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
     // tdbg!(curl.get_args());
     if curl.get_args().len() == 1 {
+        if path.read_dir().map_or(false, |mut d| d.next().is_none()) {
+            fs::remove_dir(path);
+        }
         return;
     }
     if cfg!(feature = "curl") {
