@@ -300,11 +300,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     let path = path::Path::new(dir);
-    if (!path.exists()) {
-        fs::create_dir(path).unwrap_or_else(|e| {
-            quit!("Create Dir Error: `{}`", e);
-        });
-    }
+    let dir = || {
+        if !path.exists() {
+            fs::create_dir(path).unwrap_or_else(|e| {
+                quit!("Create Dir Error: `{}`", e);
+            });
+        }
+    };
 
     let mut curl = process::Command::new("curl");
     curl.current_dir(path).args(["-Z"]);
@@ -314,6 +316,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         if url.starts_with("data:image/") {
             if cfg!(feature = "embed") {
                 env::current_dir().map(|cur| {
+                    dir();
                     env::set_current_dir(path);
                     save_to_file(url.as_str());
                     env::set_current_dir(cur);
@@ -380,12 +383,11 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
     // tdbg!(curl.get_args());
     if curl.get_args().len() == 1 {
-        if path.read_dir().map_or(false, |mut d| d.next().is_none()) {
-            fs::remove_dir(path);
-        }
         return;
     }
+
     if cfg!(feature = "curl") {
+        dir();
         curl.args([
             "--parallel-immediate",
             "--compressed",
