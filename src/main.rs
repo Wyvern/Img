@@ -179,11 +179,15 @@ fn parse(addr: &str) -> String {
             let mut skipped = 0u16;
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
-                if src.trim().is_empty() || !urls.insert(src) {
+
+                let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                let clean_url = &url[..url.find('&').unwrap_or(url.len())];
+
+                // tdbg!(clean_url);
+                if clean_url.trim().is_empty() || !urls.insert(clean_url.to_owned()) {
                     skipped += 1;
                     continue;
                 }
-                // tdbg!(&src);
             }
             if skipped > 0 {
                 println!("{B}Skipped <{skipped}> {U}Empty/Duplicated{N} 🏞️");
@@ -194,12 +198,7 @@ fn parse(addr: &str) -> String {
                     if url.starts_with("data:image/") {
                         url
                     } else {
-                        let mut src = url.as_str();
-                        src = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                        src = &src[..src.find('&').unwrap_or(src.len())];
-
-                        // tdbg!(&src);
-                        canonicalize_url(src)
+                        canonicalize_url(&url)
                     }
                 }),
                 host,
@@ -635,7 +634,6 @@ mod img {
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
-
         let arg = env::args().skip(3).nth(1);
         let addr = arg
             .as_deref()
