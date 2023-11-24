@@ -158,7 +158,7 @@ fn parse(addr: &str) -> String {
         t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
     };
 
-    let canonicalize_url = |u: &str| {
+    let canonicalize_url = |u: String| {
         if !u.starts_with("http") {
             if u.starts_with("//") {
                 format!("{scheme}:{u}")
@@ -168,7 +168,7 @@ fn parse(addr: &str) -> String {
                 format!("{}/{u}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
             }
         } else {
-            u.to_owned()
+            u
         }
     };
 
@@ -198,7 +198,7 @@ fn parse(addr: &str) -> String {
                     if url.starts_with("data:image/") {
                         url
                     } else {
-                        canonicalize_url(&url)
+                        canonicalize_url(url)
                     }
                 }),
                 host,
@@ -216,7 +216,7 @@ fn parse(addr: &str) -> String {
                             .expect("NO album a[@href] attr found.")
                     });
                     if !href.is_empty() {
-                        let album_url = canonicalize_url(&href);
+                        let album_url = canonicalize_url(href);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
