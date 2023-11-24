@@ -315,12 +315,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     for url in urls {
         if url.starts_with("data:image/") {
             if cfg!(feature = "embed") {
-                env::current_dir().map(|cur| {
+                if let Ok(cur) = env::current_dir() {
                     dir();
                     env::set_current_dir(path);
                     save_to_file(url.as_str());
                     env::set_current_dir(cur);
-                });
+                }
             } else {
                 skip_embed += 1;
             }
@@ -353,16 +353,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     |e| pl!("Get {url} content header info failed: {e}"),
                     |o| {
                         let header = String::from_utf8_lossy(&o.stdout);
-                        let info = header.lines().last().map(|ct| {
-                            ct.find('/').map(|slash| {
-                                let offset = &ct[slash + 1..];
-                                let image_type = &offset[..offset
-                                    .find('+')
-                                    .or_else(|| offset.find(';'))
-                                    .unwrap_or(offset.len())];
-                                name_ext = [name, image_type].join(".");
-                            })
-                        });
+                        if let Some(ct) = header.lines().last() {
+                            let ext = image_type(ct);
+                            name_ext = [name, ext].join(".");
+                        }
                     },
                 );
         };
@@ -547,18 +541,13 @@ fn save_to_file(data: &str) {
     if cfg!(not(feature = "embed")) {
         return;
     }
-    let mut offset = &data[data.find('/').unwrap() + 1..];
-    let ext = &offset[..offset
-        .find('+')
-        .or_else(|| offset.find(';'))
-        .unwrap_or(offset.len())];
-
     let t = &format!("{:?}", time::Instant::now());
     let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
     #[cfg(feature = "embed")]
     {
         use base64::*;
-        offset = &offset[offset.find(',').unwrap() + 1..];
+        let ext = image_type(data);
+        let offset = &data[data.find(',').unwrap() + 1..];
         let full_name = [name, ext].join(".");
         if !path::Path::new(&full_name).exists() {
             {
@@ -582,6 +571,16 @@ fn save_to_file(data: &str) {
             });
         }
     }
+}
+
+///Get content_type image metadata type
+fn image_type(header: &str) -> &str {
+    let mut offset = &header[header.find('/').unwrap() + 1..];
+
+    (&offset[..offset
+        .find('+')
+        .or_else(|| offset.find(';'))
+        .unwrap_or(offset.len())]) as _
 }
 
 #[cfg(test)]
