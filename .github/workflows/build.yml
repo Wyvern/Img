@@ -34,7 +34,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Setup Mold linker
-        uses: rui314/setup-mold
+        uses: rui314/setup-mold@v1
         with:
           mold-version: 2.3.3
           make-default: true
