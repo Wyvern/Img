@@ -157,6 +157,7 @@ mod color {
 pub use color::*;
 
 mod macros {
+
     #[macro_export]
     macro_rules! quit {
         ($l:literal $(,$e:expr)*) => {{
@@ -208,6 +209,7 @@ mod macros {
     }
 }
 }
+
 // #[test]
 fn pause() {
     use io::*;
@@ -217,6 +219,27 @@ fn pause() {
     write!(output, "Press any key to continue...");
     output.flush();
 
-    let mut handle = input.lock();
-    handle.read_line(&mut String::default());
+    input.lock().read_line(&mut String::default());
+}
+
+pub fn dyn_cast<T>(mut var: &dyn any::Any, val: T) {
+    let ptr = var as *const _ as *mut T;
+    let cell = cell::Cell::new(ptr);
+    unsafe {
+        *cell.get() = val;
+    };
+    // unsafe { *(cell.get()) }
+}
+
+#[cfg(test)]
+mod util {
+    use super::*;
+
+    #[test]
+    fn test_dyn_cast() {
+        let x = [&mut 3 as &dyn any::Any, &4.3];
+        dyn_cast(x[0], "ajfew;of");
+        dbg!(unsafe { *(x[0] as *const _ as *mut &str) });
+        dbg!(unsafe { *(x[1] as *const _ as *mut f32) });
+    }
 }

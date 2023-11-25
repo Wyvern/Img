@@ -373,7 +373,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         }
     }
     if skip_embed > 0 {
-        println!("{B}Skipped {skip_embed} {U}Embed{N} 🏞️");
+        println!("{B}Skipped <{skip_embed}> {U}Embed{N} 🏞️");
     }
     // tdbg!(curl.get_args());
     if curl.get_args().len() == 1 {
@@ -577,10 +577,11 @@ fn save_to_file(data: &str) {
 fn image_type(header: &str) -> &str {
     let mut offset = &header[header.find('/').unwrap() + 1..];
 
-    (&offset[..offset
+    &offset[..offset
         .find('+')
         .or_else(|| offset.find(';'))
-        .unwrap_or(offset.len())]) as _
+        .or_else(|| offset.find(','))
+        .unwrap_or_else(|| offset.len())]
 }
 
 #[cfg(test)]
