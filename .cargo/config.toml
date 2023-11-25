@@ -244,7 +244,7 @@ rustflags = ["-Clinker-flavor=msvc-lld"]
 rustflags = ["-Clink-args=-fno-async-exceptions"]
 
 [target.'cfg(any(target_env="gnu",target_env="musl"))']
-rustflags = ["-Clinker-flavor=gnu-lld-cc"]
+rustflags = ["-Clinker-flavor=gnu-lld-cc","-Clink-args=-fuse-ld=mold"]
 
 [target.'cfg(target_family="wasm")']
 rustflags = ["-Clinker-flavor=wasm-lld-cc"]
