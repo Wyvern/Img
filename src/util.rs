@@ -1,4 +1,4 @@
-use std::*;
+use std::{*, fmt::Debug};
 
 ///Colorized terminal constants
 /**
@@ -222,13 +222,22 @@ fn pause() {
     input.lock().read_line(&mut String::default());
 }
 
-pub fn dyn_cast<T>(mut var: &dyn any::Any, val: T) {
+pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
     let ptr = var as *const _ as *mut T;
     let cell = cell::Cell::new(ptr);
     unsafe {
         *cell.get() = val;
-    };
-    // unsafe { *(cell.get()) }
+    }
+}
+
+pub fn dyn_cast<T: Copy>(mut var: &dyn any::Any, val: T) -> T {
+    let ptr = var as *const _ as *mut T;
+    let cell = cell::Cell::new(ptr);
+    unsafe {
+        *cell.get() = val;
+    }
+
+    unsafe { *ptr }
 }
 
 #[cfg(test)]
@@ -237,9 +246,15 @@ mod util {
 
     #[test]
     fn test_dyn_cast() {
-        let x = [&mut 3 as &dyn any::Any, &4.3];
-        dyn_cast(x[0], "ajfew;of");
+        let x = [&mut 7 as &dyn any::Any, &4.3];
+        dyn_value(x[0], "rtfyuhijok");
         dbg!(unsafe { *(x[0] as *const _ as *mut &str) });
+        dbg!(unsafe { *(x[0] as *const _ as *mut i32) });
         dbg!(unsafe { *(x[1] as *const _ as *mut f32) });
+        dbg!(dyn_cast(x[1], 'x'));
+        dbg!(unsafe { *(x[1] as *const _ as *mut f64) });
+        let mut y = 3;
+        dbg!(&mem::replace(&mut y, 128));
+        dbg!(&y);
     }
 }
