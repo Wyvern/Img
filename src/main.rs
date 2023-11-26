@@ -177,6 +177,7 @@ fn parse(addr: &str) -> String {
             use collections::*;
             let mut urls = HashSet::new();
             let mut skipped = 0u16;
+
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
 
@@ -581,7 +582,7 @@ fn image_type(header: &str) -> &str {
         .find('+')
         .or_else(|| offset.find(';'))
         .or_else(|| offset.find(','))
-        .unwrap_or_else(|| offset.len())]
+        .unwrap_or(offset.len())]
 }
 
 #[cfg(test)]
