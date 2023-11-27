@@ -156,7 +156,8 @@ rustflags = [
 
 [build]
 rustflags = ["-Zpanic-in-drop=abort", "-Clink-args=-fno-async-exceptions"]
-incremental = true
+# incremental = true
+rustc-wrapper = "sccache"
 
 [unstable.gitoxide]
 checkout = true
