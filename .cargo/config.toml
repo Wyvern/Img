@@ -74,13 +74,7 @@ codegen-units = 1
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = [
-    "-Clto=fat",
-    "-Cprefer-dynamic=n",
-    "-Clinker-plugin-lto",
-    "-Zsplit-lto-unit",
-    "-Zvirtual-function-elimination",
-]
+lto = true
 panic = "abort"
 [profile.lto.build-override]
 inherits = "lto"
