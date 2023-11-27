@@ -236,7 +236,7 @@ fn parse(addr: &str) -> String {
                         }
                     }
                 };
-                
+
                 if all {
                     parse_album();
                 } else {
@@ -260,7 +260,9 @@ fn parse(addr: &str) -> String {
                     });
                     writeln!(
                         stdout,
-                        "{B}Do you want to download Album <{I}{U}{}/{albums_len}{N}>: {B}{G}{} ?{N}",i + 1,t.trim()
+                        "{B}Do you want to download Album <{U}{}/{albums_len}{N}{B}>: {G}{} ?{N}",
+                        i + 1,
+                        t.trim()
                     );
                     write!(
                         stdout,
