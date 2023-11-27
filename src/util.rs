@@ -244,6 +244,7 @@ mod test {
         let x = [&mut 7 as &dyn any::Any, &4.3];
         dyn_value(x[0], "rtfyuhijok");
         dbg!(dyn_cast::<&str>(x[0]));
+        dyn_value(x[0], 123);
         dbg!(dyn_cast::<i32>(x[0]));
         dbg!(dyn_cast::<f32>(x[1]));
         dbg!(dyn_cast::<char>(x[1]));

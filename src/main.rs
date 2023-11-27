@@ -32,7 +32,7 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        quit!("`{}`: Invalid {U}http(s){N} protocol", scheme);
+        quit!("`{}`: Invalid {U}http(s) protocol.", scheme);
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
@@ -135,18 +135,12 @@ fn parse(addr: &str) -> String {
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
+    let [albums_len, imgs_len] = [albums.as_ref().map_or(0, |a| a.len()), imgs.len()];
 
     match (has_album, !imgs.is_empty()) {
-        (true, true) => println!(
-            "{B}Totally found <{}> 📸 and <{}> 🏞️  in 📄:{G} {t}{N}",
-            albums.as_ref().unwrap().len(),
-            imgs.len(),
-        ),
-        (true, false) => println!(
-            "{B}Totally found <{}> 📸 in 📄:{G} {t}{N}",
-            albums.as_ref().unwrap().len(),
-        ),
-        (false, true) => println!("{B}Totally found <{}> 🏞️  in 📄:{G} {t}{N}", imgs.len()),
+        (true, true) => pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{G} {t}"),
+        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{G} {t}"),
+        (false, true) => pl!("Totally found <{imgs_len}> 🏞️  in 📄:{G} {t}"),
         (false, false) => {
             quit!("∅ 🏞️  found in 📄:{G} {t}");
         }
@@ -176,39 +170,55 @@ fn parse(addr: &str) -> String {
         (_, true) => {
             use collections::*;
             let mut urls = HashSet::new();
-            let mut skipped = 0u16;
+            let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
                 let src = img.attr(src).expect("Invalid img[src] selector!");
 
-                let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                let clean_url = &url[..url.find('&').unwrap_or(url.len())];
+                if src.starts_with("data:image/") {
+                    if cfg!(feature = "embed") {
+                        if !urls.insert(src) {
+                            empty_dup += 1;
+                        }
+                    } else {
+                        embed += 1;
+                    }
+                } else {
+                    let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                    let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
-                // tdbg!(clean_url);
-                if clean_url.trim().is_empty() || !urls.insert(clean_url.to_owned()) {
-                    skipped += 1;
-                    continue;
+                    // tdbg!(clean_url);
+                    if clean_url.trim().is_empty() || !urls.insert(clean_url.to_owned()) {
+                        empty_dup += 1;
+                    }
                 }
             }
-            if skipped > 0 {
-                println!("{B}Skipped <{skipped}> {U}Empty/Duplicated{N} 🏞️");
+            if empty_dup > 0 && embed > 0 {
+                let skip = empty_dup + embed;
+                pl!("Skipped <{skip}> Empty/Duplicated/Embed 🏞️");
+            } else if empty_dup > 0 {
+                pl!("Skipped <{empty_dup}> Empty/Duplicated 🏞️");
+            } else if embed > 0 {
+                pl!("Skipped <{embed}> Embed 🏞️");
             }
-            download(
-                t,
-                urls.into_iter().map(|url| {
-                    if url.starts_with("data:image/") {
-                        url
-                    } else {
-                        canonicalize_url(url)
-                    }
-                }),
-                host,
-            );
+            if urls.len() > 0 {
+                download(
+                    t,
+                    urls.into_iter().map(|url| {
+                        if url.starts_with("data:image/") {
+                            url
+                        } else {
+                            canonicalize_url(url)
+                        }
+                    }),
+                    host,
+                );
+            }
         }
         (true, false) => {
             let mut all = false;
 
-            for (i, alb) in albums.as_ref().unwrap().iter().enumerate() {
+            for (i, alb) in albums.unwrap().iter().enumerate() {
                 let mut parse_album = || {
                     let mut href = alb.attr("href").unwrap_or_else(|| {
                         alb.parent()
@@ -226,7 +236,7 @@ fn parse(addr: &str) -> String {
                         }
                     }
                 };
-
+                
                 if all {
                     parse_album();
                 } else {
@@ -250,10 +260,7 @@ fn parse(addr: &str) -> String {
                     });
                     writeln!(
                         stdout,
-                        "{B}Do you want to download Album <{I}{U}{}/{}{N}>: {B}{G}{} ?{N}",
-                        i + 1,
-                        albums.as_ref().unwrap().len(),
-                        t.trim()
+                        "{B}Do you want to download Album <{I}{U}{}/{albums_len}{N}>: {B}{G}{} ?{N}",i + 1,t.trim()
                     );
                     write!(
                         stdout,
@@ -280,7 +287,7 @@ fn parse(addr: &str) -> String {
                             parse_album()
                         }
                         _ => {
-                            println!("{B}Canceled all albums download.{N}");
+                            pl!("Canceled all albums download.");
                             next_sel = None;
                             break;
                         }
@@ -314,16 +321,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let mut skip_embed = 0u16;
 
     for url in urls {
-        if url.starts_with("data:image/") {
-            if cfg!(feature = "embed") {
-                if let Ok(cur) = env::current_dir() {
-                    dir();
-                    env::set_current_dir(path);
-                    save_to_file(url.as_str());
-                    env::set_current_dir(cur);
-                }
-            } else {
-                skip_embed += 1;
+        if cfg!(feature = "embed") && url.starts_with("data:image/") {
+            if let Ok(cur) = env::current_dir() {
+                dir();
+                env::set_current_dir(path);
+                save_to_file(url.as_str());
+                env::set_current_dir(cur);
             }
             continue;
         }
@@ -372,9 +375,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 if name_ext.is_empty() { name } else { &name_ext },
             ]);
         }
-    }
-    if skip_embed > 0 {
-        println!("{B}Skipped <{skip_embed}> {U}Embed{N} 🏞️");
     }
     // tdbg!(curl.get_args());
     if curl.get_args().len() == 1 {
@@ -625,11 +625,11 @@ mod img {
         };
 
         let i = img.unwrap_or("img[src]");
-        println!("{MARK}{B}Image Selector: {HL} {i} {N}",);
+        pl!("{MARK} Image Selector: {HL} {i} ");
         hq(i);
 
         if let Some(a) = album {
-            println!("{MARK}{B}Album Selector: {HL} {a} {N}",);
+            pl!("{MARK} Album Selector: {HL} {a} ");
             hq(a)
         }
     }
