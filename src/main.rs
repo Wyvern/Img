@@ -201,7 +201,7 @@ fn parse(addr: &str) -> String {
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
-            if urls.len() > 0 {
+            if !urls.is_empty() {
                 download(
                     t,
                     urls.into_iter().map(|url| {

@@ -192,7 +192,10 @@ mod macros {
     }
 
     macro_rules! demo {
-    ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat_param => $b:block | $p:path | $i:item | $t:tt ) => {$pat:pat $pat:pat_param};
+    ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat=> $b:block | $p:path | $i:item | $t:tt) => {$pat $t};
+
+    ($id:ident, $b:block, $stmt:stmt, $e:expr, $pat:pat, $t:ty, $lt:lifetime, $l:literal, $p:path, $m:meta, $tt:tt, $i:item, $v:vis)=>{};
+
     }
 
     macro_rules! impl_ref_elements {
@@ -240,17 +243,25 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_dyn_any() {
+    fn dyn_any() {
         let x = [&mut 7 as &dyn any::Any, &4.3];
-        dyn_value(x[0], "rtfyuhijok");
+
+        let y = 123;
+        dbg!(y, dyn_cast::<char>(&y));
+        dyn_value(&y, 456);
+        dbg!(y, dyn_cast::<char>(&y));
+
+        dyn_value(x[0], "rust");
         dbg!(dyn_cast::<&str>(x[0]));
-        dyn_value(x[0], 123);
-        dbg!(dyn_cast::<i32>(x[0]));
+        dyn_value(x[0], -123);
+        dbg!(dyn_cast::<u8>(x[0]));
+
         dbg!(dyn_cast::<f32>(x[1]));
         dbg!(dyn_cast::<char>(x[1]));
         dbg!(dyn_cast::<f64>(x[1]));
-        let mut y = 3;
-        dbg!(&mem::replace(&mut y, 128));
-        dbg!(&y);
+
+        let mut z = 111;
+        dbg!(&mem::replace(&mut z, 128));
+        dbg!(&z);
     }
 }

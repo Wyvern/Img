@@ -23,14 +23,23 @@ vcs = "none"
 
 #dev
 [profile.dev]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions", "-Zdwarf-version=4"]
+rustflags = [
+    "-Cprefer-dynamic",
+    "-Cdebug-assertions",
+    "-Zdwarf-version=5",
+    "-Zdebuginfo-compression=zstd",
+    "-Zcodegen-backend=cranelift",
+]
 rpath = true
+codegen-backend = "cranelift"
 [profile.dev.package."*"]
-inherits = "release"
+inherits = "dev"
+debug-assertions = false
 debug = false
 strip = true
 [profile.dev.build-override]
-inherits = "release"
+inherits = "dev"
+debug-assertions = false
 debug = false
 strip = true
 
@@ -38,9 +47,9 @@ strip = true
 [profile.test]
 inherits = "dev"
 [profile.test.package."*"]
-inherits = "release"
+inherits = "dev"
 [profile.test.build-override]
-inherits = "release"
+inherits = "dev"
 
 #bench
 [profile.bench.package."*"]
@@ -56,11 +65,11 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic", "-Zcombine-cgu"]
+rustflags = ["-Cprefer-dynamic"]
 strip = true
 lto = true
 rpath = true
-codegen-units = 1
+#codegen-units = 1
 
 #lto
 [profile.lto]
@@ -87,24 +96,6 @@ inherits = "src"
 [profile.src.package."*"]
 inherits = "src"
 
-#stats
-[profile.stats.build-override]
-inherits = "release"
-[profile.stats.package."*"]
-inherits = "release"
-[profile.stats]
-inherits = "release"
-rustflags = ["-Zperf-stats", "-Zmeta-stats"]
-
-#no
-[profile.no.build-override]
-inherits = "no"
-[profile.no.package."*"]
-inherits = "no"
-[profile.no]
-inherits = "release"
-rustflags = ["-Zparse-only", "-Zno-analysis", "-Zno-link", "-Zno-codegen"]
-
 [unstable]
 check-cfg = true
 avoid-dev-deps = true
@@ -130,7 +121,6 @@ rustflags = [
     "-Cno-redzone",
     "-Clink-self-contained=+linker",
 
-    "-Cllvm-args=--enable-name-compression --debugify-quiet",
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Zunstable-options",
@@ -149,6 +139,7 @@ rustflags = [
     "-Zmerge-functions=trampolines",
     "-Zinline-mir",
     "-Zinline-in-all-cgus",
+    "-Zcombine-cgu",
     "-Zmir-opt-level=4",
     "-Zpacked-bundled-libs",
     "-Zteach",
@@ -194,7 +185,6 @@ rustflags = [
     "-Cno-redzone",
     "-Clink-self-contained=+linker",
 
-    "-Cllvm-args=--enable-name-compression --debugify-quiet",
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Zunstable-options",
@@ -213,6 +203,7 @@ rustflags = [
     "-Zmerge-functions=trampolines",
     "-Zinline-mir",
     "-Zinline-in-all-cgus",
+    "-Zcombine-cgu",
     "-Zmir-opt-level=4",
     "-Zpacked-bundled-libs",
     "-Zteach",
