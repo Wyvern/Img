@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install google-android-ndk-installer -y
+          sudo apt update && sudo apt install google-android-ndk-installer -y -qq
 
           cargo update
 
