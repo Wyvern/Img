@@ -32,14 +32,15 @@ jobs:
           targets: x86_64-linux-android,aarch64-linux-android
           components: rust-src
 
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Build Release
         run: |
-          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash -y
-
-          cargo binstall cross
+          cargo binstall cross --no-confirm
 
           cargo update
 
