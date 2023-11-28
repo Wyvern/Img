@@ -12,28 +12,10 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  release:
-    name: Release - ${{ matrix.platform.release_for }}
-    strategy:
-      matrix:
-        platform:
-          - release_for: Android-x86_64
-            os: ubuntu-latest
-            target: x86_64-linux-android
-            bin: Img
-            name: Android-x86_64
-            command: build
-            toolchain: nightly
+  Linux:
+    name: Building on Ubuntu.
+    runs-on: ubuntu-latest
 
-          - release_for: Android-AArch64
-            os: ubuntu-latest
-            target: aarch64-linux-android
-            bin: Img
-            name: Android-AArch64
-            command: build
-            toolchain: nightly
-
-    runs-on: ${{ matrix.platform.os }}
     steps:
       - name: Purge Ubuntu
         run: |
@@ -44,23 +26,49 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: x86_64-linux-android,aarch64-linux-android
+          components: rust-src
+
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Build binary
-        uses: houseabsolute/actions-rust-cross@v0
-        with:
-          command: ${{ matrix.platform.command }}
-          target: ${{ matrix.platform.target }}
-          args: "--profile src -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort,panic_unwind -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem"
-          strip: true
-      
-      - name: Upload ${{ matrix.platform.name }} to a GitHub release
+      - name: Build Release
+        run: |
+          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+
+          cargo binstall cross
+
+          cargo update
+
+          time cross src x86_64-linux-android
+          time cross src aarch64-linux-android
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Android-x86_64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.platform.target }}/src/Img
-          asset_name: ${{ matrix.platform.name }}
+          file: target/x86_64-linux-android/src/Img
+          asset_name: Android-x86_64
           tag: Nightly
           overwrite: true
-          body: "${{ matrix.platform.name }}"
+          body: "Android-x86_64 binary executable."
+
+      - name: Upload Android-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-linux-android/src/Img
+          asset_name: Android-AArch64
+          tag: Nightly
+          overwrite: true
+          body: "Android-AArch64 binary executable."
