@@ -240,3 +240,9 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
+
+[target.x86_64-linux-android]
+linker = "x86_64-linux-android-gcc"
+
+[target.aarch64-linux-android]
+linker = "aarch64-linux-android-gcc"
