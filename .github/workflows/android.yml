@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install x86_64-linux-android-gcc aarch64-linux-android-gcc -y
+          sudo apt update && sudo apt install gcc-x86_64-linux-android-gnu gcc-aarch64-linux-android-gnu -y
 
           cargo update
 
