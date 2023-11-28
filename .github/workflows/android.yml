@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install x86_64-linux-android-clang aarch64-linux-android-clang -y
+          sudo apt update && sudo apt install x86_64-linux-android-clang++ aarch64-linux-android-clang++ -y
 
           cargo update
 
