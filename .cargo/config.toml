@@ -47,9 +47,9 @@ strip = true
 [profile.test]
 inherits = "dev"
 [profile.test.package."*"]
-inherits = "dev"
+inherits = "test"
 [profile.test.build-override]
-inherits = "dev"
+inherits = "test"
 
 #bench
 [profile.bench.package."*"]
@@ -242,7 +242,7 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 linker = "aarch64-linux-gnu-gcc"
 
 [target.x86_64-linux-android]
-linker = "x86_64-linux-android-gcc"
+linker = "x86_64-linux-android-clang"
 
 [target.aarch64-linux-android]
-linker = "aarch64-linux-android-gcc"
+linker = "aarch64-linux-android-clang"
