@@ -12,10 +12,28 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Linux:
-    name: Building on Ubuntu.
-    runs-on: ubuntu-latest
+  release:
+    name: Release - ${{ matrix.platform.release_for }}
+    strategy:
+      matrix:
+        platform:
+          - release_for: Android-x86_64
+            os: ubuntu-latest
+            target: x86_64-linux-android
+            bin: Img
+            name: Android-x86_64
+            command: build
+            toolchain: nightly
 
+          - release_for: Android-AArch64
+            os: ubuntu-latest
+            target: aarch64-linux-android
+            bin: Img
+            name: Android-AArch64
+            command: build
+            toolchain: nightly
+
+    runs-on: ${{ matrix.platform.os }}
     steps:
       - name: Purge Ubuntu
         run: |
@@ -26,49 +44,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          targets: x86_64-linux-android,aarch64-linux-android
-          components: rust-src
-
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Build Release
-        run: |
-          docker --version
-          exit
-          sudo apt update && sudo apt install google-android-ndk-installer -y -qq
-
-          cargo update
-
-          time cargo src x86_64-linux-android
-          time cargo src aarch64-linux-android
-
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
-
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - name: Upload Android-x86_64 to a GitHub release
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v0
+        with:
+          command: ${{ matrix.platform.command }}
+          target: ${{ matrix.platform.target }}
+          args: "--profile src -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort,panic_unwind -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem"
+          strip: true
+      
+      - name: Upload ${{ matrix.platform.name }} to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-linux-android/src/Img
-          asset_name: Android-x86_64
+          file: target/${{ matrix.platform.target }}/src/Img
+          asset_name: ${{ matrix.platform.name }}
           tag: Nightly
           overwrite: true
-          body: "Android-x86_64 binary executable."
-
-      - name: Upload Android-AArch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-linux-android/src/Img
-          asset_name: Android-AArch64
-          tag: Nightly
-          overwrite: true
-          body: "Android-AArch64 binary executable."
+          body: "${{ matrix.platform.name }}"
