@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: ["none"]
+    branches: ["dev"]
   pull_request:
-    branches: ["none"]
+    branches: ["dev"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -41,9 +41,9 @@ jobs:
 
           cargo update
 
-          time cargo src x86_64-unknown-linux-gnu
-          time cargo src aarch64-unknown-linux-gnu
-          time cargo src x86_64-unknown-linux-musl
+          time cargo s x86_64-unknown-linux-gnu
+          time cargo s aarch64-unknown-linux-gnu
+          time cargo s x86_64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -106,12 +106,12 @@ jobs:
       - name: Build Release
         run: |
           cargo update
-          #time cargo build --release
-          #time cargo lto
+          #time cargo br
+          #time cargo l
 
-          time cargo src x86_64h-apple-darwin
-          time cargo src aarch64-apple-darwin
-          time cargo src arm64e-apple-darwin
+          time cargo s x86_64h-apple-darwin
+          time cargo s aarch64-apple-darwin
+          time cargo s arm64e-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
@@ -202,10 +202,13 @@ jobs:
       - name: Build release
         run: |
           cargo update
-          #cargo build --release
-          #cargo lto
-          cargo src x86_64-pc-windows-msvc
-          cargo src aarch64-pc-windows-msvc
+
+          #cargo br
+          #cargo l
+
+          cargo s x86_64-pc-windows-msvc
+          cargo s aarch64-pc-windows-msvc
+          
           cmd /r dir /s target\Img.exe
           systeminfo
 

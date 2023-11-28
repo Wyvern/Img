@@ -1,19 +1,25 @@
 [alias]
-rr = "run -r"
-br = "build -r"
-z = "rustc -- -Z"
-cf = "clippy -r --fix --allow-no-vcs"
-fx = "fix -r --allow-no-vcs"
-ndf = "r -r --no-default-features"
-all = "r -r --all-features"
-s = "b --profile stats"
-lto = "build --profile lto"
-no = "build --profile no"
-bl = "build --lib -r"
-ti = "t -- --nocapture"
-dr = "doc -r"
-ls = "build --profile lto -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort,panic_unwind -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
-src = "build --profile src -Zbuild-std=core,alloc,std,proc_macro,libc,compiler_builtins,panic_abort,panic_unwind -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
+ad = "add --no-default-features --optional"
+br = "b -r"
+dr = "d -r --no-deps"
+rr = "r -r"
+re = "r --example"
+rb = "r --bin"
+
+cf = "clippy --fix --allow-no-vcs --no-deps"
+fx = "fix --allow-no-vcs"
+
+ndf = "r --no-default-features"
+all = "r --all-features"
+
+tn = "tree -e normal"
+ti = "t -- --exact --nocapture"
+
+l = "b --profile lto"
+
+h = "b --profile src -Zbuild-std=core,std,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64h-apple-darwin"
+e = "b --profile src -Zbuild-std=core,std,panic_abort -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin"
+s = "b --profile src -Zbuild-std=core,std,alloc,panic_abort,proc_macro,libc,compiler_builtins -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
 
 [cargo-new]
 vcs = "none"
