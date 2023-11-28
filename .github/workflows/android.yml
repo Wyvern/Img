@@ -1,0 +1,72 @@
+name: Build
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Building on Ubuntu.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge Ubuntu
+        run: |
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+
+          sudo systemctl mask systemd-journald.service systemd-journald.socket
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: x86_64-linux-android,aarch64-linux-android
+          components: rust-src
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Build Release
+        run: |
+          sudo apt update && sudo apt install gcc-x86_64-linux-android-gnu gcc-aarch64-linux-android-gnu -y
+
+          cargo update
+
+          time cargo src x86_64-linux-android
+          time cargo src aarch64-linux-android
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Android-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-linux-android/src/Img
+          asset_name: Android-x86_64
+          tag: Nightly
+          overwrite: true
+          body: "Android-x86_64 binary executable."
+
+      - name: Upload Android-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-linux-android/src/Img
+          asset_name: Android-AArch64
+          tag: Nightly
+          overwrite: true
+          body: "Android-AArch64 binary executable."
