@@ -243,8 +243,8 @@ linker = "aarch64-linux-gnu-gcc"
 
 [target.x86_64-linux-android]
 ar = "x86_64-linux-android-ar"
-linker = "x86_64-linux-android-clang"
+linker = "x86_64-linux-android21-clang"
 
 [target.aarch64-linux-android]
 ar = "aarch64-linux-android-ar"
-linker = "aarch64-linux-android-clang"
+linker = "aarch64-linux-android21-clang"
