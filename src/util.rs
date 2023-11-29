@@ -214,15 +214,15 @@ mod macros {
 }
 
 // #[test]
-fn pause() {
+pub fn pause() {
     use io::*;
-    let mut input = stdin();
+
     let mut output = stdout();
 
     write!(output, "Press any key to continue...");
     output.flush();
 
-    input.lock().read_line(&mut String::default());
+    stdin().lock().read_line(&mut String::default());
 }
 
 pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
