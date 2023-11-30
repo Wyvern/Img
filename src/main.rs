@@ -643,7 +643,7 @@ mod img {
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
-        
+
         parse(addr);
     }
 

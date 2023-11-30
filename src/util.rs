@@ -138,7 +138,7 @@ mod color {
             (0u8..=255).for_each(|g| {
                 (0u8..=255).for_each(|b| {
                     writeln!(bf,"\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m Full-range foreground RGB-color {N}");
-                });bf.flush();super::pause()
+                });bf.flush();super::pause("")
             });
         });
     }
@@ -149,12 +149,14 @@ mod color {
             (0u8..=255).for_each(|g| {
                 (0u8..=255).for_each(|b| {
                     writeln!(bf,"\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m Full-range background RGB-color {N}");
-                });bf.flush();super::pause()
+                });bf.flush();super::pause("")
             })
         });
     }
 }
 pub use color::*;
+
+use crate::tdbg;
 
 mod macros {
 
@@ -177,14 +179,23 @@ mod macros {
     macro_rules! tdbg {
         ($e:expr $(,)?) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                dbg!($e)
-            } else {
-                $e
+            dbg!(&$e);
+            if cfg!(test){
+                pause("");
             }
+            $e
+        } else {
+            $e
+        }
+
         };
         ($($e:expr),+ $(,)?) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                ($($crate::dbg!($e)),+,)
+                ($($crate::dbg!(&$e)),+,);
+                if cfg!(test){
+                    pause("");
+                }
+                ($($e),+,)
             } else {
                 ($($e),+,)
             }
@@ -213,16 +224,20 @@ mod macros {
 }
 }
 
-// #[test]
-pub fn pause() {
+pub fn pause(msg: &str) {
     use io::*;
-
-    let mut output = stdout();
-
-    write!(output, "Press any key to continue...");
-    output.flush();
-
-    stdin().lock().read_line(&mut String::default());
+    let mut o = stdout();
+    write!(
+        o,
+        "{}",
+        if msg.is_empty() {
+            "Press any key to continue..."
+        } else {
+            msg
+        }
+    );
+    o.flush();
+    stdin().lock().read(&mut []);
 }
 
 pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
@@ -238,12 +253,17 @@ pub fn dyn_cast<T: Copy>(mut var: &dyn any::Any) -> T {
     unsafe { *ptr }
 }
 
+const fn is_target_little_endian() -> bool {
+    u16::from_ne_bytes([1, 0]) == 1
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
 
     #[test]
     fn dyn_any() {
+        tdbg!(is_target_little_endian());
         let x = [&mut 7 as &dyn any::Any, &4.3];
 
         let y = 123;
