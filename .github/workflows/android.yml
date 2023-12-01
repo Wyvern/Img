@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: ["none"]
+    branches: ["dev"]
   pull_request:
-    branches: ["none"]
+    branches: ["dev"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -44,8 +44,8 @@ jobs:
 
           cargo update
 
-          time cross src x86_64-linux-android
-          time cross src aarch64-linux-android
+          time cross s x86_64-linux-android
+          time cross s aarch64-linux-android
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
