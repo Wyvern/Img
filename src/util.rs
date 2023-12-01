@@ -1,4 +1,4 @@
-use std::{fmt::Debug, *};
+use std::*;
 
 ///Colorized terminal constants
 /**
@@ -241,7 +241,7 @@ pub fn pause(msg: &str) {
 }
 
 pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
-    let ptr = var as *const _ as *mut T;
+    let ptr = var as *const _ as *mut _;
     let cell = cell::Cell::new(ptr);
     unsafe {
         *cell.get() = val;
@@ -249,7 +249,7 @@ pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
 }
 
 pub fn dyn_cast<T: Copy>(mut var: &dyn any::Any) -> T {
-    let ptr = var as *const _ as *mut T;
+    let ptr = var as *const _ as *const _;
     unsafe { *ptr }
 }
 

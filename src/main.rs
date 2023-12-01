@@ -42,7 +42,7 @@ fn check_host(addr: &str) -> [&str; 2] {
     [scheme, host]
 }
 
-///Get `host` info and Generate `img/src/next/album` selector data
+///Get `host` info and Generate `img/next/album` selector data
 fn host_info(host: &str) -> [Option<&str>; 3] {
     use {serde_json::*, sync::*};
 
@@ -403,7 +403,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 }
 
-///Check `next` page info
+///Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
     if nexts.is_empty() {
@@ -535,11 +535,11 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     serde_json::from_str(include_str!("web.json")).unwrap_or_else(|e| {
-        quit!("`{e}`");
+        quit!("Read `web.json` failed: {}", e);
     })
 }
 
-///Save inline/embed data:image/..+..;.., base64/url-escaped content to file.
+///Save inline/embed `data:image/..+..;..,...` or `base64/url-escaped` content to file.
 fn save_to_file(data: &str) {
     if cfg!(not(feature = "embed")) {
         return;
@@ -576,7 +576,7 @@ fn save_to_file(data: &str) {
     }
 }
 
-///Get content_type image metadata type
+///Get content_type info from image url response metadata type
 fn image_type(header: &str) -> &str {
     let mut offset = &header[header.find('/').unwrap() + 1..];
 
