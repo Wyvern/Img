@@ -10,7 +10,6 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "true"
   RUSTC_WRAPPER: "sccache"
-  NDK_BIN: "/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin/"
 
 jobs:
   Linux:
@@ -50,8 +49,10 @@ jobs:
         run: |
           # cargo binstall cross --no-confirm
 
+          export PATH=/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+          env |grep -i r26b
+
           cargo update
-          find /home/runner/.setup-ndk/r26b -iname "*64-linux-android-*" -type f | xargs ls -hl
 
           time cargo s x86_64-linux-android
           time cargo s aarch64-linux-android
