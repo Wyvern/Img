@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: ["none"]
+    branches: ["dev"]
   pull_request:
-    branches: ["none"]
+    branches: ["dev"]
 
 env:
   CARGO_TERM_COLOR: always
