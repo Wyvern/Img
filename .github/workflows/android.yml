@@ -42,7 +42,9 @@ jobs:
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r26b
-      - run: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
+          link-to-sdk: true
+          local-cache: true
+      - run: ./gradlew build
 
       - name: Build Release
         run: |
