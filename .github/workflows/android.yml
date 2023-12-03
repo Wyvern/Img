@@ -32,8 +32,8 @@ jobs:
           targets: x86_64-linux-android,aarch64-linux-android
           components: rust-src
 
-      # - name: Install cargo-binstall
-      #   uses: cargo-bins/cargo-binstall@main
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -47,16 +47,14 @@ jobs:
 
       - name: Build Release
         run: |
-          # cargo binstall cross --no-confirm
-          which clang
-          clang --version
-          
+          cargo binstall cross --no-confirm
+
           export PATH=/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
           
           cargo update
 
-          time cargo s x86_64-linux-android
-          time cargo s aarch64-linux-android
+          time cross s x86_64-linux-android
+          time cross s aarch64-linux-android
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
