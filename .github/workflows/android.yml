@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: ["none"]
+    branches: ["dev"]
   pull_request:
-    branches: ["none"]
+    branches: ["dev"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -37,6 +37,12 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
+
+      - name: Android NDK setup
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26b
+      - run: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
 
       - name: Build Release
         run: |
