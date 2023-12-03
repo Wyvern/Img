@@ -635,7 +635,7 @@ mod img {
             hq(a)
         }
     }
-
+    
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
@@ -643,7 +643,7 @@ mod img {
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
-
+        
         parse(addr);
     }
 
