@@ -48,9 +48,11 @@ jobs:
       - name: Build Release
         run: |
           # cargo binstall cross --no-confirm
-
+          which clang
+          clang --version
+          
           export PATH=/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
-
+          
           cargo update
 
           time cargo s x86_64-linux-android
