@@ -32,27 +32,31 @@ jobs:
           targets: x86_64-linux-android,aarch64-linux-android
           components: rust-src
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
+      # - name: Install cargo-binstall
+      #   uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
+        id: setup-ndk
         with:
           ndk-version: r26b
           link-to-sdk: true
           local-cache: true
+      - run: ./build.sh
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }
 
       - name: Build Release
         run: |
-          cargo binstall cross --no-confirm
+          # cargo binstall cross --no-confirm
 
           cargo update
 
-          time cross s x86_64-linux-android
-          time cross s aarch64-linux-android
+          time cargo s x86_64-linux-android
+          time cargo s aarch64-linux-android
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
