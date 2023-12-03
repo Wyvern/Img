@@ -42,12 +42,14 @@ jobs:
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r26b
-          link-to-sdk: true
+          # link-to-sdk: true
           local-cache: true
 
       - name: Build Release
         run: |
           # cargo binstall cross --no-confirm
+
+          export PATH=/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
           cargo update
 

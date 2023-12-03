@@ -248,7 +248,7 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 linker = "aarch64-linux-gnu-gcc"
 
 [target.x86_64-linux-android]
-linker = "/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android34-clang"
+linker = "x86_64-linux-android34-clang"
 
 [target.aarch64-linux-android]
-linker = "/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android34-clang"
+linker = "aarch64-linux-android34-clang"
