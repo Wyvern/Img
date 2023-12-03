@@ -50,10 +50,10 @@ jobs:
           # cargo binstall cross --no-confirm
 
           cargo update
-          find /home/runner/.setup-ndk/r26b/ -L -iname *linux-android* -type f | xargs ls -hl
+          find /home/runner/.setup-ndk/r26b/ -L -iname "*linux-android*" -type f | xargs ls -hl
 
-          time cargo s x86_64-linux-android
-          time cargo s aarch64-linux-android
+          # time cargo s x86_64-linux-android
+          # time cargo s aarch64-linux-android
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
