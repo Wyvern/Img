@@ -8,7 +8,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SCCACHE_GHA_ENABLED: "true"
+  SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
           components: rust-src
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+        uses: mozilla-actions/sccache-action@v0.0.3
         
       - name: Build Release
         run: |
