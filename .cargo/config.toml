@@ -147,7 +147,7 @@ rustflags = [
     "-Zno-jump-tables",
     "-Zno-trait-vptr",
     "-Zterminal-urls",
-    # "-Zthreads=0",
+    "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Ztrait-solver=next-coherence",
@@ -162,7 +162,7 @@ rustflags = [
 
 [build]
 rustflags = ["-Zpanic-in-drop=abort", "-Clink-args=-fno-async-exceptions"]
-# incremental = true
+incremental = true
 rustc-wrapper = "sccache"
 
 [unstable.gitoxide]
@@ -211,7 +211,7 @@ rustflags = [
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
     "-Zterminal-urls",
-    # "-Zthreads=0",
+    "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zno-trait-vptr",
