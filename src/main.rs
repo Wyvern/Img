@@ -310,7 +310,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     let path = path::Path::new(dir);
-    let dir = || {
+    let create_dir = || {
         if !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
                 quit!("Create Dir Error: `{}`", e);
@@ -321,11 +321,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let mut curl = process::Command::new("curl");
     curl.current_dir(path).args(["-Z"]);
     let mut skip_embed = 0u16;
+    #[cfg(feature = "infer")]
+    let mut need_file_type_detection = vec![];
 
     for url in urls {
         if cfg!(feature = "embed") && url.starts_with("data:image/") {
             if let Ok(cur) = env::current_dir() {
-                dir();
+                create_dir();
                 env::set_current_dir(path);
                 save_to_file(url.as_str());
                 env::set_current_dir(cur);
@@ -333,49 +335,35 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let name = url[url
+        let mut name = url[url
             .rfind('/')
             .unwrap_or_else(|| quit!("Invalid Url: {}", url))
             + 1..]
             .trim_start_matches(['-', '_']);
-        let has_ext = &name[..name.find('?').unwrap_or(name.len())].find('.');
+        let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
 
         let mut name_ext = String::default();
         if has_ext.is_none() {
-            process::Command::new("curl")
-                .args([
-                    url.as_str(),
-                    "-e",
-                    host,
-                    "-A",
-                    "Mozilla Firefox",
-                    "-fsSIL",
-                    "--compressed",
-                    "-w",
-                    "%{content_type}",
-                ])
-                .output()
-                .map_or_else(
-                    |e| pl!("Get {url} content header info failed: {e}"),
-                    |o| {
-                        let header = String::from_utf8_lossy(&o.stdout);
-                        if let Some(ct) = header.lines().last() {
-                            let ext = image_type(ct);
-                            name_ext = [name, ext].join(".");
-                        }
-                    },
-                );
+            #[cfg(feature = "infer")]
+            {
+                need_file_type_detection.push(name.to_owned());
+            }
+            #[cfg(not(feature = "infer"))]
+            {
+                name_ext = content_header_info(url.as_ref(), host, name);
+            }
+        } else {
+            name = &name[..name.find('?').unwrap_or(name.len())];
+        }
+
+        let file_name = if name_ext.is_empty() {
+            name
+        } else {
+            name_ext.as_str()
         };
 
-        if !path
-            .join(if name_ext.is_empty() { name } else { &name_ext })
-            .exists()
-        {
-            curl.args([
-                url.as_str(),
-                "-o",
-                if name_ext.is_empty() { name } else { &name_ext },
-            ]);
+        if !path.join(file_name).exists() {
+            curl.args([url.as_str(), "-o", file_name]);
         }
     }
     // tdbg!(curl.get_args());
@@ -384,26 +372,104 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     if cfg!(feature = "curl") {
-        dir();
-        curl.args([
-            "--parallel-immediate",
-            "--compressed",
+        create_dir();
+        let cmd = curl
+            .args([
+                "--parallel-immediate",
+                "--compressed",
+                "-e",
+                host,
+                "-A",
+                "Mozilla Firefox",
+                if cfg!(debug_assertions) {
+                    "-fsSL"
+                } else {
+                    "-fsL"
+                },
+            ])
+            .spawn()
+            .inspect_err(|e| pl!("{e}"));
+
+        #[cfg(feature = "infer")]
+        if !need_file_type_detection.is_empty() {
+            let p=dir.to_string();
+            thread::spawn(move || {
+                detect_file_type(cmd, need_file_type_detection, p);
+            });
+        }
+    }
+}
+
+/// Get `url` content header info to generate full `name.ext`
+fn content_header_info(url: &str, host: &str, name: &str) -> String {
+    let mut name_ext = String::default();
+    process::Command::new("curl")
+        .args([
+            url,
             "-e",
             host,
             "-A",
             "Mozilla Firefox",
-            if cfg!(debug_assertions) {
-                "-fsSL"
-            } else {
-                "-fsL"
-            },
+            "-fsSIL",
+            "--compressed",
+            "-w",
+            "%{content_type}",
         ])
-        .spawn()
-        .inspect_err(|e| pl!("{e}"));
+        .output()
+        .map_or_else(
+            |e| pl!("Get {url} content header info failed: {e}"),
+            |o| {
+                let header = String::from_utf8_lossy(&o.stdout);
+                if let Some(ct) = header.lines().last() {
+                    let ext = image_type(ct);
+                    name_ext = [name, ext].join(".");
+                }
+            },
+        );
+    name_ext
+}
+
+/// Detect file type through `magic number` sequence
+#[cfg(feature = "infer")]
+fn detect_file_type(cmd: Result<process::Child, io::Error>, files: Vec<String>, path: String) {
+    use std::ops::Deref;
+
+    if let Ok(mut c) = cmd {
+        if let Ok(r) = c.try_wait() {
+            let dir = env::current_dir().unwrap();
+            if dir.exists() {
+                for f in files {
+                    let file = dir.join(path.deref()).join(&f);
+                    if let Ok(e) = file.try_exists() {
+                        magic_number_type(file);
+                    }
+                }
+            }
+        };
     }
 }
 
-///Check `next` selector link page info
+/// Infer file type through magic number
+#[cfg(feature = "infer")]
+fn magic_number_type(pb: path::PathBuf) {
+    use io::*;
+
+    let mut f = fs::File::open(&pb).unwrap_or_else(|e| quit!("{e} : {}", pb.display()));
+    let mut buf = [0u8; 16];
+    f.read_exact(&mut buf);
+
+    let t = infer::get(&buf);
+    tdbg!(t);
+    if let Some(ext) = t {
+        let mut new = pb.to_owned();
+        new.set_extension(ext.extension());
+        fs::rename(pb, new);
+    } else {
+        fs::rename(&pb, format!("{}.svg", pb.display()));
+    }
+}
+
+/// Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
     if nexts.is_empty() {
@@ -635,7 +701,7 @@ mod img {
             hq(a)
         }
     }
-    
+
     #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
@@ -643,7 +709,7 @@ mod img {
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
-        
+
         parse(addr);
     }
 
@@ -652,6 +718,13 @@ mod img {
         main();
     }
 
+    #[test]
+    fn file_type() {
+        let dir = env::current_dir().unwrap();
+        let p = dir.join("src/demo");
+        #[cfg(feature = "infer")]
+        magic_number_type(p);
+    }
     #[test]
     fn embed() {
         if cfg!(not(feature = "embed")) {

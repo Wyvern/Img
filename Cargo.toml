@@ -9,6 +9,7 @@ resolver = "2"
 default = ["curl"]
 curl = []
 download = []
+infer = ["dep:infer"]
 embed = ["dep:base64", "dep:url-escape"]
 
 [[example]]
@@ -21,3 +22,4 @@ crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
 base64 = { version = "*", default-features = false, optional = true }
 url-escape = { version = "*", default-features = false, optional = true }
+infer = { version = "*", default-features = false, optional = true }
