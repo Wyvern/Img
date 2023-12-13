@@ -320,7 +320,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     let mut curl = process::Command::new("curl");
     curl.current_dir(path).args(["-Z"]);
-    let mut skip_embed = 0u16;
+
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
 
@@ -373,29 +373,32 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     if cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl
-            .args([
-                "--parallel-immediate",
-                "--compressed",
-                "-e",
-                host,
-                "-A",
-                "Mozilla Firefox",
-                if cfg!(debug_assertions) {
-                    "-fsSL"
-                } else {
-                    "-fsL"
-                },
-            ])
-            .spawn()
-            .inspect_err(|e| pl!("{e}"));
+        curl.args([
+            "--parallel-immediate",
+            "--compressed",
+            "-e",
+            host,
+            "-A",
+            "Mozilla Firefox",
+            if cfg!(debug_assertions) {
+                "-fsSL"
+            } else {
+                "-fsL"
+            },
+        ]);
+        #[cfg(not(feature = "infer"))]
+        {
+            curl.spawn().inspect_err(|e| pl!("{e}"));
+        }
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            let p=dir.to_string();
+            let p = dir.to_string();
             thread::spawn(move || {
-                detect_file_type(cmd, need_file_type_detection, p);
+                detect_file_type(curl, need_file_type_detection, p);
             });
+        } else {
+            curl.spawn().inspect_err(|e| pl!("{e}"));
         }
     }
 }
@@ -431,21 +434,17 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
 
 /// Detect file type through `magic number` sequence
 #[cfg(feature = "infer")]
-fn detect_file_type(cmd: Result<process::Child, io::Error>, files: Vec<String>, path: String) {
+fn detect_file_type(mut curl: process::Command, files: Vec<String>, path: String) {
     use std::ops::Deref;
-
-    if let Ok(mut c) = cmd {
-        if let Ok(r) = c.try_wait() {
-            let dir = env::current_dir().unwrap();
-            if dir.exists() {
-                for f in files {
-                    let file = dir.join(path.deref()).join(&f);
-                    if let Ok(e) = file.try_exists() {
-                        magic_number_type(file);
-                    }
-                }
+    let cmd = curl.output();
+    let dir = env::current_dir().unwrap();
+    if dir.exists() {
+        for f in files {
+            let file = dir.join(path.deref()).join(&f);
+            if file.exists() {
+                magic_number_type(file);
             }
-        };
+        }
     }
 }
 
@@ -459,13 +458,15 @@ fn magic_number_type(pb: path::PathBuf) {
     f.read_exact(&mut buf);
 
     let t = infer::get(&buf);
-    tdbg!(t);
     if let Some(ext) = t {
         let mut new = pb.to_owned();
         new.set_extension(ext.extension());
         fs::rename(pb, new);
     } else {
-        fs::rename(&pb, format!("{}.svg", pb.display()));
+        let str = String::from_utf8_lossy(&buf);
+        if str.contains("<svg") {
+            fs::rename(&pb, format!("{}.svg", pb.display()));
+        }
     }
 }
 
