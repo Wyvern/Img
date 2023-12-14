@@ -373,32 +373,26 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     if cfg!(feature = "curl") {
         create_dir();
-        curl.args([
-            "--parallel-immediate",
-            "--compressed",
-            "-e",
-            host,
-            "-A",
-            "Mozilla Firefox",
-            if cfg!(debug_assertions) {
-                "-fsSL"
-            } else {
-                "-fsL"
-            },
-        ]);
-        #[cfg(not(feature = "infer"))]
-        {
-            curl.spawn().inspect_err(|e| pl!("{e}"));
-        }
+        let cmd = curl
+            .args([
+                "--parallel-immediate",
+                "--compressed",
+                "-e",
+                host,
+                "-A",
+                "Mozilla Firefox",
+                if cfg!(debug_assertions) {
+                    "-fsSL"
+                } else {
+                    "-fsL"
+                },
+            ])
+            .spawn()
+            .inspect_err(|e| pl!("{e}"));
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            let p = dir.to_string();
-            thread::spawn(move || {
-                detect_file_type(curl, need_file_type_detection, p);
-            });
-        } else {
-            curl.spawn().inspect_err(|e| pl!("{e}"));
+            detect_file_type(cmd.unwrap(), need_file_type_detection, dir);
         }
     }
 }
@@ -434,16 +428,15 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
 
 /// Detect file type through `magic number` sequence
 #[cfg(feature = "infer")]
-fn detect_file_type(mut curl: process::Command, files: Vec<String>, path: String) {
+fn detect_file_type(mut curl: process::Child, files: Vec<String>, path: &str) {
     use std::ops::Deref;
-    let cmd = curl.output();
+    curl.wait();
     let dir = env::current_dir().unwrap();
-    if dir.exists() {
-        for f in files {
-            let file = dir.join(path.deref()).join(&f);
-            if file.exists() {
-                magic_number_type(file);
-            }
+
+    for f in files {
+        let file = dir.join(path).join(&f);
+        if file.exists() {
+            magic_number_type(file);
         }
     }
 }
