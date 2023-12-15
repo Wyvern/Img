@@ -150,7 +150,7 @@ rustflags = [
     "-Zthreads=0",
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
-    "-Ztrait-solver=next-coherence",
+    "-Znext-solver=coherence",
     "-Zcross-crate-inline-threshold=yes",
 
     "-Aunused",
@@ -215,7 +215,7 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Zno-trait-vptr",
-    "-Ztrait-solver=next-coherence",
+    "-Znext-solver=coherence",
     "-Zpanic-in-drop=abort",
     "-Zcross-crate-inline-threshold=yes",
 
