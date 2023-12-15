@@ -69,7 +69,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
 fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
-    println!("{BLINK}{BG}Downloading 📄 ...{N}");
+    println!("⏬ ...{N}");
     let out = process::Command::new("curl")
         .args([
             addr,
@@ -400,6 +400,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 /// Get `url` content header info to generate full `name.ext`
 fn content_header_info(url: &str, host: &str, name: &str) -> String {
     let mut name_ext = String::default();
+    tdbg!(url);
     process::Command::new("curl")
         .args([
             url,
