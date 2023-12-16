@@ -69,7 +69,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
 fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
-    println!("⏬ ...{N}");
+    println!("⏬...{N}");
     let out = process::Command::new("curl")
         .args([
             addr,
@@ -392,7 +392,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            detect_file_type(cmd.unwrap(), need_file_type_detection, dir);
+            cmd.unwrap().wait();
+            for f in need_file_type_detection {
+                let file = path.join(&f);
+                if file.exists() {
+                    magic_number_type(file);
+                }
+            }
         }
     }
 }
@@ -425,21 +431,6 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             },
         );
     name_ext
-}
-
-/// Detect file type through `magic number` sequence
-#[cfg(feature = "infer")]
-fn detect_file_type(mut curl: process::Child, files: Vec<String>, path: &str) {
-    use std::ops::Deref;
-    curl.wait();
-    let dir = env::current_dir().unwrap();
-
-    for f in files {
-        let file = dir.join(path).join(&f);
-        if file.exists() {
-            magic_number_type(file);
-        }
-    }
 }
 
 /// Infer file type through magic number
