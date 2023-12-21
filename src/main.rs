@@ -687,8 +687,8 @@ mod img {
             hq(a)
         }
     }
-    
-    #[test]
+
+    #[test] 
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
         let arg = env::args().skip(3).nth(1);
@@ -698,6 +698,7 @@ mod img {
 
         parse(addr);
     }
+
     #[test]
     fn run() {
         main();
