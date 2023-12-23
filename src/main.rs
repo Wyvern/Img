@@ -87,15 +87,9 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         .output()
         .unwrap_or_else(|e| {
             s.send(());
-            quit!("{CL}curl: {}", e);
+            quit!("curl: {}", e);
         });
-    {
-        s.send(());
-        use io::*;
-        let mut o = io::stdout();
-        write!(o, "{CL}");
-        o.flush();
-    }
+    s.send(());
     if out.stdout.is_empty() {
         quit!(
             "Fetch `{}` failed - {}",
@@ -663,6 +657,8 @@ fn progress_circle(r: sync::mpsc::Receiver<()>) {
             thread::sleep(time::Duration::from_secs_f32(0.2));
         }
     }
+    print!("{CL}");
+    o.flush();
 }
 
 #[cfg(test)]
