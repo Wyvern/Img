@@ -35,6 +35,7 @@ mod color {
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
     pub static C: &str = "\x1b[F"; //Clear/Reset
+    pub static CL: &str = "\x1b[G";
     pub static UU: &str = "\x1b[21m";
     pub static R: &str = "\x1b[91m";
     pub static G: &str = "\x1b[92m";

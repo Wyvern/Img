@@ -69,7 +69,11 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
 fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
-    println!("⏬...{N}");
+    use sync::mpsc::*;
+    let (s, r) = channel();
+    thread::spawn(|| {
+        progress_circle(r);
+    });
     let out = process::Command::new("curl")
         .args([
             addr,
@@ -82,15 +86,16 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         ])
         .output()
         .unwrap_or_else(|e| {
-            quit!("{C}curl: {}", e);
+            s.send(());
+            quit!("{CL}curl: {}", e);
         });
     {
+        s.send(());
         use io::*;
         let mut o = io::stdout();
-        write!(o, "{C}");
+        write!(o, "{CL}");
         o.flush();
     }
-
     if out.stdout.is_empty() {
         quit!(
             "Fetch `{}` failed - {}",
@@ -639,6 +644,27 @@ fn image_type(header: &str) -> &str {
         .unwrap_or(offset.len())]
 }
 
+///Show `circle` progress indicator
+fn progress_circle(r: sync::mpsc::Receiver<()>) {
+    use io::*;
+    use sync::mpsc::*;
+
+    let chars = ['◯', '◔', '◑', '◕', '●'];
+    let mut o = stdout().lock();
+
+    'l: loop {
+        for char in chars {
+            print!("{CL}{char}");
+            o.flush();
+            match r.try_recv() {
+                Ok(_) | Err(TryRecvError::Disconnected) => break 'l,
+                Err(TryRecvError::Empty) => (),
+            }
+            thread::sleep(time::Duration::from_secs_f32(0.2));
+        }
+    }
+}
+
 #[cfg(test)]
 mod img {
     use super::*;
@@ -688,7 +714,7 @@ mod img {
         }
     }
 
-    #[test] 
+    #[test]
     fn r#try() {
         // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
         let arg = env::args().skip(3).nth(1);
@@ -697,6 +723,17 @@ mod img {
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
 
         parse(addr);
+    }
+
+    #[test]
+    fn progress() {
+        use sync::mpsc::*;
+        let (s, r) = channel();
+        thread::spawn(|| {
+            progress_circle(r);
+        });
+        thread::sleep(time::Duration::from_secs(3));
+        s.send(());
     }
 
     #[test]
