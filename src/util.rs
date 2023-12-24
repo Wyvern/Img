@@ -34,8 +34,8 @@ mod color {
     pub static B: &str = "\x1b[1m";
     pub static I: &str = "\x1b[3m";
     pub static U: &str = "\x1b[4m";
-    pub static C: &str = "\x1b[F"; //Clear/Reset
-    pub static CL: &str = "\x1b[G";
+    pub static BEG: &str = "\x1b[G"; //Move to begin of line
+    pub static CL: &str = "\x1b[1K"; //Clear current line
     pub static UU: &str = "\x1b[21m";
     pub static R: &str = "\x1b[91m";
     pub static G: &str = "\x1b[92m";

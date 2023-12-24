@@ -72,7 +72,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     use sync::mpsc::*;
     let (s, r) = channel();
     thread::spawn(|| {
-        progress_circle(r);
+        circle_indicator(r);
     });
     let out = process::Command::new("curl")
         .args([
@@ -639,16 +639,17 @@ fn image_type(header: &str) -> &str {
 }
 
 ///Show `circle` progress indicator
-fn progress_circle(r: sync::mpsc::Receiver<()>) {
+fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     use io::*;
     use sync::mpsc::*;
 
     let chars = ['◯', '◔', '◑', '◕', '●'];
+    // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
     let mut o = stdout().lock();
 
     'l: loop {
         for char in chars {
-            print!("{CL}{char}");
+            print!("{BEG}{char}");
             o.flush();
             match r.try_recv() {
                 Ok(_) | Err(TryRecvError::Disconnected) => break 'l,
@@ -656,8 +657,10 @@ fn progress_circle(r: sync::mpsc::Receiver<()>) {
             }
             thread::sleep(time::Duration::from_secs_f32(0.2));
         }
+        // print!("{CL}");
+        // o.flush();
     }
-    print!("{CL}");
+    print!("{BEG}");
     o.flush();
 }
 
@@ -726,7 +729,7 @@ mod img {
         use sync::mpsc::*;
         let (s, r) = channel();
         thread::spawn(|| {
-            progress_circle(r);
+            circle_indicator(r);
         });
         thread::sleep(time::Duration::from_secs(3));
         s.send(());
