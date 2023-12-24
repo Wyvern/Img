@@ -715,7 +715,7 @@ mod img {
 
     #[test]
     fn r#try() {
-        // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
+        // https://xiurennvs.xyz p https://mmm.red
         let arg = env::args().skip(3).nth(1);
         let addr = arg
             .as_deref()

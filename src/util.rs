@@ -177,21 +177,12 @@ mod macros {
 
     #[macro_export]
     macro_rules! tdbg {
-        ($e:expr $(,)?) => {
+        ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                $crate::dbg!(&$e);
+                $crate::dbg!($(&$e),*);
                 #[cfg(test)]{pause("");}
-                $e
-            } else {$e}
-        };
-        ($($e:expr),+ $(,)?) => {
-            if cfg!(test) || cfg!(debug_assertions) {
-                ($($crate::dbg!(&$e)),+,);
-                #[cfg(test)]{pause("");}
-                ($($e),+,)
-            } else {
-                ($($e),+,)
-            }
+                ($($e),*)
+            } else {($($e),*)}
         }
     }
 
