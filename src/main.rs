@@ -259,7 +259,7 @@ fn parse(addr: &str) -> String {
                     });
                     writeln!(
                         stdout,
-                        "{B}Do you want to download Album <{U}{}/{albums_len}{N}{B}>: {G}{} ?{N}",
+                        "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
                         i + 1,
                         t.trim()
                     );
@@ -715,7 +715,7 @@ mod img {
 
     #[test]
     fn r#try() {
-        // https://xiurennvs.xyz p https://mmm.red
+        // https://xiurennvs.xyz https://girldreamy.com/ https://mmm.red
         let arg = env::args().skip(3).nth(1);
         let addr = arg
             .as_deref()
