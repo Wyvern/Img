@@ -159,8 +159,6 @@ mod color {
 }
 pub use color::*;
 
-use crate::tdbg;
-
 mod macros {
 
     #[macro_export]
@@ -174,7 +172,7 @@ mod macros {
     #[macro_export]
     macro_rules! pl {
         ($l:literal $(,$e:expr)*) => {{
-            println!("{B}{}{N}", format_args!($l $(,format_args!("{R}{}{N}{B}",$e))*));
+            println!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*));
         }}
     }
 
@@ -247,7 +245,8 @@ const fn is_target_little_endian() -> bool {
 #[cfg(test)]
 mod test {
     use super::*;
-
+    use crate::*;
+    
     #[test]
     fn dyn_any() {
         tdbg!(is_target_little_endian());

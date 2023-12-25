@@ -32,12 +32,12 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        quit!("`{}`: Invalid {U}http(s) protocol.", scheme);
+        quit!("{}: Invalid {U}http(s) protocol.", scheme);
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() || !host.contains('.') {
-        quit!("`{}`: Invalid host info.", host);
+        quit!("{}: Invalid host info.", host);
     }
     [scheme, host]
 }
@@ -92,7 +92,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     s.send(());
     if out.stdout.is_empty() {
         quit!(
-            "Fetch `{}` failed - {}",
+            "Fetch {} failed - {}",
             addr,
             String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
         );
@@ -273,7 +273,7 @@ fn parse(addr: &str) -> String {
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
-                        quit!("`{e}`");
+                        quit!("{}", e);
                     });
                     input.make_ascii_lowercase();
 
@@ -312,7 +312,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let create_dir = || {
         if !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
-                quit!("Create Dir Error: `{}`", e);
+                quit!("Create Dir Error: {}", e);
             });
         }
     };
@@ -646,7 +646,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     let chars = ['◯', '◔', '◑', '◕', '●'];
     // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
     let mut o = stdout().lock();
-
+    thread::yield_now();
     'l: loop {
         for char in chars {
             print!("{BEG}{char}");
