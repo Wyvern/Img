@@ -37,7 +37,7 @@ rustflags = [
     "-Zcodegen-backend=cranelift",
 ]
 rpath = true
-codegen-backend = "cranelift"
+# codegen-backend = "cranelift"
 [profile.dev.package."*"]
 inherits = "dev"
 debug-assertions = false
@@ -105,7 +105,7 @@ config-include = true
 bindeps = true
 binary-dep-depinfo = true
 profile-rustflags = true
-# codegen-backend = true
+codegen-backend = true
 target-applies-to-host = true
 host-config = true
 trim-paths = true
