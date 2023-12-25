@@ -34,7 +34,7 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-        
+
       - name: Build Release
         run: |
           sudo apt update && sudo apt install gcc-aarch64-linux-gnu musl-tools -y
@@ -56,7 +56,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-gnu/src/Img
+          file: target/x86_64-unknown-linux-gnu/lto/Img
           asset_name: Linux-Gnu
           tag: Stable
           overwrite: true
@@ -66,7 +66,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-gnu/src/Img
+          file: target/aarch64-unknown-linux-gnu/lto/Img
           asset_name: Linux-AArch64
           tag: Stable
           overwrite: true
@@ -76,7 +76,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-musl/src/Img
+          file: target/x86_64-unknown-linux-musl/lto/Img
           asset_name: Linux-Musl
           tag: Stable
           overwrite: true
@@ -98,7 +98,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-darwin
+          targets: aarch64-apple-darwin,x86_64h-apple-darwin
           components: rust-src
 
       - name: Run sccache-cache
@@ -112,7 +112,7 @@ jobs:
           time cargo l --target aarch64-apple-darwin
           time cargo l --target arm64e-apple-darwin
 
-          lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+          lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64h-apple-darwin/lto/Img -output Img-Universal
 
           find ./target -iname img -type f | xargs ls -hl
           ls -hl Img-Universal
@@ -127,7 +127,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64h-apple-darwin/src/Img
+          file: target/x86_64h-apple-darwin/lto/Img
           asset_name: macOS-x86_64h
           tag: Stable
           overwrite: true
@@ -137,7 +137,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-apple-darwin/src/Img
+          file: target/aarch64-apple-darwin/lto/Img
           asset_name: macOS-AArch64
           tag: Stable
           overwrite: true
@@ -147,7 +147,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/arm64e-apple-darwin/src/Img
+          file: target/arm64e-apple-darwin/lto/Img
           asset_name: macOS-Arm64e
           tag: Stable
           overwrite: true
@@ -204,7 +204,7 @@ jobs:
 
           cargo l --target x86_64-pc-windows-msvc
           cargo l --target aarch64-pc-windows-msvc
-          
+
           cmd /r dir /s target\Img.exe
           systeminfo
 
@@ -215,7 +215,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-windows-msvc/src/Img.exe
+          file: target/x86_64-pc-windows-msvc/lto/Img.exe
           asset_name: Windows.exe
           tag: Stable
           overwrite: true
@@ -225,7 +225,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-pc-windows-msvc/src/Img.exe
+          file: target/aarch64-pc-windows-msvc/lto/Img.exe
           asset_name: Windows-AArch64.exe
           tag: Stable
           overwrite: true
