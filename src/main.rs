@@ -646,7 +646,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     let chars = ['◯', '◔', '◑', '◕', '●'];
     // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
     let mut o = stdout().lock();
-    thread::yield_now();
+    
     'l: loop {
         for char in chars {
             print!("{BEG}{char}");
@@ -655,6 +655,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
                 Ok(_) | Err(TryRecvError::Disconnected) => break 'l,
                 Err(TryRecvError::Empty) => (),
             }
+            thread::yield_now();
             thread::sleep(time::Duration::from_secs_f32(0.2));
         }
         // print!("{CL}");
