@@ -79,7 +79,7 @@
         "Next": "div.pagelist a[href]"
     },
     {
-        "Site": "sxchinesegirlz.one",
+        "Site": "sxchinesegirlz.one,sxchinesegirlz01.xyz",
         "Img": "figure.wp-block-image.size-large img",
         "Next": "div.pagination a[href]"
     },
@@ -111,7 +111,7 @@
         "Next": "div.paging a"
     },
     {
-        "Site": "zhainq.net",
+        "Site": "zhainq.net,3i2n.com",
         "Img": "article.article-content img",
         "Next": "div.article-paging span.post-page-numbers.current"
     },
@@ -225,5 +225,14 @@
         "Site": "lootiu.com",
         "Img": "div.contentme img",
         "Next":"div.pagination-list a"
+    },
+    {
+        "Site": "bdsmcn.com",
+        "Img": "div.content-style img"
+    },
+    {
+        "Site": "rmm8.com",
+        "Img": "div.content img",
+        "Next":"div#page a.prepage"
     }
 ]
