@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: ["dev"]
+    branches: ["stable"]
   pull_request:
-    branches: ["dev"]
+    branches: ["stable"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -27,13 +27,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-unknown-linux-gnu,x86_64-unknown-linux-musl
           components: rust-src
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@v0.0.3
+        uses: mozilla-actions/sccache-action@main
         
       - name: Build Release
         run: |
@@ -41,9 +41,9 @@ jobs:
 
           cargo update
 
-          time cargo s x86_64-unknown-linux-gnu
-          time cargo s aarch64-unknown-linux-gnu
-          time cargo s x86_64-unknown-linux-musl
+          time cargo l --target x86_64-unknown-linux-gnu
+          time cargo l --target aarch64-unknown-linux-gnu
+          time cargo l --target x86_64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -58,7 +58,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-gnu/src/Img
           asset_name: Linux-Gnu
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "Ubuntu Linux-Gnu binary executable."
 
@@ -68,7 +68,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-unknown-linux-gnu/src/Img
           asset_name: Linux-AArch64
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "Ubuntu Linux-AArch64 binary executable."
 
@@ -78,7 +78,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-musl/src/Img
           asset_name: Linux-Musl
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "Ubuntu Linux-Musl binary executable."
 
@@ -96,7 +96,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-apple-darwin
           components: rust-src
@@ -107,12 +107,10 @@ jobs:
       - name: Build Release
         run: |
           cargo update
-          #time cargo br
-          #time cargo l
 
-          time cargo s x86_64h-apple-darwin
-          time cargo s aarch64-apple-darwin
-          time cargo s arm64e-apple-darwin
+          time cargo l --target x86_64h-apple-darwin
+          time cargo l --target aarch64-apple-darwin
+          time cargo l --target arm64e-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
@@ -131,7 +129,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64h-apple-darwin/src/Img
           asset_name: macOS-x86_64h
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "macOS x86-64h binary executable."
 
@@ -141,7 +139,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-darwin/src/Img
           asset_name: macOS-AArch64
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "macOS AArch64 binary executable."
 
@@ -151,7 +149,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/arm64e-apple-darwin/src/Img
           asset_name: macOS-Arm64e
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "macOS Arm64e binary executable."
 
@@ -161,7 +159,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: Img-Universal
           asset_name: macOS-Universal
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "macOS Universal binary executable."
 
@@ -192,7 +190,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-pc-windows-msvc
           components: rust-src
@@ -204,11 +202,8 @@ jobs:
         run: |
           cargo update
 
-          #cargo br
-          #cargo l
-
-          cargo s x86_64-pc-windows-msvc
-          cargo s aarch64-pc-windows-msvc
+          cargo l --target x86_64-pc-windows-msvc
+          cargo l --target aarch64-pc-windows-msvc
           
           cmd /r dir /s target\Img.exe
           systeminfo
@@ -222,7 +217,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-pc-windows-msvc/src/Img.exe
           asset_name: Windows.exe
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "Windows x64 binary executable."
 
@@ -232,6 +227,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-pc-windows-msvc/src/Img.exe
           asset_name: Windows-AArch64.exe
-          tag: Nightly
+          tag: Stable
           overwrite: true
           body: "Windows AArch64 binary executable."

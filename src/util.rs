@@ -32,9 +32,13 @@ use std::*;
 mod color {
     pub static N: &str = "\x1b[0m";
     pub static B: &str = "\x1b[1m";
+    pub static _B: &str = "\x1b[22m";
     pub static I: &str = "\x1b[3m";
+    pub static _I: &str = "\x1b[23m";
     pub static U: &str = "\x1b[4m";
-    pub static C: &str = "\x1b[F"; //Clear/Reset
+    pub static _U: &str = "\x1b[24m";
+    pub static BEG: &str = "\x1b[G"; //Move to begin of line
+    pub static CL: &str = "\x1b[2K"; //Erase the entire line
     pub static UU: &str = "\x1b[21m";
     pub static R: &str = "\x1b[91m";
     pub static G: &str = "\x1b[92m";
@@ -155,8 +159,6 @@ mod color {
 }
 pub use color::*;
 
-use crate::tdbg;
-
 mod macros {
 
     #[macro_export]
@@ -170,34 +172,18 @@ mod macros {
     #[macro_export]
     macro_rules! pl {
         ($l:literal $(,$e:expr)*) => {{
-            println!("{B}{}{N}", format_args!($l $(,format_args!("{R}{}{N}{B}",$e))*));
+            println!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*));
         }}
     }
 
     #[macro_export]
     macro_rules! tdbg {
-        ($e:expr $(,)?) => {
+        ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
-            dbg!(&$e);
-            if cfg!(test){
-                pause("");
-            }
-            $e
-        } else {
-            $e
-        }
-
-        };
-        ($($e:expr),+ $(,)?) => {
-            if cfg!(test) || cfg!(debug_assertions) {
-                ($($crate::dbg!(&$e)),+,);
-                if cfg!(test){
-                    pause("");
-                }
-                ($($e),+,)
-            } else {
-                ($($e),+,)
-            }
+                $crate::dbg!($(&$e),*);
+                #[cfg(test)]{pause("");}
+                ($($e),*)
+            } else {($($e),*)}
         }
     }
 
@@ -259,7 +245,8 @@ const fn is_target_little_endian() -> bool {
 #[cfg(test)]
 mod test {
     use super::*;
-
+    use crate::*;
+    
     #[test]
     fn dyn_any() {
         tdbg!(is_target_little_endian());

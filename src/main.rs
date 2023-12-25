@@ -32,12 +32,12 @@ fn check_host(addr: &str) -> [&str; 2] {
     if scheme.is_empty()
         || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
     {
-        quit!("`{}`: Invalid {U}http(s) protocol.", scheme);
+        quit!("{}: Invalid {U}http(s) protocol.", scheme);
     }
     let rest = split.1;
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if host.is_empty() || !host.contains('.') {
-        quit!("`{}`: Invalid host info.", host);
+        quit!("{}: Invalid host info.", host);
     }
     [scheme, host]
 }
@@ -69,7 +69,11 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
 fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let scheme_host @ [_, host] = check_host(addr);
     let host_info = host_info(host);
-    println!("⏬ ...{N}");
+    use sync::mpsc::*;
+    let (s, r) = channel();
+    thread::spawn(|| {
+        circle_indicator(r);
+    });
     let out = process::Command::new("curl")
         .args([
             addr,
@@ -82,18 +86,13 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         ])
         .output()
         .unwrap_or_else(|e| {
-            quit!("{C}curl: {}", e);
+            s.send(());
+            quit!("curl: {}", e);
         });
-    {
-        use io::*;
-        let mut o = io::stdout();
-        write!(o, "{C}");
-        o.flush();
-    }
-
+    s.send(());
     if out.stdout.is_empty() {
         quit!(
-            "Fetch `{}` failed - {}",
+            "Fetch {} failed - {}",
             addr,
             String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
         );
@@ -260,7 +259,7 @@ fn parse(addr: &str) -> String {
                     });
                     writeln!(
                         stdout,
-                        "{B}Do you want to download Album <{U}{}/{albums_len}{N}{B}>: {G}{} ?{N}",
+                        "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
                         i + 1,
                         t.trim()
                     );
@@ -274,7 +273,7 @@ fn parse(addr: &str) -> String {
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
-                        quit!("`{e}`");
+                        quit!("{}", e);
                     });
                     input.make_ascii_lowercase();
 
@@ -313,7 +312,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let create_dir = || {
         if !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
-                quit!("Create Dir Error: `{}`", e);
+                quit!("Create Dir Error: {}", e);
             });
         }
     };
@@ -392,7 +391,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            detect_file_type(cmd.unwrap(), need_file_type_detection, dir);
+            cmd.unwrap().wait();
+            for f in need_file_type_detection {
+                let file = path.join(&f);
+                if file.exists() {
+                    magic_number_type(file);
+                }
+            }
         }
     }
 }
@@ -425,21 +430,6 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             },
         );
     name_ext
-}
-
-/// Detect file type through `magic number` sequence
-#[cfg(feature = "infer")]
-fn detect_file_type(mut curl: process::Child, files: Vec<String>, path: &str) {
-    use std::ops::Deref;
-    curl.wait();
-    let dir = env::current_dir().unwrap();
-
-    for f in files {
-        let file = dir.join(path).join(&f);
-        if file.exists() {
-            magic_number_type(file);
-        }
-    }
 }
 
 /// Infer file type through magic number
@@ -648,6 +638,33 @@ fn image_type(header: &str) -> &str {
         .unwrap_or(offset.len())]
 }
 
+///Show `circle` progress indicator
+fn circle_indicator(r: sync::mpsc::Receiver<()>) {
+    use io::*;
+    use sync::mpsc::*;
+
+    let chars = ['◯', '◔', '◑', '◕', '●'];
+    // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
+    let mut o = stdout().lock();
+    
+    'l: loop {
+        for char in chars {
+            print!("{BEG}{char}");
+            o.flush();
+            match r.try_recv() {
+                Ok(_) | Err(TryRecvError::Disconnected) => break 'l,
+                Err(TryRecvError::Empty) => (),
+            }
+            thread::yield_now();
+            thread::sleep(time::Duration::from_secs_f32(0.2));
+        }
+        // print!("{CL}");
+        // o.flush();
+    }
+    print!("{BEG}");
+    o.flush();
+}
+
 #[cfg(test)]
 mod img {
     use super::*;
@@ -699,13 +716,25 @@ mod img {
 
     #[test]
     fn r#try() {
-        // https://xiurennvs.xyz https://girldreamy.com https://mmm.red
+        // https://xiurennvs.xyz https://girldreamy.com/ https://mmm.red
         let arg = env::args().skip(3).nth(1);
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
 
         parse(addr);
+    }
+
+    #[test]
+    fn progress() {
+        use sync::mpsc::*;
+        let (s, r) = channel();
+        thread::spawn(|| {
+            circle_indicator(r);
+        });
+        thread::yield_now();
+        thread::sleep(time::Duration::from_secs(3));
+        s.send(());
     }
 
     #[test]
