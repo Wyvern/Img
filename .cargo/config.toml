@@ -29,13 +29,13 @@ vcs = "none"
 
 #dev
 [profile.dev]
-rustflags = [
-    "-Cprefer-dynamic",
-    "-Cdebug-assertions",
-    "-Zdwarf-version=5",
-    "-Zdebuginfo-compression=zstd",
-    "-Zcodegen-backend=cranelift",
-]
+# rustflags = [
+#     "-Cprefer-dynamic",
+#     "-Cdebug-assertions",
+#     "-Zdwarf-version=5",
+#     "-Zdebuginfo-compression=zstd",
+#     "-Zcodegen-backend=cranelift",
+# ]
 rpath = true
 # codegen-backend = "cranelift"
 [profile.dev.package."*"]
