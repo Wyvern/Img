@@ -161,7 +161,6 @@ rustflags = [
 ]
 
 [build]
-rustflags = ["-Zpanic-in-drop=abort", "-Clink-args=-fno-async-exceptions"]
 incremental = true
 rustc-wrapper = "sccache"
 
