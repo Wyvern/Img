@@ -98,7 +98,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-darwin,x86_64h-apple-darwin
+          targets: aarch64-apple-darwin
           components: rust-src
 
       - name: Run sccache-cache
@@ -110,7 +110,7 @@ jobs:
 
           time cargo l --target x86_64h-apple-darwin
           time cargo l --target aarch64-apple-darwin
-          time cargo l --target arm64e-apple-darwin
+          # time cargo l --target arm64e-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64h-apple-darwin/lto/Img -output Img-Universal
 
