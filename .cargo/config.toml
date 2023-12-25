@@ -163,6 +163,7 @@ rustflags = [
 [build]
 incremental = true
 rustc-wrapper = "sccache"
+rustflags = ["-Clink-args=-fno-async-exceptions"]
 
 [unstable.gitoxide]
 checkout = true
