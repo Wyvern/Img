@@ -386,8 +386,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     "-fsL"
                 },
             ])
-            .spawn()
-            .inspect_err(|e| pl!("{e}"));
+            .spawn();
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
