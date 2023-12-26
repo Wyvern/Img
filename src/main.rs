@@ -219,13 +219,20 @@ fn parse(addr: &str) -> String {
 
             for (i, alb) in albums.unwrap().iter().enumerate() {
                 let mut parse_album = || {
-                    let mut href = alb.attr("href").unwrap_or_else(|| {
+                    let upto = |mut n: u8| {
                         let mut p = alb.parent().unwrap();
-                        p.attr("href").unwrap_or_else(|| {
+                        let mut href = None;
+                        while n > 0 {
+                            href = p.attr("href");
+                            if href.is_some() {
+                                break;
+                            }
                             p = p.parent().unwrap();
-                            p.attr("href").expect("NO album a[@href] attr found.")
-                        })
-                    });
+                            n -= 1;
+                        }
+                        href.expect("NO album a[@href] attr found.")
+                    };
+                    let href = alb.attr("href").unwrap_or_else(|| upto(2));
 
                     if !href.is_empty() {
                         let album_url = canonicalize_url(href);
