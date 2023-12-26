@@ -220,11 +220,13 @@ fn parse(addr: &str) -> String {
             for (i, alb) in albums.unwrap().iter().enumerate() {
                 let mut parse_album = || {
                     let mut href = alb.attr("href").unwrap_or_else(|| {
-                        alb.parent()
-                            .unwrap()
-                            .attr("href")
-                            .expect("NO album a[@href] attr found.")
+                        let mut p = alb.parent().unwrap();
+                        p.attr("href").unwrap_or_else(|| {
+                            p = p.parent().unwrap();
+                            p.attr("href").expect("NO album a[@href] attr found.")
+                        })
                     });
+
                     if !href.is_empty() {
                         let album_url = canonicalize_url(href);
                         let mut next_page = parse(&album_url);
@@ -645,7 +647,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     let chars = ['◯', '◔', '◑', '◕', '●'];
     // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
     let mut o = stdout().lock();
-    
+
     'l: loop {
         for char in chars {
             print!("{BEG}{char}");

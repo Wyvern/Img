@@ -228,11 +228,18 @@
     },
     {
         "Site": "bdsmcn.com",
-        "Img": "div.content-style img"
+        "Img": "div.content-style img",
+        "Album":"a.list-title"
     },
     {
         "Site": "rmm8.com",
         "Img": "div.content img",
-        "Next":"div#page a.prepage"
+        "Next":"div#page a.prepage",
+        "Album":"ul.img img[alt]"
+    },
+    {
+        "Site": "girlsteam.club",
+        "Img": "div#content img",
+        "Album":"figure img.waitpic"
     }
 ]
