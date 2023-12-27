@@ -227,8 +227,10 @@ fn parse(addr: &str) -> String {
                             if href.is_some() {
                                 break;
                             }
-                            p = p.parent().unwrap();
                             n -= 1;
+                            if n > 0 {
+                                p = p.parent().unwrap();
+                            }
                         }
                         href.expect("NO album a[@href] attr found.")
                     };
