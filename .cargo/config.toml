@@ -17,12 +17,16 @@ ti = "t -- --exact --nocapture"
 
 l = "b --profile lto"
 
-h = "b --profile src -Zbuild-std=core,std,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64h-apple-darwin"
-e = "b --profile src -Zbuild-std=core,std,panic_abort -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin"
-s = "b --profile src -Zbuild-std=core,std,alloc,panic_abort,proc_macro,libc,compiler_builtins -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target "
+h = "b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64h-apple-darwin"
+e = "b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin"
+s = "b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target "
 
 [cargo-new]
 vcs = "none"
+
+[env]
+RUST_BACKTRACE = "0"
+RUST_LIB_BACKTRACE = "0"
 
 [net]
 #offline = true     
@@ -110,16 +114,16 @@ target-applies-to-host = true
 host-config = true
 trim-paths = true
 gc = true
-build-std = [
-    "core",
-    "std",
-    "alloc",
-    "panic_abort",
-    "proc_macro",
-    "libc",
-    "compiler_builtins",
-]
-build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
+# build-std = [
+#     "core",
+#     "std",
+#     "alloc",
+#     "proc_macro",
+#     "panic_abort",
+#     "libc",
+#     "compiler_builtins",
+# ]
+# build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 
 [host]
 rustflags = [
