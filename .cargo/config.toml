@@ -24,6 +24,10 @@ s = "b --profile src -Zbuild-std=core,std,alloc,panic_abort,proc_macro,libc,comp
 [cargo-new]
 vcs = "none"
 
+[env]
+RUST_BACKTRACE = "0"
+RUST_LIB_BACKTRACE = "0"
+
 [net]
 #offline = true     
 
