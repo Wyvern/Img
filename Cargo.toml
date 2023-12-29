@@ -18,9 +18,8 @@ path = "src/color.rs"
 test = true
 
 [dependencies]
-scraper = { version = "*", default-features = false }
+crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
-
 base64 = { version = "*", default-features = false, optional = true }
 url-escape = { version = "*", default-features = false, optional = true }
 infer = { version = "*", default-features = false, optional = true }

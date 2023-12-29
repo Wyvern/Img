@@ -101,7 +101,7 @@
         "Next": "div.pagination-list"
     },
     {
-        "Site": "mrcong.com",
+        "Site": "mrcong.com,misskon.com",
         "Img": "img.aligncenter",
         "Next": "div.page-link"
     },
@@ -224,23 +224,23 @@
     {
         "Site": "lootiu.com",
         "Img": "div.contentme img",
-        "Next": "div.pagination-list a"
+        "Next":"div.pagination-list a"
     },
     {
         "Site": "bdsmcn.com",
         "Img": "div.content-style img",
-        "Album": "a.list-title"
+        "Album":"a.list-title"
     },
     {
         "Site": "rmm8.com",
         "Img": "div.content img",
-        "Next": "div#page a.prepage",
-        "Album": "ul.img img[alt]"
+        "Next":"div#page a.prepage",
+        "Album":"ul.img img[alt]"
     },
     {
         "Site": "girlsteam.club",
         "Img": "div#content img",
-        "Album": "figure img.waitpic"
+        "Album":"figure img.waitpic"
     },
     {
         "Site": "legskr.com",
