@@ -516,19 +516,16 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 if t.is_some() && t.as_deref().unwrap().is_empty() {
                     t.take();
                 }
-
+                let next_下 = |mut t: String| {
+                    t.make_ascii_lowercase();
+                    t.contains('下') || t.contains("next")
+                };
                 match t {
-                    Some(mut text) => {
-                        text.make_ascii_lowercase();
-                        text.contains('下') || text.contains("next") || (n.attr("target").is_some())
-                    }
+                    Some(mut text) => next_下(text) || (n.attr("target").is_some()),
                     None => {
                         t = n.attr("title");
                         match t {
-                            Some(mut title) => {
-                                title.make_ascii_lowercase();
-                                title.contains('下') || title.contains("next")
-                            }
+                            Some(mut title) => next_下(title),
                             None => {
                                 let span = n.select("span.currenttext");
                                 if span.is_empty() {
@@ -536,10 +533,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                                 }
                                 t = span[0].text();
                                 match t {
-                                    Some(mut text) => {
-                                        text.make_ascii_lowercase();
-                                        text.contains('下') || text.contains("next")
-                                    }
+                                    Some(mut text) => next_下(text),
                                     None => false,
                                 }
                             }
