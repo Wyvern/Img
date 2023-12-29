@@ -103,14 +103,9 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    use scraper::*;
-
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
-
-    let page = Html::parse_document(&html);
-    let imgs = page
-        .select(&Selector::parse(img.unwrap_or("img[src]")).unwrap())
-        .collect::<Vec<_>>();
+    let page = crabquery::Document::from(html);
+    let imgs = page.select(img.unwrap_or("img[src]"));
     let src = img.map_or("src", |i| {
         if i.trim_end().ends_with(']') {
             &i[i.rfind('[').expect("NO '[' found in <img> selector.") + 1..i.len() - 1]
@@ -119,15 +114,14 @@ fn parse(addr: &str) -> String {
         }
     });
 
-    let title_sel = Selector::parse("title").unwrap();
-    let mut titles = page.select(&title_sel);
+    let titles = page.select("title");
     let title = titles
-        .next()
+        .first()
         .unwrap_or_else(|| {
-            quit!("Not a valid HTML page: {}", addr);
+            quit!("Not a valid HTML page.");
         })
-        .inner_html();
-
+        .text()
+        .expect("NO title text.");
     let mut t = title.trim();
 
     (0..2).for_each(|_| {
@@ -137,12 +131,9 @@ fn parse(addr: &str) -> String {
     let slash2dot = t.replace('/', "·");
     t = slash2dot.as_ref();
 
-    let albums = album
-        .map(|a| Selector::parse(a).unwrap())
-        .map(|sel| page.select(&sel).collect::<Vec<_>>());
+    let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-
     let [albums_len, imgs_len] = [albums.as_ref().map_or(0, |a| a.len()), imgs.len()];
 
     match (has_album, !imgs.is_empty()) {
@@ -160,7 +151,7 @@ fn parse(addr: &str) -> String {
         t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
     };
 
-    let canonicalize_url = |u: &str| {
+    let canonicalize_url = |u: String| {
         if !u.starts_with("http") {
             if u.starts_with("//") {
                 format!("{scheme}:{u}")
@@ -170,7 +161,7 @@ fn parse(addr: &str) -> String {
                 format!("{}/{u}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
             }
         } else {
-            u.to_owned()
+            u
         }
     };
 
@@ -196,7 +187,7 @@ fn parse(addr: &str) -> String {
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
                     // tdbg!(clean_url);
-                    if clean_url.trim().is_empty() || !urls.insert(clean_url) {
+                    if clean_url.trim().is_empty() || !urls.insert(clean_url.to_owned()) {
                         empty_dup += 1;
                     }
                 }
@@ -214,7 +205,7 @@ fn parse(addr: &str) -> String {
                     t,
                     urls.into_iter().map(|url| {
                         if url.starts_with("data:image/") {
-                            url.to_owned()
+                            url
                         } else {
                             canonicalize_url(url)
                         }
@@ -232,7 +223,7 @@ fn parse(addr: &str) -> String {
                         let mut p = alb.parent().unwrap();
                         let mut href = None;
                         while n > 0 {
-                            href = p.value().as_element().unwrap().attr("href");
+                            href = p.attr("href");
                             if href.is_some() {
                                 break;
                             }
@@ -263,23 +254,20 @@ fn parse(addr: &str) -> String {
                     let mut stdin = io::stdin();
                     let mut stdout = io::stdout();
 
-                    //album_title
                     let mut t = alb.attr("title").unwrap_or_else(|| {
                         alb.attr("alt").unwrap_or_else(|| {
-                            alb.text().next().unwrap()
-                            // .map_or_else(
-                            //     || quit!("NO album title can be found."),
-                            //     |x| {
-                            //         if x.trim().is_empty() {
-                            //             quit!("Album title is empty.")
-                            //         } else {
-                            //             x
-                            //         }
-                            //     },
-                            // )
+                            alb.text().map_or_else(
+                                || quit!("NO album title can be found."),
+                                |x| {
+                                    if x.trim().is_empty() {
+                                        quit!("Album title is empty.")
+                                    } else {
+                                        x
+                                    }
+                                },
+                            )
                         })
                     });
-
                     writeln!(
                         stdout,
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
@@ -322,13 +310,7 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    next_sel.map_or_else(<_>::default, |n| {
-        check_next(
-            page.select(&Selector::parse(n).unwrap())
-                .collect::<Vec<_>>(),
-            addr,
-        )
-    })
+    next_sel.map_or_else(<_>::default, |n| check_next(page.select(n), addr))
 }
 
 ///Perform photo download operation
@@ -483,20 +465,18 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<scraper::ElementRef<'_>>, cur: &str) -> String {
-    use scraper::*;
-
+fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
     } else if nexts.len() == 1 {
-        let element = nexts[0];
-        if element.value().name() == "span" {
-            let items = element.parent().unwrap().children().collect::<Vec<_>>();
+        let element = &nexts[0];
+        if element.tag().unwrap() == "span" {
+            let items = element.parent().unwrap().children();
 
             let mut tags = items.split(|e| {
-                e.value().as_element().unwrap().name() == "span"
+                e.tag().unwrap() == "span"
                 // && e.attr("class")
                 //     .map_or(true, |c| c.contains("current") || c.contains("now-page"))
             });
@@ -504,83 +484,61 @@ fn check_next(nexts: Vec<scraper::ElementRef<'_>>, cur: &str) -> String {
                 .next_back()
                 .unwrap()
                 .iter()
-                .filter(|e| e.value().as_element().unwrap().name() == "a")
+                .filter(|e| e.tag().unwrap() == "a")
                 .collect::<Vec<_>>();
 
-            next_link = a.first().map_or(String::default(), |f| {
-                f.value()
-                    .as_element()
-                    .unwrap()
-                    .attr("href")
-                    .unwrap()
-                    .to_owned()
-            });
+            next_link = a
+                .first()
+                .map_or(String::default(), |f| f.attr("href").unwrap());
         } else {
-            next_link = nexts[0].attr("href").unwrap().to_owned();
+            next_link = nexts[0].attr("href").unwrap();
         }
     } else {
         let element = &nexts[0];
-        if element.value().name() == "div" && nexts.len() == 2 {
-            let tags = element.children().collect::<Vec<_>>();
+        if element.tag().unwrap() == "div" && nexts.len() == 2 {
+            let tags = element.children();
             let mut rest = tags.split(|tag| {
-                tag.children().next().map_or_else(
-                    || {
-                        tag.value().as_element().unwrap().name() == "span"
-                            || tag
-                                .value()
-                                .as_element()
-                                .unwrap()
-                                .attr("class")
-                                .is_some_and(|c| c.contains("current"))
-                    },
-                    |f| {
-                        f.value()
-                            .as_element()
-                            .unwrap()
-                            .attr("class")
-                            .unwrap()
-                            .contains("current")
-                    },
+                tag.children().first().map_or(
+                    tag.tag().unwrap() == "span"
+                        || tag.attr("class").is_some_and(|c| c.contains("current")),
+                    |f| f.attr("class").unwrap().contains("current"),
                 )
             });
             let s = rest.next_back().unwrap();
             next_link = s.first().map_or(String::default(), |f| {
                 f.children()
-                    .next()
-                    .map_or_else(
-                        || f.value().as_element().unwrap().attr("href").unwrap(),
-                        |ff| ff.value().as_element().unwrap().attr("href").unwrap(),
-                    )
-                    .to_owned()
+                    .first()
+                    .map_or_else(|| f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
             });
         } else {
-            let last2 = nexts[nexts.len() - 2..].iter().rfind(|n| {
-                let mut t = n.text().next();
+            let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
+                let mut t = n.text();
+                if t.is_some() && t.as_deref().unwrap().is_empty() {
+                    t.take();
+                }
 
                 match t {
-                    Some(text) => {
-                        let lo = text.to_ascii_lowercase();
-                        lo.contains('下') || lo.contains("next") || (n.attr("target").is_some())
+                    Some(mut text) => {
+                        text.make_ascii_lowercase();
+                        text.contains('下') || text.contains("next") || (n.attr("target").is_some())
                     }
                     None => {
                         t = n.attr("title");
                         match t {
-                            Some(title) => {
-                                let lo = title.to_ascii_lowercase();
-                                lo.contains('下') || lo.contains("next")
+                            Some(mut title) => {
+                                title.make_ascii_lowercase();
+                                title.contains('下') || title.contains("next")
                             }
                             None => {
-                                let span = n
-                                    .select(&Selector::parse("span.currenttext").unwrap())
-                                    .collect::<Vec<_>>();
+                                let span = n.select("span.currenttext");
                                 if span.is_empty() {
                                     return false;
                                 }
-                                t = span[0].text().next();
+                                t = span[0].text();
                                 match t {
-                                    Some(text) => {
-                                        let lo = text.to_ascii_lowercase();
-                                        lo.contains('下') || lo.contains("next")
+                                    Some(mut text) => {
+                                        text.make_ascii_lowercase();
+                                        text.contains('下') || text.contains("next")
                                     }
                                     None => false,
                                 }
@@ -592,8 +550,7 @@ fn check_next(nexts: Vec<scraper::ElementRef<'_>>, cur: &str) -> String {
             next_link = match last2 {
                 Some(v) => v
                     .attr("href")
-                    .expect("NO [href] attr found in <next> link.")
-                    .to_owned(),
+                    .expect("NO [href] attr found in <next> link."),
                 None => {
                     let pos = nexts
                         .iter()
@@ -601,7 +558,7 @@ fn check_next(nexts: Vec<scraper::ElementRef<'_>>, cur: &str) -> String {
                     match pos {
                         Some(p) => {
                             if p < nexts.len() - 1 {
-                                nexts[p + 1].attr("href").unwrap().to_owned()
+                                nexts[p + 1].attr("href").unwrap()
                             } else {
                                 String::default()
                             }
@@ -731,7 +688,7 @@ mod img {
 
     #[test]
     fn htmlq() {
-        let addr = "https://taotu.org/";
+        let addr = "visualstudio.com";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
 
@@ -768,23 +725,8 @@ mod img {
     }
 
     #[test]
-    fn scrape() {
-        use scraper::*;
-
-        let fragment = Html::parse_fragment(
-            "<h1>Hello, <i>world!<i>wor ld !</i></i> <i>world!<i>wor ld!</i></i> </h1>",
-        );
-        let selector = Selector::parse("h1").unwrap();
-
-        let h1 = fragment.select(&selector).next().unwrap();
-        let text = h1.text().collect::<Vec<_>>();
-
-        tdbg!(text);
-    }
-
-    #[test]
     fn r#try() {
-        // https://girlsteam.club https://girldreamy.com/ https://legskr.com
+        // https://girlsteam.club https://girldreamy.com https://legskr.com/
         let arg = env::args().skip(3).nth(1);
         let addr = arg
             .as_deref()
