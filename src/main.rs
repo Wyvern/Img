@@ -107,11 +107,10 @@ fn parse(addr: &str) -> String {
 
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
 
-    let img_sel = Selector::parse(img.unwrap_or("img[src]")).unwrap();
-    let album_sel = album.map(|a| Selector::parse(a).unwrap());
-
     let page = Html::parse_document(&html);
-    let imgs = page.select(&img_sel).collect::<Vec<_>>();
+    let imgs = page
+        .select(&Selector::parse(img.unwrap_or("img[src]")).unwrap())
+        .collect::<Vec<_>>();
     let src = img.map_or("src", |i| {
         if i.trim_end().ends_with(']') {
             &i[i.rfind('[').expect("NO '[' found in <img> selector.") + 1..i.len() - 1]
@@ -138,7 +137,9 @@ fn parse(addr: &str) -> String {
     let slash2dot = t.replace('/', "·");
     t = slash2dot.as_ref();
 
-    let albums = album_sel.map(|sel| page.select(&sel).collect::<Vec<_>>());
+    let albums = album
+        .map(|a| Selector::parse(a).unwrap())
+        .map(|sel| page.select(&sel).collect::<Vec<_>>());
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
 
