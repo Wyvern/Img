@@ -244,7 +244,7 @@
     },
     {
         "Site": "legskr.com",
-        "Img": "div#lightgallery img[data-src]",
+        "Img": "div#lightgallery div[data-src]",
         "Album": "div.albums img"
     },
     {
