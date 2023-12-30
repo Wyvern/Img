@@ -761,13 +761,13 @@ mod img {
             .expect("Json file parse error.")
             .iter()
             .for_each(|s| {
-                if let Some(s) = s["Site"].as_str() {
+                s["Site"].as_str().map(|s| {
                     s.split_terminator(',').for_each(|domain| {
                         if !sites.insert(domain.trim()) {
                             dup_site.push(domain);
                         }
                     })
-                }
+                });
             });
 
         pl!(
