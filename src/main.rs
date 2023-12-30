@@ -720,6 +720,8 @@ mod img {
 
     #[test]
     fn r#try() {
+        //fn(...) -> Pin<Box<Future<Output = Something> + ' _>>
+
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
         let arg = env::args().skip(3).nth(1);
         let addr = arg
@@ -744,6 +746,37 @@ mod img {
     #[test]
     fn run() {
         main();
+    }
+
+    #[test]
+    fn sanity_check_json() {
+        use {collections::*, serde_json::*, sync::*};
+
+        static JSON: OnceLock<Value> = OnceLock::new();
+        let mut sites = HashSet::new();
+        let mut dup_site = vec![];
+
+        JSON.get_or_init(website)
+            .as_array()
+            .expect("Json file parse error.")
+            .iter()
+            .for_each(|s| {
+                if let Some(s) = s["Site"].as_str() {
+                    s.split_terminator(',').for_each(|domain| {
+                        if !sites.insert(domain.trim()) {
+                            dup_site.push(domain);
+                        }
+                    })
+                }
+            });
+
+        pl!(
+            "Todally find {} web sites, with duplicated {} sites.",
+            sites.len(),
+            dup_site.len()
+        );
+        dbg!(&dup_site);
+        assert!(dup_site.is_empty());
     }
 
     #[test]
