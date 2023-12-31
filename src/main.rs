@@ -718,10 +718,9 @@ mod img {
         }
     }
 
+    //fn(...) -> Pin<Box<Future<Output = Something> + '_>>
     #[test]
     fn r#try() {
-        //fn(...) -> Pin<Box<Future<Output = Something> + ' _>>
-
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
         let arg = env::args().skip(3).nth(1);
         let addr = arg

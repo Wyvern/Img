@@ -249,7 +249,7 @@
     },
     {
         "Site": "taotu.org",
-        "Img": "div.piclist a:not([target])[href]",
-        "Album": "div.piclist img"
+        "Img": "div.piclist > a[href]",
+        "Album": "div.piclist > div img"
     }
 ]
