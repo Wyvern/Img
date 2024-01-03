@@ -660,7 +660,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
                 Err(TryRecvError::Empty) => (),
             }
             thread::yield_now();
-            thread::sleep(time::Duration::from_secs_f32(0.2));
+            thread::sleep(time::Duration::from_millis(200));
         }
         // print!("{CL}");
         // o.flush();
@@ -718,7 +718,7 @@ mod img {
         }
     }
 
-    //fn(...) -> Pin<Box<Future<Output = Something> + '_>>
+    // fn(..) -> Pin<Box<Future<Output = Something> + '_>>
     #[test]
     fn r#try() {
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
