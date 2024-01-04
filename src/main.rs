@@ -792,16 +792,16 @@ mod img {
         );
         dbg!(dup_site);
 
-        let dup_sels = img_sel
+        let dup_sel = img_sel
             .keys()
             .filter(|k| img_sel[**k].len() > 1)
             .collect::<Vec<_>>();
         pl!(
-            "Todally find {} Img Sel, with duplicated {} selectors.",
+            "Todally find {} Img Sels, with duplicated {} selectors.",
             img_sel.len(),
-            dup_sels.len()
+            dup_sel.len()
         );
-        dbg!(dup_sels);
+        dbg!(dup_sel);
     }
 
     #[test]

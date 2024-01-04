@@ -268,5 +268,26 @@
         "Site": "photos18.com",
         "Img": "div.imgHolder a[href]",
         "Album": "div.card-body a[href]"
+    },
+    {
+        "Site": "xiannvk.net",
+        "Img": "img[referrerpolicy][data-original]",
+        "Next": "div.link_pages a.next",
+        "Album": "div.u-img img"
+    },
+    {
+        "Site": "everiaclub.com",
+        "Img": "div.mainleft > img[data-original]",
+        "Album": "div.leftp a > img"
+    },
+    {
+        "Site": "3600000.xyz",
+        "Img": "div.entry-content img[file]",
+        "Album": "div.blog-entry-content a > img"
+    },
+    {
+        "Site": "tujigu.top",
+        "Img": "figure.figure img",
+        "Album": "div.text-center a > img"
     }
 ]
