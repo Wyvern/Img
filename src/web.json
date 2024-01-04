@@ -25,7 +25,7 @@
         "Img": "span.photoThum a[href]"
     },
     {
-        "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgyw.pro",
+        "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro",
         "Img": "article.article-content img",
         "Next": "div.pagination a[href]"
     },
@@ -69,11 +69,6 @@
         "Album": "div.loop em"
     },
     {
-        "Site": "yuleba.org,shzx.org",
-        "Img": "div.picture img",
-        "Next": "div.paging a[href]"
-    },
-    {
         "Site": "jrmnt.com,whtaotu.com,mfsft.com,sfnmt.com,jpnst.com,mttuku.com,jpsft.com,ywmmt.com,jpflt.com,mtgqt.com,zpmzt.com",
         "Img": "p[align=\"center\"] img",
         "Next": "div.pagelist a[href]"
@@ -106,7 +101,7 @@
         "Next": "div.page-link"
     },
     {
-        "Site": "fjrx.org,tjrx.org,whrx.org,dv67.com,xinwenba.net",
+        "Site": "yuleba.org,shzx.org,fjrx.org,tjrx.org,whrx.org,dv67.com,xinwenba.net",
         "Img": "div.picture img",
         "Next": "div.paging a"
     },
@@ -224,23 +219,23 @@
     {
         "Site": "lootiu.com",
         "Img": "div.contentme img",
-        "Next":"div.pagination-list a"
+        "Next": "div.pagination-list a"
     },
     {
         "Site": "bdsmcn.com",
         "Img": "div.content-style img",
-        "Album":"a.list-title"
+        "Album": "a.list-title"
     },
     {
         "Site": "rmm8.com",
         "Img": "div.content img",
-        "Next":"div#page a.prepage",
-        "Album":"ul.img img[alt]"
+        "Next": "div#page a.prepage",
+        "Album": "ul.img img[alt]"
     },
     {
         "Site": "girlsteam.club",
         "Img": "div#content img",
-        "Album":"figure img.waitpic"
+        "Album": "figure img.waitpic"
     },
     {
         "Site": "legskr.com",
@@ -251,5 +246,27 @@
         "Site": "taotu.org",
         "Img": "div.piclist > a[href]",
         "Album": "div.piclist > div img"
+    },
+    {
+        "Site": "xiurenwang.me",
+        "Img": "div.intro img",
+        "Album": "div.title a[href]"
+    },
+    {
+        "Site": "meirentu.cc",
+        "Img": "div.content img",
+        "Next": "div.page a[href]",
+        "Album": "div.meta-title"
+    },
+    {
+        "Site": "8se.me,xchina.co,xchina.biz",
+        "Img": "div.photos figure img",
+        "Next": "div.pager a[href]",
+        "Album": "div.item > a[href] > img"
+    },
+    {
+        "Site": "photos18.com",
+        "Img": "div.imgHolder a[href]",
+        "Album": "div.card-body a[href]"
     }
 ]
