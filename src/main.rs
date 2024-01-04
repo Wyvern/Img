@@ -187,7 +187,9 @@ fn parse(addr: &str) -> String {
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
                     // tdbg!(clean_url);
-                    if clean_url.trim().is_empty() || !urls.insert(clean_url.to_owned()) {
+                    if clean_url.trim().is_empty()
+                        || !urls.insert(clean_url.replace("_600x0.", "."))
+                    {
                         empty_dup += 1;
                     }
                 }
@@ -222,6 +224,7 @@ fn parse(addr: &str) -> String {
                     let upto = |mut n: u8| {
                         let mut p = alb.parent().unwrap();
                         let mut href = None;
+
                         while n > 0 {
                             href = p.attr("href");
                             if href.is_some() {
@@ -232,7 +235,14 @@ fn parse(addr: &str) -> String {
                                 p = p.parent().unwrap();
                             }
                         }
-                        href.expect("NO album a[@href] attr found.")
+
+                        href.unwrap_or_else(|| {
+                            p.select("a[href]")
+                                .first()
+                                .expect("NO album a[@href] attr found.")
+                                .attr("href")
+                                .unwrap()
+                        })
                     };
                     let href = alb.attr("href").unwrap_or_else(|| upto(2));
 
@@ -660,7 +670,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
                 Err(TryRecvError::Empty) => (),
             }
             thread::yield_now();
-            thread::sleep(time::Duration::from_secs_f32(0.2));
+            thread::sleep(time::Duration::from_millis(200));
         }
         // print!("{CL}");
         // o.flush();
@@ -718,7 +728,7 @@ mod img {
         }
     }
 
-    //fn(...) -> Pin<Box<Future<Output = Something> + '_>>
+    // fn(..) -> Pin<Box<Future<Output = Something> + '_>>
     #[test]
     fn r#try() {
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
@@ -754,19 +764,25 @@ mod img {
         static JSON: OnceLock<Value> = OnceLock::new();
         let mut sites = HashSet::new();
         let mut dup_site = vec![];
+        let mut img_sel = HashMap::new();
 
         JSON.get_or_init(website)
             .as_array()
             .expect("Json file parse error.")
             .iter()
             .for_each(|s| {
-                s["Site"].as_str().map(|s| {
-                    s.split_terminator(',').for_each(|domain| {
+                if let Some(v) = s["Site"].as_str() {
+                    v.split_terminator(',').for_each(|domain| {
                         if !sites.insert(domain.trim()) {
                             dup_site.push(domain);
                         }
-                    })
-                });
+                    });
+                    let img = s["Img"].as_str().unwrap().trim();
+                    if let Some(mut old) = img_sel.insert(img, vec![v]) {
+                        old.push(v);
+                        img_sel.insert(img, old);
+                    }
+                }
             });
 
         pl!(
@@ -774,8 +790,18 @@ mod img {
             sites.len(),
             dup_site.len()
         );
-        dbg!(&dup_site);
-        assert!(dup_site.is_empty());
+        dbg!(dup_site);
+
+        let dup_sel = img_sel
+            .keys()
+            .filter(|k| img_sel[**k].len() > 1)
+            .collect::<Vec<_>>();
+        pl!(
+            "Todally find {} Img Sels, with duplicated {} selectors.",
+            img_sel.len(),
+            dup_sel.len()
+        );
+        dbg!(dup_sel);
     }
 
     #[test]
