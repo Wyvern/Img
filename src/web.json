@@ -161,9 +161,10 @@
         "Next": "div.fenye a[href]"
     },
     {
-        "Site": "ligui.org",
+        "Site": "ligui.org,counv.com",
         "Img": "div.info-imtg-box img",
-        "Next": "div.pagebar a[href]"
+        "Next": "div.pagebar a[href]",
+        "Album":"span.img-box img"
     },
     {
         "Site": "nsphb.com",
