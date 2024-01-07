@@ -77,6 +77,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let out = process::Command::new("curl")
         .args([
             addr,
+            //"--ssl-auto-client-cert",
             "--compressed",
             "-e",
             host,
@@ -128,8 +129,8 @@ fn parse(addr: &str) -> String {
         t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim();
     });
 
-    let slash2dot = t.replace('/', "·");
-    t = slash2dot.as_ref();
+    let slash2colon = t.replace('/', ":");
+    t = slash2colon.as_ref();
 
     let albums = album.map(|a| page.select(a));
 
