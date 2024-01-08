@@ -267,16 +267,18 @@ fn parse(addr: &str) -> String {
 
                     let mut t = alb.attr("title").unwrap_or_else(|| {
                         alb.attr("alt").unwrap_or_else(|| {
-                            alb.text().map_or_else(
-                                || quit!("NO album title can be found."),
-                                |x| {
-                                    if x.trim().is_empty() {
-                                        quit!("Album title is empty.")
-                                    } else {
-                                        x
-                                    }
-                                },
-                            )
+                            alb.attr("aria-label").unwrap_or_else(|| {
+                                alb.text().map_or_else(
+                                    || quit!("NO album title can be found."),
+                                    |x| {
+                                        if x.trim().is_empty() {
+                                            quit!("Album title is empty.")
+                                        } else {
+                                            x
+                                        }
+                                    },
+                                )
+                            })
                         })
                     });
                     writeln!(

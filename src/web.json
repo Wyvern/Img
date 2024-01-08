@@ -129,7 +129,7 @@
         "Album": "a.item-link div"
     },
     {
-        "Site": "xrmn01.cc,xrmnw.xyz,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,2xiuren.cc",
+        "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,2xiuren.cc",
         "Img": "div.content img",
         "Next": "div.page a[href]",
         "Album": "ul.update_area_lists a"
@@ -290,5 +290,10 @@
         "Site": "tujigu.top",
         "Img": "figure.figure img",
         "Album": "div.text-center a > img"
+    },
+    {
+        "Site": "cosplaytele.com",
+        "Img": "div.gallery-icon img",
+        "Album": "div.image-cover a"
     }
 ]
