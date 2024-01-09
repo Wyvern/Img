@@ -262,25 +262,26 @@ fn parse(addr: &str) -> String {
                     parse_album();
                 } else {
                     use io::*;
-                    let mut stdin = io::stdin();
-                    let mut stdout = io::stdout();
 
-                    let mut t = alb.attr("title").unwrap_or_else(|| {
-                        alb.attr("alt").unwrap_or_else(|| {
-                            alb.attr("aria-label").unwrap_or_else(|| {
-                                alb.text().map_or_else(
-                                    || quit!("NO album title can be found."),
-                                    |x| {
-                                        if x.trim().is_empty() {
-                                            quit!("Album title is empty.")
-                                        } else {
-                                            x
-                                        }
-                                    },
-                                )
-                            })
-                        })
-                    });
+                    let stdin = stdin();
+                    let mut stdout = stdout();
+
+                    let t = ["title", "alt", "aria-label"]
+                        .iter()
+                        .find_map(|a| alb.attr(a))
+                        .unwrap_or_else(|| {
+                            alb.text().map_or_else(
+                                || quit!("NO album title can be found."),
+                                |x| {
+                                    if x.trim().is_empty() {
+                                        quit!("Album title is empty.")
+                                    } else {
+                                        x
+                                    }
+                                },
+                            )
+                        });
+
                     writeln!(
                         stdout,
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
@@ -504,7 +505,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 .first()
                 .map_or(String::default(), |f| f.attr("href").unwrap());
         } else {
-            next_link = nexts[0].attr("href").unwrap();
+            next_link = element.attr("href").unwrap();
         }
     } else {
         let element = &nexts[0];
@@ -513,8 +514,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             let mut rest = tags.split(|tag| {
                 tag.children().first().map_or(
                     tag.tag().unwrap() == "span"
-                        || tag.attr("class").is_some_and(|c| c.contains("current")),
-                    |f| f.attr("class").unwrap().contains("current"),
+                        || tag.attr("class").is_some_and(|c| c.contains("cur")),
+                    |f| f.attr("class").unwrap().contains("cur"),
                 )
             });
             let s = rest.next_back().unwrap();
@@ -559,9 +560,10 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     .attr("href")
                     .expect("NO [href] attr found in <next> link."),
                 None => {
-                    let pos = nexts
-                        .iter()
-                        .rposition(|e| cur.trim().ends_with(&e.attr("href").unwrap().trim()));
+                    let pos = nexts.iter().rposition(|e| {
+                        let href = e.attr("href").unwrap();
+                        cur.trim().ends_with(href.trim()) || href.trim() == "#"
+                    });
                     match pos {
                         Some(p) => {
                             if p < nexts.len() - 1 {
@@ -797,7 +799,14 @@ mod img {
 
         let dup_sel = img_sel
             .keys()
-            .filter(|k| img_sel[**k].len() > 1)
+            .filter_map(|k| {
+                if img_sel[*k].len() > 1 {
+                    Some((*k, img_sel[*k].len()))
+                } else {
+                    None
+                }
+            })
+            // .map(|(k, l)| format!("`{k}` : {l}"))
             .collect::<Vec<_>>();
         pl!(
             "Todally find {} Img Sels, with duplicated {} selectors.",

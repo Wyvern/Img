@@ -124,7 +124,7 @@
         "Img": "div#rl-gallery-1 a[href]"
     },
     {
-        "Site": "mmm.red",
+        "Site": "mmm.red,mmm666.red",
         "Img": "div[data-fancybox=\"gallery\"] img[data-original]",
         "Album": "a.item-link div"
     },
@@ -295,5 +295,10 @@
         "Site": "cosplaytele.com",
         "Img": "div.gallery-icon img",
         "Album": "div.image-cover a"
+    },
+    {
+        "Site": "guixiu.org",
+        "Img": "article#lightgallery img",
+        "Next": "ul.ipage a"
     }
 ]
