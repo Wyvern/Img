@@ -1,4 +1,4 @@
-use {std::*, util::*};
+use {ops::*, std::*, util::*};
 
 mod util;
 
@@ -128,9 +128,6 @@ fn parse(addr: &str) -> String {
     (0..2).for_each(|_| {
         t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim();
     });
-
-    let slash2colon = t.replace('/', ":");
-    t = slash2colon.as_ref();
 
     let albums = album.map(|a| page.select(a));
 
@@ -332,8 +329,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if cfg!(all(test, not(feature = "download"))) {
         return;
     }
-
-    let path = path::Path::new(dir);
+    let slash2colon = dir.replace('/', ":");
+    let path = path::Path::new(slash2colon.deref());
     let create_dir = || {
         if !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {

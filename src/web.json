@@ -129,7 +129,7 @@
         "Album": "a.item-link div"
     },
     {
-        "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,2xiuren.cc",
+        "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr09.vip,Xiurenba.Com,2xiuren.cc",
         "Img": "div.content img",
         "Next": "div.page a[href]",
         "Album": "ul.update_area_lists a"
@@ -164,7 +164,7 @@
         "Site": "ligui.org,counv.com",
         "Img": "div.info-imtg-box img",
         "Next": "div.pagebar a[href]",
-        "Album":"span.img-box img"
+        "Album": "span.img-box img"
     },
     {
         "Site": "nsphb.com",
@@ -299,6 +299,12 @@
     {
         "Site": "guixiu.org",
         "Img": "article#lightgallery img",
-        "Next": "ul.ipage a"
+        "Next": "ul.ipage a",
+        "Album": "div.list-img img"
+    },
+    {
+        "Site": "imgcup.com",
+        "Img": "div.item-gallery-masonry a[href]",
+        "Album": "div.thumbnail a[href]"
     }
 ]
