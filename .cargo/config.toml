@@ -166,6 +166,7 @@ rustflags = [
     "-Zstaticlib-prefer-dynamic",
     "-Znext-solver=coherence",
     "-Zcross-crate-inline-threshold=yes",
+    "-Zuse-sync-unwind",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -231,6 +232,7 @@ rustflags = [
     "-Znext-solver=coherence",
     "-Zpanic-in-drop=abort",
     "-Zcross-crate-inline-threshold=yes",
+    "-Zuse-sync-unwind",
 
     "-Aunused",
     "-Anonstandard_style",
