@@ -184,10 +184,18 @@ fn parse(addr: &str) -> String {
                     let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
-                    // tdbg!(clean_url);
-                    if clean_url.trim().is_empty()
-                        || !urls.insert(clean_url.replace("_600x0.", "."))
+                    let [dash, dot] = ['-', '.'].map(|c| clean_url.rfind(c));
+
+                    let r = if dash.is_some()
+                        && dot.is_some()
+                        && clean_url[dash.unwrap()..dot.unwrap()].contains('x')
                     {
+                        clean_url.replace(&clean_url[dash.unwrap()..dot.unwrap()], "")
+                    } else {
+                        clean_url.to_owned()
+                    };
+                    // tdbg!(r);
+                    if r.trim().is_empty() || !urls.insert(r) {
                         empty_dup += 1;
                     }
                 }
