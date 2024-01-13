@@ -192,7 +192,7 @@ fn parse(addr: &str) -> String {
                     {
                         clean_url.replace(&clean_url[dash.unwrap()..dot.unwrap()], "")
                     } else {
-                        clean_url.to_owned()
+                        clean_url.to_string()
                     };
                     // tdbg!(r);
                     if r.trim().is_empty() || !urls.insert(r) {
@@ -375,7 +375,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
             {
-                need_file_type_detection.push(name.to_owned());
+                need_file_type_detection.push(name.to_string());
             }
             #[cfg(not(feature = "infer"))]
             {
@@ -472,7 +472,7 @@ fn magic_number_type(pb: path::PathBuf) {
 
     let t = infer::get(&buf);
     if let Some(ext) = t {
-        let mut new = pb.to_owned();
+        let mut new = pb.to_string();
         new.set_extension(ext.extension());
         fs::rename(pb, new);
     } else {
@@ -746,7 +746,7 @@ mod img {
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
-
+        
         parse(addr);
     }
 
