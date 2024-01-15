@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use {ops::*, std::*, util::*};
 
 mod util;
@@ -99,7 +101,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         );
     }
     let res = String::from_utf8_lossy(&out.stdout);
-    (res.to_string(), host_info, scheme_host)
+    (res.into_owned(), host_info, scheme_host)
 }
 
 ///Parse photos in web url
@@ -188,7 +190,7 @@ fn parse(addr: &str) -> String {
                         [Some(dash), Some(dot)] if clean_url[dash..dot].contains('x') => {
                             clean_url.replace(&clean_url[dash..dot], "")
                         }
-                        _ => clean_url.to_string(),
+                        _ => clean_url.to_owned(),
                     };
                     // tdbg!(r);
                     if r.trim().is_empty() || !urls.insert(r) {
@@ -371,7 +373,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
             {
-                need_file_type_detection.push(name.to_string());
+                need_file_type_detection.push(name.to_owned());
             }
             #[cfg(not(feature = "infer"))]
             {
