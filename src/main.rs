@@ -184,15 +184,11 @@ fn parse(addr: &str) -> String {
                     let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
-                    let [dash, dot] = ['-', '.'].map(|c| clean_url.rfind(c));
-
-                    let r = if dash.is_some()
-                        && dot.is_some()
-                        && clean_url[dash.unwrap()..dot.unwrap()].contains('x')
-                    {
-                        clean_url.replace(&clean_url[dash.unwrap()..dot.unwrap()], "")
-                    } else {
-                        clean_url.to_string()
+                    let r = match ['-', '.'].map(|c| clean_url.rfind(c)) {
+                        [Some(dash), Some(dot)] if clean_url[dash..dot].contains('x') => {
+                            clean_url.replace(&clean_url[dash..dot], "")
+                        }
+                        _ => clean_url.to_string(),
                     };
                     // tdbg!(r);
                     if r.trim().is_empty() || !urls.insert(r) {
@@ -746,7 +742,7 @@ mod img {
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
-        
+
         parse(addr);
     }
 

@@ -17,6 +17,14 @@ name = "color"
 path = "src/color.rs"
 test = true
 
+[package.metadata.docs.rs]
+rustdoc-args = [
+    "-Z",
+    "unstable-options",
+    "--playground-url",
+    "https://play.rust-lang.org",
+]
+
 [dependencies]
 crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
