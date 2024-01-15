@@ -1,4 +1,6 @@
-use {std::*, util::*};
+use std::borrow::Cow;
+
+use {ops::*, std::*, util::*};
 
 mod util;
 
@@ -99,7 +101,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         );
     }
     let res = String::from_utf8_lossy(&out.stdout);
-    (res.to_string(), host_info, scheme_host)
+    (res.into_owned(), host_info, scheme_host)
 }
 
 ///Parse photos in web url
@@ -128,9 +130,6 @@ fn parse(addr: &str) -> String {
     (0..2).for_each(|_| {
         t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim();
     });
-
-    let slash2colon = t.replace('/', ":");
-    t = slash2colon.as_ref();
 
     let albums = album.map(|a| page.select(a));
 
@@ -187,10 +186,14 @@ fn parse(addr: &str) -> String {
                     let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
-                    // tdbg!(clean_url);
-                    if clean_url.trim().is_empty()
-                        || !urls.insert(clean_url.replace("_600x0.", "."))
-                    {
+                    let r = match ['-', '.'].map(|c| clean_url.rfind(c)) {
+                        [Some(dash), Some(dot)] if clean_url[dash..dot].contains('x') => {
+                            clean_url.replace(&clean_url[dash..dot], "")
+                        }
+                        _ => clean_url.to_owned(),
+                    };
+                    // tdbg!(r);
+                    if r.trim().is_empty() || !urls.insert(r) {
                         empty_dup += 1;
                     }
                 }
@@ -332,8 +335,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if cfg!(all(test, not(feature = "download"))) {
         return;
     }
-
-    let path = path::Path::new(dir);
+    let slash2colon = dir.replace('/', ":");
+    let path = path::Path::new(slash2colon.deref());
     let create_dir = || {
         if !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
@@ -467,7 +470,7 @@ fn magic_number_type(pb: path::PathBuf) {
 
     let t = infer::get(&buf);
     if let Some(ext) = t {
-        let mut new = pb.to_owned();
+        let mut new = pb.to_string();
         new.set_extension(ext.extension());
         fs::rename(pb, new);
     } else {
