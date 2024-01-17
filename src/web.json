@@ -135,8 +135,9 @@
         "Album": "ul.update_area_lists a"
     },
     {
-        "Site": "yaomitao.com",
-        "Img": "img.aligncenter"
+        "Site": "yaomitao.com,deepxt.top,deepxt.cfd,deepxt.sbs,deepxt.com",
+        "Img": "img.aligncenter",
+        "Album": "div.entry-media a[href]"
     },
     {
         "Site": "meituss.com",
@@ -306,5 +307,16 @@
         "Site": "imgcup.com",
         "Img": "div.item-gallery-masonry a[href]",
         "Album": "div.thumbnail a[href]"
+    },
+    {
+        "Site": "larose.vip,zdgtl.com",
+        "Img": "img.aligncenter.size-full",
+        "Album": "figure a[href] img"
+    },
+    {
+        "Site": "modelsvibe.com",
+        "Img": "p img.alignnone.size-full",
+        "Next": "footer span.current",
+        "Album": "div.td-module-thumb a[title]"
     }
 ]
