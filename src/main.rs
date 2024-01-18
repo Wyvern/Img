@@ -107,12 +107,9 @@ fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.unwrap_or("img[src]"));
-    let src = img.map_or("src", |i| {
-        if i.trim_end().ends_with(']') {
-            &i[i.rfind('[').expect("NO '[' found in <img> selector.") + 1..i.len() - 1]
-        } else {
-            "src"
-        }
+    let src = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
+        [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
+        _ => "src",
     });
 
     let titles = page.select("title");
