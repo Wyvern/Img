@@ -167,6 +167,7 @@ rustflags = [
     "-Znext-solver=coherence",
     "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
+    "-Zno-implied-bounds-compat",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -233,6 +234,7 @@ rustflags = [
     "-Zpanic-in-drop=abort",
     "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
+    "-Zno-implied-bounds-compat",
 
     "-Aunused",
     "-Anonstandard_style",
