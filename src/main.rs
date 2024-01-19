@@ -722,7 +722,7 @@ mod img {
         }
     }
 
-    // fn(..) -> Pin<Box<Future<Output = Something> + '_>>
+    // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
     #[test]
     fn r#try() {
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
