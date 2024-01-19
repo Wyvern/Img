@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use {ops::*, std::*, util::*};
 
 mod util;
@@ -109,12 +107,9 @@ fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.unwrap_or("img[src]"));
-    let src = img.map_or("src", |i| {
-        if i.trim_end().ends_with(']') {
-            &i[i.rfind('[').expect("NO '[' found in <img> selector.") + 1..i.len() - 1]
-        } else {
-            "src"
-        }
+    let src = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
+        [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
+        _ => "src",
     });
 
     let titles = page.select("title");
@@ -193,7 +188,7 @@ fn parse(addr: &str) -> String {
                         _ => clean_url.to_owned(),
                     };
                     // tdbg!(r);
-                    if r.trim().is_empty() || !urls.insert(r) {
+                    if r.trim().is_empty() || !urls.insert(canonicalize_url(r)) {
                         empty_dup += 1;
                     }
                 }
@@ -206,18 +201,9 @@ fn parse(addr: &str) -> String {
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
+
             if !urls.is_empty() {
-                download(
-                    t,
-                    urls.into_iter().map(|url| {
-                        if url.starts_with("data:image/") {
-                            url
-                        } else {
-                            canonicalize_url(url)
-                        }
-                    }),
-                    host,
-                );
+                download(t, urls, host);
             }
         }
         (true, false) => {
@@ -331,7 +317,7 @@ fn parse(addr: &str) -> String {
 }
 
 ///Perform photo download operation
-fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
+fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
     if cfg!(all(test, not(feature = "download"))) {
         return;
     }
@@ -736,7 +722,7 @@ mod img {
         }
     }
 
-    // fn(..) -> Pin<Box<Future<Output = Something> + '_>>
+    // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
     #[test]
     fn r#try() {
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
