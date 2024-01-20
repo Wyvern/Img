@@ -318,5 +318,17 @@
         "Img": "p img.alignnone.size-full",
         "Next": "footer span.current",
         "Album": "div.td-module-thumb a[title]"
+    },
+    {
+        "Site": "shoucangpai88.com",
+        "Img": "article.article-content img",
+        "Next": "div.article-paging span.current",
+        "Album": "article.excerpt h2 a"
+    },
+    {
+        "Site": "1plq.com",
+        "Img": "div#post_content img",
+        "Next": "div.pagelist span",
+        "Album": "div.thumbnail a[title]"
     }
 ]

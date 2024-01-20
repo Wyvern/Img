@@ -721,7 +721,7 @@ mod img {
             hq(a)
         }
     }
-
+    
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
     #[test]
     fn r#try() {
