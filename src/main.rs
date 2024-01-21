@@ -660,8 +660,8 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             print!("{BEG}{char}");
             o.flush();
             match r.try_recv() {
-                Ok(_) | Err(TryRecvError::Disconnected) => break 'l,
                 Err(TryRecvError::Empty) => (),
+                _ => break 'l,
             }
             thread::yield_now();
             thread::sleep(time::Duration::from_millis(200));
@@ -721,7 +721,7 @@ mod img {
             hq(a)
         }
     }
-    
+
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
     #[test]
     fn r#try() {

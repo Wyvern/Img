@@ -168,6 +168,7 @@ rustflags = [
     "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
     "-Zno-implied-bounds-compat",
+    "-Zcollapse-macro-debuginfo=no",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -235,6 +236,7 @@ rustflags = [
     "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
     "-Zno-implied-bounds-compat",
+    "-Zcollapse-macro-debuginfo=no",
 
     "-Aunused",
     "-Anonstandard_style",
