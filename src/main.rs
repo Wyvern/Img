@@ -501,10 +501,12 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         if element.tag().unwrap() == "div" && nexts.len() == 2 {
             let tags = element.children();
             let mut rest = tags.split(|tag| {
-                tag.children().first().map_or(
-                    tag.tag().unwrap() == "span"
-                        || tag.attr("class").is_some_and(|c| c.contains("cur")),
-                    |f| f.attr("class").unwrap().contains("cur"),
+                tag.children().first().map_or_else(
+                    || {
+                        tag.tag().unwrap() == "span"
+                            || tag.attr("class").is_some_and(|c| c.contains("cur"))
+                    },
+                    |f| f.attr("class").is_some_and(|c| c.contains("cur")),
                 )
             });
             let s = rest.next_back().unwrap();
@@ -660,8 +662,8 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             print!("{BEG}{char}");
             o.flush();
             match r.try_recv() {
-                Ok(_) | Err(TryRecvError::Disconnected) => break 'l,
                 Err(TryRecvError::Empty) => (),
+                _ => break 'l,
             }
             thread::yield_now();
             thread::sleep(time::Duration::from_millis(200));
@@ -726,7 +728,7 @@ mod img {
     #[test]
     fn r#try() {
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
-        let arg = env::args().skip(3).nth(1);
+        let arg = env::args().nth(4);
         let addr = arg
             .as_deref()
             .unwrap_or("http://www.beautyleg6.com/siwameitui/");
