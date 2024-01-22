@@ -106,11 +106,6 @@
         "Next": "div.paging a"
     },
     {
-        "Site": "zhainq.net,3i2n.com",
-        "Img": "article.article-content img",
-        "Next": "div.article-paging span.post-page-numbers.current"
-    },
-    {
         "Site": "hotgirlpix.com",
         "Img": "div.postImageContainer img",
         "Next": "div#singlePostPagination span"
@@ -129,7 +124,7 @@
         "Album": "a.item-link div"
     },
     {
-        "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr09.vip,Xiurenba.Com,2xiuren.cc",
+        "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr09.vip,xr08.vip,Xiurenba.com,2xiuren.cc,秀人集.com",
         "Img": "div.content img",
         "Next": "div.page a[href]",
         "Album": "ul.update_area_lists a"
@@ -320,15 +315,20 @@
         "Album": "div.td-module-thumb a[title]"
     },
     {
-        "Site": "shoucangpai88.com",
+        "Site": "shoucangpai88.com,0k3f.com,zhainq.net,3i2n.com",
         "Img": "article.article-content img",
         "Next": "div.article-paging span.current",
-        "Album": "article.excerpt h2 a"
+        "Album": "article.excerpt h2 a[href]"
     },
     {
         "Site": "1plq.com",
         "Img": "div#post_content img",
         "Next": "div.pagelist span",
         "Album": "div.thumbnail a[title]"
+    },
+    {
+        "Site": "bisipic.xyz",
+        "Img": "ignore_js_op > img[file]",
+        "Album": "a[href] h2"
     }
 ]
