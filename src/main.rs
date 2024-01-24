@@ -167,7 +167,10 @@ fn parse(addr: &str) -> String {
             let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
-                let src = img.attr(src).expect("Invalid img[src] selector!");
+                let src = ["data-src", src]
+                    .iter()
+                    .find_map(|&a| img.attr(a))
+                    .expect("Invalid img[src] selector!");
 
                 if src.starts_with("data:image/") {
                     if cfg!(feature = "embed") {
@@ -688,7 +691,7 @@ mod img {
 
     #[test]
     fn htmlq() {
-        let addr = "visualstudio.com";
+        let addr = "https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7689-tang-an-qi/";
         let (html, [img, .., album], _) = get_html(addr);
         use process::*;
 

@@ -1,12 +1,7 @@
 [
     {
-        "Site": "goddess247.com,girldreamy.com,girlsweetie.com,girlsexy247.com,xasia.pics,bestprettygirl.com",
+        "Site": "goddess247.com,girldreamy.com,girlsweetie.com,girlsexy247.com,xasia.pics,bestprettygirl.com,bestgirlsexy.com",
         "Img": "img.aligncenter.size-full",
-        "Album": "div.elementor-post__text a[href]"
-    },
-    {
-        "Site": "bestgirlsexy.com",
-        "Img": "img.aligncenter.size-full[data-src]",
         "Album": "div.elementor-post__text a[href]"
     },
     {
@@ -59,7 +54,7 @@
     },
     {
         "Site": "xia44.com,zei77.com,zan63.com,tai69.com,zei99.com,zai66.com,yan44.com,zei33.com,wai77.com,zan23.com,wai55.com,xie69.com",
-        "Img": "div.spotlight.text-center[data-src]",
+        "Img": "div.spotlight.text-center",
         "Next": "div.single-nav-links span"
     },
     {
@@ -71,12 +66,14 @@
     {
         "Site": "jrmnt.com,whtaotu.com,mfsft.com,sfnmt.com,jpnst.com,mttuku.com,jpsft.com,ywmmt.com,jpflt.com,mtgqt.com,zpmzt.com",
         "Img": "p[align=\"center\"] img",
-        "Next": "div.pagelist a[href]"
+        "Next": "div.pagelist a[href]",
+        "Album": "div.title a[href]"
     },
     {
         "Site": "sxchinesegirlz.one,sxchinesegirlz01.xyz",
         "Img": "figure.wp-block-image.size-large img",
-        "Next": "div.pagination a[href]"
+        "Next": "div.pagination a[href]",
+        "Album": "h2 a[href]"
     },
     {
         "Site": "xiuren.biz",
@@ -124,7 +121,7 @@
         "Album": "a.item-link div"
     },
     {
-        "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr09.vip,xr08.vip,Xiurenba.com,2xiuren.cc,秀人集.com",
+        "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr09.vip,xr08.vip,xr07.vip,Xiurenba.com,2xiuren.cc,秀人集.com",
         "Img": "div.content img",
         "Next": "div.page a[href]",
         "Album": "ul.update_area_lists a"
@@ -136,7 +133,7 @@
     },
     {
         "Site": "meituss.com",
-        "Img": "li figure img[data-src]"
+        "Img": "li figure img"
     },
     {
         "Site": "z227m.cc",
@@ -164,13 +161,8 @@
     },
     {
         "Site": "nsphb.com",
-        "Img": "div.article-content img[data-src]",
+        "Img": "div.article-content img",
         "Next": "span.current"
-    },
-    {
-        "Site": "jaoren.com",
-        "Img": "div#post_content img",
-        "Next": "div.pagelist span"
     },
     {
         "Site": "beautyleg6.com",
@@ -321,7 +313,7 @@
         "Album": "article.excerpt h2 a[href]"
     },
     {
-        "Site": "1plq.com",
+        "Site": "1plq.com,jaoren.com",
         "Img": "div#post_content img",
         "Next": "div.pagelist span",
         "Album": "div.thumbnail a[title]"
