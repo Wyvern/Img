@@ -115,6 +115,9 @@ target-applies-to-host = true
 host-config = true
 trim-paths = true
 gc = true
+precise-pre-release = true
+git = { shallow_index = true, shallow_deps = true }
+gitoxide = { checkout = true, fetch = true, internal_use_git2 = true }
 # build-std = [
 #     "core",
 #     "std",
@@ -182,13 +185,6 @@ rustflags = [
 incremental = true
 rustc-wrapper = "sccache"
 rustflags = ["-Clink-args=-fno-async-exceptions"]
-
-[unstable.gitoxide]
-checkout = true
-fetch = true
-shallow_index = true
-shallow_deps = true
-internal_use_git2 = true
 
 [package.metadata.docs.rs]
 all-features = true
