@@ -211,7 +211,7 @@ mod macros {
 
 pub fn pause(msg: &str) {
     use io::*;
-    let mut o = stdout();
+    let mut o = stdout().lock();
     write!(
         o,
         "{}",
@@ -246,7 +246,7 @@ const fn is_target_little_endian() -> bool {
 mod test {
     use super::*;
     use crate::*;
-    
+
     #[test]
     fn dyn_any() {
         tdbg!(is_target_little_endian());
