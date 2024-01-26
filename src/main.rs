@@ -644,10 +644,9 @@ fn save_to_file(data: &str) {
 fn image_type(header: &str) -> &str {
     let mut offset = &header[header.find('/').unwrap() + 1..];
 
-    &offset[..offset
-        .find('+')
-        .or_else(|| offset.find(';'))
-        .or_else(|| offset.find(','))
+    &offset[..['+', ';', ',']
+        .iter()
+        .find_map(|&x| offset.find(x))
         .unwrap_or(offset.len())]
 }
 
