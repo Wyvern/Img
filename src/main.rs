@@ -214,31 +214,30 @@ fn parse(addr: &str) -> String {
 
             for (i, alb) in albums.unwrap().iter().enumerate() {
                 let mut parse_album = || {
-                    let href = alb.attr("href").unwrap_or_else(|| {
-                        (|mut n: u8| {
-                            let mut p = alb.parent().unwrap();
-                            let mut href = None;
+                    let upto = |mut n: u8| {
+                        let mut p = alb.parent().unwrap();
+                        let mut href = None;
 
-                            while n > 0 {
-                                href = p.attr("href");
-                                if href.is_some() {
-                                    break;
-                                }
-                                n -= 1;
-                                if n > 0 {
-                                    p = p.parent().unwrap();
-                                }
+                        while n > 0 {
+                            href = p.attr("href");
+                            if href.is_some() {
+                                break;
                             }
+                            n -= 1;
+                            if n > 0 {
+                                p = p.parent().unwrap();
+                            }
+                        }
 
-                            href.unwrap_or_else(|| {
-                                p.select("a[href]")
-                                    .first()
-                                    .expect("NO album a[@href] attr found.")
-                                    .attr("href")
-                                    .unwrap()
-                            })
-                        })(2)
-                    });
+                        href.unwrap_or_else(|| {
+                            p.select("a[href]")
+                                .first()
+                                .expect("NO album a[@href] attr found.")
+                                .attr("href")
+                                .unwrap()
+                        })
+                    };
+                    let href = alb.attr("href").unwrap_or_else(|| upto(2));
 
                     if !href.is_empty() {
                         let album_url = canonicalize_url(href);
