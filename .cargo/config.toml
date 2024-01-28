@@ -133,7 +133,7 @@ gitoxide = { checkout = true, fetch = true, internal_use_git2 = true }
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
+    "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
@@ -198,7 +198,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
+    "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
@@ -259,6 +259,9 @@ rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(any(target_vendor="apple",target_os=windows))']
 rustflags = ["-Clink-args=-fno-async-exceptions"]
+
+[target.'cfg(target_os="linux")']
+rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_env="gnu",target_env="musl"))']
 rustflags = ["-Clinker-flavor=gnu-lld-cc"]
