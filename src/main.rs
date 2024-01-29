@@ -217,7 +217,7 @@ fn parse(addr: &str) -> String {
                     let href = alb.attr("href").unwrap_or_else(|| {
                         let mut p = alb.parent().unwrap();
                         let mut href = None;
-                        let mut n=2;
+                        let mut n = 2;
                         while n > 0 {
                             href = p.attr("href");
                             if href.is_some() {
@@ -457,16 +457,21 @@ fn magic_number_type(pb: path::PathBuf) {
     f.read_exact(&mut buf);
 
     let t = infer::get(&buf);
-    if let Some(ext) = t {
-        let mut new = pb.to_string();
-        new.set_extension(ext.extension());
-        fs::rename(pb, new);
-    } else {
-        let str = String::from_utf8_lossy(&buf);
-        if str.contains("<svg") {
-            fs::rename(&pb, format!("{}.svg", pb.display()));
-        }
-    }
+    fs::rename(
+        pb,
+        pb.with_extension(
+            t.unwrap_or_else(|| {
+                let str = String::from_utf8_lossy(&buf);
+                if str.contains("<svg") {
+                    "svg"
+                } else {
+                    ""
+                }
+            })
+            .extension(),
+        ),
+    )
+    .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
 
 /// Check `next` selector link page info

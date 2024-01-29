@@ -2,7 +2,6 @@
 name = "Img"
 version = "1.0.0"
 edition = "2021"
-resolver = "2"
 # default-run = "Img"
 
 [features]
@@ -16,14 +15,6 @@ embed = ["dep:base64", "dep:url-escape"]
 name = "color"
 path = "src/color.rs"
 test = true
-
-[package.metadata.docs.rs]
-rustdoc-args = [
-    "-Z",
-    "unstable-options",
-    "--playground-url",
-    "https://play.rust-lang.org",
-]
 
 [dependencies]
 crabquery = { version = "*", default-features = false }
