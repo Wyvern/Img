@@ -389,33 +389,47 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
 
     if cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl
-            .args([
-                "--parallel-immediate",
-                "--compressed",
-                "-e",
-                host,
-                "-A",
-                "Mozilla Firefox",
-                if cfg!(debug_assertions) {
-                    "-fsSL"
-                } else {
-                    "-fsL"
-                },
-            ])
-            .spawn();
+        let cmd = curl.args([
+            "--parallel-immediate",
+            "--compressed",
+            "-e",
+            host,
+            "-A",
+            "Mozilla Firefox",
+            if cfg!(debug_assertions) {
+                "-fsSL"
+            } else {
+                "-fsL"
+            },
+        ]);
+        #[cfg(not(feature = "infer"))]
+        cmd.spawn();
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            cmd.unwrap().wait();
+            cmd.output();
             for f in need_file_type_detection {
                 let file = path.join(&f);
                 if file.exists() {
                     magic_number_type(file);
                 }
             }
+
+            // let p = path.to_owned();
+            // let h = host.to_owned();
+
+            // thread::spawn(move || {
+            //     cmd.output();
+            //     for f in need_file_type_detection {
+            //         let file = p.join(&f);
+            //         if file.exists() {
+            //             magic_number_type(file);
+            //         }
+            //     }
+            // });
         }
     }
+    // thread::sleep(time::Duration::from_secs(3));
 }
 
 /// Get `url` content header info to generate full `name.ext`
@@ -458,6 +472,7 @@ fn magic_number_type(pb: path::PathBuf) {
     f.read_exact(&mut buf);
 
     let t = infer::get(&buf);
+    // tdbg!(&t);
     fs::rename(
         &pb,
         pb.with_extension(t.map_or_else(
