@@ -178,7 +178,10 @@ rustflags = [
 # rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
-rustflags = ["-Clink-args=-fno-async-exceptions"]
+rustflags = ["-Clink-arg=-fno-async-exceptions"]
+
+[target.'cfg(all(target_vendor="apple",target_arch="x86_64"))']
+rustflags = ["-Ctarget-cpu=x86-64-v4"]
 
 [target.'cfg(any(target_env="gnu",target_env="musl"))']
 # rustflags = ["-Clinker-flavor=gnu-lld-cc"]
