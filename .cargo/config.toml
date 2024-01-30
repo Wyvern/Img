@@ -174,7 +174,7 @@ rustflags = [
     "-Zno-implied-bounds-compat",
     "-Zcollapse-macro-debuginfo=no",
     "-Zgraphviz-dark-mode",
-    "-Zhas-thread-local",
+    # "-Zhas-thread-local",
     "-Zshell-argfiles",
 
     "-Aunused",
@@ -239,7 +239,7 @@ rustflags = [
     "-Zno-implied-bounds-compat",
     "-Zcollapse-macro-debuginfo=no",
     "-Zgraphviz-dark-mode",
-    "-Zhas-thread-local",
+    # "-Zhas-thread-local",
     "-Zshell-argfiles",
 
     "-Aunused",
