@@ -110,9 +110,9 @@ jobs:
           #time cargo br
           #time cargo l
 
-          time cargo s x86_64h-apple-darwin
           time cargo s aarch64-apple-darwin
           time cargo s arm64e-apple-darwin
+          time cargo s x86_64h-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
