@@ -2,7 +2,6 @@
 name = "Img"
 version = "1.0.0"
 edition = "2021"
-# default-run = "Img"
 
 [features]
 default = ["curl"]
@@ -19,6 +18,8 @@ test = true
 [dependencies]
 crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
+
 base64 = { version = "*", default-features = false, optional = true }
 url-escape = { version = "*", default-features = false, optional = true }
+
 infer = { version = "*", default-features = false, optional = true }

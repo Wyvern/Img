@@ -1,4 +1,4 @@
-use {ops::*, std::*, util::*};
+use {std::*, util::*};
 
 mod util;
 
@@ -190,7 +190,7 @@ fn parse(addr: &str) -> String {
                         }
                         _ => clean_url.to_owned(),
                     };
-                    // tdbg!(r);
+                    // tdbg!(&r);
                     if r.trim().is_empty() || !urls.insert(canonicalize_url(r)) {
                         empty_dup += 1;
                     }
@@ -206,6 +206,7 @@ fn parse(addr: &str) -> String {
             }
 
             if !urls.is_empty() {
+                // tdbg!(&urls);
                 download(t, urls, host);
             }
         }
@@ -324,7 +325,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
         return;
     }
     let slash2colon = dir.replace('/', ":");
-    let path = path::Path::new(slash2colon.deref());
+    let path = path::Path::new(&slash2colon);
     let create_dir = || {
         if !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
@@ -458,18 +459,18 @@ fn magic_number_type(pb: path::PathBuf) {
 
     let t = infer::get(&buf);
     fs::rename(
-        pb,
-        pb.with_extension(
-            t.unwrap_or_else(|| {
+        &pb,
+        pb.with_extension(t.map_or_else(
+            || {
                 let str = String::from_utf8_lossy(&buf);
                 if str.contains("<svg") {
                     "svg"
                 } else {
                     ""
                 }
-            })
-            .extension(),
-        ),
+            },
+            |ty| ty.extension(),
+        )),
     )
     .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
