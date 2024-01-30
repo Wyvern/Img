@@ -256,10 +256,10 @@ rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
-rustflags = ["-Clink-args=-fno-async-exceptions"]
+rustflags = ["-Clink-arg=-fno-async-exceptions"]
 
-[target.'cfg(all(target_vendor="apple",target_arch="x86_64"))']
-rustflags = ["-Ctarget-cpu=x86-64-v4", "-Ztune-cpu=x86-64-v4"]
+# [target.'cfg(all(target_vendor="apple",target_arch="x86_64"))']
+# rustflags = ["-Ctarget-cpu=x86-64-v4", "-Ztune-cpu=x86-64-v4"]
 
 [target.'cfg(target_os="linux")']
 rustflags = ["-Zrelax-elf-relocations"]
