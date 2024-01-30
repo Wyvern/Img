@@ -84,7 +84,7 @@ jobs:
 
   macOS:
     name: Building on macOS.
-    runs-on: macos-13
+    runs-on: macos-14
 
     steps:
       - name: Disable macos spotlight index
@@ -108,8 +108,8 @@ jobs:
         run: |
           cargo update
 
-          time cargo l --target x86_64-apple-darwin
           time cargo l --target aarch64-apple-darwin
+          time cargo l --target x86_64-apple-darwin
           # time cargo l --target arm64e-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal

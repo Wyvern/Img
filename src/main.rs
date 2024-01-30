@@ -1,4 +1,4 @@
-use {ops::*, std::*, util::*};
+use {std::*, util::*};
 
 mod util;
 
@@ -190,7 +190,7 @@ fn parse(addr: &str) -> String {
                         }
                         _ => clean_url.to_owned(),
                     };
-                    // tdbg!(r);
+                    // tdbg!(&r);
                     if r.trim().is_empty() || !urls.insert(canonicalize_url(r)) {
                         empty_dup += 1;
                     }
@@ -206,6 +206,7 @@ fn parse(addr: &str) -> String {
             }
 
             if !urls.is_empty() {
+                // tdbg!(&urls);
                 download(t, urls, host);
             }
         }
@@ -214,10 +215,10 @@ fn parse(addr: &str) -> String {
 
             for (i, alb) in albums.unwrap().iter().enumerate() {
                 let mut parse_album = || {
-                    let upto = |mut n: u8| {
+                    let href = alb.attr("href").unwrap_or_else(|| {
                         let mut p = alb.parent().unwrap();
                         let mut href = None;
-
+                        let mut n = 2;
                         while n > 0 {
                             href = p.attr("href");
                             if href.is_some() {
@@ -236,8 +237,7 @@ fn parse(addr: &str) -> String {
                                 .attr("href")
                                 .unwrap()
                         })
-                    };
-                    let href = alb.attr("href").unwrap_or_else(|| upto(2));
+                    });
 
                     if !href.is_empty() {
                         let album_url = canonicalize_url(href);
@@ -325,7 +325,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
         return;
     }
     let slash2colon = dir.replace('/', ":");
-    let path = path::Path::new(slash2colon.deref());
+    let path = path::Path::new(&slash2colon);
     let create_dir = || {
         if !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
@@ -389,33 +389,47 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
 
     if cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl
-            .args([
-                "--parallel-immediate",
-                "--compressed",
-                "-e",
-                host,
-                "-A",
-                "Mozilla Firefox",
-                if cfg!(debug_assertions) {
-                    "-fsSL"
-                } else {
-                    "-fsL"
-                },
-            ])
-            .spawn();
+        let cmd = curl.args([
+            "--parallel-immediate",
+            "--compressed",
+            "-e",
+            host,
+            "-A",
+            "Mozilla Firefox",
+            if cfg!(debug_assertions) {
+                "-fsSL"
+            } else {
+                "-fsL"
+            },
+        ]);
+        #[cfg(not(feature = "infer"))]
+        cmd.spawn();
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            cmd.unwrap().wait();
+            cmd.output();
             for f in need_file_type_detection {
                 let file = path.join(&f);
                 if file.exists() {
                     magic_number_type(file);
                 }
             }
+
+            // let p = path.to_owned();
+            // let h = host.to_owned();
+
+            // thread::spawn(move || {
+            //     cmd.output();
+            //     for f in need_file_type_detection {
+            //         let file = p.join(&f);
+            //         if file.exists() {
+            //             magic_number_type(file);
+            //         }
+            //     }
+            // });
         }
     }
+    // thread::sleep(time::Duration::from_secs(3));
 }
 
 /// Get `url` content header info to generate full `name.ext`
@@ -458,16 +472,22 @@ fn magic_number_type(pb: path::PathBuf) {
     f.read_exact(&mut buf);
 
     let t = infer::get(&buf);
-    if let Some(ext) = t {
-        let mut new = pb.to_string();
-        new.set_extension(ext.extension());
-        fs::rename(pb, new);
-    } else {
-        let str = String::from_utf8_lossy(&buf);
-        if str.contains("<svg") {
-            fs::rename(&pb, format!("{}.svg", pb.display()));
-        }
-    }
+    // tdbg!(&t);
+    fs::rename(
+        &pb,
+        pb.with_extension(t.map_or_else(
+            || {
+                let str = String::from_utf8_lossy(&buf);
+                if str.contains("<svg") {
+                    "svg"
+                } else {
+                    ""
+                }
+            },
+            |ty| ty.extension(),
+        )),
+    )
+    .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
 
 /// Check `next` selector link page info
@@ -644,10 +664,9 @@ fn save_to_file(data: &str) {
 fn image_type(header: &str) -> &str {
     let mut offset = &header[header.find('/').unwrap() + 1..];
 
-    &offset[..offset
-        .find('+')
-        .or_else(|| offset.find(';'))
-        .or_else(|| offset.find(','))
+    &offset[..['+', ';', ',']
+        .iter()
+        .find_map(|&x| offset.find(x))
         .unwrap_or(offset.len())]
 }
 
