@@ -832,10 +832,11 @@ mod img {
     #[test]
     fn file_type() {
         let dir = env::current_dir().unwrap();
-        let p = dir.join("src/demo");
+
         #[cfg(feature = "infer")]
         magic_number_type(p);
     }
+
     #[test]
     fn embed() {
         if cfg!(not(feature = "embed")) {
