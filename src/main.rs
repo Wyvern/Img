@@ -595,6 +595,10 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     // if !next.is_empty() && !next[next.rfind('/').unwrap()..].contains(['_', '-', '?']) {
     //     next = String::default();
     // }
+
+    if cur.trim().ends_with(&next_link) || next_link.trim() == "#" {
+        next_link = String::default();
+    }
     if !next_link.is_empty() && !next_link.starts_with("http") {
         if next_link.trim() == "/" || next_link.trim() == "#" {
             next_link = String::default();
@@ -832,10 +836,11 @@ mod img {
     #[test]
     fn file_type() {
         let dir = env::current_dir().unwrap();
-        let p = dir.join("src/demo");
+        let f = dir.join("demo.file");
         #[cfg(feature = "infer")]
-        magic_number_type(p);
+        magic_number_type(f);
     }
+
     #[test]
     fn embed() {
         if cfg!(not(feature = "embed")) {

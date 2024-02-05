@@ -322,5 +322,11 @@
         "Site": "bisipic.xyz",
         "Img": "ignore_js_op > img[file]",
         "Album": "a[href] h2"
+    },
+    {
+        "Site": "mash120.com",
+        "Img": "div#showimg img",
+        "Next": "div#page a.nextpage",
+        "Album": "div.card-img img"
     }
 ]

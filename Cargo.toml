@@ -2,7 +2,6 @@
 name = "Img"
 version = "1.0.0"
 edition = "2021"
-resolver = "2"
 # default-run = "Img"
 
 [features]
@@ -11,6 +10,7 @@ curl = []
 download = []
 infer = ["dep:infer"]
 embed = ["dep:base64", "dep:url-escape"]
+
 
 [[example]]
 name = "color"
@@ -22,4 +22,8 @@ crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
 base64 = { version = "*", default-features = false, optional = true }
 url-escape = { version = "*", default-features = false, optional = true }
+
 infer = { version = "*", default-features = false, optional = true }
+
+[dev-dependencies]
+# file-format = { version = "*", features = ["reader-xml"] }

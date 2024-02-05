@@ -180,7 +180,7 @@ mod macros {
     macro_rules! tdbg {
         ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                $crate::dbg!($(&$e),*);
+                $crate::dbg!(($(&$e),*));
                 #[cfg(test)]{pause("");}
                 ($($e),*)
             } else {($($e),*)}
