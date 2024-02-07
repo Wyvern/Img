@@ -596,25 +596,22 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     //     next = String::default();
     // }
 
-    if cur.trim().ends_with(&next_link) || next_link.trim() == "#" {
+    if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
         next_link = String::default();
+        tdbg!("Next page is same as current page/domain, so set it to empty string.");
     }
     if !next_link.is_empty() && !next_link.starts_with("http") {
-        if next_link.trim() == "/" || next_link.trim() == "#" {
-            next_link = String::default();
-        } else {
-            next_link = format!(
-                "{}{}",
-                if next_link.starts_with("//") {
-                    &cur[..cur.find("//").unwrap()]
-                } else if next_link.starts_with('/') {
-                    &cur[..cur[10..].find('/').unwrap() + 10]
-                } else {
-                    &cur[..=cur.rfind('/').unwrap()]
-                },
-                next_link
-            );
-        }
+        next_link = format!(
+            "{}{}",
+            if next_link.starts_with("//") {
+                &cur[..cur.find("//").unwrap()]
+            } else if next_link.starts_with('/') {
+                &cur[..cur[10..].find('/').unwrap() + 10]
+            } else {
+                &cur[..=cur.rfind('/').unwrap()]
+            },
+            next_link
+        );
     }
 
     tdbg!(next_link)
