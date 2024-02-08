@@ -328,5 +328,10 @@
         "Img": "div#showimg img",
         "Next": "div#page a.nextpage",
         "Album": "div.card-img img"
+    },
+    {
+        "Site": "bisipic.online,bisipic.xyz",
+        "Img": "div.pct img[file]",
+        "Album": "div.cacklist h2"
     }
 ]
