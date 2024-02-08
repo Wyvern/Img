@@ -76,7 +76,7 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic", "-Zlocation-detail=none"]
 strip = true
 lto = true
 rpath = true
@@ -85,6 +85,7 @@ codegen-units = 1
 #lto
 [profile.lto]
 inherits = "release"
+rustflags = ["-Zlocation-detail=none", "-Zcross-crate-inline-threshold=yes"]
 lto = true
 panic = "abort"
 [profile.lto.build-override]
@@ -146,6 +147,7 @@ rustflags = [
     "-Zexport-executable-symbols",
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
+    "-Zlocation-detail=none",
     "-Zplt",
     "-Zthinlto",
     "-Zdylib-lto",
@@ -210,6 +212,7 @@ rustflags = [
     "-Zexport-executable-symbols",
     "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
+    "-Zlocation-detail=none",
     "-Zplt",
     "-Zthinlto",
     "-Zdylib-lto",
