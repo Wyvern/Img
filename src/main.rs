@@ -123,7 +123,7 @@ fn parse(addr: &str) -> String {
     let mut t = title.trim();
 
     (0..2).for_each(|_| {
-        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim();
+        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim().trim_end_matches(['/', '-', '_', '|', '–']);
     });
 
     let albums = album.map(|a| page.select(a));
