@@ -132,14 +132,18 @@ fn parse(addr: &str) -> String {
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
     let [albums_len, imgs_len] = [albums.as_ref().map_or(0, |a| a.len()), imgs.len()];
+    let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, !imgs.is_empty()) {
-        (true, true) => pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{G} {t}"),
-        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{G} {t}"),
-        (false, true) => pl!("Totally found <{imgs_len}> 🏞️  in 📄:{G} {t}"),
-        (false, false) => {
-            quit!("∅ 🏞️  found in 📄:{G} {t}");
+        (true, true) => {
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
         }
+
+        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
+
+        (false, true) => pl!("Totally found <{imgs_len}> 🏞️  in 📄:{link_title}"),
+
+        (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
     }
 
     t = if t.contains("page") || t.contains('页') {
@@ -280,7 +284,7 @@ fn parse(addr: &str) -> String {
                         stdout,
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
                         i + 1,
-                        t.trim()
+                        t.trim(),
                     );
                     write!(
                         stdout,
