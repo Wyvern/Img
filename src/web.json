@@ -319,11 +319,6 @@
         "Album": "div.thumbnail a[title]"
     },
     {
-        "Site": "bisipic.xyz",
-        "Img": "ignore_js_op > img[file]",
-        "Album": "a[href] h2"
-    },
-    {
         "Site": "mash120.com",
         "Img": "div#showimg img",
         "Next": "div#page a.nextpage",
@@ -333,5 +328,11 @@
         "Site": "bisipic.online,bisipic.xyz",
         "Img": "div.pct img[file]",
         "Album": "div.cacklist h2"
+    },
+    {
+        "Site": "chinagirlclub.com",
+        "Img": "div.entry-inner img",
+        "Next": "a.nextpostslink",
+        "Album": "h2.post-title a"
     }
 ]

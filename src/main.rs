@@ -123,7 +123,9 @@ fn parse(addr: &str) -> String {
     let mut t = title.trim();
 
     (0..2).for_each(|_| {
-        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim().trim_end_matches(['/', '-', '_', '|', '–']);
+        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
+            .trim()
+            .trim_end_matches(['/', '-', '_', '|', '–']);
     });
 
     let albums = album.map(|a| page.select(a));
@@ -598,7 +600,6 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 
     if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
         next_link = String::default();
-        tdbg!("Next page is same as current page/domain, so set it to empty string.");
     }
     if !next_link.is_empty() && !next_link.starts_with("http") {
         next_link = format!(
