@@ -92,11 +92,8 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         });
     s.send(());
     if out.stdout.is_empty() {
-        quit!(
-            "Fetch {} failed - {}",
-            addr,
-            String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
-        );
+        let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
+        quit!("Fetch {} failed - {err}", addr);
     }
     let res = String::from_utf8_lossy(&out.stdout);
     (res.into_owned(), host_info, scheme_host)
@@ -123,21 +120,25 @@ fn parse(addr: &str) -> String {
     let mut t = title.trim();
 
     (0..2).for_each(|_| {
-        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())].trim().trim_end_matches(['/', '-', '_', '|', '–']);
+        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
+            .trim()
+            .trim_end_matches(['/', '-', '_', '|', '–']);
     });
 
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
     let [albums_len, imgs_len] = [albums.as_ref().map_or(0, |a| a.len()), imgs.len()];
+    let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, !imgs.is_empty()) {
-        (true, true) => pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{G} {t}"),
-        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{G} {t}"),
-        (false, true) => pl!("Totally found <{imgs_len}> 🏞️  in 📄:{G} {t}"),
-        (false, false) => {
-            quit!("∅ 🏞️  found in 📄:{G} {t}");
-        }
+        (true, true) => pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}"),
+
+        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
+
+        (false, true) => pl!("Totally found <{imgs_len}> 🏞️  in 📄:{link_title}"),
+
+        (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
     }
 
     t = if t.contains("page") || t.contains('页') {
@@ -278,7 +279,7 @@ fn parse(addr: &str) -> String {
                         stdout,
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
                         i + 1,
-                        t.trim()
+                        t.trim(),
                     );
                     write!(
                         stdout,
@@ -516,6 +517,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             next_link = a
                 .first()
                 .map_or(String::default(), |f| f.attr("href").unwrap());
+        } else if element.tag().unwrap() == "i" {
+            next_link = element.parent().unwrap().attr("href").unwrap();
         } else {
             next_link = element.attr("href").unwrap();
         }
@@ -598,7 +601,6 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 
     if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
         next_link = String::default();
-        tdbg!("Next page is same as current page/domain, so set it to empty string.");
     }
     if !next_link.is_empty() && !next_link.starts_with("http") {
         next_link = format!(
