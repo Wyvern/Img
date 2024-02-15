@@ -132,9 +132,7 @@ fn parse(addr: &str) -> String {
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, !imgs.is_empty()) {
-        (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
-        }
+        (true, true) => pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}"),
 
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
 
@@ -519,6 +517,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             next_link = a
                 .first()
                 .map_or(String::default(), |f| f.attr("href").unwrap());
+        } else if element.tag().unwrap() == "i" {
+            next_link = element.parent().unwrap().attr("href").unwrap();
         } else {
             next_link = element.attr("href").unwrap();
         }

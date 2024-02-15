@@ -334,5 +334,15 @@
         "Img": "div.entry-inner img",
         "Next": "a.nextpostslink",
         "Album": "h2.post-title a"
+    },
+    {
+        "Site": "smilemask.net",
+        "Img": "article.article-content img",
+        "Next": "span.current"
+    },
+    {
+        "Site": "xgirlscollection.com",
+        "Img": "div.col-12 img",
+        "Next": "ul.pagination i.fa-angle-right"
     }
 ]
