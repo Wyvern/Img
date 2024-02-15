@@ -92,11 +92,8 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         });
     s.send(());
     if out.stdout.is_empty() {
-        quit!(
-            "Fetch {} failed - {}",
-            addr,
-            String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string())
-        );
+        let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
+        quit!("Fetch {} failed - {err}", addr);
     }
     let res = String::from_utf8_lossy(&out.stdout);
     (res.into_owned(), host_info, scheme_host)
