@@ -4,7 +4,7 @@ mod util;
 
 fn main() {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
-        quit!("Usage: `Command <URL>`");
+        quit!("Too many arguments. Usage: `Img <url>`");
     }
     let arg = if cfg!(test) {
         env::args().skip(3).nth(1)
@@ -12,7 +12,7 @@ fn main() {
         env::args().nth(1)
     }
     .unwrap_or_else(|| {
-        quit!("Please input <URL> argument.");
+        quit!("Please input <url> argument.");
     });
 
     let mut next_page = parse(&arg);
