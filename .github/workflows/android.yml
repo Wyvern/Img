@@ -14,19 +14,14 @@ env:
 jobs:
   Linux:
     name: Building on Ubuntu.
-    runs-on: macos-14
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Disable macos spotlight index
+      - name: Purge Ubuntu
         run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
 
-      # - name: Purge Ubuntu
-      #   run: |
-      #     sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-
-      #     sudo systemctl mask systemd-journald.service systemd-journald.socket
+          sudo systemctl mask systemd-journald.service systemd-journald.socket
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -49,9 +44,11 @@ jobs:
 
       - name: Build Release
         run: |
-          cargo install cargo-ndk
+          time cargo install cargo-ndk
+
           cargo update
-          cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
+          
+          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
