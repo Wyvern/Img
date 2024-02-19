@@ -14,14 +14,19 @@ env:
 jobs:
   Linux:
     name: Building on Ubuntu.
-    runs-on: ubuntu-latest
+    runs-on: macos-14
 
     steps:
-      - name: Purge Ubuntu
+      - name: Disable macos spotlight index
         run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
 
-          sudo systemctl mask systemd-journald.service systemd-journald.socket
+      # - name: Purge Ubuntu
+      #   run: |
+      #     sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+
+      #     sudo systemctl mask systemd-journald.service systemd-journald.socket
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,9 +36,6 @@ jobs:
         with:
           targets: x86_64-linux-android,aarch64-linux-android
           components: rust-src
-
-      # - name: Install cargo-binstall
-      #   uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -47,15 +49,9 @@ jobs:
 
       - name: Build Release
         run: |
-          # cargo binstall cross --no-confirm
-          
-          # export PATH=/home/runner/.setup-ndk/r26c/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
-
           cargo install cargo-ndk
           cargo update
           cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
-          # time cargo s x86_64-linux-android
-          # time cargo s aarch64-linux-android
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
