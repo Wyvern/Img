@@ -76,7 +76,7 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic", "-Zlocation-detail=none"]
+rustflags = ["-Cprefer-dynamic", "-Zlocation-detail=none","-Clink-arg=-nostartfiles"]
 strip = true
 lto = true
 rpath = true
