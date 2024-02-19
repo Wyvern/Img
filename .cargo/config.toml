@@ -76,7 +76,7 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic", "-Zlocation-detail=none","-Clink-arg=-nostartfiles"]
+rustflags = ["-Cprefer-dynamic","-Clink-arg=-nostartfiles"]
 strip = true
 lto = true
 rpath = true
@@ -85,14 +85,14 @@ codegen-units = 1
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = ["-Zlocation-detail=none", "-Zcross-crate-inline-threshold=yes"]
+rustflags = ["-Zcross-crate-inline-threshold=yes"]
 lto = true
 panic = "abort"
 [profile.lto.build-override]
 inherits = "lto"
 [profile.lto.package."*"]
 inherits = "lto"
-
+Ï
 #src
 [profile.src]
 inherits = "lto"
@@ -140,6 +140,7 @@ rustflags = [
     "-Cno-redzone",
     "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
+    
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
