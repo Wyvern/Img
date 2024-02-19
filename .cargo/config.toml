@@ -76,7 +76,7 @@ inherits = "release"
 [profile.release.package."*"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic","-Clink-arg=-nostartfiles"]
+rustflags = ["-Cprefer-dynamic"]
 strip = true
 lto = true
 rpath = true
@@ -92,7 +92,7 @@ panic = "abort"
 inherits = "lto"
 [profile.lto.package."*"]
 inherits = "lto"
-Ï
+
 #src
 [profile.src]
 inherits = "lto"
