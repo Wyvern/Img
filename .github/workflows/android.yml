@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: ["none"]
+    branches: ["dev"]
   pull_request:
-    branches: ["none"]
+    branches: ["dev"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -41,7 +41,7 @@ jobs:
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r26b
+          ndk-version: r26c
           link-to-sdk: true
           local-cache: true
 
@@ -49,7 +49,7 @@ jobs:
         run: |
           # cargo binstall cross --no-confirm
 
-          export PATH=/home/runner/.setup-ndk/r26b/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+          export PATH=/home/runner/.setup-ndk/r26c/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
           
           cargo update
 
