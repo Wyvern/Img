@@ -277,10 +277,8 @@ rustflags = ["-Clinker-flavor=wasm-lld-cc"]
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
 
-[target.x86_64-linux-android]
-linker = "x86_64-linux-android34-clang"
-cc = "clang"
+# [target.x86_64-linux-android]
+# linker = "x86_64-linux-android34-clang"
 
-[target.aarch64-linux-android]
-linker = "aarch64-linux-android34-clang"
-cc = "clang"
+# [target.aarch64-linux-android]
+# linker = "aarch64-linux-android34-clang"
