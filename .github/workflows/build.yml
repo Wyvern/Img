@@ -107,14 +107,12 @@ jobs:
       - name: Build Release
         run: |
           cargo update
-          #time cargo br
-          #time cargo l
 
-          time cargo s aarch64-apple-darwin
+          # time cargo s aarch64-apple-darwin
           time cargo s arm64e-apple-darwin
           time cargo s x86_64h-apple-darwin
 
-          lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+          lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
           find ./target -iname img -type f | xargs ls -hl
           ls -hl Img-Universal
@@ -134,16 +132,6 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "macOS x86-64h binary executable."
-
-      - name: Upload macOS-AArch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-apple-darwin/src/Img
-          asset_name: macOS-AArch64
-          tag: Nightly
-          overwrite: true
-          body: "macOS AArch64 binary executable."
 
       - name: Upload macOS-Arm64e to a GitHub release
         uses: svenstaro/upload-release-action@v2
