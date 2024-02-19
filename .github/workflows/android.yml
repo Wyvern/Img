@@ -53,7 +53,7 @@ jobs:
 
           cargo install cargo-ndk
           cargo update
-          cargo ndk -t x86_64-linux-android -t aarch64-linux-android -o ./jniLibs b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
+          cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
           # time cargo s x86_64-linux-android
           # time cargo s aarch64-linux-android
 

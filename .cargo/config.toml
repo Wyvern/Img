@@ -265,6 +265,9 @@ rustflags = ["-Clink-arg=-fno-async-exceptions"]
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 
+[target.'cfg(target_arch="aarch64")']
+rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+
 [target.'cfg(target_os="linux")']
 rustflags = ["-Zrelax-elf-relocations"]
 
@@ -276,9 +279,3 @@ rustflags = ["-Clinker-flavor=wasm-lld-cc"]
 
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
-
-# [target.x86_64-linux-android]
-# linker = "x86_64-linux-android34-clang"
-
-# [target.aarch64-linux-android]
-# linker = "aarch64-linux-android34-clang"
