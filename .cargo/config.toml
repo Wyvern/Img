@@ -266,13 +266,13 @@ rustflags = ["-Clink-arg=-fno-async-exceptions"]
 rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
-rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+rustflags = ["-Ctarget-feature=+neon","-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
-[target.'cfg(target_arch="aarch64")']
+[target.'cfg(all(target_arch="aarch64",not(target_vendor="apple")))']
 rustflags = [
     "-Ctarget-feature=+neon",
-    "-Ctarget-cpu=arm64-v8a",
-    "-Ztune-cpu=arm64-v8a",
+    "-Ctarget-cpu=arm64",
+    "-Ztune-cpu=arm64",
 ]
 
 [target.'cfg(target_os="android")']
