@@ -271,8 +271,8 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 [target.'cfg(target_arch="aarch64")']
 rustflags = [
     "-Ctarget-feature=+neon",
-    "-Ctarget-cpu=armv8-a",
-    "-Ztune-cpu=armv8-a",
+    "-Ctarget-cpu=arm64-v8a",
+    "-Ztune-cpu=arm64-v8a",
 ]
 
 [target.'cfg(target_os="android")']
