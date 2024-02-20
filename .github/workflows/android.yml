@@ -47,8 +47,7 @@ jobs:
 
       - name: Build Release
         run: |
-          # cargo install cargo-ndk
-          cargo binstall cargo-ndk
+          cargo binstall cargo-ndk -y
 
           cargo update
           
