@@ -82,7 +82,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            "Mozilla/5.0 Firefox/120",
             "-fsSL",
         ])
         .output()
@@ -132,7 +132,9 @@ fn parse(addr: &str) -> String {
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, !imgs.is_empty()) {
-        (true, true) => pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}"),
+        (true, true) => {
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
+        }
 
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
 
@@ -396,7 +398,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            "Mozilla/5.0 Firefox/120",
             if cfg!(debug_assertions) {
                 "-fsSL"
             } else {
@@ -443,7 +445,7 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            "Mozilla/5.0 Firefox/120",
             "-fsSIL",
             "--compressed",
             "-w",
