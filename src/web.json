@@ -344,5 +344,17 @@
         "Site": "xgirlscollection.com",
         "Img": "div.col-12 img",
         "Next": "ul.pagination i.fa-angle-right"
+    },
+    {
+        "Site": "kongquehai.net",
+        "Img": "div.m-list-content img",
+        "Next": "div.link_pages a.next",
+        "Album": "div.m-list-main h2 a"
+    },
+    {
+        "Site": "foamgirl.net",
+        "Img": "img.size-full",
+        "Next": "div.nav-links a i.fa-chevron-right",
+        "Album": "div.case_info a"
     }
 ]
