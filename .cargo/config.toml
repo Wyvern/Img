@@ -30,7 +30,7 @@ RUST_LIB_BACKTRACE = "0"
 RUST_PANIC_STRATEGY = "abort"
 
 [net]
-#offline = true     
+#offline = true
 
 #dev
 [profile.dev]
@@ -140,7 +140,7 @@ rustflags = [
     "-Cno-redzone",
     "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
-    
+
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
@@ -190,7 +190,6 @@ rustflags = [
 [build]
 incremental = true
 rustc-wrapper = "sccache"
-rustflags = ["-Clink-args=-fno-async-exceptions"]
 
 [package.metadata.docs.rs]
 all-features = true
