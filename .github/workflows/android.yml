@@ -50,7 +50,7 @@ jobs:
           cargo binstall cargo-ndk -y
 
           cargo update
-          
+
           time cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
 
           find ./target -iname img -type f | xargs ls -hl
