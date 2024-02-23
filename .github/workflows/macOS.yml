@@ -1,0 +1,84 @@
+name: macOS
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  macOS:
+    name: Building on macOS.
+    runs-on: macos-14
+
+    steps:
+      - name: Disable macos spotlight index
+        run: |
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: x86_64-apple-darwin
+          components: rust-src
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Build Release
+        run: |
+          cargo update
+
+          # time cargo s aarch64-apple-darwin
+          time cargo s arm64e-apple-darwin
+          time cargo s x86_64h-apple-darwin
+
+          lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+
+          find ./target -iname img -type f | xargs ls -hl
+          ls -hl Img-Universal
+          sw_vers
+          hostinfo
+          sysctl -a | grep brand
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload macOS x86-64h to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64h-apple-darwin/src/Img
+          asset_name: macOS-x86_64h
+          tag: Nightly
+          overwrite: true
+          body: "macOS x86-64h binary executable."
+
+      - name: Upload macOS-Arm64e to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/arm64e-apple-darwin/src/Img
+          asset_name: macOS-Arm64e
+          tag: Nightly
+          overwrite: true
+          body: "macOS Arm64e binary executable."
+
+      - name: Upload macOS-Universal to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: Img-Universal
+          asset_name: macOS-Universal
+          tag: Nightly
+          overwrite: true
+          body: "macOS Universal binary executable."

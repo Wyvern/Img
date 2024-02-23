@@ -1,0 +1,83 @@
+name: Linux
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Building on Ubuntu.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge Ubuntu
+        run: |
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+
+          sudo systemctl mask systemd-journald.service systemd-journald.socket
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: aarch64-unknown-linux-gnu,x86_64-unknown-linux-musl
+          components: rust-src
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Build Release
+        run: |
+          sudo apt update && sudo apt install gcc-aarch64-linux-gnu musl-tools -y
+
+          cargo update
+
+          time cargo s x86_64-unknown-linux-gnu
+          time cargo s aarch64-unknown-linux-gnu
+          time cargo s x86_64-unknown-linux-musl
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Linux-Gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-linux-gnu/src/Img
+          asset_name: Linux-Gnu
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-Gnu binary executable."
+
+      - name: Upload Linux-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-linux-gnu/src/Img
+          asset_name: Linux-AArch64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-AArch64 binary executable."
+
+      - name: Upload Linux-Musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-linux-musl/src/Img
+          asset_name: Linux-Musl
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-Musl binary executable."

@@ -1,0 +1,84 @@
+name: Linux+macOS+Windows
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Windows:
+    name: Building on Windows.
+    runs-on: windows-latest
+
+    steps:
+      - name: Disable windows services
+        run: |
+          sc config "WSearch" start=disabled
+          sc config "DiagTrack" start=disabled
+          sc config "WdiServiceHost" start=disabled
+          sc config "WdiSystemHost" start=disabled
+          sc config "PcaSvc" start=disabled
+          sc config "WerSvc" start=disabled
+          sc stop "DPS"
+          sc stop "pla"
+
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*TELEMETRY*" | Set-Service -StartMode Disabled
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*TELEMETRY*" | ? status -eq "running" | Stop-Service
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | Set-Service -StartMode Disabled
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | ? status -eq "running" | Stop-Service
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*Diagnostic*" | Set-Service -StartMode Disabled
+          Get-Service -ErrorAction SilentlyContinue|? name -Like "*Diagnostic*" | ? status -eq "running" | Stop-Service
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: aarch64-pc-windows-msvc
+          components: rust-src
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Build release
+        run: |
+          cargo update
+
+          #cargo br
+          #cargo l
+
+          cargo s x86_64-pc-windows-msvc
+          cargo s aarch64-pc-windows-msvc
+
+          cmd /r dir /s target\Img.exe
+          systeminfo
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Windows-x64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-pc-windows-msvc/src/Img.exe
+          asset_name: Windows.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows x64 binary executable."
+
+      - name: Upload Windows-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-pc-windows-msvc/src/Img.exe
+          asset_name: Windows-AArch64.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows AArch64 binary executable."
