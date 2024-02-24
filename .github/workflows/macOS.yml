@@ -28,7 +28,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: x86_64-apple-darwin, aarch64-apple-ios
+          targets: x86_64-apple-darwin
           components: rust-src
 
       - name: Run sccache-cache
@@ -39,6 +39,7 @@ jobs:
           cargo update
 
           time cargo s aarch64-apple-ios
+          time cargo s aarch64-apple-tvos
           time cargo s arm64e-apple-darwin
           time cargo s x86_64h-apple-darwin
 
@@ -92,3 +93,13 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "iOS binary executable."
+
+      - name: Upload tvOS to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-apple-tvos/src/Img
+          asset_name: tvOS
+          tag: Nightly
+          overwrite: true
+          body: "tvOS binary executable."
