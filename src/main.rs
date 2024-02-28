@@ -119,11 +119,19 @@ fn parse(addr: &str) -> String {
         .expect("NO title text.");
     let mut t = title.trim();
 
-    (0..2).for_each(|_| {
-        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
-            .trim()
-            .trim_end_matches(['/', '-', '_', '|', '–']);
-    });
+    if t.ends_with('P') {
+        (0..2).for_each(|_| {
+            t = t[t.find(['/', '-', '_', '|', '–']).unwrap_or(0)..]
+                .trim()
+                .trim_start_matches(['/', '-', '_', '|', '–']);
+        });
+    } else {
+        (0..2).for_each(|_| {
+            t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
+                .trim()
+                .trim_end_matches(['/', '-', '_', '|', '–']);
+        });
+    }
 
     let albums = album.map(|a| page.select(a));
 
@@ -752,6 +760,7 @@ mod img {
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
+
     #[test]
     fn r#try() {
         // https://girlsteam.club https://girldreamy.com https://legskr.com/
