@@ -763,11 +763,9 @@ mod img {
 
     #[test]
     fn r#try() {
-        // https://girlsteam.club https://girldreamy.com https://legskr.com/
+        // https://girlsteam.club https://legskr.com/
         let arg = env::args().nth(4);
-        let addr = arg
-            .as_deref()
-            .unwrap_or("http://www.beautyleg6.com/siwameitui/");
+        let addr = arg.as_deref().unwrap_or("https://girldreamy.com");
 
         parse(addr);
     }

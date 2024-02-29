@@ -37,22 +37,22 @@ RUST_PANIC_STRATEGY = "abort"
 rustflags = [
     "-Cprefer-dynamic",
     "-Cdebug-assertions",
-    "-Zdwarf-version=5",
-    "-Zdebuginfo-compression=zstd",
+    "-Zlocation-detail=file,line,column",
     "-Zcodegen-backend=cranelift",
 ]
 rpath = true
 codegen-backend = "cranelift"
+trim-paths = true
+debug = false
+strip = true
 [profile.dev.package."*"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
-debug = false
-strip = true
 [profile.dev.build-override]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
-debug = false
-strip = true
 
 #test
 [profile.test]
@@ -64,16 +64,18 @@ inherits = "test"
 
 #bench
 [profile.bench.package."*"]
-inherits = "release"
+inherits = "bench"
 [profile.bench.build-override]
-inherits = "release"
+inherits = "bench"
 [profile.bench]
 inherits = "dev"
 
 #release
 [profile.release.build-override]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
 rustflags = ["-Cprefer-dynamic"]
@@ -81,12 +83,12 @@ strip = true
 lto = true
 rpath = true
 codegen-units = 1
+trim-paths = true
 
 #lto
 [profile.lto]
 inherits = "release"
 rustflags = ["-Zcross-crate-inline-threshold=yes"]
-lto = true
 panic = "abort"
 [profile.lto.build-override]
 inherits = "lto"
@@ -119,6 +121,8 @@ gc = true
 precise-pre-release = true
 git = { shallow_index = true, shallow_deps = true }
 gitoxide = { checkout = true, fetch = true, internal_use_git2 = true }
+public-dependency = true
+
 # build-std = [
 #     "core",
 #     "std",
