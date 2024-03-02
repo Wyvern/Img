@@ -82,7 +82,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
             "-e",
             host,
             "-A",
-            "Mozilla/5.0 Firefox/120",
+            "Mozilla Firefox",
             "-fsSL",
         ])
         .output()
@@ -406,7 +406,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
             "-e",
             host,
             "-A",
-            "Mozilla/5.0 Firefox/120",
+            "Mozilla Firefox",
             if cfg!(debug_assertions) {
                 "-fsSL"
             } else {
@@ -453,7 +453,7 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             "-e",
             host,
             "-A",
-            "Mozilla/5.0 Firefox/120",
+            "Mozilla Firefox",
             "-fsSIL",
             "--compressed",
             "-w",
