@@ -40,7 +40,6 @@ jobs:
       - name: Build Release
         run: |
           cargo binstall cargo-pgo -y
-          cargo pgo info
 
           cargo update
 
