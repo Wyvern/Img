@@ -28,6 +28,7 @@ vcs = "none"
 RUST_BACKTRACE = "0"
 RUST_LIB_BACKTRACE = "0"
 RUST_PANIC_STRATEGY = "abort"
+RUSTFLAGS = "-Aunused -Anonstandard_style -Aunexpected_cfgs -Frust_2018_idioms -Frust_2018_compatibility"
 
 [net]
 #offline = true
