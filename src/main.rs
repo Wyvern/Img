@@ -119,18 +119,18 @@ fn parse(addr: &str) -> String {
         .expect("NO title text.");
     let mut t = title.trim();
 
-    if t.ends_with('P') {
-        (0..2).for_each(|_| {
+    if t.ends_with(['P', 'p']) {
+        while (t.rsplit(['/', '-', '_', '|', '–']).count() > 2) {
             t = t[t.find(['/', '-', '_', '|', '–']).unwrap_or(0)..]
                 .trim()
                 .trim_start_matches(['/', '-', '_', '|', '–']);
-        });
+        }
     } else {
-        (0..2).for_each(|_| {
+        while (t.split(['/', '-', '_', '|', '–']).count() > 2) {
             t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
                 .trim()
                 .trim_end_matches(['/', '-', '_', '|', '–']);
-        });
+        }
     }
 
     let albums = album.map(|a| page.select(a));

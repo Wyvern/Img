@@ -20,9 +20,10 @@
     "Img": "span.photoThum a[href]"
   },
   {
-    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro",
+    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,12356781.xyz,ihook.cloud,jpxgmn.com",
     "Img": "article.article-content img",
-    "Next": "div.pagination a[href]"
+    "Next": "div.pagination a[href]",
+    "Album": "li.related_boxindex a[href]"
   },
   {
     "Site": "ctopgirl.com",
@@ -356,11 +357,5 @@
     "Img": "img.size-full",
     "Next": "div.nav-links a i.fa-chevron-right",
     "Album": "div.case_info a"
-  },
-  {
-    "Site": "ihook.cloud",
-    "Img": "article.article-content img",
-    "Next": "div.pagination a[href]",
-    "Album": "li.related_boxindex a[href]"
   }
 ]
