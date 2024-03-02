@@ -4,7 +4,7 @@ mod util;
 
 fn main() {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
-        quit!("Usage: `Command <URL>`");
+        quit!("Too many arguments. Usage: `Img <url>`");
     }
     let arg = if cfg!(test) {
         env::args().skip(3).nth(1)
@@ -12,7 +12,7 @@ fn main() {
         env::args().nth(1)
     }
     .unwrap_or_else(|| {
-        quit!("Please input <URL> argument.");
+        quit!("Please input <url> argument.");
     });
 
     let mut next_page = parse(&arg);
@@ -82,7 +82,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            "Mozilla/5.0 Firefox/120",
             "-fsSL",
         ])
         .output()
@@ -119,11 +119,19 @@ fn parse(addr: &str) -> String {
         .expect("NO title text.");
     let mut t = title.trim();
 
-    (0..2).for_each(|_| {
-        t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
-            .trim()
-            .trim_end_matches(['/', '-', '_', '|', '–']);
-    });
+    if t.ends_with(['P', 'p']) {
+        while (t.rsplit(['/', '-', '_', '|', '–']).count() > 2) {
+            t = t[t.find(['/', '-', '_', '|', '–']).unwrap_or(0)..]
+                .trim()
+                .trim_start_matches(['/', '-', '_', '|', '–']);
+        }
+    } else {
+        while (t.split(['/', '-', '_', '|', '–']).count() > 2) {
+            t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
+                .trim()
+                .trim_end_matches(['/', '-', '_', '|', '–']);
+        }
+    }
 
     let albums = album.map(|a| page.select(a));
 
@@ -132,7 +140,9 @@ fn parse(addr: &str) -> String {
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, !imgs.is_empty()) {
-        (true, true) => pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}"),
+        (true, true) => {
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
+        }
 
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
 
@@ -396,7 +406,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            "Mozilla/5.0 Firefox/120",
             if cfg!(debug_assertions) {
                 "-fsSL"
             } else {
@@ -443,7 +453,7 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            "Mozilla/5.0 Firefox/120",
             "-fsSIL",
             "--compressed",
             "-w",
@@ -750,13 +760,12 @@ mod img {
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
+
     #[test]
     fn r#try() {
-        // https://girlsteam.club https://girldreamy.com https://legskr.com/
+        // https://girlsteam.club https://legskr.com/
         let arg = env::args().nth(4);
-        let addr = arg
-            .as_deref()
-            .unwrap_or("http://www.beautyleg6.com/siwameitui/");
+        let addr = arg.as_deref().unwrap_or("https://girldreamy.com");
 
         parse(addr);
     }
