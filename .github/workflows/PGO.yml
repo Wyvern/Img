@@ -43,9 +43,9 @@ jobs:
 
           cargo update
 
-          time cargo pgo build -- --profile src -Zbuild-std=std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin
+          time cargo pgo build -- --profile lto
 
-          cargo pgo run -- --profile src "https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7870-lavinia-rou/"
+          cargo pgo run -- --profile lto "https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7870-lavinia-rou/"
 
           time cargo pgo optimize
 
@@ -76,7 +76,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/arm64e-apple-darwin/src/Img
+          file: target/lto/Img
           asset_name: macOS-Arm64e
           tag: Nightly
           overwrite: true
