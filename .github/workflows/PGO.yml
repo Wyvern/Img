@@ -43,7 +43,7 @@ jobs:
 
           cargo update
 
-          time cargo pgo build -- --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort,profiler_builtins -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin
+          time cargo pgo build -- --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin
 
           cargo pgo run -- --profile src "https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7870-lavinia-rou/"
 
