@@ -47,7 +47,7 @@ jobs:
 
           cargo pgo run -- --profile lto "https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7870-lavinia-rou/"
 
-          time cargo pgo optimize -- --profile lto
+          time cargo pgo optimize build -- --profile lto
 
           # time cargo s arm64e-apple-darwin
           # time cargo s x86_64h-apple-darwin
