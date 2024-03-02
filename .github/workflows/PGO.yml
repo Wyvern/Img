@@ -76,8 +76,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/lto/Img
-          asset_name: macOS-Arm64e
+          file: target/aarch64-apple-darwin/lto/Img
+          asset_name: macOS-LTO+PGO
           tag: Nightly
           overwrite: true
           body: "macOS Arm64e binary executable."
