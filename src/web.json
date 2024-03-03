@@ -5,11 +5,6 @@
     "Album": "div.elementor-post__text a[href]"
   },
   {
-    "Site": "loxiu.com",
-    "Img": "div.info-imtg-box.ta-c.mb15 img",
-    "Next": "div.pagebar.info-pagebar a"
-  },
-  {
     "Site": "meitu131.com",
     "Img": "p[align=\"center\"] img",
     "Next": "div#pages a[href]",
@@ -155,10 +150,10 @@
     "Next": "div.fenye a[href]"
   },
   {
-    "Site": "ligui.org,counv.com",
+    "Site": "ligui.org,counv.com,ikmn05.cc,ikmn.cc,loxiu.com",
     "Img": "div.info-imtg-box img",
     "Next": "div.pagebar a[href]",
-    "Album": "span.img-box img"
+    "Album": "span.img-box h3 a"
   },
   {
     "Site": "nsphb.com",
