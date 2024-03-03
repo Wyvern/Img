@@ -1,7 +1,9 @@
+#![no_main]
 use {std::*, util::*};
 
 mod util;
 
+#[no_mangle]
 fn main() {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         quit!("Too many arguments. Usage: `Img <url>`");
