@@ -7,7 +7,7 @@ mod util;
 #[cfg_attr(not(debug_assertions), no_mangle)]
 fn main() {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
-        quit!("Too many arguments. Usage: `Img <url>`");
+        quit!("Too many arguments.\nUsage: {}", "Img <url>");
     }
     let arg = if cfg!(test) {
         env::args().skip(3).nth(1)
