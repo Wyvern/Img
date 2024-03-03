@@ -1,10 +1,7 @@
-#![cfg_attr(not(debug_assertions), no_main)]
-
 use {std::*, util::*};
 
 mod util;
 
-#[cfg_attr(not(debug_assertions), no_mangle)]
 fn main() {
     if env::args().len() > if cfg!(test) { 5 + 3 } else { 5 } {
         exit()
