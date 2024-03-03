@@ -124,7 +124,7 @@ rustflags = [
     "-Copt-level=s",
     "-Cno-redzone",
     "-Cstrip=symbols",
-    "-Clink-self-contained=+linker",
+    # "-Clink-self-contained=+linker",
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
 
@@ -160,7 +160,7 @@ rustflags = [
     "-Copt-level=s",
     "-Cno-redzone",
     "-Cstrip=symbols",
-    "-Clink-self-contained=+linker",
+    # "-Clink-self-contained=+linker",
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
 
@@ -172,10 +172,10 @@ rustflags = [
 ]
 
 [target.'cfg(target_vendor="apple")']
-rustflags = ["-Clinker-flavor=darwin-lld-cc"]
+# rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
 [target.'cfg(target_env="msvc")']
-rustflags = ["-Clinker-flavor=msvc-lld"]
+# rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
@@ -184,10 +184,10 @@ rustflags = ["-Clink-arg=-fno-async-exceptions"]
 rustflags = ["-Ctarget-cpu=x86-64-v3"]
 
 [target.'cfg(any(target_env="gnu",target_env="musl"))']
-rustflags = ["-Clinker-flavor=gnu-lld-cc"]
+# rustflags = ["-Clinker-flavor=gnu-lld-cc"]
 
 [target.'cfg(target_family="wasm")']
-rustflags = ["-Clinker-flavor=wasm-lld-cc"]
+# rustflags = ["-Clinker-flavor=wasm-lld-cc"]
 
 [target.'cfg(target_arch="aarch64")']
 rustflags = ["-Ctarget-cpu=apple-m1"]
