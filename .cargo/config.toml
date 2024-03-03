@@ -84,7 +84,6 @@ codegen-units = 1
 #lto
 [profile.lto]
 inherits = "release"
-lto = true
 panic = "abort"
 [profile.lto.build-override]
 inherits = "lto"
