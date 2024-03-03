@@ -29,7 +29,7 @@ RUST_BACKTRACE = "0"
 RUST_LIB_BACKTRACE = "0"
 
 [net]
-#offline = true     
+#offline = true
 
 #dev
 [profile.dev]
@@ -119,12 +119,12 @@ gc = true
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
+    "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
     "-Cstrip=symbols",
-    # "-Clink-self-contained=+linker",
+    "-Clink-self-contained=+linker",
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
 
@@ -155,12 +155,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
+    "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
     "-Cstrip=symbols",
-    # "-Clink-self-contained=+linker",
+    "-Clink-self-contained=+linker",
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
 
@@ -172,32 +172,25 @@ rustflags = [
 ]
 
 [target.'cfg(target_vendor="apple")']
-# rustflags = ["-Clinker-flavor=darwin-lld-cc"]
+rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
 [target.'cfg(target_env="msvc")']
-# rustflags = ["-Clinker-flavor=msvc-lld"]
+rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
 
-[target.'cfg(all(target_vendor="apple",target_arch="x86_64"))']
+[target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=x86-64-v3"]
 
 [target.'cfg(any(target_env="gnu",target_env="musl"))']
-# rustflags = ["-Clinker-flavor=gnu-lld-cc"]
+rustflags = ["-Clinker-flavor=gnu-lld-cc"]
 
 [target.'cfg(target_family="wasm")']
-# rustflags = ["-Clinker-flavor=wasm-lld-cc"]
+rustflags = ["-Clinker-flavor=wasm-lld-cc"]
+
+[target.'cfg(target_arch="aarch64")']
+rustflags = ["-Ctarget-cpu=apple-m1"]
 
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
-
-[target.x86_64-linux-android]
-linker = "x86_64-linux-android34-clang"
-cc = "clang"
-cxx = "clang++"
-
-[target.aarch64-linux-android]
-linker = "aarch64-linux-android34-clang"
-cc = "clang"
-cxx = "clang++"
