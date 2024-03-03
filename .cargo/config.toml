@@ -119,7 +119,7 @@ gc = true
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=hashed",
+    "-Csymbol-mangling-version=v0",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
@@ -155,7 +155,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=hashed",
+    "-Csymbol-mangling-version=v0",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
