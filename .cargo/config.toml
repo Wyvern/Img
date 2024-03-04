@@ -72,10 +72,8 @@ inherits = "dev"
 
 #release
 [profile.release.build-override]
-rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
-rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
 rustflags = ["-Cprefer-dynamic"]
