@@ -44,6 +44,7 @@ rpath = true
 codegen-backend = "cranelift"
 debug = false
 strip = true
+trim-paths = true
 [profile.dev.package."*"]
 rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
@@ -82,6 +83,7 @@ strip = true
 lto = true
 rpath = true
 codegen-units = 1
+trim-paths = true
 
 #lto
 [profile.lto]
@@ -140,6 +142,7 @@ rustflags = [
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
+    "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
@@ -203,6 +206,7 @@ rustflags = [
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
+    "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
