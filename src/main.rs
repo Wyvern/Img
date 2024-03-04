@@ -1,10 +1,10 @@
-// #![cfg_attr(not(debug_assertions), no_main)]
+#![cfg_attr(not(debug_assertions), no_main)]
 
 use {std::*, util::*};
 
 mod util;
 
-// #[cfg_attr(not(debug_assertions), no_mangle)]
+#[cfg_attr(not(debug_assertions), no_mangle)]
 fn main() {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         quit!("Too many arguments.\nUsage: {}", "Img <url>");

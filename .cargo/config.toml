@@ -42,7 +42,6 @@ rustflags = [
 ]
 rpath = true
 codegen-backend = "cranelift"
-trim-paths = true
 debug = false
 strip = true
 [profile.dev.package."*"]
@@ -83,7 +82,6 @@ strip = true
 lto = true
 rpath = true
 codegen-units = 1
-trim-paths = true
 
 #lto
 [profile.lto]
