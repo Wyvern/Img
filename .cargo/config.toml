@@ -172,7 +172,6 @@ rustflags = [
     "-Zstaticlib-allow-rdylib-deps",
     "-Zstaticlib-prefer-dynamic",
     "-Znext-solver=coherence",
-    "-Zpanic-in-drop=abort",
     "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
     "-Zno-implied-bounds-compat",
