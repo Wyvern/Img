@@ -41,6 +41,7 @@ RUST_LIB_BACKTRACE = "0"
 #     "-Zcodegen-backend=cranelift",
 # ]
 rpath = true
+trim-paths = true
 # codegen-backend = "cranelift"
 [profile.dev.package."*"]
 inherits = "dev"
@@ -71,17 +72,18 @@ inherits = "dev"
 
 #release
 [profile.release.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 strip = true
 lto = true
 rpath = true
 codegen-units = 1
+trim-paths = true
 
 #lto
 [profile.lto]
