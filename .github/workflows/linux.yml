@@ -2,9 +2,9 @@ name: Linux
 
 on:
   push:
-    branches: ["_"]
+    branches: ["dev"]
   pull_request:
-    branches: ["_"]
+    branches: ["dev"]
 
 env:
   CARGO_TERM_COLOR: always
