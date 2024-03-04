@@ -79,7 +79,6 @@ rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
 rustflags = ["-Cprefer-dynamic"]
-strip = true
 lto = true
 rpath = true
 codegen-units = 1
@@ -145,7 +144,7 @@ rustflags = [
     "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
 
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Zunstable-options",
     "-Zexport-executable-symbols",
@@ -209,7 +208,7 @@ rustflags = [
     "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
 
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -nostartfiles",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Zunstable-options",
     "-Zexport-executable-symbols",
@@ -272,6 +271,9 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.'cfg(target_os="android")']
 rustflags = ["-Zhas-thread-local=no"]
+
+[target.'cfg(target_os="linux")']
+rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_env="gnu",target_env="musl"))']
 rustflags = ["-Clinker-flavor=gnu-lld-cc"]
