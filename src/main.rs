@@ -122,19 +122,11 @@ fn parse(addr: &str) -> String {
         .expect("NO title text.");
     let mut t = title.trim();
 
-    if t.ends_with(['P', 'p']) {
-        while (t.rsplit(['/', '-', '_', '|', '–']).count() > 2) {
-            t = t[t.find(['/', '-', '_', '|', '–']).unwrap_or(0)..]
-                .trim()
-                .trim_start_matches(['/', '-', '_', '|', '–']);
-        }
-    } else {
-        while (t.split(['/', '-', '_', '|', '–']).count() > 2) {
-            t = t[..t.rfind(['/', '-', '_', '|', '–']).unwrap_or(t.len())]
-                .trim()
-                .trim_end_matches(['/', '-', '_', '|', '–']);
-        }
-    }
+    t = t
+        .split(['/', '-', '_', '|', '–'])
+        .max_by_key(|x| x.len())
+        .unwrap()
+        .trim();
 
     let albums = album.map(|a| page.select(a));
 
@@ -517,8 +509,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 
             let mut tags = items.split(|e| {
                 e.tag().unwrap() == "span"
-                // && e.attr("class")
-                //     .map_or(true, |c| c.contains("current") || c.contains("now-page"))
+                    && e.attr("class")
+                        .map_or(true, |c| c.contains("current") || c.contains("now"))
             });
             let a = tags
                 .next_back()
