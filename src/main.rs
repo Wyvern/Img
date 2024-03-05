@@ -509,8 +509,9 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
 
             let mut tags = items.split(|e| {
                 e.tag().unwrap() == "span"
-                    && e.attr("class")
-                        .map_or(true, |c| c.contains("current") || c.contains("now"))
+                    && (e
+                        .attr("class")
+                        .map_or(true, |c| c.contains("current") || c.contains("now")))
             });
             let a = tags
                 .next_back()
