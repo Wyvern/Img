@@ -2,13 +2,13 @@
   {
     "Site": "goddess247.com,girldreamy.com,girlsweetie.com,girlsexy247.com,xasia.pics,bestprettygirl.com,bestgirlsexy.com",
     "Img": "img.aligncenter.size-full",
-    "Album": "div.elementor-post__text a[href]"
+    "Album": "div.elementor-post__text a"
   },
   {
     "Site": "meitu131.com",
     "Img": "p[align=\"center\"] img",
-    "Next": "div#pages a[href]",
-    "Album": "div.title-info a[href]"
+    "Next": "div#pages a",
+    "Album": "div.title-info a"
   },
   {
     "Site": "xiuren.org",
@@ -17,18 +17,18 @@
   {
     "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,xgyw.org,12356781.xyz,ihook.cloud,jpxgmn.com",
     "Img": "article.article-content img",
-    "Next": "div.pagination a[href]",
-    "Album": "li.related_boxindex a[href]"
+    "Next": "div.pagination a",
+    "Album": "li.related_boxindex a"
   },
   {
     "Site": "ctopgirl.com",
     "Img": "div.bigimg img",
-    "Next": "div.page a[href]"
+    "Next": "div.page a"
   },
   {
     "Site": "chansd.com",
     "Img": "div.photo img",
-    "Next": "div.page a[href]"
+    "Next": "div.page a"
   },
   {
     "Site": "bestba.cn",
@@ -37,7 +37,7 @@
   {
     "Site": "502x.com",
     "Img": "div#content.content img",
-    "Next": "a.page-numbers.prev[href]"
+    "Next": "a.page-numbers.prev"
   },
   {
     "Site": "xren.us",
@@ -56,20 +56,20 @@
   {
     "Site": "btleg.net",
     "Img": "div.s_p img",
-    "Next": "div.fy a[href]",
+    "Next": "div.fy a",
     "Album": "div.loop em"
   },
   {
     "Site": "jrmnt.com,whtaotu.com,mfsft.com,sfnmt.com,jpnst.com,mttuku.com,jpsft.com,ywmmt.com,jpflt.com,mtgqt.com,zpmzt.com",
     "Img": "p[align=\"center\"] img",
-    "Next": "div.pagelist a[href]",
-    "Album": "div.title a[href]"
+    "Next": "div.pagelist a",
+    "Album": "div.title a"
   },
   {
     "Site": "sxchinesegirlz.one,sxchinesegirlz01.xyz",
     "Img": "figure.wp-block-image.size-large img",
-    "Next": "div.pagination a[href]",
-    "Album": "h2 a[href]"
+    "Next": "div.pagination a",
+    "Album": "h2 a"
   },
   {
     "Site": "xiuren.biz",
@@ -78,10 +78,6 @@
   {
     "Site": "nudegirls4u.com",
     "Img": "a.rgg-simplelightbox.size-medium.rgg-img[href]"
-  },
-  {
-    "Site": "hotgirl.biz",
-    "Img": "div.thecontent a[href]"
   },
   {
     "Site": "buondua.com,xiutaku.com",
@@ -119,13 +115,13 @@
   {
     "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr04.vip,xr05.vip,xr07.vip,xr08.vip,xr09.vip,Xiurenba.com,2xiuren.cc,秀人集.com",
     "Img": "div.content img",
-    "Next": "div.page a[href]",
+    "Next": "div.page a",
     "Album": "ul.update_area_lists a"
   },
   {
     "Site": "yaomitao.com,deepxt.top,deepxt.cfd,deepxt.sbs,deepxt.com",
     "Img": "img.aligncenter",
-    "Album": "div.entry-media a[href]"
+    "Album": "div.entry-media a"
   },
   {
     "Site": "meituss.com",
@@ -147,12 +143,12 @@
   {
     "Site": "tuxiuren.com",
     "Img": "div.entry-wrapper img",
-    "Next": "div.fenye a[href]"
+    "Next": "div.fenye a"
   },
   {
     "Site": "ligui.org,counv.com,ikmn05.cc,ikmn.cc,loxiu.com",
     "Img": "div.info-imtg-box img",
-    "Next": "div.pagebar a[href]",
+    "Next": "div.pagebar a",
     "Album": "span.img-box h3 a"
   },
   {
@@ -163,8 +159,8 @@
   {
     "Site": "beautyleg6.com",
     "Img": "div.contents img",
-    "Next": "div.page a[href]",
-    "Album": "div.t a[href]"
+    "Next": "div.page a",
+    "Album": "div.t a"
   },
   {
     "Site": "kanmeitu1.cc",
@@ -174,27 +170,27 @@
   {
     "Site": "rosi8.com",
     "Img": "div#picg img",
-    "Next": "div.pagelist a[href]"
+    "Next": "div.pagelist a"
   },
   {
     "Site": "shxiaowu.com",
     "Img": "div.main img",
-    "Next": "div.paging a[href]"
+    "Next": "div.paging a"
   },
   {
     "Site": "umeitu.com",
     "Img": "div.vipimglist img",
-    "Next": "div.page_navi a[href]"
+    "Next": "div.page_navi a"
   },
   {
     "Site": "ribi.me",
     "Img": "div.container img.img-fluid",
-    "Album": "li.breadcrumb-item a[href]"
+    "Album": "li.breadcrumb-item a"
   },
   {
     "Site": "everia.club",
     "Img": "figure.wp-block-image.size-large img",
-    "Album": "div.thumbnail a[href]"
+    "Album": "div.thumbnail a"
   },
   {
     "Site": "xiurennvs.xyz",
@@ -235,24 +231,24 @@
   {
     "Site": "xiurenwang.me",
     "Img": "div.intro img",
-    "Album": "div.title a[href]"
+    "Album": "div.title a"
   },
   {
     "Site": "meirentu.cc",
     "Img": "div.content img",
-    "Next": "div.page a[href]",
+    "Next": "div.page a",
     "Album": "div.meta-title"
   },
   {
     "Site": "8se.me,xchina.co,xchina.biz",
     "Img": "div.photos figure img",
-    "Next": "div.pager a[href]",
+    "Next": "div.pager a",
     "Album": "div.item > a[href] > img"
   },
   {
     "Site": "photos18.com",
     "Img": "div.imgHolder a[href]",
-    "Album": "div.card-body a[href]"
+    "Album": "div.card-body a"
   },
   {
     "Site": "xiannvk.net",
@@ -289,7 +285,7 @@
   {
     "Site": "imgcup.com",
     "Img": "div.item-gallery-masonry a[href]",
-    "Album": "div.thumbnail a[href]"
+    "Album": "div.thumbnail a"
   },
   {
     "Site": "larose.vip,zdgtl.com",
@@ -303,13 +299,13 @@
     "Album": "div.td-module-thumb a[title]"
   },
   {
-    "Site": "shoucangpai88.com,0k3f.com,zhainq.net,3i2n.com",
+    "Site": "smilemask.net,shoucangpai88.com,0k3f.com,zhainq.net,3i2n.com",
     "Img": "article.article-content img",
     "Next": "div.article-paging span.current",
-    "Album": "article.excerpt h2 a[href]"
+    "Album": "article.excerpt h2 a"
   },
   {
-    "Site": "1plq.com,jaoren.com",
+    "Site": "1plq.com,jaoren.com,6kpo.com",
     "Img": "div#post_content img",
     "Next": "div.pagelist span",
     "Album": "div.thumbnail a[title]"
@@ -332,11 +328,6 @@
     "Album": "h2.post-title a"
   },
   {
-    "Site": "smilemask.net",
-    "Img": "article.article-content img",
-    "Next": "span.current"
-  },
-  {
     "Site": "xgirlscollection.com",
     "Img": "div.col-12 img",
     "Next": "ul.pagination i.fa-angle-right"
@@ -356,13 +347,30 @@
   {
     "Site": "hotgirl2024.com",
     "Img": "a[data-fancybox=\"gallery\"][href]",
-    "Next": "div.pagination a[href]",
-    "Album": "div.articles-grid__title a[href]"
+    "Next": "div.pagination a",
+    "Album": "div.articles-grid__title a"
   },
   {
     "Site": "1y.is",
     "Img": "div.entry-content img",
     "Next": "div.page-links > span.current[aria-current]",
-    "Album": "header.np-entry-header > h2 > a[href]"
+    "Album": "header.np-entry-header > h2 > a"
+  },
+  {
+    "Site": "nudebird.biz,hotgirl.biz",
+    "Img": "div.thecontent a[href]",
+    "Album": "div.slide-caption h2"
+  },
+  {
+    "Site": "jrants.com",
+    "Img": "div.bialty-container p img",
+    "Next": "div.pgntn-page-pagination-block a",
+    "Album": "header.entry-header h2 a"
+  },
+  {
+    "Site": "plmn5.cc",
+    "Img": "div.newstext img",
+    "Next": "div.page a",
+    "Album": "div.videos-list li > a"
   }
 ]

@@ -173,7 +173,7 @@ fn parse(addr: &str) -> String {
             let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
-                let src = ["data-src", src]
+                let src = ["data-src", "data-lazy", "data-lazy-src", src]
                     .iter()
                     .find_map(|&a| img.attr(a))
                     .expect("Invalid img[src] selector!");
