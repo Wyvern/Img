@@ -4,6 +4,8 @@ use {std::*, util::*};
 
 mod util;
 
+static UA: &str = "Mozilla/5.0 Firefox/200";
+
 #[cfg_attr(not(debug_assertions), no_mangle)]
 fn main() {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
@@ -85,7 +87,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            UA,
             "-fsSL",
         ])
         .output()
@@ -401,7 +403,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            UA,
             if cfg!(debug_assertions) {
                 "-fsSL"
             } else {
@@ -448,7 +450,7 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            UA,
             "-fsSIL",
             "--compressed",
             "-w",

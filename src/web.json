@@ -87,7 +87,8 @@
   {
     "Site": "mrcong.com,misskon.com",
     "Img": "img.aligncenter",
-    "Next": "div.page-link"
+    "Next": "div.page-link",
+    "Album": "h2.post-box-title a"
   },
   {
     "Site": "yuleba.org,shzx.org,fjrx.org,tjrx.org,whrx.org,dv67.com,xinwenba.net",
@@ -333,7 +334,7 @@
     "Next": "ul.pagination i.fa-angle-right"
   },
   {
-    "Site": "kongquehai.net",
+    "Site": "kongquehai.net,lolili.net",
     "Img": "div.m-list-content img",
     "Next": "div.link_pages a.next",
     "Album": "div.m-list-main h2 a"
@@ -372,5 +373,16 @@
     "Img": "div.newstext img",
     "Next": "div.page a",
     "Album": "div.videos-list li > a"
+  },
+  {
+    "Site": "kantaotu.cc",
+    "Img": "div.message img",
+    "Album": "div.subject > a"
+  },
+  {
+    "Site": "xiurenmn.org",
+    "Img": "div.post_content p > img",
+    "Next": "div.nav-links a.next",
+    "Album": "div.article a"
   }
 ]
