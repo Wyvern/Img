@@ -6,8 +6,7 @@ mod util;
 
 static UA: &str = "Mozilla/5.0 Firefox/200";
 
-#[cfg_attr(not(debug_assertions), no_mangle)]
-fn main() {
+fn check_args() -> String {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         quit!("Too many arguments.\nUsage: {}", "Img <url>");
     }
@@ -19,7 +18,12 @@ fn main() {
     .unwrap_or_else(|| {
         quit!("Please input <url> argument.");
     });
+    arg
+}
 
+#[cfg_attr(not(debug_assertions), no_mangle)]
+fn main() {
+    let arg = check_args();
     let mut next_page = parse(&arg);
 
     if cfg!(not(test)) {
@@ -79,6 +83,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     thread::spawn(|| {
         circle_indicator(r);
     });
+
     let out = process::Command::new("curl")
         .args([
             addr,
@@ -702,10 +707,8 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             thread::yield_now();
             thread::sleep(time::Duration::from_millis(200));
         }
-        // print!("{CL}");
-        // o.flush();
     }
-    print!("{BEG}");
+    print!("{CL}{BEG}");
     o.flush();
 }
 
@@ -763,10 +766,47 @@ mod img {
     #[test]
     fn r#try() {
         // https://girlsteam.club https://legskr.com/
-        let arg = env::args().nth(4);
-        let addr = arg.as_deref().unwrap_or("https://girldreamy.com");
 
-        parse(addr);
+        parse(&arg("https://girldreamy.com"));
+    }
+
+    fn arg(default: &str) -> String {
+        let arg = env::args().nth(4);
+        let addr = arg.unwrap_or(String::from(default));
+        addr
+    }
+
+    #[test]
+    fn bg_img() {
+        let addr = arg("autodesk.com");
+
+        let (html, ..) = get_html(&addr);
+        let sep = "background-image: url";
+        let mut segments = html.split(sep);
+        let mut images = collections::HashSet::new();
+
+        for i in segments.skip(1) {
+            match ['(', ')'].map(|p| i.find(p)) {
+                [Some(lp), Some(rp)] => {
+                    let mut url = &i[lp + 1..rp];
+                    url = url.trim_matches(['\'', '"']).trim();
+
+                    let decode = url
+                        .replace("&#39;", "")
+                        .replace("&apos;", "")
+                        .replace("&#34;", "")
+                        .replace("&quot;", "")
+                        .replace("&#38;", "&")
+                        .replace("&amp;", "&");
+
+                    if !decode.is_empty() {
+                        images.insert(decode);
+                    }
+                }
+                _ => (),
+            }
+        }
+        tdbg!(&images, images.len());
     }
 
     #[test]
