@@ -112,6 +112,14 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
+    let bk_img = if img.is_none() {
+        background_image(&html)
+            .into_iter()
+            .map(|x| canonicalize(x.into(), scheme, host, addr))
+            .collect::<Vec<_>>()
+    } else {
+        vec![]
+    };
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.unwrap_or("img[src]"));
     let src = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
@@ -138,10 +146,14 @@ fn parse(addr: &str) -> String {
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-    let [albums_len, imgs_len] = [albums.as_ref().map_or(0, |a| a.len()), imgs.len()];
+    let [albums_len, imgs_len] = [
+        albums.as_ref().map_or(0, |a| a.len()),
+        imgs.len() + bk_img.len(),
+    ];
+
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
-    match (has_album, !imgs.is_empty()) {
+    match (has_album, imgs_len > 0) {
         (true, true) => {
             pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
         }
@@ -159,7 +171,7 @@ fn parse(addr: &str) -> String {
         t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
     };
 
-    match (has_album, !imgs.is_empty()) {
+    match (has_album, imgs_len > 0) {
         (_, true) => {
             use collections::*;
             let mut urls = HashSet::new();
@@ -204,6 +216,9 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
 
+            for bk in bk_img {
+                urls.insert(bk);
+            }
             if !urls.is_empty() {
                 // tdbg!(&urls);
                 download(t, urls, host);
@@ -707,6 +722,33 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     o.flush();
 }
 
+///Parse & extract css style `background-image:` url
+fn background_image(html: &str) -> collections::HashSet<&str> {
+    let sep = "background-image: url";
+    let mut segments = html.split(sep);
+    let mut images = collections::HashSet::new();
+
+    for i in segments.skip(1) {
+        if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| i.find(p)) {
+            let mut url = &i[lp + 1..rp];
+            url = url.trim_matches(['\'', '"']).trim();
+
+            let mut strip_matches = |p: &str| {
+                if let Some(s) = url.strip_prefix(p) {
+                    url = s.strip_suffix(p).unwrap();
+                }
+            };
+            ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
+            url = &url[..url.find('&').unwrap_or(url.len())];
+
+            if !url.is_empty() {
+                images.insert(url);
+            }
+        }
+    }
+    images
+}
+
 #[cfg(test)]
 mod img {
     use super::*;
@@ -773,29 +815,8 @@ mod img {
     #[test]
     fn bg_img() {
         let (html, ..) = get_html(&arg("autodesk.com"));
-        let sep = "background-image: url";
-        let mut segments = html.split(sep);
-        let mut images = collections::HashSet::new();
-
-        for i in segments.skip(1) {
-            if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| i.find(p)) {
-                let mut url = &i[lp + 1..rp];
-                url = url.trim_matches(['\'', '"']).trim();
-
-                let mut strip_matches = |p: &str| {
-                    if let Some(s) = url.strip_prefix(p) {
-                        url = s.strip_suffix(p).unwrap();
-                    }
-                };
-                ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
-                url = &url[..url.find('&').unwrap_or(url.len())];
-
-                if !url.is_empty() {
-                    images.insert(url);
-                }
-            }
-        }
-        tdbg!(&images, images.len());
+        let r = background_image(&html);
+        tdbg!(&r, r.len());
     }
 
     #[test]
