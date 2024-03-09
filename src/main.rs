@@ -10,15 +10,15 @@ fn check_args() -> String {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         quit!("Too many arguments.\nUsage: {}", "Img <url>");
     }
-    let arg = if cfg!(test) {
+
+    if cfg!(test) {
         env::args().skip(3).nth(1)
     } else {
         env::args().nth(1)
     }
     .unwrap_or_else(|| {
         quit!("Please input <url> argument.");
-    });
-    arg
+    })
 }
 
 #[cfg_attr(not(debug_assertions), no_mangle)]
@@ -772,38 +772,34 @@ mod img {
 
     fn arg(default: &str) -> String {
         let arg = env::args().nth(4);
-        let addr = arg.unwrap_or(String::from(default));
-        addr
+        arg.unwrap_or(String::from(default))
     }
 
     #[test]
     fn bg_img() {
-        let addr = arg("autodesk.com");
-
-        let (html, ..) = get_html(&addr);
+        let (html, ..) = get_html(&arg("autodesk.com"));
         let sep = "background-image: url";
         let mut segments = html.split(sep);
         let mut images = collections::HashSet::new();
 
         for i in segments.skip(1) {
-            match ['(', ')'].map(|p| i.find(p)) {
-                [Some(lp), Some(rp)] => {
-                    let mut url = &i[lp + 1..rp];
-                    url = url.trim_matches(['\'', '"']).trim();
+            if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| i.find(p)) {
+                let mut url = &i[lp + 1..rp];
+                url = url.trim_matches(['\'', '"']).trim();
 
-                    let decode = url
-                        .replace("&#39;", "")
-                        .replace("&apos;", "")
-                        .replace("&#34;", "")
-                        .replace("&quot;", "")
-                        .replace("&#38;", "&")
-                        .replace("&amp;", "&");
-
-                    if !decode.is_empty() {
-                        images.insert(decode);
+                let mut strip_matches = |p: &str| {
+                    if let Some(s) = url.strip_prefix(p) {
+                        url = s.strip_suffix(p).unwrap();
                     }
+                };
+                ["&#39;", "&apos;", "&#34;", "&quot;"].map(|x| {
+                    strip_matches(x);
+                });
+                url = &url[..url.find('&').unwrap_or(url.len())];
+
+                if !url.is_empty() {
+                    images.insert(url);
                 }
-                _ => (),
             }
         }
         tdbg!(&images, images.len());
