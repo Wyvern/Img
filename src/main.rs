@@ -159,20 +159,6 @@ fn parse(addr: &str) -> String {
         t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
     };
 
-    let canonicalize_url = |u: String| {
-        if !u.starts_with("http") {
-            if u.starts_with("//") {
-                format!("{scheme}:{u}")
-            } else if u.starts_with('/') {
-                format!("{scheme}://{host}{u}")
-            } else {
-                format!("{}/{u}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
-            }
-        } else {
-            u
-        }
-    };
-
     match (has_album, !imgs.is_empty()) {
         (_, true) => {
             use collections::*;
@@ -204,7 +190,7 @@ fn parse(addr: &str) -> String {
                         _ => clean_url.to_owned(),
                     };
                     // tdbg!(&r);
-                    if r.trim().is_empty() || !urls.insert(canonicalize_url(r)) {
+                    if r.trim().is_empty() || !urls.insert(canonicalize(r, scheme, host, addr)) {
                         empty_dup += 1;
                     }
                 }
@@ -253,7 +239,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize_url(href);
+                        let album_url = canonicalize(href, scheme, host, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -329,7 +315,27 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    next_sel.map_or_else(<_>::default, |n| check_next(page.select(n), addr))
+    next_sel.map_or_else(<_>::default, |n| {
+        check_next(page.select(n), scheme, host, addr)
+    })
+}
+
+///Canonicalize `img/next` link `url` in `addr`
+fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
+    if url.is_empty() {
+        return url;
+    }
+    if !url.starts_with("http") {
+        if url.starts_with("//") {
+            format!("{scheme}:{url}")
+        } else if url.starts_with('/') {
+            format!("{scheme}://{host}{url}")
+        } else {
+            format!("{}/{url}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
+        }
+    } else {
+        url
+    }
 }
 
 ///Perform photo download operation
@@ -504,7 +510,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
+fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &str) -> String {
     let mut next_link: String;
     if nexts.is_empty() {
         next_link = String::default();
@@ -616,19 +622,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
         next_link = String::default();
     }
-    if !next_link.is_empty() && !next_link.starts_with("http") {
-        next_link = format!(
-            "{}{}",
-            if next_link.starts_with("//") {
-                &cur[..cur.find("//").unwrap()]
-            } else if next_link.starts_with('/') {
-                &cur[..cur[10..].find('/').unwrap() + 10]
-            } else {
-                &cur[..=cur.rfind('/').unwrap()]
-            },
-            next_link
-        );
-    }
+
+    next_link = canonicalize(next_link, scheme, host, cur);
 
     tdbg!(next_link)
 }
@@ -792,9 +787,7 @@ mod img {
                         url = s.strip_suffix(p).unwrap();
                     }
                 };
-                ["&#39;", "&apos;", "&#34;", "&quot;"].map(|x| {
-                    strip_matches(x);
-                });
+                ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
                 url = &url[..url.find('&').unwrap_or(url.len())];
 
                 if !url.is_empty() {
