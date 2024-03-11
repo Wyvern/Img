@@ -5,6 +5,8 @@ use {std::*, util::*};
 mod util;
 
 static UA: &str = "Mozilla/5.0 Firefox/200";
+static BGI: &str = "background-image: url";
+static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 
 fn check_args() -> String {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
@@ -53,11 +55,6 @@ fn check_host(addr: &str) -> [&str; 2] {
 
 ///Get `host` info and Generate `img/next/album` selector data
 fn host_info(host: &str) -> [Option<&str>; 3] {
-    use {serde_json::*, sync::*};
-
-    // static JSON: LazyLock<Value> = LazyLock::new(|| website());
-    static JSON: OnceLock<Value> = OnceLock::new();
-
     let site = JSON
         .get_or_init(website)
         .as_array()
@@ -85,16 +82,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     });
 
     let out = process::Command::new("curl")
-        .args([
-            addr,
-            //"--ssl-auto-client-cert",
-            "--compressed",
-            "-e",
-            host,
-            "-A",
-            UA,
-            "-fsSL",
-        ])
+        .args([addr, "--compressed", "-e", host, "-A", UA, "-fsSL"])
         .output()
         .unwrap_or_else(|e| {
             s.send(());
@@ -122,7 +110,7 @@ fn parse(addr: &str) -> String {
     };
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.unwrap_or("img[src]"));
-    let src = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
+    let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
     });
@@ -173,26 +161,31 @@ fn parse(addr: &str) -> String {
 
     match (has_album, imgs_len > 0) {
         (_, true) => {
-            use collections::*;
-            let mut urls = HashSet::new();
+            let mut urls = collections::HashSet::new();
             let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
-                let src = ["data-src", "data-lazy", "data-lazy-src", src]
+                let value = ["data-src", "data-lazy", "data-lazy-src", attr]
                     .iter()
                     .find_map(|&a| img.attr(a))
                     .expect("Invalid img[src] selector!");
 
-                if src.starts_with("data:image/") {
+                if value.starts_with("data:image/") {
                     if cfg!(feature = "embed") {
-                        if !urls.insert(src) {
+                        if !urls.insert(value) {
                             empty_dup += 1;
                         }
                     } else {
                         embed += 1;
                     }
+                } else if value.starts_with(BGI) {
+                    if !bgi(value.trim_start_matches(BGI)).is_some_and(|url| {
+                        urls.insert(canonicalize(url.into(), scheme, host, addr))
+                    }) {
+                        empty_dup += 1;
+                    }
                 } else {
-                    let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                    let url = &value[value.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
                     let r = match ['-', '.'].map(|c| clean_url.rfind(c)) {
@@ -722,29 +715,32 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     o.flush();
 }
 
-///Parse & extract css style `background-image:` url
+///Parse `html tag` style `background-image:` url
+fn bgi(content: &str) -> Option<&str> {
+    if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| content.find(p)) {
+        let mut url = &content[lp + 1..rp];
+        url = url.trim_matches(['\'', '"']).trim();
+
+        let mut strip_matches = |p: &str| {
+            if let Some(s) = url.strip_prefix(p) {
+                url = s.strip_suffix(p).unwrap();
+            }
+        };
+        ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
+        url = &url[..url.find('&').unwrap_or(url.len())];
+        Some(url)
+    } else {
+        None
+    }
+}
+
+///Get `page` css style `background-image:` url
 fn background_image(html: &str) -> collections::HashSet<&str> {
-    let sep = "background-image: url";
-    let mut segments = html.split(sep);
+    let mut segments = html.split(BGI);
     let mut images = collections::HashSet::new();
 
     for i in segments.skip(1) {
-        if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| i.find(p)) {
-            let mut url = &i[lp + 1..rp];
-            url = url.trim_matches(['\'', '"']).trim();
-
-            let mut strip_matches = |p: &str| {
-                if let Some(s) = url.strip_prefix(p) {
-                    url = s.strip_suffix(p).unwrap();
-                }
-            };
-            ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
-            url = &url[..url.find('&').unwrap_or(url.len())];
-
-            if !url.is_empty() {
-                images.insert(url);
-            }
-        }
+        bgi(i).is_some_and(|url| images.insert(url));
     }
     images
 }
@@ -838,12 +834,9 @@ mod img {
 
     #[test]
     fn sanity_check_json() {
-        use {collections::*, serde_json::*, sync::*};
-
-        static JSON: OnceLock<Value> = OnceLock::new();
-        let mut sites = HashSet::new();
+        let mut sites = collections::HashSet::new();
         let mut dup_site = vec![];
-        let mut img_sel = HashMap::new();
+        let mut img_sel = collections::HashMap::new();
 
         JSON.get_or_init(website)
             .as_array()
