@@ -4,20 +4,28 @@ use {std::*, util::*};
 
 mod util;
 
-#[cfg_attr(not(debug_assertions), no_mangle)]
-fn main() {
+static UA: &str = "Mozilla/5.0 Firefox/200";
+static BGI: &str = "background-image: url";
+static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
+
+fn check_args() -> String {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         quit!("Too many arguments.\nUsage: {}", "Img <url>");
     }
-    let arg = if cfg!(test) {
+
+    if cfg!(test) {
         env::args().skip(3).nth(1)
     } else {
         env::args().nth(1)
     }
     .unwrap_or_else(|| {
         quit!("Please input <url> argument.");
-    });
+    })
+}
 
+#[cfg_attr(not(debug_assertions), no_mangle)]
+fn main() {
+    let arg = check_args();
     let mut next_page = parse(&arg);
 
     if cfg!(not(test)) {
@@ -47,11 +55,6 @@ fn check_host(addr: &str) -> [&str; 2] {
 
 ///Get `host` info and Generate `img/next/album` selector data
 fn host_info(host: &str) -> [Option<&str>; 3] {
-    use {serde_json::*, sync::*};
-
-    // static JSON: LazyLock<Value> = LazyLock::new(|| website());
-    static JSON: OnceLock<Value> = OnceLock::new();
-
     let site = JSON
         .get_or_init(website)
         .as_array()
@@ -77,17 +80,9 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     thread::spawn(|| {
         circle_indicator(r);
     });
+
     let out = process::Command::new("curl")
-        .args([
-            addr,
-            //"--ssl-auto-client-cert",
-            "--compressed",
-            "-e",
-            host,
-            "-A",
-            "Mozilla Firefox",
-            "-fsSL",
-        ])
+        .args([addr, "--compressed", "-e", host, "-A", UA, "-fsSL"])
         .output()
         .unwrap_or_else(|e| {
             s.send(());
@@ -105,9 +100,17 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
+    let bk_img = if img.is_none() {
+        background_image(&html)
+            .into_iter()
+            .map(|x| canonicalize(x.into(), scheme, host, addr))
+            .collect::<Vec<_>>()
+    } else {
+        vec![]
+    };
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.unwrap_or("img[src]"));
-    let src = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
+    let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
     });
@@ -131,10 +134,14 @@ fn parse(addr: &str) -> String {
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-    let [albums_len, imgs_len] = [albums.as_ref().map_or(0, |a| a.len()), imgs.len()];
+    let [albums_len, imgs_len] = [
+        albums.as_ref().map_or(0, |a| a.len()),
+        imgs.len() + bk_img.len(),
+    ];
+
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
-    match (has_album, !imgs.is_empty()) {
+    match (has_album, imgs_len > 0) {
         (true, true) => {
             pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
         }
@@ -152,42 +159,33 @@ fn parse(addr: &str) -> String {
         t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
     };
 
-    let canonicalize_url = |u: String| {
-        if !u.starts_with("http") {
-            if u.starts_with("//") {
-                format!("{scheme}:{u}")
-            } else if u.starts_with('/') {
-                format!("{scheme}://{host}{u}")
-            } else {
-                format!("{}/{u}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
-            }
-        } else {
-            u
-        }
-    };
-
-    match (has_album, !imgs.is_empty()) {
+    match (has_album, imgs_len > 0) {
         (_, true) => {
-            use collections::*;
-            let mut urls = HashSet::new();
+            let mut urls = collections::HashSet::new();
             let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
-                let src = ["data-src", src]
+                let value = ["data-src", "data-lazy", "data-lazy-src", attr]
                     .iter()
                     .find_map(|&a| img.attr(a))
                     .expect("Invalid img[src] selector!");
 
-                if src.starts_with("data:image/") {
+                if value.starts_with("data:image/") {
                     if cfg!(feature = "embed") {
-                        if !urls.insert(src) {
+                        if !urls.insert(value) {
                             empty_dup += 1;
                         }
                     } else {
                         embed += 1;
                     }
+                } else if value.starts_with(BGI) {
+                    if !bgi(value.trim_start_matches(BGI)).is_some_and(|url| {
+                        urls.insert(canonicalize(url.into(), scheme, host, addr))
+                    }) {
+                        empty_dup += 1;
+                    }
                 } else {
-                    let url = &src[src.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                    let url = &value[value.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
                     let r = match ['-', '.'].map(|c| clean_url.rfind(c)) {
@@ -197,7 +195,7 @@ fn parse(addr: &str) -> String {
                         _ => clean_url.to_owned(),
                     };
                     // tdbg!(&r);
-                    if r.trim().is_empty() || !urls.insert(canonicalize_url(r)) {
+                    if r.trim().is_empty() || !urls.insert(canonicalize(r, scheme, host, addr)) {
                         empty_dup += 1;
                     }
                 }
@@ -211,6 +209,9 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
 
+            for bk in bk_img {
+                urls.insert(bk);
+            }
             if !urls.is_empty() {
                 // tdbg!(&urls);
                 download(t, urls, host);
@@ -246,7 +247,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize_url(href);
+                        let album_url = canonicalize(href, scheme, host, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -322,7 +323,27 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    next_sel.map_or_else(<_>::default, |n| check_next(page.select(n), addr))
+    next_sel.map_or_else(<_>::default, |n| {
+        check_next(page.select(n), scheme, host, addr)
+    })
+}
+
+///Canonicalize `img/next` link `url` in `addr`
+fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
+    if url.is_empty() {
+        return url;
+    }
+    if !url.starts_with("http") {
+        if url.starts_with("//") {
+            format!("{scheme}:{url}")
+        } else if url.starts_with('/') {
+            format!("{scheme}://{host}{url}")
+        } else {
+            format!("{}/{url}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
+        }
+    } else {
+        url
+    }
 }
 
 ///Perform photo download operation
@@ -401,7 +422,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            UA,
             if cfg!(debug_assertions) {
                 "-fsSL"
             } else {
@@ -448,7 +469,7 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             "-e",
             host,
             "-A",
-            "Mozilla Firefox",
+            UA,
             "-fsSIL",
             "--compressed",
             "-w",
@@ -497,7 +518,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
+fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &str) -> String {
     let mut next_link: String;
     if nexts.is_empty() {
         next_link = String::default();
@@ -511,7 +532,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 e.tag().unwrap() == "span"
                     && (e
                         .attr("class")
-                        .map_or(true, |c| c.contains("current") || c.contains("now")))
+                        .map_or(false, |c| c.contains("current") || c.contains("now"))
+                        || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
             });
             let a = tags
                 .next_back()
@@ -608,19 +630,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
         next_link = String::default();
     }
-    if !next_link.is_empty() && !next_link.starts_with("http") {
-        next_link = format!(
-            "{}{}",
-            if next_link.starts_with("//") {
-                &cur[..cur.find("//").unwrap()]
-            } else if next_link.starts_with('/') {
-                &cur[..cur[10..].find('/').unwrap() + 10]
-            } else {
-                &cur[..=cur.rfind('/').unwrap()]
-            },
-            next_link
-        );
-    }
+
+    next_link = canonicalize(next_link, scheme, host, cur);
 
     tdbg!(next_link)
 }
@@ -699,11 +710,39 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             thread::yield_now();
             thread::sleep(time::Duration::from_millis(200));
         }
-        // print!("{CL}");
-        // o.flush();
     }
-    print!("{BEG}");
+    print!("{CL}{BEG}");
     o.flush();
+}
+
+///Parse `html tag` style `background-image:` url
+fn bgi(content: &str) -> Option<&str> {
+    if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| content.find(p)) {
+        let mut url = &content[lp + 1..rp];
+        url = url.trim_matches(['\'', '"']).trim();
+
+        let mut strip_matches = |p: &str| {
+            if let Some(s) = url.strip_prefix(p) {
+                url = s.strip_suffix(p).unwrap();
+            }
+        };
+        ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
+        url = &url[..url.find('&').unwrap_or(url.len())];
+        Some(url)
+    } else {
+        None
+    }
+}
+
+///Get `page` css style `background-image:` url
+fn background_image(html: &str) -> collections::HashSet<&str> {
+    let mut segments = html.split(BGI);
+    let mut images = collections::HashSet::new();
+
+    for i in segments.skip(1) {
+        bgi(i).is_some_and(|url| images.insert(url));
+    }
+    images
 }
 
 #[cfg(test)]
@@ -760,10 +799,20 @@ mod img {
     #[test]
     fn r#try() {
         // https://girlsteam.club https://legskr.com/
-        let arg = env::args().nth(4);
-        let addr = arg.as_deref().unwrap_or("https://girldreamy.com");
 
-        parse(addr);
+        parse(&arg("https://girldreamy.com"));
+    }
+
+    fn arg(default: &str) -> String {
+        let arg = env::args().nth(4);
+        arg.unwrap_or(String::from(default))
+    }
+
+    #[test]
+    fn bg_img() {
+        let (html, ..) = get_html(&arg("autodesk.com"));
+        let r = background_image(&html);
+        tdbg!(&r, r.len());
     }
 
     #[test]
@@ -785,12 +834,9 @@ mod img {
 
     #[test]
     fn sanity_check_json() {
-        use {collections::*, serde_json::*, sync::*};
-
-        static JSON: OnceLock<Value> = OnceLock::new();
-        let mut sites = HashSet::new();
+        let mut sites = collections::HashSet::new();
         let mut dup_site = vec![];
-        let mut img_sel = HashMap::new();
+        let mut img_sel = collections::HashMap::new();
 
         JSON.get_or_init(website)
             .as_array()
