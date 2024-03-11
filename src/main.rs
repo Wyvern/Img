@@ -4,9 +4,15 @@ use {std::*, util::*};
 
 mod util;
 
-static UA: &str = "Mozilla/5.0 Firefox/200";
 static BGI: &str = "background-image: url";
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
+static CURL: [&str; 5] = [
+    "--compressed",
+    "-A",
+    "Mozilla/5.0 Firefox/200",
+    "-fsSL",
+    "-e",
+];
 
 fn check_args() -> String {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
@@ -80,9 +86,9 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     thread::spawn(|| {
         circle_indicator(r);
     });
-
     let out = process::Command::new("curl")
-        .args([addr, "--compressed", "-e", host, "-A", UA, "-fsSL"])
+        .args(CURL)
+        .args([host, addr])
         .output()
         .unwrap_or_else(|e| {
             s.send(());
@@ -416,19 +422,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
 
     if cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl.args([
-            "--parallel-immediate",
-            "--compressed",
-            "-e",
-            host,
-            "-A",
-            UA,
-            if cfg!(debug_assertions) {
-                "-fsSL"
-            } else {
-                "-fsL"
-            },
-        ]);
+        let cmd = curl.args(CURL).args([host, "--parallel-immediate"]);
         #[cfg(not(feature = "infer"))]
         cmd.spawn();
 
@@ -464,17 +458,9 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
     let mut name_ext = String::default();
     tdbg!(url);
     process::Command::new("curl")
-        .args([
-            url,
-            "-e",
-            host,
-            "-A",
-            UA,
-            "-fsSIL",
-            "--compressed",
-            "-w",
-            "%{content_type}",
-        ])
+        .args(["-I", "-w", "%{content_type}"])
+        .args(CURL)
+        .args([host, url])
         .output()
         .map_or_else(
             |e| pl!("Get {url} content header info failed: {e}"),
@@ -751,15 +737,16 @@ mod img {
 
     #[test]
     fn html() {
-        let addr = "mmm.red";
-        let (html, ..) = get_html(addr);
+        let (html, ..) = get_html(&arg("mmm.red"));
         dbg!(&html);
     }
 
     #[test]
     fn htmlq() {
-        let addr = "https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7689-tang-an-qi/";
-        let (html, [img, .., album], _) = get_html(addr);
+        let addr =
+            arg("https;://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7689-tang-an-qi/");
+        let (html, [img, .., album], _) = get_html(&addr);
+
         use process::*;
 
         let hq = |sel: &str| {
