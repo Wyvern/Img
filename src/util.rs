@@ -172,6 +172,7 @@ mod macros {
     #[macro_export]
     macro_rules! pl {
         ($l:literal $(,$e:expr)*) => {{
+            io::stdout().lock();
             println!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*));
         }}
     }
