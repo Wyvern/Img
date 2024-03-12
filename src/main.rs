@@ -83,6 +83,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let host_info = host_info(host);
     use sync::mpsc::*;
     let (s, r) = channel();
+    io::stdout().lock();
     thread::spawn(|| {
         circle_indicator(r);
     });
@@ -735,6 +736,11 @@ fn background_image(html: &str) -> collections::HashSet<&str> {
 mod img {
     use super::*;
 
+    fn arg(default: &str) -> String {
+        let arg = env::args().nth(4);
+        arg.unwrap_or(String::from(default))
+    }
+
     #[test]
     fn html() {
         let (html, ..) = get_html(&arg("mmm.red"));
@@ -788,11 +794,6 @@ mod img {
         // https://girlsteam.club https://legskr.com/
 
         parse(&arg("https://girldreamy.com"));
-    }
-
-    fn arg(default: &str) -> String {
-        let arg = env::args().nth(4);
-        arg.unwrap_or(String::from(default))
     }
 
     #[test]
