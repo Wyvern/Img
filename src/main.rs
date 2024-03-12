@@ -751,7 +751,7 @@ mod img {
 
         let hq = |sel: &str| {
             let cmd = Command::new("htmlq")
-                .args([sel])
+                .arg(sel)
                 .stdin(Stdio::piped())
                 //.stdout(Stdio::piped())
                 .spawn()
