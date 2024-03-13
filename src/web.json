@@ -252,8 +252,8 @@
     "Album": "div.card-body a"
   },
   {
-    "Site": "xiannvk.net",
-    "Img": "img[referrerpolicy][data-original]",
+    "Site": "xiannvk.net,xiannvk.top",
+    "Img": "div.m-list-content > p > img",
     "Next": "div.link_pages a.next",
     "Album": "div.u-img img"
   },
