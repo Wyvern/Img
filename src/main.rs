@@ -10,7 +10,11 @@ static CURL: [&str; 5] = [
     "--compressed",
     "-A",
     "Mozilla/5.0 Firefox/200",
-    "-fsSL",
+    if cfg!(debug_assertions) {
+        "-fsSL"
+    } else {
+        "-fsL"
+    },
     "-e",
 ];
 
@@ -83,12 +87,18 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let host_info = host_info(host);
     use sync::mpsc::*;
     let (s, r) = channel();
+    io::stdout().lock();
     thread::spawn(|| {
         circle_indicator(r);
     });
     let out = process::Command::new("curl")
         .args(CURL)
-        .args([host, addr])
+        .args([
+            host,
+            addr,
+            #[cfg(not(debug_assertions))]
+            "-S",
+        ])
         .output()
         .unwrap_or_else(|e| {
             s.send(());
@@ -114,6 +124,7 @@ fn parse(addr: &str) -> String {
     } else {
         vec![]
     };
+
     let page = crabquery::Document::from(html);
     let imgs = page.select(img.unwrap_or("img[src]"));
     let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
@@ -705,6 +716,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 fn bgi(content: &str) -> Option<&str> {
     if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| content.find(p)) {
         let mut url = &content[lp + 1..rp];
+
         url = url.trim_matches(['\'', '"']).trim();
 
         let mut strip_matches = |p: &str| {
@@ -714,7 +726,12 @@ fn bgi(content: &str) -> Option<&str> {
         };
         ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
         url = &url[..url.find('&').unwrap_or(url.len())];
-        Some(url)
+
+        if url.is_empty() {
+            None
+        } else {
+            Some(url)
+        }
     } else {
         None
     }
@@ -734,6 +751,11 @@ fn background_image(html: &str) -> collections::HashSet<&str> {
 #[cfg(test)]
 mod img {
     use super::*;
+
+    fn arg(default: &str) -> String {
+        let arg = env::args().nth(4);
+        arg.unwrap_or(String::from(default))
+    }
 
     #[test]
     fn html() {
@@ -788,11 +810,6 @@ mod img {
         // https://girlsteam.club https://legskr.com/
 
         parse(&arg("https://girldreamy.com"));
-    }
-
-    fn arg(default: &str) -> String {
-        let arg = env::args().nth(4);
-        arg.unwrap_or(String::from(default))
     }
 
     #[test]
