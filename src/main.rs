@@ -4,7 +4,7 @@ use {std::*, util::*};
 
 mod util;
 
-static BGI: &str = "background-image: url";
+static CSS: [&str; 3] = ["background-image: url", "background: url", "content: url"];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
@@ -117,12 +117,9 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let bk_img = if img.is_none() {
-        background_image(&html)
-            .into_iter()
-            .map(|x| canonicalize(x.into(), scheme, host, addr))
-            .collect::<Vec<_>>()
+        background_image(&html, scheme, host, addr)
     } else {
-        vec![]
+        collections::HashSet::new()
     };
 
     let page = crabquery::Document::from(html);
@@ -187,19 +184,28 @@ fn parse(addr: &str) -> String {
                     .find_map(|&a| img.attr(a))
                     .expect("Invalid img[src] selector!");
 
-                if value.starts_with("data:image/") {
+                if let Some(sep) = CSS.iter().find(|&&s| value.starts_with(s)) {
+                    let url = url(value.trim_start_matches(sep));
+                    if let Some(u) = url {
+                        if u.starts_with("data:image/") {
+                            if cfg!(feature = "embed") {
+                                if !urls.insert(u.into()) {
+                                    empty_dup += 1;
+                                }
+                            } else {
+                                embed += 1;
+                            }
+                        } else if !urls.insert(canonicalize(u.into(), scheme, host, addr)) {
+                            empty_dup += 1;
+                        }
+                    }
+                } else if value.starts_with("data:image/") {
                     if cfg!(feature = "embed") {
                         if !urls.insert(value) {
                             empty_dup += 1;
                         }
                     } else {
                         embed += 1;
-                    }
-                } else if value.starts_with(BGI) {
-                    if !bgi(value.trim_start_matches(BGI)).is_some_and(|url| {
-                        urls.insert(canonicalize(url.into(), scheme, host, addr))
-                    }) {
-                        empty_dup += 1;
                     }
                 } else {
                     let url = &value[value.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
@@ -217,6 +223,7 @@ fn parse(addr: &str) -> String {
                     }
                 }
             }
+
             if empty_dup > 0 && embed > 0 {
                 let skip = empty_dup + embed;
                 pl!("Skipped <{skip}> Empty/Duplicated/Embed 🏞️");
@@ -225,14 +232,8 @@ fn parse(addr: &str) -> String {
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
-
-            for bk in bk_img {
-                urls.insert(bk);
-            }
-            if !urls.is_empty() {
-                // tdbg!(&urls);
-                download(t, urls, host);
-            }
+            // tdbg!(urls.len(), bk_img.len());
+            download(t, urls.into_iter().chain(bk_img), host)
         }
         (true, false) => {
             let mut all = false;
@@ -364,7 +365,7 @@ fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
 }
 
 ///Perform photo download operation
-fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
+fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if cfg!(all(test, not(feature = "download"))) {
         return;
     }
@@ -423,6 +424,7 @@ fn download(dir: &str, urls: collections::HashSet<String>, host: &str) {
         };
 
         if !path.join(file_name).exists() {
+            // tdbg!(&url);
             curl.args([url.as_str(), "-o", file_name]);
         }
     }
@@ -713,7 +715,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 }
 
 ///Parse `html tag` style `background-image:` url
-fn bgi(content: &str) -> Option<&str> {
+fn url(content: &str) -> Option<&str> {
     if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| content.find(p)) {
         let mut url = &content[lp + 1..rp];
 
@@ -730,7 +732,7 @@ fn bgi(content: &str) -> Option<&str> {
         if url.is_empty() {
             None
         } else {
-            Some(url)
+            Some(url.trim())
         }
     } else {
         None
@@ -738,13 +740,19 @@ fn bgi(content: &str) -> Option<&str> {
 }
 
 ///Get `page` css style `background-image:` url
-fn background_image(html: &str) -> collections::HashSet<&str> {
-    let mut segments = html.split(BGI);
+fn background_image(
+    html: &str,
+    scheme: &str,
+    host: &str,
+    addr: &str,
+) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
-
-    for i in segments.skip(1) {
-        bgi(i).is_some_and(|url| images.insert(url));
-    }
+    CSS.map(|s| {
+        let segments = html.split(s);
+        for seg in segments.skip(1) {
+            url(seg).is_some_and(|u| images.insert(canonicalize(u.into(), scheme, host, addr)));
+        }
+    });
     images
 }
 
@@ -814,8 +822,9 @@ mod img {
 
     #[test]
     fn bg_img() {
-        let (html, ..) = get_html(&arg("autodesk.com"));
-        let r = background_image(&html);
+        let addr = arg("autodesk.com");
+        let (html, _, [scheme, host]) = get_html(&addr);
+        let r = background_image(&html, scheme, host, &addr);
         tdbg!(&r, r.len());
     }
 
