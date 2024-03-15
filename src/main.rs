@@ -4,7 +4,7 @@ use {std::*, util::*};
 
 mod util;
 
-static CSS: [&str; 3] = ["background-image: url", "background: url", "content: url"];
+static CSS: [&str; 2] = ["url(", "image("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
@@ -184,8 +184,8 @@ fn parse(addr: &str) -> String {
                     .find_map(|&a| img.attr(a))
                     .expect("Invalid img[src] selector!");
 
-                if let Some(sep) = CSS.iter().find(|&&s| value.starts_with(s)) {
-                    let url = url(value.trim_start_matches(sep));
+                if let Some(sep) = CSS.iter().find(|&&s| value.contains(s)) {
+                    let url = url(value.split_once(sep).unwrap().1);
                     if let Some(u) = url {
                         if u.starts_with("data:image/") {
                             if cfg!(feature = "embed") {
@@ -714,10 +714,14 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     o.flush();
 }
 
-///Parse `html tag` style `background-image:` url
+///Parse inline `url(),image()`
 fn url(content: &str) -> Option<&str> {
-    if let [Some(lp), Some(rp)] = ['(', ')'].map(|p| content.find(p)) {
-        let mut url = &content[lp + 1..rp];
+    if let Some(rp) = content.find(')') {
+        let mut url = &content[..rp];
+
+        if let Some(dir) = ["rtl ", "ltr "].into_iter().find(|&x| url.starts_with(x)) {
+            url = url.trim_start_matches(dir);
+        }
 
         url = url.trim_matches(['\'', '"']).trim();
 
@@ -728,7 +732,7 @@ fn url(content: &str) -> Option<&str> {
         };
         ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
         url = &url[..url.find('&').unwrap_or(url.len())];
-
+        url = &url[..url.rfind('#').unwrap_or(url.len())];
         if url.is_empty() {
             None
         } else {
@@ -739,7 +743,7 @@ fn url(content: &str) -> Option<&str> {
     }
 }
 
-///Get `page` css style `background-image:` url
+///Get `page` css style `url(),image()`
 fn background_image(
     html: &str,
     scheme: &str,
