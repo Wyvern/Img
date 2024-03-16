@@ -220,8 +220,7 @@ fn parse(addr: &str) -> String {
                         _ => clean_url.to_owned(),
                     };
                     // tdbg!(&r);
-                    if r.trim().is_empty() || !urls.insert(canonicalize(r, scheme, host, addr))
-                    {
+                    if r.trim().is_empty() || !urls.insert(canonicalize(r, scheme, host, addr)) {
                         empty_dup += 1;
                     }
                 }
@@ -404,9 +403,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             .unwrap_or_else(|| quit!("Invalid Url: {}", url))
             + 1..]
             .trim_start_matches(['-', '_']);
-
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
-
         let mut name_ext = String::default();
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
