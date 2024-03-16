@@ -184,19 +184,21 @@ fn parse(addr: &str) -> String {
                     .find_map(|&a| img.attr(a))
                     .expect("Invalid img[src] selector!");
 
-                if let Some(frag) = CSS.iter().find_map(|&s| value.split_once(s)) {
-                    let url = url(frag.1);
-                    if let Some(u) = url {
-                        if u.starts_with("data:image/") {
-                            if cfg!(feature = "embed") {
-                                if !urls.insert(u.into()) {
-                                    empty_dup += 1;
+                if attr == "style" {
+                    if let Some(frag) = CSS.iter().find_map(|&s| value.split_once(s)) {
+                        let url = url(frag.1);
+                        if let Some(u) = url {
+                            if u.starts_with("data:image/") {
+                                if cfg!(feature = "embed") {
+                                    if !urls.insert(u.into()) {
+                                        empty_dup += 1;
+                                    }
+                                } else {
+                                    embed += 1;
                                 }
-                            } else {
-                                embed += 1;
+                            } else if !urls.insert(canonicalize(u.into(), scheme, host, addr)) {
+                                empty_dup += 1;
                             }
-                        } else if !urls.insert(canonicalize(u.into(), scheme, host, addr)) {
-                            empty_dup += 1;
                         }
                     }
                 } else if value.starts_with("data:image/") {
@@ -218,7 +220,8 @@ fn parse(addr: &str) -> String {
                         _ => clean_url.to_owned(),
                     };
                     // tdbg!(&r);
-                    if r.trim().is_empty() || !urls.insert(canonicalize(r, scheme, host, addr)) {
+                    if r.trim().is_empty() || !urls.insert(canonicalize(r, scheme, host, addr))
+                    {
                         empty_dup += 1;
                     }
                 }
@@ -401,6 +404,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             .unwrap_or_else(|| quit!("Invalid Url: {}", url))
             + 1..]
             .trim_start_matches(['-', '_']);
+
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
 
         let mut name_ext = String::default();
