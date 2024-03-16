@@ -184,8 +184,8 @@ fn parse(addr: &str) -> String {
                     .find_map(|&a| img.attr(a))
                     .expect("Invalid img[src] selector!");
 
-                if let Some(sep) = CSS.iter().find(|&&s| value.contains(s)) {
-                    let url = url(value.split_once(sep).unwrap().1);
+                if let Some(frag) = CSS.iter().find_map(|&s| value.split_once(s)) {
+                    let url = url(frag.1);
                     if let Some(u) = url {
                         if u.starts_with("data:image/") {
                             if cfg!(feature = "embed") {
@@ -718,13 +718,8 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 fn url(content: &str) -> Option<&str> {
     if let Some(rp) = content.find(')') {
         let mut url = &content[..rp];
-
-        if let Some(dir) = ["rtl ", "ltr "].into_iter().find(|&x| url.starts_with(x)) {
-            url = url.trim_start_matches(dir);
-        }
-
+        ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
-
         let mut strip_matches = |p: &str| {
             if let Some(s) = url.strip_prefix(p) {
                 url = s.strip_suffix(p).unwrap();
