@@ -390,5 +390,10 @@
     "Img": "div.w3-col > img",
     "Next": "div.pagination a.pagination_num",
     "Album": "div.w3-quarter > a > h4"
+  },
+  {
+    "Site": "asupanpenyegar.com",
+    "Img": "div[itemprop] p img",
+    "Album": "h2.entry-title > a"
   }
 ]
