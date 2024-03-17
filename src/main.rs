@@ -520,6 +520,10 @@ fn magic_number_type(pb: path::PathBuf) {
 /// Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &str) -> String {
     let mut next_link: String;
+    let splitter = |tag: &crabquery::Element| {
+        tag.attr("class")
+            .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
+    };
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
@@ -527,12 +531,9 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
         let element = &nexts[0];
         if element.tag().unwrap() == "span" {
             let items = element.parent().unwrap().children();
-
             let mut tags = items.split(|e| {
                 e.tag().unwrap() == "span"
-                    && (e
-                        .attr("class")
-                        .map_or(false, |c| c.contains("current") || c.contains("now"))
+                    && (splitter(e)
                         || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
             });
             let a = tags
@@ -555,13 +556,9 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
         if element.tag().unwrap() == "div" && nexts.len() == 2 {
             let tags = element.children();
             let mut rest = tags.split(|tag| {
-                tag.children().first().map_or_else(
-                    || {
-                        tag.tag().unwrap() == "span"
-                            || tag.attr("class").is_some_and(|c| c.contains("cur"))
-                    },
-                    |f| f.attr("class").is_some_and(|c| c.contains("cur")),
-                )
+                tag.children()
+                    .first()
+                    .map_or_else(|| tag.tag().unwrap() == "span" || splitter(tag), splitter)
             });
             let s = rest.next_back().unwrap();
             next_link = s.first().map_or(String::default(), |f| {
@@ -606,8 +603,11 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
                     .expect("NO [href] attr found in <next> link."),
                 None => {
                     let pos = nexts.iter().rposition(|e| {
-                        let href = e.attr("href").unwrap();
-                        cur.trim().ends_with(href.trim()) || href.trim() == "#"
+                        e.attr("href").is_some_and(|h| {
+                            cur.trim().ends_with(h.trim())
+                                || h.trim() == "#"
+                                || format!("{}/1", cur.trim_end_matches('/')).ends_with(h.trim())
+                        })
                     });
                     match pos {
                         Some(p) => {
