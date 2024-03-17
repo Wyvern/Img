@@ -179,24 +179,32 @@ fn parse(addr: &str) -> String {
             let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
-                let value = ["data-src", "data-lazy", "data-lazy-src", attr]
-                    .iter()
-                    .find_map(|&a| img.attr(a))
-                    .expect("Invalid img[src] selector!");
+                let value = [
+                    "data-src",
+                    "data-lazy",
+                    "data-lazy-src",
+                    "data-lazy-srcset",
+                    attr,
+                ]
+                .iter()
+                .find_map(|&a| img.attr(a))
+                .expect("Invalid img[src] selector!");
 
-                if let Some(sep) = CSS.iter().find(|&&s| value.contains(s)) {
-                    let url = url(value.split_once(sep).unwrap().1);
-                    if let Some(u) = url {
-                        if u.starts_with("data:image/") {
-                            if cfg!(feature = "embed") {
-                                if !urls.insert(u.into()) {
-                                    empty_dup += 1;
+                if attr == "style" {
+                    if let Some(frag) = CSS.iter().find_map(|&s| value.split_once(s)) {
+                        let url = url(frag.1);
+                        if let Some(u) = url {
+                            if u.starts_with("data:image/") {
+                                if cfg!(feature = "embed") {
+                                    if !urls.insert(u.into()) {
+                                        empty_dup += 1;
+                                    }
+                                } else {
+                                    embed += 1;
                                 }
-                            } else {
-                                embed += 1;
+                            } else if !urls.insert(canonicalize(u.into(), scheme, host, addr)) {
+                                empty_dup += 1;
                             }
-                        } else if !urls.insert(canonicalize(u.into(), scheme, host, addr)) {
-                            empty_dup += 1;
                         }
                     }
                 } else if value.starts_with("data:image/") {
@@ -211,14 +219,10 @@ fn parse(addr: &str) -> String {
                     let url = &value[value.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
                     let clean_url = &url[..url.find('&').unwrap_or(url.len())];
 
-                    let r = match ['-', '.'].map(|c| clean_url.rfind(c)) {
-                        [Some(dash), Some(dot)] if clean_url[dash..dot].contains('x') => {
-                            clean_url.replace(&clean_url[dash..dot], "")
-                        }
-                        _ => clean_url.to_owned(),
-                    };
-                    // tdbg!(&r);
-                    if r.trim().is_empty() || !urls.insert(canonicalize(r, scheme, host, addr)) {
+                    // tdbg!(clean_url);
+                    if clean_url.trim().is_empty()
+                        || !urls.insert(canonicalize(clean_url.into(), scheme, host, addr))
+                    {
                         empty_dup += 1;
                     }
                 }
@@ -402,7 +406,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             + 1..]
             .trim_start_matches(['-', '_']);
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
-
         let mut name_ext = String::default();
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
@@ -519,6 +522,10 @@ fn magic_number_type(pb: path::PathBuf) {
 /// Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &str) -> String {
     let mut next_link: String;
+    let splitter = |tag: &crabquery::Element| {
+        tag.attr("class")
+            .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
+    };
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
@@ -526,12 +533,9 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
         let element = &nexts[0];
         if element.tag().unwrap() == "span" {
             let items = element.parent().unwrap().children();
-
             let mut tags = items.split(|e| {
                 e.tag().unwrap() == "span"
-                    && (e
-                        .attr("class")
-                        .map_or(false, |c| c.contains("current") || c.contains("now"))
+                    && (splitter(e)
                         || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
             });
             let a = tags
@@ -554,13 +558,9 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
         if element.tag().unwrap() == "div" && nexts.len() == 2 {
             let tags = element.children();
             let mut rest = tags.split(|tag| {
-                tag.children().first().map_or_else(
-                    || {
-                        tag.tag().unwrap() == "span"
-                            || tag.attr("class").is_some_and(|c| c.contains("cur"))
-                    },
-                    |f| f.attr("class").is_some_and(|c| c.contains("cur")),
-                )
+                tag.children()
+                    .first()
+                    .map_or_else(|| tag.tag().unwrap() == "span" || splitter(tag), splitter)
             });
             let s = rest.next_back().unwrap();
             next_link = s.first().map_or(String::default(), |f| {
@@ -605,8 +605,11 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
                     .expect("NO [href] attr found in <next> link."),
                 None => {
                     let pos = nexts.iter().rposition(|e| {
-                        let href = e.attr("href").unwrap();
-                        cur.trim().ends_with(href.trim()) || href.trim() == "#"
+                        e.attr("href").is_some_and(|h| {
+                            cur.trim().ends_with(h.trim())
+                                || h.trim() == "#"
+                                || format!("{}/1", cur.trim_end_matches('/')).ends_with(h.trim())
+                        })
                     });
                     match pos {
                         Some(p) => {
@@ -718,13 +721,8 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 fn url(content: &str) -> Option<&str> {
     if let Some(rp) = content.find(')') {
         let mut url = &content[..rp];
-
-        if let Some(dir) = ["rtl ", "ltr "].into_iter().find(|&x| url.starts_with(x)) {
-            url = url.trim_start_matches(dir);
-        }
-
+        ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
-
         let mut strip_matches = |p: &str| {
             if let Some(s) = url.strip_prefix(p) {
                 url = s.strip_suffix(p).unwrap();
