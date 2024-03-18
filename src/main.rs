@@ -4,7 +4,7 @@ use {std::*, util::*};
 
 mod util;
 
-static CSS: [&str; 2] = ["url(", "image("];
+static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
@@ -117,7 +117,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let bk_img = if img.is_none() {
-        background_image(&html, scheme, host, addr)
+        css_image(&html, scheme, host, addr)
     } else {
         collections::HashSet::new()
     };
@@ -723,12 +723,8 @@ fn url(content: &str) -> Option<&str> {
         let mut url = &content[..rp];
         ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
-        let mut strip_matches = |p: &str| {
-            if let Some(s) = url.strip_prefix(p) {
-                url = s.strip_suffix(p).unwrap();
-            }
-        };
-        ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
+        ["&#39;", "&apos;", "&#34;", "&quot;"]
+            .map(|x| url = url.trim_start_matches(x).trim_end_matches(x));
         url = &url[..url.find('&').unwrap_or(url.len())];
         url = &url[..url.rfind('#').unwrap_or(url.len())];
         if url.is_empty() {
@@ -741,18 +737,22 @@ fn url(content: &str) -> Option<&str> {
     }
 }
 
-///Get `page` css style `url(),image()`
-fn background_image(
-    html: &str,
-    scheme: &str,
-    host: &str,
-    addr: &str,
-) -> collections::HashSet<String> {
+///Get `page` css style `url(),image(),image-set()`
+fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
     CSS.map(|s| {
         let segments = html.split(s);
-        for seg in segments.skip(1) {
-            url(seg).is_some_and(|u| images.insert(canonicalize(u.into(), scheme, host, addr)));
+        if s == "image-set(" {
+            for seg in segments.skip(1) {
+                images = images
+                    .union(&css_image(seg, scheme, host, addr))
+                    .map(|x| x.into())
+                    .collect();
+            }
+        } else {
+            for seg in segments.skip(1) {
+                url(seg).is_some_and(|u| images.insert(canonicalize(u.into(), scheme, host, addr)));
+            }
         }
     });
     images
@@ -823,10 +823,10 @@ mod img {
     }
 
     #[test]
-    fn bg_img() {
+    fn css_img() {
         let addr = arg("autodesk.com");
         let (html, _, [scheme, host]) = get_html(&addr);
-        let r = background_image(&html, scheme, host, &addr);
+        let r = css_image(&html, scheme, host, &addr);
         tdbg!(&r, r.len());
     }
 
