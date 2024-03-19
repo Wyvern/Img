@@ -123,7 +123,7 @@ fn parse(addr: &str) -> String {
     };
 
     let page = crabquery::Document::from(html);
-    let imgs = page.select(img.unwrap_or("img[src]"));
+    let imgs = page.select(img.unwrap_or("img"));
     let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
@@ -192,7 +192,7 @@ fn parse(addr: &str) -> String {
 
                 if attr == "style" {
                     if let Some(frag) = CSS.iter().find_map(|&s| value.split_once(s)) {
-                        let url = url(frag.1);
+                        let url = url_image(frag.1);
                         if let Some(u) = url {
                             if u.starts_with("data:image/") {
                                 if cfg!(feature = "embed") {
@@ -718,7 +718,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 }
 
 ///Parse inline `url(),image()`
-fn url(content: &str) -> Option<&str> {
+fn url_image(content: &str) -> Option<&str> {
     if let Some(rp) = content.find(')') {
         let mut url = &content[..rp];
         ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
@@ -746,12 +746,13 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
             for seg in segments.skip(1) {
                 images = images
                     .union(&css_image(seg, scheme, host, addr))
-                    .map(|x| x.into())
+                    .map(Into::into)
                     .collect();
             }
         } else {
             for seg in segments.skip(1) {
-                url(seg).is_some_and(|u| images.insert(canonicalize(u.into(), scheme, host, addr)));
+                url_image(seg)
+                    .is_some_and(|u| images.insert(canonicalize(u.into(), scheme, host, addr)));
             }
         }
     });

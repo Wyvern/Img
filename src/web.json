@@ -109,7 +109,7 @@
     "Img": "div#rl-gallery-1 a[href]"
   },
   {
-    "Site": "mmm.red,mmm666.red",
+    "Site": "mmm.red,mmm666.red,mmm000.com",
     "Img": "div[data-fancybox=\"gallery\"] img[data-original]",
     "Album": "a.item-link div"
   },
@@ -395,5 +395,9 @@
     "Site": "asupanpenyegar.com",
     "Img": "div[itemprop] p img",
     "Album": "h2.entry-title > a"
+  },
+  {
+    "Site": "bbs.bkv0.com,bbs.9fv56.com",
+    "Img": "td.tpc_content img"
   }
 ]
