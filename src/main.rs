@@ -241,7 +241,7 @@ fn parse(addr: &str) -> String {
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
-            // tdbg!(urls.len(), bk_img.len());
+            // tdbg!(&urls, &bk_img);
             download(t, urls.into_iter().chain(bk_img), host)
         }
         (true, false) => {
@@ -395,12 +395,14 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let mut need_file_type_detection = vec![];
 
     for url in urls {
-        if cfg!(feature = "embed") && url.starts_with("data:image/") {
-            if let Ok(cur) = env::current_dir() {
-                create_dir();
-                env::set_current_dir(path);
-                save_to_file(url.as_str());
-                env::set_current_dir(cur);
+        if url.starts_with("data:image/") {
+            if cfg!(feature = "embed") {
+                if let Ok(cur) = env::current_dir() {
+                    create_dir();
+                    env::set_current_dir(path);
+                    save_to_file(url.as_str());
+                    env::set_current_dir(cur);
+                }
             }
             continue;
         }
@@ -730,10 +732,13 @@ fn url_image(content: &str) -> Option<&str> {
         ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
         ["&#39;", "&apos;", "&#34;", "&quot;"]
-            .map(|x| url = url.trim_start_matches(x).trim_end_matches(x));
-        url = &url[..url.find('&').unwrap_or(url.len())];
-        url = &url[..url.rfind('#').unwrap_or(url.len())];
-        if url.is_empty() {
+            .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
+
+        if !url.starts_with("data:image/") {
+            url = &url[..url.find('&').unwrap_or(url.len())];
+            url = &url[..url.rfind('#').unwrap_or(url.len())];
+        }
+        if url.is_empty() || url == "undefined" {
             None
         } else {
             Some(url.trim())
@@ -757,8 +762,13 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
             }
         } else {
             for seg in segments.skip(1) {
-                url_image(seg)
-                    .is_some_and(|u| images.insert(canonicalize(u.into(), scheme, host, addr)));
+                url_image(seg).is_some_and(|u| {
+                    images.insert(if u.starts_with("data:image/") {
+                        u.into()
+                    } else {
+                        canonicalize(u.into(), scheme, host, addr)
+                    })
+                });
             }
         }
     });
