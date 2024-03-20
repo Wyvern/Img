@@ -179,51 +179,57 @@ fn parse(addr: &str) -> String {
             let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
-                let value = [
-                    "data-src",
-                    "data-lazy",
-                    "data-lazy-src",
-                    "data-lazy-srcset",
-                    attr,
-                ]
-                .iter()
-                .find_map(|&a| img.attr(a))
-                .expect("Invalid img[src] selector!");
+                let value = ["data-src", "data-lazy", "data-lazy-src", attr]
+                    .iter()
+                    .find_map(|&a| img.attr(a));
 
-                if attr == "style" {
-                    if let Some(frag) = CSS.iter().find_map(|&s| value.split_once(s)) {
-                        let url = url_image(frag.1);
-                        if let Some(u) = url {
-                            if u.starts_with("data:image/") {
-                                if cfg!(feature = "embed") {
-                                    if !urls.insert(u.into()) {
+                match value {
+                    Some(val) => {
+                        if attr == "style" {
+                            if let Some(frag) = CSS.iter().find_map(|&s| val.trim().split_once(s)) {
+                                let url = url_image(frag.1);
+                                if let Some(u) = url {
+                                    if u.starts_with("data:image/") {
+                                        if cfg!(feature = "embed") {
+                                            if !urls.insert(u.into()) {
+                                                empty_dup += 1;
+                                            }
+                                        } else {
+                                            embed += 1;
+                                        }
+                                    } else if !urls.insert(canonicalize(
+                                        u.into(),
+                                        scheme,
+                                        host,
+                                        addr,
+                                    )) {
                                         empty_dup += 1;
                                     }
-                                } else {
-                                    embed += 1;
                                 }
-                            } else if !urls.insert(canonicalize(u.into(), scheme, host, addr)) {
+                            }
+                        } else if val.starts_with("data:image/") {
+                            if cfg!(feature = "embed") {
+                                if !urls.insert(val) {
+                                    empty_dup += 1;
+                                }
+                            } else {
+                                embed += 1;
+                            }
+                        } else {
+                            let mut url = &val[val.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                            url = url[..url.find('&').unwrap_or(url.len())].trim();
+
+                            // tdbg!(url);
+                            if url.is_empty()
+                                || !urls.insert(canonicalize(url.into(), scheme, host, addr))
+                            {
                                 empty_dup += 1;
                             }
                         }
                     }
-                } else if value.starts_with("data:image/") {
-                    if cfg!(feature = "embed") {
-                        if !urls.insert(value) {
-                            empty_dup += 1;
-                        }
-                    } else {
-                        embed += 1;
-                    }
-                } else {
-                    let url = &value[value.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                    let clean_url = &url[..url.find('&').unwrap_or(url.len())];
-
-                    // tdbg!(clean_url);
-                    if clean_url.trim().is_empty()
-                        || !urls.insert(canonicalize(clean_url.into(), scheme, host, addr))
-                    {
+                    None => {
                         empty_dup += 1;
+                        continue;
                     }
                 }
             }
