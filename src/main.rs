@@ -229,7 +229,6 @@ fn parse(addr: &str) -> String {
                     }
                     None => {
                         empty_dup += 1;
-                        continue;
                     }
                 }
             }
@@ -425,7 +424,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name = &name[..name.find('?').unwrap_or(name.len())];
         }
-
         let file_name = if name_ext.is_empty() {
             name
         } else {
@@ -489,8 +487,10 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             |o| {
                 let header = String::from_utf8_lossy(&o.stdout);
                 if let Some(ct) = header.lines().last() {
-                    let ext = image_type(ct);
-                    name_ext = [name, ext].join(".");
+                    if !ct.is_empty() {
+                        let ext = image_type(ct);
+                        name_ext = [name, ext].join(".");
+                    }
                 }
             },
         );
