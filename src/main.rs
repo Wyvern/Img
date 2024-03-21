@@ -763,11 +763,15 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
         } else {
             for seg in segments.skip(1) {
                 url_image(seg).is_some_and(|u| {
-                    images.insert(if u.starts_with("data:image/") {
-                        u.into()
+                    if u.starts_with("data:image/") {
+                        if cfg!(feature = "embed") {
+                            images.insert(u.into())
+                        } else {
+                            false
+                        }
                     } else {
-                        canonicalize(u.into(), scheme, host, addr)
-                    })
+                        images.insert(canonicalize(u.into(), scheme, host, addr))
+                    }
                 });
             }
         }
