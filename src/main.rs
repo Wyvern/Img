@@ -148,21 +148,25 @@ fn parse(addr: &str) -> String {
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-    let [albums_len, imgs_len] = [
+    let [albums_len, imgs_len, html, css] = [
         albums.as_ref().map_or(0, |a| a.len()),
         html_img.len() + css_img.len(),
+        html_img.len(),
+        css_img.len(),
     ];
 
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}")
         }
 
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
 
-        (false, true) => pl!("Totally found <{imgs_len}> 🏞️  in 📄:{link_title}"),
+        (false, true) => {
+            pl!("Totally found <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}")
+        }
 
         (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
     }
@@ -217,7 +221,12 @@ fn parse(addr: &str) -> String {
                             }
                         } else {
                             let mut url = &val[val.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                            url = url[..url.find('&').unwrap_or(url.len())].trim();
+
+                            let amp = url
+                                .find('?')
+                                .and_then(|q| url[q..].find('&').map(|a| a + q));
+
+                            url = url[..amp.unwrap_or(url.len())].trim();
 
                             // tdbg!(url);
                             if url.is_empty()
@@ -738,7 +747,7 @@ fn url_image(content: &str) -> Option<&str> {
             url = &url[..url.find('&').unwrap_or(url.len())];
             url = &url[..url.rfind('#').unwrap_or(url.len())];
         }
-        if url.is_empty() || url == "undefined" {
+        if url.is_empty() || url == "undefined" || (url.starts_with('{')) && url.ends_with('}') {
             None
         } else {
             Some(url.trim())
