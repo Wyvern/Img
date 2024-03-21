@@ -9,7 +9,7 @@ static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
     "-A",
-    "Mozilla/5.0 Firefox/200",
+    "Mozilla/5.0 Firefox/Chrome/Edge",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
@@ -222,11 +222,11 @@ fn parse(addr: &str) -> String {
                         } else {
                             let mut url = &val[val.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
 
-                            let amp = url
+                            url = url[..url
                                 .find('?')
-                                .and_then(|q| url[q..].find('&').map(|a| a + q));
-
-                            url = url[..amp.unwrap_or(url.len())].trim();
+                                .and_then(|q| url[q..].find('&').map(|a| a + q))
+                                .unwrap_or(url.len())]
+                                .trim();
 
                             // tdbg!(url);
                             if url.is_empty()
@@ -250,7 +250,7 @@ fn parse(addr: &str) -> String {
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
-            // tdbg!(&urls, &bk_img);
+            // tdbg!(&urls, &css_img);
             download(t, urls.into_iter().chain(css_img), host)
         }
         (true, false) => {
@@ -744,10 +744,19 @@ fn url_image(content: &str) -> Option<&str> {
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
 
         if !url.starts_with("data:image/") {
-            url = &url[..url.find('&').unwrap_or(url.len())];
             url = &url[..url.rfind('#').unwrap_or(url.len())];
+            url = &url[..url
+                .find('?')
+                .and_then(|q| url[q..].find('&').map(|a| a + q))
+                .unwrap_or(url.len())];
         }
-        if url.is_empty() || url == "undefined" || (url.starts_with('{')) && url.ends_with('}') {
+        if url.is_empty()
+            || url == "undefined"
+            || [".otf", ".ttf", ".woff", ".woff2", ".fnt", ".eot", ".cff"]
+                .iter()
+                .any(|&f| url.ends_with(f))
+            || (url.starts_with('{')) && url.ends_with('}')
+        {
             None
         } else {
             Some(url.trim())
@@ -841,7 +850,7 @@ mod img {
         }
     }
 
-    // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
+    // fn(..) -> Pin<Box<impl/&dyn Future<Output = Something> + '_>>
 
     #[test]
     fn r#try() {
