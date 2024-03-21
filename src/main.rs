@@ -4,7 +4,7 @@ use {std::*, util::*};
 
 mod util;
 
-static CSS: [&str; 2] = ["url(", "image("];
+static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
@@ -117,13 +117,13 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let bk_img = if img.is_none() {
-        background_image(&html, scheme, host, addr)
+        css_image(&html, scheme, host, addr)
     } else {
         collections::HashSet::new()
     };
 
     let page = crabquery::Document::from(html);
-    let imgs = page.select(img.unwrap_or("img[src]"));
+    let imgs = page.select(img.unwrap_or("img"));
     let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
@@ -179,50 +179,55 @@ fn parse(addr: &str) -> String {
             let [mut empty_dup, mut embed] = [0u16; 2];
 
             for img in imgs {
-                let value = [
-                    "data-src",
-                    "data-lazy",
-                    "data-lazy-src",
-                    "data-lazy-srcset",
-                    attr,
-                ]
-                .iter()
-                .find_map(|&a| img.attr(a))
-                .expect("Invalid img[src] selector!");
+                let value = ["data-src", "data-lazy", "data-lazy-src", attr]
+                    .iter()
+                    .find_map(|&a| img.attr(a));
 
-                if attr == "style" {
-                    if let Some(frag) = CSS.iter().find_map(|&s| value.split_once(s)) {
-                        let url = url(frag.1);
-                        if let Some(u) = url {
-                            if u.starts_with("data:image/") {
-                                if cfg!(feature = "embed") {
-                                    if !urls.insert(u.into()) {
+                match value {
+                    Some(val) => {
+                        if attr == "style" {
+                            if let Some(frag) = CSS.iter().find_map(|&s| val.trim().split_once(s)) {
+                                let url = url_image(frag.1);
+                                if let Some(u) = url {
+                                    if u.starts_with("data:image/") {
+                                        if cfg!(feature = "embed") {
+                                            if !urls.insert(u.into()) {
+                                                empty_dup += 1;
+                                            }
+                                        } else {
+                                            embed += 1;
+                                        }
+                                    } else if !urls.insert(canonicalize(
+                                        u.into(),
+                                        scheme,
+                                        host,
+                                        addr,
+                                    )) {
                                         empty_dup += 1;
                                     }
-                                } else {
-                                    embed += 1;
                                 }
-                            } else if !urls.insert(canonicalize(u.into(), scheme, host, addr)) {
+                            }
+                        } else if val.starts_with("data:image/") {
+                            if cfg!(feature = "embed") {
+                                if !urls.insert(val) {
+                                    empty_dup += 1;
+                                }
+                            } else {
+                                embed += 1;
+                            }
+                        } else {
+                            let mut url = &val[val.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+                            url = url[..url.find('&').unwrap_or(url.len())].trim();
+
+                            // tdbg!(url);
+                            if url.is_empty()
+                                || !urls.insert(canonicalize(url.into(), scheme, host, addr))
+                            {
                                 empty_dup += 1;
                             }
                         }
                     }
-                } else if value.starts_with("data:image/") {
-                    if cfg!(feature = "embed") {
-                        if !urls.insert(value) {
-                            empty_dup += 1;
-                        }
-                    } else {
-                        embed += 1;
-                    }
-                } else {
-                    let url = &value[value.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                    let clean_url = &url[..url.find('&').unwrap_or(url.len())];
-
-                    // tdbg!(clean_url);
-                    if clean_url.trim().is_empty()
-                        || !urls.insert(canonicalize(clean_url.into(), scheme, host, addr))
-                    {
+                    None => {
                         empty_dup += 1;
                     }
                 }
@@ -236,7 +241,7 @@ fn parse(addr: &str) -> String {
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
-            // tdbg!(urls.len(), bk_img.len());
+            // tdbg!(&urls, &bk_img);
             download(t, urls.into_iter().chain(bk_img), host)
         }
         (true, false) => {
@@ -390,12 +395,14 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let mut need_file_type_detection = vec![];
 
     for url in urls {
-        if cfg!(feature = "embed") && url.starts_with("data:image/") {
-            if let Ok(cur) = env::current_dir() {
-                create_dir();
-                env::set_current_dir(path);
-                save_to_file(url.as_str());
-                env::set_current_dir(cur);
+        if url.starts_with("data:image/") {
+            if cfg!(feature = "embed") {
+                if let Ok(cur) = env::current_dir() {
+                    create_dir();
+                    env::set_current_dir(path);
+                    save_to_file(url.as_str());
+                    env::set_current_dir(cur);
+                }
             }
             continue;
         }
@@ -419,7 +426,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name = &name[..name.find('?').unwrap_or(name.len())];
         }
-
         let file_name = if name_ext.is_empty() {
             name
         } else {
@@ -483,8 +489,10 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
             |o| {
                 let header = String::from_utf8_lossy(&o.stdout);
                 if let Some(ct) = header.lines().last() {
-                    let ext = image_type(ct);
-                    name_ext = [name, ext].join(".");
+                    if !ct.is_empty() {
+                        let ext = image_type(ct);
+                        name_ext = [name, ext].join(".");
+                    }
                 }
             },
         );
@@ -718,20 +726,19 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 }
 
 ///Parse inline `url(),image()`
-fn url(content: &str) -> Option<&str> {
+fn url_image(content: &str) -> Option<&str> {
     if let Some(rp) = content.find(')') {
         let mut url = &content[..rp];
         ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
-        let mut strip_matches = |p: &str| {
-            if let Some(s) = url.strip_prefix(p) {
-                url = s.strip_suffix(p).unwrap();
-            }
-        };
-        ["&#39;", "&apos;", "&#34;", "&quot;"].map(strip_matches);
-        url = &url[..url.find('&').unwrap_or(url.len())];
-        url = &url[..url.rfind('#').unwrap_or(url.len())];
-        if url.is_empty() {
+        ["&#39;", "&apos;", "&#34;", "&quot;"]
+            .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
+
+        if !url.starts_with("data:image/") {
+            url = &url[..url.find('&').unwrap_or(url.len())];
+            url = &url[..url.rfind('#').unwrap_or(url.len())];
+        }
+        if url.is_empty() || url == "undefined" {
             None
         } else {
             Some(url.trim())
@@ -741,18 +748,32 @@ fn url(content: &str) -> Option<&str> {
     }
 }
 
-///Get `page` css style `url(),image()`
-fn background_image(
-    html: &str,
-    scheme: &str,
-    host: &str,
-    addr: &str,
-) -> collections::HashSet<String> {
+///Get `page` css style `url(),image(),image-set()`
+fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
     CSS.map(|s| {
         let segments = html.split(s);
-        for seg in segments.skip(1) {
-            url(seg).is_some_and(|u| images.insert(canonicalize(u.into(), scheme, host, addr)));
+        if s == "image-set(" {
+            for seg in segments.skip(1) {
+                images = images
+                    .union(&css_image(seg, scheme, host, addr))
+                    .map(Into::into)
+                    .collect();
+            }
+        } else {
+            for seg in segments.skip(1) {
+                url_image(seg).is_some_and(|u| {
+                    if u.starts_with("data:image/") {
+                        if cfg!(feature = "embed") {
+                            images.insert(u.into())
+                        } else {
+                            false
+                        }
+                    } else {
+                        images.insert(canonicalize(u.into(), scheme, host, addr))
+                    }
+                });
+            }
         }
     });
     images
@@ -823,10 +844,10 @@ mod img {
     }
 
     #[test]
-    fn bg_img() {
+    fn css_img() {
         let addr = arg("autodesk.com");
         let (html, _, [scheme, host]) = get_html(&addr);
-        let r = background_image(&html, scheme, host, &addr);
+        let r = css_image(&html, scheme, host, &addr);
         tdbg!(&r, r.len());
     }
 
