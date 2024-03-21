@@ -116,14 +116,14 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
-    let bk_img = if img.is_none() {
+    let css_img = if img.is_none() {
         css_image(&html, scheme, host, addr)
     } else {
         collections::HashSet::new()
     };
 
     let page = crabquery::Document::from(html);
-    let imgs = page.select(img.unwrap_or("img"));
+    let html_img = page.select(img.unwrap_or("img"));
     let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
@@ -150,7 +150,7 @@ fn parse(addr: &str) -> String {
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
     let [albums_len, imgs_len] = [
         albums.as_ref().map_or(0, |a| a.len()),
-        imgs.len() + bk_img.len(),
+        html_img.len() + css_img.len(),
     ];
 
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
@@ -178,7 +178,7 @@ fn parse(addr: &str) -> String {
             let mut urls = collections::HashSet::new();
             let [mut empty_dup, mut embed] = [0u16; 2];
 
-            for img in imgs {
+            for img in html_img {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
                     .iter()
                     .find_map(|&a| img.attr(a));
@@ -242,7 +242,7 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
             // tdbg!(&urls, &bk_img);
-            download(t, urls.into_iter().chain(bk_img), host)
+            download(t, urls.into_iter().chain(css_img), host)
         }
         (true, false) => {
             let mut all = false;
@@ -762,17 +762,15 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
             }
         } else {
             for seg in segments.skip(1) {
-                url_image(seg).is_some_and(|u| {
+                if let Some(u) = url_image(seg) {
                     if u.starts_with("data:image/") {
                         if cfg!(feature = "embed") {
-                            images.insert(u.into())
-                        } else {
-                            false
+                            images.insert(u.into());
                         }
                     } else {
-                        images.insert(canonicalize(u.into(), scheme, host, addr))
+                        images.insert(canonicalize(u.into(), scheme, host, addr));
                     }
-                });
+                }
             }
         }
     });
