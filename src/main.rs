@@ -744,17 +744,19 @@ fn url_image(content: &str) -> Option<&str> {
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
 
         if !url.starts_with("data:image/") {
-            url = &url[..url.rfind('#').unwrap_or(url.len())];
             url = &url[..url
                 .find('?')
                 .and_then(|q| url[q..].find('&').map(|a| a + q))
                 .unwrap_or(url.len())];
         }
         if url.is_empty()
-            || url == "undefined"
-            || [".otf", ".ttf", ".woff", ".woff2", ".fnt", ".eot", ".cff"]
-                .iter()
-                .any(|&f| url.ends_with(f))
+            || url.eq_ignore_ascii_case("undefined")
+            || url.contains('#')
+            || [
+                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
+            ]
+            .iter()
+            .any(|&f| url.ends_with(f))
             || (url.starts_with('{')) && url.ends_with('}')
         {
             None
