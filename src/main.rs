@@ -850,7 +850,7 @@ mod img {
         }
     }
 
-    // fn(..) -> Pin<Box<impl/&dyn Future<Output = Something> + '_>>
+    // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
 
     #[test]
     fn r#try() {
