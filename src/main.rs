@@ -9,7 +9,7 @@ static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
     "-A",
-    "Mozilla/5.0 Firefox/200",
+    "Mozilla/5.0 Firefox/Chrome/Edge",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
@@ -116,14 +116,14 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
-    let bk_img = if img.is_none() {
+    let css_img = if img.is_none() {
         css_image(&html, scheme, host, addr)
     } else {
         collections::HashSet::new()
     };
 
     let page = crabquery::Document::from(html);
-    let imgs = page.select(img.unwrap_or("img"));
+    let html_img = page.select(img.unwrap_or("img"));
     let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
@@ -148,21 +148,25 @@ fn parse(addr: &str) -> String {
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-    let [albums_len, imgs_len] = [
+    let [albums_len, imgs_len, html, css] = [
         albums.as_ref().map_or(0, |a| a.len()),
-        imgs.len() + bk_img.len(),
+        html_img.len() + css_img.len(),
+        html_img.len(),
+        css_img.len(),
     ];
 
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}> 🏞️  in 📄:{link_title}")
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}")
         }
 
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
 
-        (false, true) => pl!("Totally found <{imgs_len}> 🏞️  in 📄:{link_title}"),
+        (false, true) => {
+            pl!("Totally found <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}")
+        }
 
         (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
     }
@@ -178,7 +182,7 @@ fn parse(addr: &str) -> String {
             let mut urls = collections::HashSet::new();
             let [mut empty_dup, mut embed] = [0u16; 2];
 
-            for img in imgs {
+            for img in html_img {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
                     .iter()
                     .find_map(|&a| img.attr(a));
@@ -217,7 +221,12 @@ fn parse(addr: &str) -> String {
                             }
                         } else {
                             let mut url = &val[val.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-                            url = url[..url.find('&').unwrap_or(url.len())].trim();
+
+                            url = url[..url
+                                .find('?')
+                                .and_then(|q| url[q..].find('&').map(|a| a + q))
+                                .unwrap_or(url.len())]
+                                .trim();
 
                             // tdbg!(url);
                             if url.is_empty()
@@ -241,8 +250,8 @@ fn parse(addr: &str) -> String {
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
-            // tdbg!(&urls, &bk_img);
-            download(t, urls.into_iter().chain(bk_img), host)
+            // tdbg!(&urls, &css_img);
+            download(t, urls.into_iter().chain(css_img), host)
         }
         (true, false) => {
             let mut all = false;
@@ -735,10 +744,21 @@ fn url_image(content: &str) -> Option<&str> {
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
 
         if !url.starts_with("data:image/") {
-            url = &url[..url.find('&').unwrap_or(url.len())];
-            url = &url[..url.rfind('#').unwrap_or(url.len())];
+            url = &url[..url
+                .find('?')
+                .and_then(|q| url[q..].find('&').map(|a| a + q))
+                .unwrap_or(url.len())];
         }
-        if url.is_empty() || url == "undefined" {
+        if url.is_empty()
+            || url.eq_ignore_ascii_case("undefined")
+            || url.contains('#')
+            || [
+                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
+            ]
+            .iter()
+            .any(|&f| url.ends_with(f))
+            || (url.starts_with('{')) && url.ends_with('}')
+        {
             None
         } else {
             Some(url.trim())
@@ -762,17 +782,15 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
             }
         } else {
             for seg in segments.skip(1) {
-                url_image(seg).is_some_and(|u| {
+                if let Some(u) = url_image(seg) {
                     if u.starts_with("data:image/") {
                         if cfg!(feature = "embed") {
-                            images.insert(u.into())
-                        } else {
-                            false
+                            images.insert(u.into());
                         }
                     } else {
-                        images.insert(canonicalize(u.into(), scheme, host, addr))
+                        images.insert(canonicalize(u.into(), scheme, host, addr));
                     }
-                });
+                }
             }
         }
     });
