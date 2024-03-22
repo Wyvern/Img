@@ -223,7 +223,7 @@ pub fn pause(msg: &str) {
         }
     );
     o.flush();
-    stdin().lock().read_exact(&mut [0]);
+    stdin().lock().read_line(&mut String::default());
 }
 
 pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
