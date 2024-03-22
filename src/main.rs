@@ -402,7 +402,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
-
+    let mut invalid_url = 0u16;
     for url in urls {
         if url.starts_with("data:image/") {
             if cfg!(feature = "embed") {
@@ -416,11 +416,15 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let mut name = url[url
+        let mut name = url
             .rfind('/')
-            .unwrap_or_else(|| quit!("Invalid Url: {}", url))
-            + 1..]
-            .trim_start_matches(['-', '_']);
+            .map_or("", |slash| url[slash + 1..].trim_start_matches(['-', '_']));
+        if name.is_empty() {
+            tdbg!(url);
+            invalid_url += 1;
+            continue;
+        }
+
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
@@ -446,7 +450,11 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             curl.args([url.as_str(), "-o", file_name]);
         }
     }
-    // tdbg!(curl.get_args());
+
+    if invalid_url > 0 {
+        pl!("Skipped <{invalid_url}> Invalid URLs");
+    }
+    // tdbg!(curl.get_args(), (curl.get_args().len() - 1) / 3);
     if curl.get_args().len() == 1 {
         return;
     }
