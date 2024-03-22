@@ -375,7 +375,11 @@ fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
         } else if url.starts_with('/') {
             format!("{scheme}://{host}{url}")
         } else {
-            format!("{}/{url}", &addr[..addr.rfind('/').unwrap_or(addr.len())])
+            format!(
+                "{}/{}",
+                &addr[..addr.rfind('/').unwrap_or(addr.len())],
+                url.trim_start_matches("./")
+            )
         }
     } else {
         url
@@ -752,6 +756,7 @@ fn url_image(content: &str) -> Option<&str> {
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
 
         if !url.starts_with("data:image/") {
+            url = &url[url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
             url = &url[..url
                 .find('?')
                 .and_then(|q| url[q..].find('&').map(|a| a + q))
@@ -764,7 +769,7 @@ fn url_image(content: &str) -> Option<&str> {
                 ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
             ]
             .iter()
-            .any(|&f| url.ends_with(f))
+            .any(|&ext| url.ends_with(ext))
             || (url.starts_with('{')) && url.ends_with('}')
         {
             None
