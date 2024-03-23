@@ -158,16 +158,9 @@ fn parse(addr: &str) -> String {
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
     match (has_album, imgs_len > 0) {
-        (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}")
-        }
-
+        (true, true) =>pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}"),
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
-
-        (false, true) => {
-            pl!("Totally found <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}")
-        }
-
+        (false, true) => pl!("Totally found <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
     }
 
@@ -632,6 +625,8 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
                             cur.trim().ends_with(h.trim())
                                 || h.trim() == "#"
                                 || format!("{}/1", cur.trim_end_matches('/')).ends_with(h.trim())
+                                || format!("{}?page=1", cur.trim_end_matches('/'))
+                                    .ends_with(h.trim())
                         })
                     });
                     match pos {
@@ -758,19 +753,19 @@ fn url_image(content: &str) -> Option<&str> {
         url = url.trim_matches(['\'', '"']).trim();
         ["&#39;", "&apos;", "&#34;", "&quot;"]
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
-
+        url = &url[..url.rfind('#').unwrap_or(url.len())];
         if !url.starts_with("data:image/") {
             url = url_redirect_and_query_cleanup(url);
         }
         if url.is_empty()
             || url.eq_ignore_ascii_case("undefined")
-            || url.contains('#')
+            || (url.starts_with('{'))
+            || url.starts_with("${")
             || [
                 ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
             ]
             .iter()
             .any(|&ext| url.ends_with(ext))
-            || (url.starts_with('{')) && url.ends_with('}')
         {
             None
         } else {

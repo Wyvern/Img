@@ -283,7 +283,7 @@
     "Album": "div.thumbnail a"
   },
   {
-    "Site": "larose.vip,zdgtl.com",
+    "Site": "larose.vip",
     "Img": "img.aligncenter.size-full",
     "Album": "figure a[href] img"
   },
@@ -393,5 +393,22 @@
   {
     "Site": "bbs.bkv0.com,bbs.9fv56.com",
     "Img": "td.tpc_content img"
+  },
+  {
+    "Site": "zdgtl.com",
+    "Img": "figure.wp-block-image img",
+    "Album": "h6 > a"
+  },
+  {
+    "Site": "v2ph.com,v2ph.ru,v2ph.co",
+    "Img": "div.album-photo img",
+    "Next": "ul.pagination a",
+    "Album": "div.card-body a"
+  },
+  {
+    "Site": "nvshen5.com",
+    "Img": "ul#hgallery img",
+    "Next": "div#pages a",
+    "Album": "div.card-body a"
   }
 ]
