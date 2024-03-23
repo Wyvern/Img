@@ -220,13 +220,7 @@ fn parse(addr: &str) -> String {
                                 embed += 1;
                             }
                         } else {
-                            let mut url = &val[val.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-
-                            url = url[..url
-                                .find('?')
-                                .and_then(|q| url[q..].find('&').map(|a| a + q))
-                                .unwrap_or(url.len())]
-                                .trim();
+                            let url = url_redirect_and_query_cleanup(&val);
 
                             // tdbg!(url);
                             if url.is_empty()
@@ -746,6 +740,16 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     o.flush();
 }
 
+///cleanup url
+fn url_redirect_and_query_cleanup(url: &str) -> &str {
+    let mut cleanup = &url[url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+    cleanup = &cleanup[..cleanup
+        .find('?')
+        .and_then(|q| cleanup[q..].find('&').map(|a| a + q))
+        .unwrap_or(cleanup.len())];
+    cleanup.trim()
+}
+
 ///Parse inline `url(),image()`
 fn url_image(content: &str) -> Option<&str> {
     if let Some(rp) = content.find(')') {
@@ -756,11 +760,7 @@ fn url_image(content: &str) -> Option<&str> {
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
 
         if !url.starts_with("data:image/") {
-            url = &url[url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
-            url = &url[..url
-                .find('?')
-                .and_then(|q| url[q..].find('&').map(|a| a + q))
-                .unwrap_or(url.len())];
+            url = url_redirect_and_query_cleanup(url);
         }
         if url.is_empty()
             || url.eq_ignore_ascii_case("undefined")
