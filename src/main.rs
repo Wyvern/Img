@@ -157,10 +157,21 @@ fn parse(addr: &str) -> String {
 
     let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
 
+    let htmlcss = if html > 0 && css > 0 {
+        format!(": HTML({html}) + CSS({css})")
+    } else if html > 0 {
+        format!(": HTML({html})")
+    } else if css > 0 {
+        format!(": CSS({css})")
+    } else {
+        format!("")
+    };
     match (has_album, imgs_len > 0) {
-        (true, true) =>pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}"),
+        (true, true) => {
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}")
+        }
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
-        (false, true) => pl!("Totally found <{imgs_len}: HTML({html}) + CSS({css})> 🏞️  in 📄:{link_title}"),
+        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
     }
 
