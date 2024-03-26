@@ -9,7 +9,7 @@ static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
     "-A",
-    "Mozilla/5.0 Firefox/Chrome/Edge",
+    "Mozilla/5.0  Firefox/Edge/Chrome",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
@@ -764,14 +764,15 @@ fn url_image(content: &str) -> Option<&str> {
         url = url.trim_matches(['\'', '"']).trim();
         ["&#39;", "&apos;", "&#34;", "&quot;"]
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
-        url = &url[..url.rfind('#').unwrap_or(url.len())];
+        url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
         if !url.starts_with("data:image/") {
             url = url_redirect_and_query_cleanup(url);
         }
         if url.is_empty()
             || url.eq_ignore_ascii_case("undefined")
-            || (url.starts_with('{'))
+            || url.starts_with('{')
             || url.starts_with("${")
+            || url.contains('#')
             || [
                 ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
             ]
