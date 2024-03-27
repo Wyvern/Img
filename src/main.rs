@@ -9,7 +9,7 @@ static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
     "-A",
-    "Mozilla/5.0  Firefox/Edge/Chrome",
+    "Mozilla/5.0 Firefox/Edge/Chrome",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
