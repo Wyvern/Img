@@ -9,7 +9,8 @@ default = ["curl"]
 curl = []
 download = []
 infer = ["dep:infer"]
-embed = ["dep:base64", "dep:url-escape"]
+embed = ["dep:base64"]
+
 
 [[example]]
 name = "color"
@@ -19,10 +20,9 @@ test = true
 [dependencies]
 crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
+url-escape = { version = "*", default-features = false }
 
 base64 = { version = "*", default-features = false, optional = true }
-url-escape = { version = "*", default-features = false, optional = true }
-
 infer = { version = "*", default-features = false, optional = true }
 
 [dev-dependencies]
