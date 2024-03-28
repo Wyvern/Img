@@ -222,8 +222,7 @@ fn parse(addr: &str) -> String {
                             let url = url_redirect_and_query_cleanup(&val);
 
                             // tdbg!(url);
-                            if url.is_empty()
-                                || !urls.insert(canonicalize(url.into(), scheme, host, addr))
+                            if url.is_empty() || !urls.insert(canonicalize(url, scheme, host, addr))
                             {
                                 empty_dup += 1;
                             }
@@ -412,18 +411,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             continue;
         }
-        let mut dec_url = String::default();
-        let mut name = url
-            .rfind('/')
-            .map_or("", |slash| url[slash + 1..].trim_start_matches(['-', '_']));
-        if name.is_empty() {
-            name = url_escape::decode_to_string(&url, &mut dec_url)
-                .rfind('/')
-                .map_or_else(
-                    || quit!("Invalid URL: {}", dec_url),
-                    |slash| dec_url[slash + 1..].trim_start_matches(['-', '_']),
-                );
-        }
+
+        let mut name = url.rfind('/').map_or_else(
+            || quit!("Invalid URL: {}", url),
+            |slash| url[slash + 1..].trim_start_matches(['-', '_']),
+        );
+
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
@@ -443,18 +436,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name_ext.as_str()
         };
-
+        let enc_url = url.replace(' ', "%20");
         if !path.join(file_name).exists() {
             // tdbg!(&url);
-            curl.args([
-                if dec_url.is_empty() {
-                    url.as_str()
-                } else {
-                    dec_url.as_str()
-                },
-                "-o",
-                file_name,
-            ]);
+            curl.args([&enc_url, "-o", file_name]);
         }
     }
 
@@ -699,7 +684,12 @@ fn save_to_file(data: &str) {
                     buf.truncate(size);
                     fs::write(full_name, buf)
                 } else {
-                    fs::write(full_name, url_escape::decode(offset).as_bytes())
+                    fs::write(
+                        full_name,
+                        percent_encoding::percent_decode_str(offset)
+                            .decode_utf8_lossy()
+                            .as_ref(),
+                    )
                 }
             }
             .unwrap_or_else(|e| {
@@ -749,13 +739,15 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 }
 
 ///cleanup url
-fn url_redirect_and_query_cleanup(url: &str) -> &str {
-    let mut cleanup = &url[url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+fn url_redirect_and_query_cleanup(url: &str) -> String {
+    use percent_encoding::*;
+    let dec_url = percent_decode_str(url).decode_utf8_lossy();
+    let mut cleanup = &dec_url[dec_url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
     cleanup = &cleanup[..cleanup
-        .find('?')
+        .rfind(['?', '/'])
         .and_then(|q| cleanup[q..].find('&').map(|a| a + q))
         .unwrap_or(cleanup.len())];
-    cleanup.trim()
+    cleanup.into()
 }
 
 ///Parse inline `url(),image()`
@@ -766,12 +758,9 @@ fn url_image(content: &str) -> Option<String> {
         url = url.trim_matches(['\'', '"']).trim();
         ["&#39;", "&apos;", "&#34;", "&quot;"]
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
-        let dec_url = url_escape::decode(url);
-        url = dec_url.as_ref();
+        let dec = url_redirect_and_query_cleanup(url);
+        url = dec.as_str();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
-        if !url.starts_with("data:image/") {
-            url = url_redirect_and_query_cleanup(url);
-        }
         if url.is_empty()
             || url.eq_ignore_ascii_case("undefined")
             || url.starts_with('{')

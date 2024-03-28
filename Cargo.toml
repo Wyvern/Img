@@ -20,7 +20,7 @@ test = true
 [dependencies]
 crabquery = { version = "*", default-features = false }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
-url-escape = { version = "*", default-features = false }
+percent-encoding = "*"
 
 base64 = { version = "*", default-features = false, optional = true }
 infer = { version = "*", default-features = false, optional = true }
