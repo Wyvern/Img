@@ -758,6 +758,9 @@ fn url_image(content: &str) -> Option<String> {
         url = url.trim_matches(['\'', '"']).trim();
         ["&#39;", "&apos;", "&#34;", "&quot;"]
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
+        if url.starts_with("data:image/") {
+            return Some(url.into());
+        }
         let dec = url_redirect_and_query_cleanup(url);
         url = dec.as_str();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
