@@ -9,7 +9,7 @@ static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 5] = [
     "--compressed",
     "-A",
-    "Mozilla/5.0  Firefox/Edge/Chrome",
+    "Mozilla/5.0 Firefox/Edge/Chrome",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
@@ -164,7 +164,7 @@ fn parse(addr: &str) -> String {
     } else if css > 0 {
         format!(": CSS({css})")
     } else {
-        format!("")
+        String::new()
     };
     match (has_album, imgs_len > 0) {
         (true, true) => {
@@ -199,18 +199,13 @@ fn parse(addr: &str) -> String {
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
                                         if cfg!(feature = "embed") {
-                                            if !urls.insert(u.into()) {
+                                            if !urls.insert(u) {
                                                 empty_dup += 1;
                                             }
                                         } else {
                                             embed += 1;
                                         }
-                                    } else if !urls.insert(canonicalize(
-                                        u.into(),
-                                        scheme,
-                                        host,
-                                        addr,
-                                    )) {
+                                    } else if !urls.insert(canonicalize(u, scheme, host, addr)) {
                                         empty_dup += 1;
                                     }
                                 }
@@ -227,8 +222,7 @@ fn parse(addr: &str) -> String {
                             let url = url_redirect_and_query_cleanup(&val);
 
                             // tdbg!(url);
-                            if url.is_empty()
-                                || !urls.insert(canonicalize(url.into(), scheme, host, addr))
+                            if url.is_empty() || !urls.insert(canonicalize(url, scheme, host, addr))
                             {
                                 empty_dup += 1;
                             }
@@ -404,7 +398,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
-    let mut invalid_url = 0u16;
+
     for url in urls {
         if url.starts_with("data:image/") {
             if cfg!(feature = "embed") {
@@ -418,14 +412,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let mut name = url
-            .rfind('/')
-            .map_or("", |slash| url[slash + 1..].trim_start_matches(['-', '_']));
-        if name.is_empty() {
-            tdbg!(url);
-            invalid_url += 1;
-            continue;
-        }
+        let mut name = url.rfind('/').map_or_else(
+            || quit!("Invalid URL: {}", url),
+            |slash| url[slash + 1..].trim_start_matches(['-', '_']),
+        );
 
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
         let mut name_ext = String::default();
@@ -446,16 +436,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name_ext.as_str()
         };
-
+        let enc_url = url.replace(' ', "%20");
         if !path.join(file_name).exists() {
             // tdbg!(&url);
-            curl.args([url.as_str(), "-o", file_name]);
+            curl.args([&enc_url, "-o", file_name]);
         }
     }
 
-    if invalid_url > 0 {
-        pl!("Skipped <{invalid_url}> Invalid URLs");
-    }
     // tdbg!(curl.get_args(), (curl.get_args().len() - 1) / 3);
     if curl.get_args().len() == 1 {
         return;
@@ -697,7 +684,12 @@ fn save_to_file(data: &str) {
                     buf.truncate(size);
                     fs::write(full_name, buf)
                 } else {
-                    fs::write(full_name, url_escape::decode(offset).as_bytes())
+                    fs::write(
+                        full_name,
+                        percent_encoding::percent_decode_str(offset)
+                            .decode_utf8_lossy()
+                            .as_ref(),
+                    )
                 }
             }
             .unwrap_or_else(|e| {
@@ -747,27 +739,28 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 }
 
 ///cleanup url
-fn url_redirect_and_query_cleanup(url: &str) -> &str {
-    let mut cleanup = &url[url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+fn url_redirect_and_query_cleanup(url: &str) -> String {
+    use percent_encoding::*;
+    let dec_url = percent_decode_str(url).decode_utf8_lossy();
+    let mut cleanup = &dec_url[dec_url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
     cleanup = &cleanup[..cleanup
-        .find('?')
+        .rfind(['?', '/'])
         .and_then(|q| cleanup[q..].find('&').map(|a| a + q))
         .unwrap_or(cleanup.len())];
-    cleanup.trim()
+    cleanup.into()
 }
 
 ///Parse inline `url(),image()`
-fn url_image(content: &str) -> Option<&str> {
+fn url_image(content: &str) -> Option<String> {
     if let Some(rp) = content.find(')') {
         let mut url = &content[..rp];
         ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
         ["&#39;", "&apos;", "&#34;", "&quot;"]
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
+        let dec = url_redirect_and_query_cleanup(url);
+        url = dec.as_str();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
-        if !url.starts_with("data:image/") {
-            url = url_redirect_and_query_cleanup(url);
-        }
         if url.is_empty()
             || url.eq_ignore_ascii_case("undefined")
             || url.starts_with('{')
@@ -781,7 +774,7 @@ fn url_image(content: &str) -> Option<&str> {
         {
             None
         } else {
-            Some(url.trim())
+            Some(url.trim().into())
         }
     } else {
         None
@@ -805,10 +798,10 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
                 if let Some(u) = url_image(seg) {
                     if u.starts_with("data:image/") {
                         if cfg!(feature = "embed") {
-                            images.insert(u.into());
+                            images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(u.into(), scheme, host, addr));
+                        images.insert(canonicalize(u, scheme, host, addr));
                     }
                 }
             }
