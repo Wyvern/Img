@@ -164,7 +164,7 @@ fn parse(addr: &str) -> String {
     } else if css > 0 {
         format!(": CSS({css})")
     } else {
-        format!("")
+        String::new()
     };
     match (has_album, imgs_len > 0) {
         (true, true) => {
@@ -199,18 +199,13 @@ fn parse(addr: &str) -> String {
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
                                         if cfg!(feature = "embed") {
-                                            if !urls.insert(u.into()) {
+                                            if !urls.insert(u) {
                                                 empty_dup += 1;
                                             }
                                         } else {
                                             embed += 1;
                                         }
-                                    } else if !urls.insert(canonicalize(
-                                        u.into(),
-                                        scheme,
-                                        host,
-                                        addr,
-                                    )) {
+                                    } else if !urls.insert(canonicalize(u, scheme, host, addr)) {
                                         empty_dup += 1;
                                     }
                                 }
@@ -404,7 +399,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
-    let mut invalid_url = 0u16;
+
     for url in urls {
         if url.starts_with("data:image/") {
             if cfg!(feature = "embed") {
@@ -417,16 +412,18 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             continue;
         }
-
+        let mut dec_url = String::default();
         let mut name = url
             .rfind('/')
             .map_or("", |slash| url[slash + 1..].trim_start_matches(['-', '_']));
         if name.is_empty() {
-            tdbg!(url);
-            invalid_url += 1;
-            continue;
+            name = url_escape::decode_to_string(&url, &mut dec_url)
+                .rfind('/')
+                .map_or_else(
+                    || quit!("Invalid URL: {}", dec_url),
+                    |slash| dec_url[slash + 1..].trim_start_matches(['-', '_']),
+                );
         }
-
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
@@ -449,13 +446,18 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         if !path.join(file_name).exists() {
             // tdbg!(&url);
-            curl.args([url.as_str(), "-o", file_name]);
+            curl.args([
+                if dec_url.is_empty() {
+                    url.as_str()
+                } else {
+                    dec_url.as_str()
+                },
+                "-o",
+                file_name,
+            ]);
         }
     }
 
-    if invalid_url > 0 {
-        pl!("Skipped <{invalid_url}> Invalid URLs");
-    }
     // tdbg!(curl.get_args(), (curl.get_args().len() - 1) / 3);
     if curl.get_args().len() == 1 {
         return;
@@ -757,13 +759,15 @@ fn url_redirect_and_query_cleanup(url: &str) -> &str {
 }
 
 ///Parse inline `url(),image()`
-fn url_image(content: &str) -> Option<&str> {
+fn url_image(content: &str) -> Option<String> {
     if let Some(rp) = content.find(')') {
         let mut url = &content[..rp];
         ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
         ["&#39;", "&apos;", "&#34;", "&quot;"]
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
+        let dec_url = url_escape::decode(url);
+        url = dec_url.as_ref();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
         if !url.starts_with("data:image/") {
             url = url_redirect_and_query_cleanup(url);
@@ -781,7 +785,7 @@ fn url_image(content: &str) -> Option<&str> {
         {
             None
         } else {
-            Some(url.trim())
+            Some(url.trim().into())
         }
     } else {
         None
@@ -805,10 +809,10 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
                 if let Some(u) = url_image(seg) {
                     if u.starts_with("data:image/") {
                         if cfg!(feature = "embed") {
-                            images.insert(u.into());
+                            images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(u.into(), scheme, host, addr));
+                        images.insert(canonicalize(u, scheme, host, addr));
                     }
                 }
             }
