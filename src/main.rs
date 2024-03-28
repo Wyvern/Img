@@ -468,7 +468,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             // let h = host.to_owned();
 
             // thread::spawn(move || {
-            //     cmd.output();
+            //     curl.args(CURL).args([&h, "--parallel-immediate"]).output();
             //     for f in need_file_type_detection {
             //         let file = p.join(&f);
             //         if file.exists() {
@@ -486,17 +486,20 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
     let mut name_ext = String::default();
     tdbg!(url);
     process::Command::new("curl")
-        .args(["-I", "-w", "%{content_type}"])
+        .args(["-J", "-w", "%{content_type}"])
         .args(CURL)
         .args([host, url])
         .output()
         .map_or_else(
-            |e| pl!("Get {url} content header info failed: {e}"),
+            |e| pl!("Get {} content type info failed: {}", url, e),
             |o| {
                 let header = String::from_utf8_lossy(&o.stdout);
-                if let Some(ct) = header.lines().last() {
-                    if !ct.is_empty() {
-                        let ext = image_type(ct);
+                if let Some(l) = header.lines().last() {
+                    if let Some((_, ctx)) = l.rsplit_once("image/") {
+                        let ext = &ctx[..['+', ';', ',']
+                            .iter()
+                            .find_map(|&x| ctx.find(x))
+                            .unwrap_or(ctx.len())];
                         name_ext = [name, ext].join(".");
                     }
                 }
@@ -701,16 +704,6 @@ fn save_to_file(data: &str) {
             });
         }
     }
-}
-
-///Get content_type info from image url response metadata type
-fn image_type(header: &str) -> &str {
-    let mut offset = &header[header.find('/').unwrap() + 1..];
-
-    &offset[..['+', ';', ',']
-        .iter()
-        .find_map(|&x| offset.find(x))
-        .unwrap_or(offset.len())]
 }
 
 ///Show `circle` progress indicator
