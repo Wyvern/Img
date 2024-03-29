@@ -500,7 +500,9 @@ fn content_header_info(url: &str, host: &str, name: &str) -> String {
                             .iter()
                             .find_map(|&x| ctx.find(x))
                             .unwrap_or(ctx.len())];
-                        name_ext = [name, ext].join(".");
+                        if !name.ends_with(format!(".{ext}").as_str()) {
+                            name_ext = [name, ext].join(".");
+                        }
                     }
                 }
             },
@@ -737,8 +739,17 @@ fn url_redirect_and_query_cleanup(url: &str) -> String {
     let dec_url = percent_decode_str(url).decode_utf8_lossy();
     let mut cleanup = &dec_url[dec_url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
     cleanup = &cleanup[..cleanup
-        .rfind(['?', '/'])
+        .find('?')
         .and_then(|q| cleanup[q..].find('&').map(|a| a + q))
+        .or_else(|| {
+            cleanup.rfind('/').and_then(|slash| {
+                cleanup[slash..].rfind('.').and_then(|dot| {
+                    cleanup[slash + dot..]
+                        .find('&')
+                        .map(|amp| amp + dot + slash)
+                })
+            })
+        })
         .unwrap_or(cleanup.len())];
     cleanup.into()
 }
