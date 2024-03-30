@@ -770,8 +770,7 @@ fn url_image(content: &str) -> Option<String> {
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
         if url.is_empty()
             || url.eq_ignore_ascii_case("undefined")
-            || url.starts_with('{')
-            || url.starts_with("${")
+            || url.starts_with(['{', '$'])
             || url.contains('#')
             || [
                 ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
