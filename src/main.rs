@@ -450,7 +450,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     if cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl.args(CURL).args([host, "--parallel-immediate"]);
+        let cmd = curl
+            .args(CURL)
+            .args([&format!("https://{host}"), "--parallel-immediate"]);
         #[cfg(not(feature = "infer"))]
         cmd.spawn();
 
