@@ -6,8 +6,9 @@ mod util;
 
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; 5] = [
+static CURL: [&str; 6] = [
     "--compressed",
+    "-k",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     if cfg!(debug_assertions) {
