@@ -113,15 +113,15 @@ jobs:
       - name: Build Release
         run: |
           cargo binstall cargo-pgo -y
-          curl --version
+
           cargo update
 
-          cargo pgo run -- --profile lto --target aarch64-apple-darwin https://bisipic.online/thread-18097-1-1.html
+          # cargo pgo run -- --profile lto --target aarch64-apple-darwin https://bisipic.online/thread-18097-1-1.html
 
-          cargo pgo optimize build -- --profile lto --target aarch64-apple-darwin
+          # cargo pgo optimize build -- --profile lto --target aarch64-apple-darwin
 
-          # time cargo l --target aarch64-apple-darwin
-          # time cargo l --target x86_64-apple-darwin
+          time cargo l --target aarch64-apple-darwin
+          time cargo l --target x86_64-apple-darwin
           # time cargo l --target arm64e-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
