@@ -116,13 +116,15 @@ jobs:
 
           cargo update
 
-          cargo pgo run -- --profile lto --target aarch64-apple-darwin https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-8051-lei-lei-xing-le-mei/
+          # cargo pgo run -- --profile lto --target aarch64-apple-darwin https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-8051-lei-lei-xing-le-mei/
 
-          cargo pgo optimize build -- --profile lto --target aarch64-apple-darwin
+          # cargo pgo optimize build -- --profile lto --target aarch64-apple-darwin
 
-          # time cargo l --target aarch64-apple-darwin
-          # time cargo l --target x86_64-apple-darwin
+          time cargo l --target aarch64-apple-darwin
+          time cargo l --target x86_64-apple-darwin
           # time cargo l --target arm64e-apple-darwin
+
+          cargo run --profile lto --target aarch64-apple-darwin https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-8051-lei-lei-xing-le-mei/
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
