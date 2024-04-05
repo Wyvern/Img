@@ -30,7 +30,10 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-unknown-linux-gnu,x86_64-unknown-linux-musl
-          components: rust-src
+          components: rust-src,llvm-tools
+
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -99,20 +102,28 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-apple-darwin
-          components: rust-src
+          components: rust-src,llvm-tools
+
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Build Release
         run: |
+          cargo binstall cargo-pgo -y
+
           cargo update
 
-          time cargo l --target aarch64-apple-darwin
-          time cargo l --target x86_64-apple-darwin
+          cargo pgo run --profile lto --target aarch64-apple-darwin https://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-8051-lei-lei-xing-le-mei/
+          cargo pgo optimize build --profile lto --target aarch64-apple-darwin
+
+          # time cargo l --target aarch64-apple-darwin
+          # time cargo l --target x86_64-apple-darwin
           # time cargo l --target arm64e-apple-darwin
 
-          lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
+          # lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
           find ./target -iname img -type f | xargs ls -hl
           ls -hl Img-Universal
@@ -183,7 +194,10 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-pc-windows-msvc
-          components: rust-src
+          components: rust-src,llvm-tools
+
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
