@@ -116,7 +116,7 @@ jobs:
 
           cargo update
 
-          cargo pgo run -- --profile lto --target aarch64-apple-darwin https://bisipic.online/thread-18097-1-1.html || true
+          cargo pgo run https://bisipic.online/thread-18097-1-1.html -- --profile lto --target aarch64-apple-darwin
 
           cargo pgo optimize build -- --profile lto --target aarch64-apple-darwin
 
