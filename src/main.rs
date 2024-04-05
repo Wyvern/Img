@@ -169,11 +169,11 @@ fn parse(addr: &str) -> String {
     };
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{G} {t}")
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}")
         }
-        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{G} {t}"),
-        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{G} {t}"),
-        (false, false) => quit!("∅ 🏞️  found in 📄:{G} {t}"),
+        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
+        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}"),
+        (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
     }
 
     t = if t.contains("page") || t.contains('页') {

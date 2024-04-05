@@ -113,7 +113,8 @@ jobs:
       - name: Build Release
         run: |
           cargo binstall cargo-pgo -y
-
+          touch demo.xyz
+          echo "jfef">demo.xyz
           cargo update
 
           cargo pgo run -- --profile lto --target aarch64-apple-darwin https://bisipic.online/thread-18097-1-1.html
