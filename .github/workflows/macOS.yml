@@ -39,9 +39,11 @@ jobs:
           cargo update
 
           time cargo s arm64e-apple-ios
-          time cargo s aarch64-apple-tvos
+          time cargo s aarch64-apple-visionos
           time cargo s arm64e-apple-darwin
           time cargo s x86_64h-apple-darwin
+
+          # time cargo s aarch64-apple-tvos
 
           lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
@@ -94,12 +96,12 @@ jobs:
           overwrite: true
           body: "iOS binary executable."
 
-      - name: Upload tvOS to a GitHub release
+      - name: Upload visionOS to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-apple-tvos/src/Img
-          asset_name: tvOS
+          file: target/aarch64-apple-visionos/src/Img
+          asset_name: visionOS
           tag: Nightly
           overwrite: true
-          body: "tvOS binary executable."
+          body: "visionOS binary executable."
