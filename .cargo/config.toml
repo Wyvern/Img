@@ -115,9 +115,8 @@ target-applies-to-host = true
 host-config = true
 trim-paths = true
 gc = true
-precise-pre-release = true
 git = { shallow_index = true, shallow_deps = true }
-gitoxide = { checkout = true, fetch = true, internal_use_git2 = true, list_files = true }
+gitoxide = { checkout = true, fetch = true, internal_use_git2 = true}
 public-dependency = true
 cargo-lints = true
 
