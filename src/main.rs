@@ -6,7 +6,7 @@ mod util;
 
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; 6] = [
+static CURL: [&str; 5] = [
     "--compressed",
     "-k",
     "-A",
@@ -16,7 +16,6 @@ static CURL: [&str; 6] = [
     } else {
         "-fsL"
     },
-    "-e",
 ];
 
 fn check_args() -> String {
@@ -95,7 +94,6 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let out = process::Command::new("curl")
         .args(CURL)
         .args([
-            host,
             addr,
             #[cfg(not(debug_assertions))]
             "-S",
@@ -395,7 +393,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     };
 
     let mut curl = process::Command::new("curl");
-    curl.current_dir(path).args(["-Z"]);
+    curl.current_dir(path).arg("-Z");
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
@@ -427,7 +425,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             #[cfg(not(feature = "infer"))]
             {
-                name_ext = content_header_info(url.as_ref(), host, name);
+                name_ext = content_header_info(url.as_ref(), name);
             }
         } else {
             name = &name[..name.find('?').unwrap_or(name.len())];
@@ -453,7 +451,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         create_dir();
         let cmd = curl
             .args(CURL)
-            .args([&format!("https://{host}"), "--parallel-immediate"]);
+            .args(["-e", &format!("https://{host}"), "--parallel-immediate"]);
         #[cfg(not(feature = "infer"))]
         cmd.spawn();
 
@@ -467,11 +465,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 }
             }
 
+            //async
             // let p = path.to_owned();
             // let h = host.to_owned();
 
             // thread::spawn(move || {
-            //     curl.args(CURL).args([&h, "--parallel-immediate"]).output();
+            //     curl.args(CURL).args(["-e",&h, "--parallel-immediate"]).output();
             //     for f in need_file_type_detection {
             //         let file = p.join(&f);
             //         if file.exists() {
@@ -485,13 +484,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Get `url` content header info to generate full `name.ext`
-fn content_header_info(url: &str, host: &str, name: &str) -> String {
+fn content_header_info(url: &str, name: &str) -> String {
     let mut name_ext = String::default();
     tdbg!(url);
     process::Command::new("curl")
         .args(["-J", "-w", "%{content_type}"])
         .args(CURL)
-        .args([host, url])
+        .arg(url)
         .output()
         .map_or_else(
             |e| pl!("Get {} content type info failed: {}", url, e),
