@@ -120,10 +120,10 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-
+    let sel = img.and_then(|i| i.split_once(" | ").map(|(l, _)| l).or(Some(i)));
     let page = crabquery::Document::from(html);
-    let html_img = page.select(img.unwrap_or("img"));
-    let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
+    let html_img = page.select(sel.unwrap_or("img"));
+    let attr = sel.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
     });
@@ -185,10 +185,10 @@ fn parse(addr: &str) -> String {
             let mut urls = collections::HashSet::new();
             let [mut empty_dup, mut embed] = [0u16; 2];
 
-            for img in html_img {
+            for elm in html_img {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
                     .iter()
-                    .find_map(|&a| img.attr(a));
+                    .find_map(|&a| elm.attr(a));
 
                 match value {
                     Some(val) => {
@@ -218,9 +218,13 @@ fn parse(addr: &str) -> String {
                                 embed += 1;
                             }
                         } else {
-                            let url = url_redirect_and_query_cleanup(&val);
+                            let url = if sel == img {
+                                url_redirect_and_query_cleanup(&val)
+                            } else {
+                                val
+                            };
 
-                            // tdbg!(url);
+                            // tdbg!(&url);
                             if url.is_empty() || !urls.insert(canonicalize(url, scheme, host, addr))
                             {
                                 empty_dup += 1;
@@ -240,6 +244,27 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{empty_dup}> Empty/Duplicated 🏞️");
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
+            }
+
+            if img.is_some_and(|i| i.contains(" | ")) {
+                let mut curl = process::Command::new("curl");
+                curl.arg("-Z");
+                for u in &urls {
+                    curl.arg(u);
+                }
+                let o = curl
+                    .args(CURL)
+                    .arg("--parallel-immediate")
+                    .output()
+                    .unwrap();
+                let html = String::from_utf8_lossy(&o.stdout).into_owned();
+                let page = crabquery::Document::from(html);
+                let html_img = page.select(img.unwrap().split_once(" | ").unwrap().1);
+                urls.clear();
+                for e in html_img {
+                    let src = e.attr("src").unwrap();
+                    urls.insert(canonicalize(src, scheme, host, addr));
+                }
             }
             // tdbg!(&urls, &css_img);
             download(t, urls.into_iter().chain(css_img), host)
@@ -360,16 +385,17 @@ fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
     if url.is_empty() {
         return url;
     }
+
     if !url.starts_with("http") {
         if url.starts_with("//") {
             format!("{scheme}:{url}")
         } else if url.starts_with('/') {
             format!("{scheme}://{host}{url}")
         } else {
+            let path = addr.split_once("://").unwrap().1;
             format!(
-                "{}/{}",
-                &addr[..addr.rfind('/').unwrap_or(addr.len())],
-                url.trim_start_matches("./")
+                "{scheme}://{}/{url}",
+                &path[..path.rfind('/').unwrap_or(path.len())]
             )
         }
     } else {
@@ -415,7 +441,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             || quit!("Invalid URL: {}", url),
             |slash| url[slash + 1..].trim_start_matches(['-', '_']),
         );
-
+        name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
@@ -739,7 +765,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 fn url_redirect_and_query_cleanup(url: &str) -> String {
     use percent_encoding::*;
     let dec_url = percent_decode_str(url).decode_utf8_lossy();
-    let mut cleanup = &dec_url[dec_url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+    let mut cleanup = &dec_url[dec_url.rfind("?url=").map_or(0, |p| p + 5)..];
     cleanup = &cleanup[..cleanup
         .find('?')
         .and_then(|q| cleanup[q..].find('&').map(|a| a + q))
