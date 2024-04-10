@@ -6,7 +6,7 @@ mod util;
 
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; 6] = [
+static CURL: [&str; 5] = [
     "--compressed",
     "-k",
     "-A",
@@ -16,7 +16,6 @@ static CURL: [&str; 6] = [
     } else {
         "-fsL"
     },
-    "-e",
 ];
 
 fn check_args() -> String {
@@ -95,7 +94,6 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let out = process::Command::new("curl")
         .args(CURL)
         .args([
-            host,
             addr,
             #[cfg(not(debug_assertions))]
             "-S",
@@ -122,10 +120,10 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-
+    let sel = img.and_then(|i| i.split_once(" | ").map(|(l, _)| l).or(Some(i)));
     let page = crabquery::Document::from(html);
-    let html_img = page.select(img.unwrap_or("img"));
-    let attr = img.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
+    let html_img = page.select(sel.unwrap_or("img"));
+    let attr = sel.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
     });
@@ -187,10 +185,10 @@ fn parse(addr: &str) -> String {
             let mut urls = collections::HashSet::new();
             let [mut empty_dup, mut embed] = [0u16; 2];
 
-            for img in html_img {
+            for elm in html_img {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
                     .iter()
-                    .find_map(|&a| img.attr(a));
+                    .find_map(|&a| elm.attr(a));
 
                 match value {
                     Some(val) => {
@@ -220,9 +218,13 @@ fn parse(addr: &str) -> String {
                                 embed += 1;
                             }
                         } else {
-                            let url = url_redirect_and_query_cleanup(&val);
+                            let url = if sel == img {
+                                url_redirect_and_query_cleanup(&val)
+                            } else {
+                                val
+                            };
 
-                            // tdbg!(url);
+                            // tdbg!(&url);
                             if url.is_empty() || !urls.insert(canonicalize(url, scheme, host, addr))
                             {
                                 empty_dup += 1;
@@ -242,6 +244,43 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{empty_dup}> Empty/Duplicated 🏞️");
             } else if embed > 0 {
                 pl!("Skipped <{embed}> Embed 🏞️");
+            }
+
+            if img.is_some_and(|i| i.contains(" | ")) {
+                let mut curl = process::Command::new("curl");
+                curl.arg("-Z");
+                for u in &urls {
+                    curl.arg(u);
+                }
+                let o = curl
+                    .args(CURL)
+                    .arg("--parallel-immediate")
+                    .output()
+                    .unwrap();
+                let html = String::from_utf8_lossy(&o.stdout).into_owned();
+                let page = crabquery::Document::from(html);
+                let html_img = page.select(img.unwrap().split_once(" | ").unwrap().1);
+                urls.clear();
+                for e in html_img {
+                    let src = e.attr("src").unwrap();
+                    let title_alt = ["title", "alt"]
+                        .iter()
+                        .find_map(|a| {
+                            e.attr(a).and_then(|x| {
+                                if !x.is_empty()
+                                    && [".jpg", ".jpeg", ".png", ".webp"]
+                                        .iter()
+                                        .any(|&ext| x.trim_end().ends_with(ext))
+                                {
+                                    Some(x)
+                                } else {
+                                    None
+                                }
+                            })
+                        })
+                        .unwrap_or(String::default());
+                    urls.insert([canonicalize(src, scheme, host, addr), title_alt].join("::"));
+                }
             }
             // tdbg!(&urls, &css_img);
             download(t, urls.into_iter().chain(css_img), host)
@@ -362,16 +401,17 @@ fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
     if url.is_empty() {
         return url;
     }
+
     if !url.starts_with("http") {
         if url.starts_with("//") {
             format!("{scheme}:{url}")
         } else if url.starts_with('/') {
             format!("{scheme}://{host}{url}")
         } else {
+            let path = addr.split_once("://").unwrap().1;
             format!(
-                "{}/{}",
-                &addr[..addr.rfind('/').unwrap_or(addr.len())],
-                url.trim_start_matches("./")
+                "{scheme}://{}/{url}",
+                &path[..path.rfind('/').unwrap_or(path.len())]
             )
         }
     } else {
@@ -395,7 +435,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     };
 
     let mut curl = process::Command::new("curl");
-    curl.current_dir(path).args(["-Z"]);
+    curl.current_dir(path).arg("-Z");
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
@@ -417,7 +457,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             || quit!("Invalid URL: {}", url),
             |slash| url[slash + 1..].trim_start_matches(['-', '_']),
         );
-
+        name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
+        name = &name[..name.rfind("::").unwrap_or(name.len())];
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
@@ -427,7 +468,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             #[cfg(not(feature = "infer"))]
             {
-                name_ext = content_header_info(url.as_ref(), host, name);
+                name_ext = match url.rsplit_once("::") {
+                    Some((_, title_alt)) if !title_alt.is_empty() => title_alt.into(),
+                    _ => content_header_info(url.as_ref(), name),
+                }
             }
         } else {
             name = &name[..name.find('?').unwrap_or(name.len())];
@@ -437,7 +481,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name_ext.as_str()
         };
-        let enc_url = url.replace(' ', "%20");
+
+        let enc_url = url[..url.rfind("::").unwrap_or(url.len())].replace(' ', "%20");
         if !path.join(file_name).exists() {
             // tdbg!(&url);
             curl.args([&enc_url, "-o", file_name]);
@@ -453,7 +498,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         create_dir();
         let cmd = curl
             .args(CURL)
-            .args([&format!("https://{host}"), "--parallel-immediate"]);
+            .args(["-e", &format!("https://{host}"), "--parallel-immediate"]);
         #[cfg(not(feature = "infer"))]
         cmd.spawn();
 
@@ -467,11 +512,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 }
             }
 
+            //async
             // let p = path.to_owned();
             // let h = host.to_owned();
 
             // thread::spawn(move || {
-            //     curl.args(CURL).args([&h, "--parallel-immediate"]).output();
+            //     curl.args(CURL).args(["-e",&h, "--parallel-immediate"]).output();
             //     for f in need_file_type_detection {
             //         let file = p.join(&f);
             //         if file.exists() {
@@ -485,13 +531,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Get `url` content header info to generate full `name.ext`
-fn content_header_info(url: &str, host: &str, name: &str) -> String {
+fn content_header_info(url: &str, name: &str) -> String {
     let mut name_ext = String::default();
     tdbg!(url);
     process::Command::new("curl")
         .args(["-J", "-w", "%{content_type}"])
         .args(CURL)
-        .args([host, url])
+        .arg(url)
         .output()
         .map_or_else(
             |e| pl!("Get {} content type info failed: {}", url, e),
@@ -740,7 +786,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
 fn url_redirect_and_query_cleanup(url: &str) -> String {
     use percent_encoding::*;
     let dec_url = percent_decode_str(url).decode_utf8_lossy();
-    let mut cleanup = &dec_url[dec_url.rfind("?url=").map(|p| p + 5).unwrap_or(0)..];
+    let mut cleanup = &dec_url[dec_url.rfind("?url=").map_or(0, |p| p + 5)..];
     cleanup = &cleanup[..cleanup
         .find('?')
         .and_then(|q| cleanup[q..].find('&').map(|a| a + q))

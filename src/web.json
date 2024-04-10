@@ -66,10 +66,10 @@
     "Album": "div.title a"
   },
   {
-    "Site": "sxchinesegirlz.one,sxchinesegirlz01.xyz",
+    "Site": "everia.club,sxchinesegirlz.one,sxchinesegirlz01.xyz",
     "Img": "figure.wp-block-image.size-large img",
     "Next": "div.pagination a",
-    "Album": "h2 a"
+    "Album": "h2 > a"
   },
   {
     "Site": "xiuren.biz",
@@ -147,7 +147,7 @@
     "Next": "div.fenye a"
   },
   {
-    "Site": "ligui.org,counv.com,ikmn05.cc,ikmn.cc,loxiu.com",
+    "Site": "ligui.org,counv.com,ikmn05.cc,ikmn05.top,ikmn.cc,loxiu.com",
     "Img": "div.info-imtg-box img",
     "Next": "div.pagebar a",
     "Album": "span.img-box h3 a"
@@ -187,11 +187,6 @@
     "Site": "ribi.me",
     "Img": "div.container img.img-fluid",
     "Album": "li.breadcrumb-item a"
-  },
-  {
-    "Site": "everia.club",
-    "Img": "figure.wp-block-image.size-large img",
-    "Album": "div.thumbnail a"
   },
   {
     "Site": "xiurennvs.xyz",
@@ -410,5 +405,11 @@
     "Img": "ul#hgallery img",
     "Next": "div#pages a",
     "Album": "div.card-body a"
+  },
+  {
+    "Site": "legbabe.com,honeyleg.com,nlegs.com",
+    "Img": "div > a.thumbnail[href] | img.img-res",
+    "Next": "ul.pagination a",
+    "Album": "div > span.title"
   }
 ]
