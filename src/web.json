@@ -66,10 +66,10 @@
     "Album": "div.title a"
   },
   {
-    "Site": "sxchinesegirlz.one,sxchinesegirlz01.xyz",
+    "Site": "everia.club,sxchinesegirlz.one,sxchinesegirlz01.xyz",
     "Img": "figure.wp-block-image.size-large img",
     "Next": "div.pagination a",
-    "Album": "h2 a"
+    "Album": "h2 > a"
   },
   {
     "Site": "xiuren.biz",
@@ -187,11 +187,6 @@
     "Site": "ribi.me",
     "Img": "div.container img.img-fluid",
     "Album": "li.breadcrumb-item a"
-  },
-  {
-    "Site": "everia.club",
-    "Img": "figure.wp-block-image.size-large img",
-    "Album": "div.thumbnail a"
   },
   {
     "Site": "xiurennvs.xyz",

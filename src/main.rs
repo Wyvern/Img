@@ -263,7 +263,23 @@ fn parse(addr: &str) -> String {
                 urls.clear();
                 for e in html_img {
                     let src = e.attr("src").unwrap();
-                    urls.insert(canonicalize(src, scheme, host, addr));
+                    let title_alt = ["title", "alt"]
+                        .iter()
+                        .find_map(|a| {
+                            e.attr(a).and_then(|x| {
+                                if !x.is_empty()
+                                    && [".jpg", ".jpeg", ".png", ".webp"]
+                                        .iter()
+                                        .any(|&ext| x.trim_end().ends_with(ext))
+                                {
+                                    Some(x)
+                                } else {
+                                    None
+                                }
+                            })
+                        })
+                        .unwrap_or(String::default());
+                    urls.insert([canonicalize(src, scheme, host, addr), title_alt].join("::"));
                 }
             }
             // tdbg!(&urls, &css_img);
@@ -442,6 +458,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             |slash| url[slash + 1..].trim_start_matches(['-', '_']),
         );
         name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
+        name = &name[..name.rfind("::").unwrap_or(name.len())];
         let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
@@ -451,7 +468,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             #[cfg(not(feature = "infer"))]
             {
-                name_ext = content_header_info(url.as_ref(), name);
+                name_ext = match url.rsplit_once("::") {
+                    Some((_, title_alt)) if !title_alt.is_empty() => title_alt.into(),
+                    _ => content_header_info(url.as_ref(), name),
+                }
             }
         } else {
             name = &name[..name.find('?').unwrap_or(name.len())];
@@ -461,7 +481,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name_ext.as_str()
         };
-        let enc_url = url.replace(' ', "%20");
+
+        let enc_url = url[..url.rfind("::").unwrap_or(url.len())].replace(' ', "%20");
         if !path.join(file_name).exists() {
             // tdbg!(&url);
             curl.args([&enc_url, "-o", file_name]);
