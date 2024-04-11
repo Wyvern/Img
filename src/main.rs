@@ -263,23 +263,29 @@ fn parse(addr: &str) -> String {
                 urls.clear();
                 for e in html_img {
                     let src = e.attr("src").unwrap();
-                    let title_alt = ["title", "alt"]
-                        .iter()
-                        .find_map(|a| {
-                            e.attr(a).and_then(|x| {
-                                if !x.is_empty()
-                                    && [".jpg", ".jpeg", ".png", ".webp"]
-                                        .iter()
-                                        .any(|&ext| x.trim_end().ends_with(ext))
-                                {
-                                    Some(x)
-                                } else {
-                                    None
-                                }
-                            })
+                    let title_alt = ["title", "alt"].iter().find_map(|a| {
+                        e.attr(a).and_then(|x| {
+                            if !x.is_empty()
+                                && [".jpg", ".jpeg", ".png", ".webp"]
+                                    .iter()
+                                    .any(|&ext| x.trim_end().ends_with(ext))
+                            {
+                                Some(x)
+                            } else {
+                                None
+                            }
                         })
-                        .unwrap_or(String::default());
-                    urls.insert([canonicalize(src, scheme, host, addr), title_alt].join("::"));
+                    });
+
+                    if title_alt.is_some() {
+                        urls.insert(format!(
+                            "{}::{}",
+                            canonicalize(src, scheme, host, addr),
+                            title_alt.unwrap()
+                        ));
+                    } else {
+                        urls.insert(canonicalize(src, scheme, host, addr));
+                    }
                 }
             }
             // tdbg!(&urls, &css_img);
@@ -468,10 +474,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             #[cfg(not(feature = "infer"))]
             {
-                name_ext = match url.rsplit_once("::") {
-                    Some((_, title_alt)) if !title_alt.is_empty() => title_alt.into(),
-                    _ => content_header_info(url.as_ref(), name),
-                }
+                name_ext = url.rsplit_once("::").map_or_else(
+                    || content_header_info(url.as_ref(), name),
+                    |(_, title_alt)| title_alt.into(),
+                )
             }
         } else {
             name = &name[..name.find('?').unwrap_or(name.len())];
@@ -550,7 +556,7 @@ fn content_header_info(url: &str, name: &str) -> String {
                             .find_map(|&x| ctx.find(x))
                             .unwrap_or(ctx.len())];
                         if !name.ends_with(format!(".{ext}").as_str()) {
-                            name_ext = [name, ext].join(".");
+                            name_ext = format!("{name}.{ext}")
                         }
                     }
                 }
@@ -725,9 +731,12 @@ fn save_to_file(data: &str) {
     #[cfg(feature = "embed")]
     {
         use base64::*;
-        let ext = image_type(data);
+        let ext = &data[..['+', ';', ',']
+            .iter()
+            .find_map(|&x| data.find(x))
+            .unwrap_or(data.len())];
         let offset = &data[data.find(',').unwrap() + 1..];
-        let full_name = [name, ext].join(".");
+        let full_name = format!("{name}.{ext}");
         if !path::Path::new(&full_name).exists() {
             {
                 if data.contains(";base64,") {
