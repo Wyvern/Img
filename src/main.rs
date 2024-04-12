@@ -827,11 +827,11 @@ fn url_image(content: &str) -> Option<String> {
         url = dec.as_str();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
         if url.is_empty()
-            || url.eq_ignore_ascii_case("undefined")
+            || url == "undefined"
             || url.starts_with(['{', '$'])
             || url.contains('#')
             || [
-                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
+                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".pdf", ".fnt", ".eot", ".cff",
             ]
             .iter()
             .any(|&ext| url.ends_with(ext))
