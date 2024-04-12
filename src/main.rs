@@ -120,7 +120,8 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-    let sel = img.and_then(|i| i.split_once(" | ").map(|(l, _)| l).or(Some(i)));
+    let sels = img.and_then(|i| i.split_once(" | "));
+    let sel = sels.map(|(l, _)| l).or(img);
     let page = crabquery::Document::from(html);
     let html_img = page.select(sel.unwrap_or("img"));
     let attr = sel.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
@@ -246,7 +247,7 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
 
-            if img.is_some_and(|i| i.contains(" | ")) {
+            if let Some((_, r)) = sels {
                 let mut curl = process::Command::new("curl");
                 curl.arg("-Z");
                 for u in &urls {
@@ -259,7 +260,7 @@ fn parse(addr: &str) -> String {
                     .unwrap();
                 let html = String::from_utf8_lossy(&o.stdout).into_owned();
                 let page = crabquery::Document::from(html);
-                let html_img = page.select(img.unwrap().split_once(" | ").unwrap().1);
+                let html_img = page.select(r);
                 urls.clear();
                 for e in html_img {
                     let src = e.attr("src").unwrap();
@@ -459,13 +460,15 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let mut name = url.rfind('/').map_or_else(
-            || quit!("Invalid URL: {}", url),
-            |slash| url[slash + 1..].trim_start_matches(['-', '_']),
+        let lr = url.rsplit_once("::");
+        let u = lr.map_or(url.as_ref(), |(l, _)| l);
+        let mut name = u.rfind('/').map_or_else(
+            || quit!("Invalid URL: {}", u),
+            |slash| u[slash + 1..].trim_start_matches(['-', '_']),
         );
         name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
-        name = &name[..name.rfind("::").unwrap_or(name.len())];
-        let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
+        let name_no_query = &name[..name.find('?').unwrap_or(name.len())];
+        let has_ext = name_no_query.rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
@@ -474,13 +477,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             #[cfg(not(feature = "infer"))]
             {
-                name_ext = url.rsplit_once("::").map_or_else(
+                name_ext = lr.map_or_else(
                     || content_header_info(url.as_ref(), name),
-                    |(_, title_alt)| title_alt.into(),
+                    |(_, file_name)| file_name.into(),
                 )
             }
         } else {
-            name = &name[..name.find('?').unwrap_or(name.len())];
+            name = name_no_query
         }
         let file_name = if name_ext.is_empty() {
             name
@@ -488,7 +491,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             name_ext.as_str()
         };
 
-        let enc_url = url[..url.rfind("::").unwrap_or(url.len())].replace(' ', "%20");
+        let enc_url = u.replace(' ', "%20");
         if !path.join(file_name).exists() {
             // tdbg!(&url);
             curl.args([&enc_url, "-o", file_name]);
