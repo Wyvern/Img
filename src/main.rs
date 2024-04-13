@@ -120,7 +120,8 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-    let sel = img.and_then(|i| i.split_once(" | ").map(|(l, _)| l).or(Some(i)));
+    let sels = img.and_then(|i| i.split_once(" | "));
+    let sel = sels.map(|(l, _)| l).or(img);
     let page = crabquery::Document::from(html);
     let html_img = page.select(sel.unwrap_or("img"));
     let attr = sel.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
@@ -154,7 +155,11 @@ fn parse(addr: &str) -> String {
         css_img.len(),
     ];
 
-    let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
+    let term_title = if terminal_emulator() {
+        format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\")
+    } else {
+        format!("{G} {t}")
+    };
 
     let htmlcss = if html > 0 && css > 0 {
         format!(": HTML({html}) + CSS({css})")
@@ -167,11 +172,11 @@ fn parse(addr: &str) -> String {
     };
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}")
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}")
         }
-        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
-        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}"),
-        (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
+        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{term_title}"),
+        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}"),
+        (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
     t = if t.contains("page") || t.contains('页') {
@@ -246,7 +251,7 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
 
-            if img.is_some_and(|i| i.contains(" | ")) {
+            if let Some((_, r)) = sels {
                 let mut curl = process::Command::new("curl");
                 curl.arg("-Z");
                 for u in &urls {
@@ -259,7 +264,7 @@ fn parse(addr: &str) -> String {
                     .unwrap();
                 let html = String::from_utf8_lossy(&o.stdout).into_owned();
                 let page = crabquery::Document::from(html);
-                let html_img = page.select(img.unwrap().split_once(" | ").unwrap().1);
+                let html_img = page.select(r);
                 urls.clear();
                 for e in html_img {
                     let src = e.attr("src").unwrap();
@@ -459,13 +464,15 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let mut name = url.rfind('/').map_or_else(
-            || quit!("Invalid URL: {}", url),
-            |slash| url[slash + 1..].trim_start_matches(['-', '_']),
+        let lr = url.rsplit_once("::");
+        let u = lr.map_or(url.as_ref(), |(l, _)| l);
+        let mut name = u.rfind('/').map_or_else(
+            || quit!("Invalid URL: {}", u),
+            |slash| u[slash + 1..].trim_start_matches(['-', '_']),
         );
         name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
-        name = &name[..name.rfind("::").unwrap_or(name.len())];
-        let has_ext = &name[..name.find('?').unwrap_or(name.len())].rfind('.');
+        let name_no_query = &name[..name.find('?').unwrap_or(name.len())];
+        let has_ext = name_no_query.rfind('.');
         let mut name_ext = String::default();
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
@@ -474,13 +481,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             }
             #[cfg(not(feature = "infer"))]
             {
-                name_ext = url.rsplit_once("::").map_or_else(
+                name_ext = lr.map_or_else(
                     || content_header_info(url.as_ref(), name),
-                    |(_, title_alt)| title_alt.into(),
+                    |(_, file_name)| file_name.into(),
                 )
             }
         } else {
-            name = &name[..name.find('?').unwrap_or(name.len())];
+            name = name_no_query
         }
         let file_name = if name_ext.is_empty() {
             name
@@ -488,7 +495,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             name_ext.as_str()
         };
 
-        let enc_url = url[..url.rfind("::").unwrap_or(url.len())].replace(' ', "%20");
+        let enc_url = u.replace(' ', "%20");
         if !path.join(file_name).exists() {
             // tdbg!(&url);
             curl.args([&enc_url, "-o", file_name]);
@@ -827,11 +834,11 @@ fn url_image(content: &str) -> Option<String> {
         url = dec.as_str();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
         if url.is_empty()
-            || url.eq_ignore_ascii_case("undefined")
+            || url == "undefined"
             || url.starts_with(['{', '$'])
             || url.contains('#')
             || [
-                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".ps", ".fnt", ".eot", ".cff",
+                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".pdf", ".fnt", ".eot", ".cff",
             ]
             .iter()
             .any(|&ext| url.ends_with(ext))
@@ -874,9 +881,23 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
     images
 }
 
+///Detect terminal emulator using `echo $TERM`
+fn terminal_emulator() -> bool {
+    env::var("TERM").map_or(false, |o| {
+        ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
+            .iter()
+            .any(|x| o.contains(x))
+    })
+}
+
 #[cfg(test)]
 mod img {
     use super::*;
+
+    #[test]
+    fn detect_terminal_emulator() {
+        dbg!(terminal_emulator());
+    }
 
     fn arg(default: &str) -> String {
         let arg = env::args().nth(4);
