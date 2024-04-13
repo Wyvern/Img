@@ -411,5 +411,10 @@
     "Img": "div > a.thumbnail[href] | img.img-res",
     "Next": "ul.pagination a",
     "Album": "div > span.title"
+  },
+  {
+    "Site": "spacemiss.com",
+    "Img": "div.tdb-block-inner img",
+    "Album": "h2.entry-title a"
   }
 ]

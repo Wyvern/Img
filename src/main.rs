@@ -155,7 +155,11 @@ fn parse(addr: &str) -> String {
         css_img.len(),
     ];
 
-    let link_title = format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\");
+    let term_title = if terminal_emulator() {
+        format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\")
+    } else {
+        format!("{G} {t}")
+    };
 
     let htmlcss = if html > 0 && css > 0 {
         format!(": HTML({html}) + CSS({css})")
@@ -168,11 +172,11 @@ fn parse(addr: &str) -> String {
     };
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}")
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}")
         }
-        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{link_title}"),
-        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{link_title}"),
-        (false, false) => quit!("∅ 🏞️  found in 📄:{link_title}"),
+        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{term_title}"),
+        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}"),
+        (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
     t = if t.contains("page") || t.contains('页') {
@@ -877,9 +881,23 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
     images
 }
 
+///Detect terminal emulator using `echo $TERM`
+fn terminal_emulator() -> bool {
+    env::var("TERM").map_or(false, |o| {
+        ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
+            .iter()
+            .any(|x| o.contains(x))
+    })
+}
+
 #[cfg(test)]
 mod img {
     use super::*;
+
+    #[test]
+    fn detect_terminal_emulator() {
+        dbg!(terminal_emulator());
+    }
 
     fn arg(default: &str) -> String {
         let arg = env::args().nth(4);
