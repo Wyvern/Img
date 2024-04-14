@@ -209,7 +209,7 @@ fn parse(addr: &str) -> String {
                                         } else {
                                             embed += 1;
                                         }
-                                    } else if !urls.insert(canonicalize(u, scheme, host, addr)) {
+                                    } else if !urls.insert(canonicalize(u, scheme, addr)) {
                                         empty_dup += 1;
                                     }
                                 }
@@ -230,8 +230,7 @@ fn parse(addr: &str) -> String {
                             };
 
                             // tdbg!(&url);
-                            if url.is_empty() || !urls.insert(canonicalize(url, scheme, host, addr))
-                            {
+                            if url.is_empty() || !urls.insert(canonicalize(url, scheme, addr)) {
                                 empty_dup += 1;
                             }
                         }
@@ -285,11 +284,11 @@ fn parse(addr: &str) -> String {
                     if title_alt.is_some() {
                         urls.insert(format!(
                             "{}::{}",
-                            canonicalize(src, scheme, host, addr),
+                            canonicalize(src, scheme, addr),
                             title_alt.unwrap()
                         ));
                     } else {
-                        urls.insert(canonicalize(src, scheme, host, addr));
+                        urls.insert(canonicalize(src, scheme, addr));
                     }
                 }
             }
@@ -326,7 +325,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize(href, scheme, host, addr);
+                        let album_url = canonicalize(href, scheme, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -402,13 +401,11 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    next_sel.map_or_else(<_>::default, |n| {
-        check_next(page.select(n), scheme, host, addr)
-    })
+    next_sel.map_or_else(<_>::default, |n| check_next(page.select(n), scheme, addr))
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
+fn canonicalize(url: String, scheme: &str, addr: &str) -> String {
     if url.is_empty() {
         return url;
     }
@@ -417,7 +414,11 @@ fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
         if url.starts_with("//") {
             format!("{scheme}:{url}")
         } else if url.starts_with('/') {
-            format!("{scheme}://{host}{url}")
+            let path = addr.split_once("://").unwrap().1;
+            format!(
+                "{scheme}://{}{url}",
+                &path[..path.find('/').unwrap_or(path.len())]
+            )
         } else {
             let path = addr.split_once("://").unwrap().1;
             format!(
@@ -601,7 +602,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &str) -> String {
+fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String {
     let mut next_link: String;
     let splitter = |tag: &crabquery::Element| {
         tag.attr("class")
@@ -716,7 +717,7 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
         next_link = String::default();
     }
 
-    next_link = canonicalize(next_link, scheme, host, cur);
+    next_link = canonicalize(next_link, scheme, cur);
 
     tdbg!(next_link)
 }
@@ -872,7 +873,7 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(u, scheme, host, addr));
+                        images.insert(canonicalize(u, scheme, addr));
                     }
                 }
             }

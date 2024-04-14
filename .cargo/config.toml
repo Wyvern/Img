@@ -180,6 +180,7 @@ rustflags = [
     "-Zhas-thread-local",
     "-Zshell-argfiles",
     "-Zub-checks=off",
+    "-Zlinker-features=+lld",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -246,6 +247,7 @@ rustflags = [
     "-Zhas-thread-local",
     "-Zshell-argfiles",
     "-Zub-checks=off",
+    "-Zlinker-features=+lld",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -254,11 +256,11 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(target_vendor="apple")']
-rustflags = ["-Clinker-flavor=darwin-lld-cc"]
+# [target.'cfg(target_vendor="apple")']
+# rustflags = ["-Clinker-flavor=darwin-lld-cc"]
 
-[target.'cfg(target_env="msvc")']
-rustflags = ["-Clinker-flavor=msvc-lld"]
+# [target.'cfg(target_env="msvc")']
+# rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
@@ -275,11 +277,11 @@ rustflags = ["-Zhas-thread-local=no"]
 [target.'cfg(target_os="linux")']
 rustflags = ["-Zrelax-elf-relocations"]
 
-[target.'cfg(any(target_env="gnu",target_env="musl"))']
-rustflags = ["-Clinker-flavor=gnu-lld-cc"]
+# [target.'cfg(any(target_env="gnu",target_env="musl"))']
+# rustflags = ["-Clinker-flavor=gnu-lld-cc"]
 
-[target.'cfg(target_family="wasm")']
-rustflags = ["-Clinker-flavor=wasm-lld-cc"]
+# [target.'cfg(target_family="wasm")']
+# rustflags = ["-Clinker-flavor=wasm-lld-cc"]
 
 [target.aarch64-unknown-linux-gnu]
 linker = "aarch64-linux-gnu-gcc"
