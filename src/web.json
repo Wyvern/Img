@@ -416,5 +416,11 @@
     "Site": "spacemiss.com",
     "Img": "div.tdb-block-inner img",
     "Album": "h2.entry-title a"
+  },
+  {
+    "Site": "hotgirl.asia",
+    "Img": "div.galeria_img img",
+    "Next": "ul.pagination li.active",
+    "Album": "span.mli-info > h2"
   }
 ]
