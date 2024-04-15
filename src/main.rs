@@ -116,7 +116,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
 fn parse(addr: &str) -> String {
     let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
     let css_img = if img.is_none() {
-        css_image(&html, scheme, host, addr)
+        css_image(&html, scheme, addr)
     } else {
         collections::HashSet::new()
     };
@@ -209,7 +209,7 @@ fn parse(addr: &str) -> String {
                                         } else {
                                             embed += 1;
                                         }
-                                    } else if !urls.insert(canonicalize(u, scheme, host, addr)) {
+                                    } else if !urls.insert(canonicalize(u, scheme, addr)) {
                                         empty_dup += 1;
                                     }
                                 }
@@ -230,8 +230,7 @@ fn parse(addr: &str) -> String {
                             };
 
                             // tdbg!(&url);
-                            if url.is_empty() || !urls.insert(canonicalize(url, scheme, host, addr))
-                            {
+                            if url.is_empty() || !urls.insert(canonicalize(url, scheme, addr)) {
                                 empty_dup += 1;
                             }
                         }
@@ -285,11 +284,11 @@ fn parse(addr: &str) -> String {
                     if title_alt.is_some() {
                         urls.insert(format!(
                             "{}::{}",
-                            canonicalize(src, scheme, host, addr),
+                            canonicalize(src, scheme, addr),
                             title_alt.unwrap()
                         ));
                     } else {
-                        urls.insert(canonicalize(src, scheme, host, addr));
+                        urls.insert(canonicalize(src, scheme, addr));
                     }
                 }
             }
@@ -326,7 +325,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize(href, scheme, host, addr);
+                        let album_url = canonicalize(href, scheme, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -402,13 +401,11 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    next_sel.map_or_else(<_>::default, |n| {
-        check_next(page.select(n), scheme, host, addr)
-    })
+    next_sel.map_or_else(<_>::default, |n| check_next(page.select(n), scheme, addr))
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
+fn canonicalize(url: String, scheme: &str, addr: &str) -> String {
     if url.is_empty() {
         return url;
     }
@@ -417,7 +414,11 @@ fn canonicalize(url: String, scheme: &str, host: &str, addr: &str) -> String {
         if url.starts_with("//") {
             format!("{scheme}:{url}")
         } else if url.starts_with('/') {
-            format!("{scheme}://{host}{url}")
+            let path = addr.split_once("://").unwrap().1;
+            format!(
+                "{scheme}://{}{url}",
+                &path[..path.find('/').unwrap_or(path.len())]
+            )
         } else {
             let path = addr.split_once("://").unwrap().1;
             format!(
@@ -601,7 +602,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &str) -> String {
+fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String {
     let mut next_link: String;
     let splitter = |tag: &crabquery::Element| {
         tag.attr("class")
@@ -612,10 +613,10 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
         //println!("NO next page <element> found.")
     } else if nexts.len() == 1 {
         let element = &nexts[0];
-        if element.tag().unwrap() == "span" {
+        if element.tag().unwrap() == "span" || element.attr("href").is_none() {
             let items = element.parent().unwrap().children();
             let mut tags = items.split(|e| {
-                e.tag().unwrap() == "span"
+                (e.tag().unwrap() == "span" || e.attr("href").is_none())
                     && (splitter(e)
                         || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
             });
@@ -623,12 +624,19 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
                 .next_back()
                 .unwrap()
                 .iter()
-                .filter(|e| e.tag().unwrap() == "a")
+                .filter(|e| {
+                    e.tag().unwrap() == "a"
+                        || e.children()
+                            .first()
+                            .is_some_and(|c| c.tag().unwrap() == "a")
+                })
                 .collect::<Vec<_>>();
 
-            next_link = a
-                .first()
-                .map_or(String::default(), |f| f.attr("href").unwrap());
+            next_link = a.first().map_or(String::default(), |f| {
+                f.attr("href")
+                    .or_else(|| f.children().first().and_then(|x| x.attr("href")))
+                    .unwrap()
+            });
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr("href").unwrap();
         } else {
@@ -716,7 +724,7 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, host: &str, cur: &st
         next_link = String::default();
     }
 
-    next_link = canonicalize(next_link, scheme, host, cur);
+    next_link = canonicalize(next_link, scheme, cur);
 
     tdbg!(next_link)
 }
@@ -853,14 +861,14 @@ fn url_image(content: &str) -> Option<String> {
 }
 
 ///Get `page` css style `url(),image(),image-set()`
-fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::HashSet<String> {
+fn css_image(html: &str, scheme: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
     CSS.map(|s| {
         let segments = html.split(s);
         if s == "image-set(" {
             for seg in segments.skip(1) {
                 images = images
-                    .union(&css_image(seg, scheme, host, addr))
+                    .union(&css_image(seg, scheme, addr))
                     .map(Into::into)
                     .collect();
             }
@@ -872,7 +880,7 @@ fn css_image(html: &str, scheme: &str, host: &str, addr: &str) -> collections::H
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(u, scheme, host, addr));
+                        images.insert(canonicalize(u, scheme, addr));
                     }
                 }
             }
@@ -963,7 +971,7 @@ mod img {
     fn css_img() {
         let addr = arg("autodesk.com");
         let (html, _, [scheme, host]) = get_html(&addr);
-        let r = css_image(&html, scheme, host, &addr);
+        let r = css_image(&html, scheme, &addr);
         tdbg!(&r, r.len());
     }
 
