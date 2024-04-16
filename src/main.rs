@@ -6,11 +6,13 @@ mod util;
 
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; 5] = [
+static CURL: [&str; 7] = [
     "--compressed",
     "-k",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
+    "--tcp-fastopen",
+    "--tcp-nodelay",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
@@ -414,13 +416,13 @@ fn canonicalize(url: String, scheme: &str, addr: &str) -> String {
         if url.starts_with("//") {
             format!("{scheme}:{url}")
         } else if url.starts_with('/') {
-            let path = addr.split_once("://").unwrap().1;
+            let path = addr.split_once("://").unwrap_or((scheme, addr)).1;
             format!(
                 "{scheme}://{}{url}",
                 &path[..path.find('/').unwrap_or(path.len())]
             )
         } else {
-            let path = addr.split_once("://").unwrap().1;
+            let path = addr.split_once("://").unwrap_or((scheme, addr)).1;
             format!(
                 "{scheme}://{}/{url}",
                 &path[..path.rfind('/').unwrap_or(path.len())]
