@@ -80,6 +80,7 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Windows AArch64 binary executable."
+
       - name: Upload Windows-Arm64EC to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
