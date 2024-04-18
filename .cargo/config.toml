@@ -139,6 +139,7 @@ rustflags = [
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
+    "-Cdebuginfo=0",
     "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
 
@@ -205,6 +206,7 @@ rustflags = [
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
+    "-Cdebuginfo=0",
     "-Cstrip=symbols",
     "-Clink-self-contained=+linker",
 
