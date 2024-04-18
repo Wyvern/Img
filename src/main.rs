@@ -75,7 +75,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
         .find(|&s| {
             s["Site"].as_str().map_or(false, |s| {
                 s.split_terminator(',')
-                    .any(|s| s == host.trim_start_matches("www."))
+                    .any(|s| host.trim_end().ends_with(s.trim()))
             })
         });
     site.map_or([None; 3], |s| {
@@ -285,7 +285,7 @@ fn parse(addr: &str) -> String {
 
                     if title_alt.is_some() {
                         urls.insert(format!(
-                            "{}::{}",
+                            "{}|{}",
                             canonicalize(src, scheme, addr),
                             title_alt.unwrap()
                         ));
@@ -467,7 +467,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let lr = url.rsplit_once("::");
+        let lr = url.rsplit_once('|');
         let u = lr.map_or(url.as_ref(), |(l, _)| l);
         let mut name = u.rfind('/').map_or_else(
             || quit!("Invalid URL: {}", u),
