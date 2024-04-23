@@ -428,5 +428,11 @@
     "Img": "img.aligncenter",
     "Next": "div.article-paging span.current",
     "Album": "header > h2 > a"
+  },
+  {
+    "Site": "tuzac.com,kkc3.com",
+    "Img": "div.image-loading-box img",
+    "Next": "div#pager a.page-next",
+    "Album": "div.teaser-file-detail div.teaser-file-title"
   }
 ]
