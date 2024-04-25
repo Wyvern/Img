@@ -63,7 +63,7 @@ mod color {
             .chain(90..=97)
             .chain(100..=107)
             .for_each(|c| {
-                match c {
+                let _ = match c {
                     0 => writeln!(bf, "\n{B}{U}Basic Style:{N}"),
                     30 => writeln!(bf, "\n{B}{U}8-color regular foreground:{N}"),
                     40 => writeln!(bf, "\n{B}{U}8-color regular background:{N}"),
@@ -71,9 +71,9 @@ mod color {
                     100 => writeln!(bf, "\n{B}{U}8-color bright background:{N}"),
                     _ => Ok(()),
                 };
-                writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
+                let _ = writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
             });
-        bf.flush();
+        let _ = bf.flush();
     }
 
     pub fn color256(text: &str) {
@@ -83,76 +83,76 @@ mod color {
 
     pub fn color256_fg(text: &str) {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color foreground:{N}");
+        let _ = writeln!(bf, "\n{B}{U}256-color foreground:{N}");
         (0u8..=255).for_each(|c| {
-            writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
+            let _ = writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
         });
-        bf.flush();
+        let _ = bf.flush();
     }
 
     pub fn color256_bg(text: &str) {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color background:{N}");
+        let _ = writeln!(bf, "\n{B}{U}256-color background:{N}");
         (0u8..=255).for_each(|c| {
-            writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
+            let _ = writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
         });
-        bf.flush();
+        let _ = bf.flush();
     }
 
     pub fn color_256_fg(c: u8, text: &str) {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color foreground:{N}");
-        writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
-        bf.flush();
+        let _ = writeln!(bf, "\n{B}{U}256-color foreground:{N}");
+        let _ = writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
+        let _ = bf.flush();
     }
 
     pub fn color_256_bg(c: u8, text: &str) {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color background:{N}");
-        writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
-        bf.flush();
+        let _ = writeln!(bf, "\n{B}{U}256-color background:{N}");
+        let _ = writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
+        let _ = bf.flush();
     }
 
     pub fn color_rgb_fg(rgb: [u8; 3], text: &str) {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}RGB-color foreground:{N}");
-        writeln!(
+        let _ = writeln!(bf, "\n{B}{U}RGB-color foreground:{N}");
+        let _ = writeln!(
             bf,
             "\"\\x1b[38;2;{0};{1};{2}m\": - \x1b[38;2;{0};{1};{2}m {text} {N}",
             rgb[0], rgb[1], rgb[2]
         );
-        bf.flush();
+        let _ = bf.flush();
     }
 
     pub fn color_rgb_bg(rgb: [u8; 3], text: &str) {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}RGB-color background:{N}");
-        writeln!(
+        let _ = writeln!(bf, "\n{B}{U}RGB-color background:{N}");
+        let _ = writeln!(
             bf,
             "\"\\x1b[48;2;{0};{1};{2}m\": - \x1b[48;2;{0};{1};{2}m {text} {N}",
             rgb[0], rgb[1], rgb[2]
         );
-        bf.flush();
+        let _ = bf.flush();
     }
 
-    pub fn color_rgb_fg_full() {
+    pub fn _color_rgb_fg_full() {
         let mut bf = BufWriter::new(stdout());
         (0u8..=255).for_each(|r| {
             (0u8..=255).for_each(|g| {
                 (0u8..=255).for_each(|b| {
-                    writeln!(bf,"\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m Full-range foreground RGB-color {N}");
-                });bf.flush();super::pause("")
+                    let _=writeln!(bf,"\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m Full-range foreground RGB-color {N}");
+                });let _=bf.flush();super::pause("")
             });
         });
     }
 
-    pub fn color_rgb_bg_full() {
+    pub fn _color_rgb_bg_full() {
         let mut bf = BufWriter::new(stdout());
         (0u8..=255).for_each(|r| {
             (0u8..=255).for_each(|g| {
                 (0u8..=255).for_each(|b| {
-                    writeln!(bf,"\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m Full-range background RGB-color {N}");
-                });bf.flush();super::pause("")
+                    let _=writeln!(bf,"\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m Full-range background RGB-color {N}");
+                });let _=bf.flush();super::pause("")
             })
         });
     }
@@ -180,22 +180,22 @@ mod macros {
     macro_rules! tdbg {
         ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                io::stdout().lock();
-                let r=$crate::dbg!(($($e),*));
-                #[cfg(test)]{pause("");}
+                let _ = io::stdout().lock();
+                let r = $crate::dbg!(($($e),*));
+                #[cfg(test)]{pause("")}
                 r
             } else {($($e),*)}
         }
     }
 
-    macro_rules! demo {
+    macro_rules! _demo {
     ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat => $b:block | $p:path | $i:item | $t:tt) => {$pat $t};
 
     ($id:ident, $b:block, $stmt:stmt, $e:expr, $pat:pat, $t:ty, $lt:lifetime, $l:literal, $p:path, $m:meta, $tt:tt, $i:item, $v:vis)=>{};
 
     }
 
-    macro_rules! impl_ref_elements {
+    macro_rules! _impl_ref_elements {
     () => {};
     ($T0:ident $($T:ident)*) => {
         impl<$T0, $($T,)*> RefElements for ($T0,$($T,)*) {
@@ -213,7 +213,7 @@ mod macros {
 pub fn pause(msg: &str) {
     use io::*;
     let mut o = stdout().lock();
-    write!(
+    let _ = write!(
         o,
         "{}",
         if msg.is_empty() {
@@ -222,11 +222,11 @@ pub fn pause(msg: &str) {
             msg
         }
     );
-    o.flush();
-    stdin().lock().read_line(&mut String::default());
+    let _ = o.flush();
+    let _ = stdin().lock().read_line(&mut String::default());
 }
 
-pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
+pub fn dyn_value<T>(var: &dyn any::Any, val: T) {
     let ptr = var as *const _ as *mut _;
     let cell = cell::Cell::new(ptr);
     unsafe {
@@ -234,7 +234,7 @@ pub fn dyn_value<T>(mut var: &dyn any::Any, val: T) {
     }
 }
 
-pub fn dyn_cast<T: Copy>(mut var: &dyn any::Any) -> T {
+pub fn dyn_cast<T: Copy>(var: &dyn any::Any) -> T {
     let ptr = var as *const _ as *const _;
     unsafe { *ptr }
 }

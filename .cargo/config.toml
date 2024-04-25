@@ -186,7 +186,11 @@ rustflags = [
 
     "-Aunused",
     "-Anonstandard_style",
-    "-Aunexpected_cfgs",
+    "-Aunused_must_use",
+    "-Aclippy::tabs_in_doc_comments",
+    "-Dunused_mut",
+    "-Dclippy::redundant_clone",
+    "-Dclippy::unused_io_amount",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
@@ -255,7 +259,11 @@ rustflags = [
 
     "-Aunused",
     "-Anonstandard_style",
-    "-Aunexpected_cfgs",
+    "-Aunused_must_use",
+    "-Aclippy::tabs_in_doc_comments",
+    "-Dunused_mut",
+    "-Dclippy::redundant_clone",
+    "-Dclippy::unused_io_amount",
     "-Frust_2018_idioms",
     "-Frust_2018_compatibility",
 ]
