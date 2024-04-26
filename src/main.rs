@@ -1,8 +1,6 @@
 #![cfg_attr(not(debug_assertions), no_main)]
-
-use {std::*, util::*};
-
 mod util;
+use {std::*, util::*};
 
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
@@ -89,7 +87,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
     let host_info = host_info(host);
     use sync::mpsc::*;
     let (s, r) = channel();
-    io::stdout().lock();
+    let _ = io::stdout().lock();
     thread::spawn(|| {
         circle_indicator(r);
     });
@@ -102,10 +100,10 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         ])
         .output()
         .unwrap_or_else(|e| {
-            s.send(());
+            let _ = s.send(());
             quit!("curl: {}", e);
         });
-    s.send(());
+    let _ = s.send(());
     if out.stdout.is_empty() {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
@@ -301,7 +299,7 @@ fn parse(addr: &str) -> String {
             let mut all = false;
 
             for (i, alb) in albums.unwrap().iter().enumerate() {
-                let mut parse_album = || {
+                let parse_album = || {
                     let href = alb.attr("href").unwrap_or_else(|| {
                         let mut p = alb.parent().unwrap();
                         let mut href = None;
@@ -361,19 +359,19 @@ fn parse(addr: &str) -> String {
                             )
                         });
 
-                    writeln!(
+                    let _ = writeln!(
                         stdout,
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
                         i + 1,
                         t.trim(),
                     );
-                    write!(
+                    let _ = write!(
                         stdout,
                         "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = " | ",
                     );
-                    stdout.flush();
+                    let _ = stdout.flush();
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
@@ -459,9 +457,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             if cfg!(feature = "embed") {
                 if let Ok(cur) = env::current_dir() {
                     create_dir();
-                    env::set_current_dir(path);
+                    let _ = env::set_current_dir(path);
                     save_to_file(url.as_str());
-                    env::set_current_dir(cur);
+                    let _ = env::set_current_dir(cur);
                 }
             }
             continue;
@@ -516,7 +514,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             .args(CURL)
             .args(["-e", &format!("https://{host}"), "--parallel-immediate"]);
         #[cfg(not(feature = "infer"))]
-        cmd.spawn();
+        let _ = cmd.spawn();
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
@@ -670,11 +668,11 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String
                     t.contains('下') || t.contains("next")
                 };
                 match t {
-                    Some(mut text) => next_下(text) || (n.attr("target").is_some()),
+                    Some(text) => next_下(text) || (n.attr("target").is_some()),
                     None => {
                         t = n.attr("title");
                         match t {
-                            Some(mut title) => next_下(title),
+                            Some(title) => next_下(title),
                             None => {
                                 let span = n.select("span.currenttext");
                                 if span.is_empty() {
@@ -682,7 +680,7 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String
                                 }
                                 t = span[0].text();
                                 match t {
-                                    Some(mut text) => next_下(text),
+                                    Some(text) => next_下(text),
                                     None => false,
                                 }
                             }
@@ -739,12 +737,12 @@ fn website() -> serde_json::Value {
 }
 
 ///Save inline/embed `data:image/..+..;..,...` or `base64/url-escaped` content to file.
-fn save_to_file(data: &str) {
+fn save_to_file(_data: &str) {
     if cfg!(not(feature = "embed")) {
         return;
     }
     let t = &format!("{:?}", time::Instant::now());
-    let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
+    let _name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
     #[cfg(feature = "embed")]
     {
         use base64::*;
@@ -795,7 +793,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     'l: loop {
         for char in chars {
             print!("{BEG}{char}");
-            o.flush();
+            let _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
                 _ => break 'l,
@@ -805,7 +803,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
         }
     }
     print!("{CL}{BEG}");
-    o.flush();
+    let _ = o.flush();
 }
 
 ///cleanup url
@@ -972,7 +970,7 @@ mod img {
     #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let (html, _, [scheme, host]) = get_html(&addr);
+        let (html, _, [scheme, _]) = get_html(&addr);
         let r = css_image(&html, scheme, &addr);
         tdbg!(&r, r.len());
     }
@@ -986,7 +984,7 @@ mod img {
         });
         thread::yield_now();
         thread::sleep(time::Duration::from_secs(3));
-        s.send(());
+        let _ = s.send(());
     }
 
     #[test]
@@ -1048,7 +1046,7 @@ mod img {
     #[test]
     fn file_type() {
         let dir = env::current_dir().unwrap();
-        let f = dir.join("demo.file");
+        let _f = dir.join("demo.file");
         #[cfg(feature = "infer")]
         magic_number_type(f);
     }
