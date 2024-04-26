@@ -2,7 +2,7 @@ use {std::*, util::*};
 
 mod util;
 
-fn main() {
+fn main() -> io::Result<()> {
     if env::args().len() > if cfg!(test) { 5 + 3 } else { 5 } {
         exit()
     }
@@ -15,13 +15,13 @@ fn main() {
         }
     });
 
-    analyze_args(array::from_fn(|i| args[i].as_deref()));
+    analyze_args(array::from_fn(|i| args[i].as_deref()))
 }
 
-fn analyze_args(args: [Option<&str>; 4]) {
+fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
     match args {
         [None, None, None, None] => {
-            color8(TEXT);
+            color8(TEXT)?;
             color256(TEXT)
         }
         [Some(v), None, None, None] if v.parse::<u8>() == Ok(8) => color8(TEXT),
@@ -32,15 +32,21 @@ fn analyze_args(args: [Option<&str>; 4]) {
                 .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16)),
         ) {
             (Ok(256), Ok(c)) => {
-                color_256_fg(c, TEXT);
-                color_256_bg(c, TEXT);
+                color_256_fg(c, TEXT)?;
+                color_256_bg(c, TEXT)
             }
             (Ok(256), _) => match v2 {
                 "fg" => color256_fg(TEXT),
                 "bg" => color256_bg(TEXT),
-                _ => exit(),
+                _ => {
+                    exit();
+                    Ok(())
+                }
             },
-            _ => exit(),
+            _ => {
+                exit();
+                Ok(())
+            }
         },
         [Some("rgb") | Some("RGB"), Some(r), Some(g), Some(b)] => {
             match [r, g, b].map(|v| {
@@ -48,13 +54,19 @@ fn analyze_args(args: [Option<&str>; 4]) {
                     .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
             }) {
                 [Ok(r), Ok(g), Ok(b)] => {
-                    color_rgb_fg([r, g, b], TEXT);
-                    color_rgb_bg([r, g, b], TEXT);
+                    color_rgb_fg([r, g, b], TEXT)?;
+                    color_rgb_bg([r, g, b], TEXT)
                 }
-                _ => exit(),
+                _ => {
+                    exit();
+                    Ok(())
+                }
             }
         }
-        _ => exit(),
+        _ => {
+            exit();
+            Ok(())
+        }
     }
 }
 
@@ -68,17 +80,15 @@ mod color {
     use super::*;
 
     #[test]
-    fn run() {
-        main();
+    fn run() -> io::Result<()> {
+        main()
     }
 
     #[test]
-    fn show() {
-        let begin = time::Instant::now();
-        color8(TEXT);
+    fn show() -> io::Result<()> {
+        color8(TEXT)
         // color256(TEXT);
         // color_rgb_fg_full();
         // color_rgb_bg_full();
-        dbg!(&(time::Instant::now() - begin));
     }
 }

@@ -54,7 +54,7 @@ mod color {
 
     use std::io::*;
 
-    pub fn color8(text: &str) {
+    pub fn color8(text: &str) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
         (0u8..10)
             .chain(21..=21)
@@ -73,69 +73,69 @@ mod color {
                 };
                 let _ = writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
             });
-        let _ = bf.flush();
+        bf.flush()
     }
 
-    pub fn color256(text: &str) {
-        color256_fg(text);
-        color256_bg(text);
+    pub fn color256(text: &str) -> Result<()> {
+        color256_fg(text)?;
+        color256_bg(text)
     }
 
-    pub fn color256_fg(text: &str) {
+    pub fn color256_fg(text: &str) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        let _ = writeln!(bf, "\n{B}{U}256-color foreground:{N}");
+        writeln!(bf, "\n{B}{U}256-color foreground:{N}")?;
         (0u8..=255).for_each(|c| {
             let _ = writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
         });
-        let _ = bf.flush();
+        bf.flush()
     }
 
-    pub fn color256_bg(text: &str) {
+    pub fn color256_bg(text: &str) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        let _ = writeln!(bf, "\n{B}{U}256-color background:{N}");
+        writeln!(bf, "\n{B}{U}256-color background:{N}")?;
         (0u8..=255).for_each(|c| {
             let _ = writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
         });
-        let _ = bf.flush();
+        bf.flush()
     }
 
-    pub fn color_256_fg(c: u8, text: &str) {
+    pub fn color_256_fg(c: u8, text: &str) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        let _ = writeln!(bf, "\n{B}{U}256-color foreground:{N}");
-        let _ = writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
-        let _ = bf.flush();
+        writeln!(bf, "\n{B}{U}256-color foreground:{N}")?;
+        writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}")?;
+        bf.flush()
     }
 
-    pub fn color_256_bg(c: u8, text: &str) {
+    pub fn color_256_bg(c: u8, text: &str) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        let _ = writeln!(bf, "\n{B}{U}256-color background:{N}");
-        let _ = writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
-        let _ = bf.flush();
+        writeln!(bf, "\n{B}{U}256-color background:{N}")?;
+        writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}")?;
+        bf.flush()
     }
 
-    pub fn color_rgb_fg(rgb: [u8; 3], text: &str) {
+    pub fn color_rgb_fg(rgb: [u8; 3], text: &str) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        let _ = writeln!(bf, "\n{B}{U}RGB-color foreground:{N}");
-        let _ = writeln!(
+        writeln!(bf, "\n{B}{U}RGB-color foreground:{N}")?;
+        writeln!(
             bf,
             "\"\\x1b[38;2;{0};{1};{2}m\": - \x1b[38;2;{0};{1};{2}m {text} {N}",
             rgb[0], rgb[1], rgb[2]
-        );
-        let _ = bf.flush();
+        )?;
+        bf.flush()
     }
 
-    pub fn color_rgb_bg(rgb: [u8; 3], text: &str) {
+    pub fn color_rgb_bg(rgb: [u8; 3], text: &str) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        let _ = writeln!(bf, "\n{B}{U}RGB-color background:{N}");
-        let _ = writeln!(
+        writeln!(bf, "\n{B}{U}RGB-color background:{N}")?;
+        writeln!(
             bf,
             "\"\\x1b[48;2;{0};{1};{2}m\": - \x1b[48;2;{0};{1};{2}m {text} {N}",
             rgb[0], rgb[1], rgb[2]
-        );
-        let _ = bf.flush();
+        )?;
+        bf.flush()
     }
 
-    pub fn _color_rgb_fg_full() {
+    pub fn color_rgb_fg_full() {
         let mut bf = BufWriter::new(stdout());
         (0u8..=255).for_each(|r| {
             (0u8..=255).for_each(|g| {
@@ -146,7 +146,7 @@ mod color {
         });
     }
 
-    pub fn _color_rgb_bg_full() {
+    pub fn color_rgb_bg_full() {
         let mut bf = BufWriter::new(stdout());
         (0u8..=255).for_each(|r| {
             (0u8..=255).for_each(|g| {
