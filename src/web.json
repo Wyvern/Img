@@ -436,7 +436,7 @@
     "Album": "div.teaser-file-detail div.teaser-file-title"
   },
   {
-    "Site": "chaomv.com",
+    "Site": "chaomv.com,chaomc.com",
     "Img": "div.row img",
     "Next": "ul.pagination a"
   }
