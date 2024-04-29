@@ -454,10 +454,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     for url in urls {
         if url.starts_with("data:image/") {
-            if cfg!(feature = "embed") {
+            #[cfg(feature = "embed")]
+            {
                 if let Ok(cur) = env::current_dir() {
                     create_dir();
                     let _ = env::set_current_dir(path);
+
                     save_to_file(url.as_str());
                     let _ = env::set_current_dir(cur);
                 }
@@ -737,47 +739,46 @@ fn website() -> serde_json::Value {
 }
 
 ///Save inline/embed `data:image/..+..;..,...` or `base64/url-escaped` content to file.
-fn save_to_file(_data: &str) {
+#[cfg(feature = "embed")]
+fn save_to_file(data: &str) {
     if cfg!(not(feature = "embed")) {
         return;
     }
     let t = &format!("{:?}", time::Instant::now());
-    let _name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
-    #[cfg(feature = "embed")]
-    {
-        use base64::*;
-        let ext = &data[..['+', ';', ',']
-            .iter()
-            .find_map(|&x| data.find(x))
-            .unwrap_or(data.len())];
-        let offset = &data[data.find(',').unwrap() + 1..];
-        let full_name = format!("{name}.{ext}");
-        if !path::Path::new(&full_name).exists() {
-            {
-                if data.contains(";base64,") {
-                    let mut buf = vec![0; offset.len()];
-                    let size = engine::general_purpose::STANDARD
-                        .decode_slice(offset, &mut buf)
-                        .unwrap_or_else(|e| quit!("{e}"));
-                    buf.truncate(size);
-                    fs::write(full_name, buf)
-                } else {
-                    fs::write(
-                        full_name,
-                        percent_encoding::percent_decode_str(offset)
-                            .decode_utf8_lossy()
-                            .as_ref(),
-                    )
-                }
-            }
-            .unwrap_or_else(|e| {
-                quit!(
-                    "Write {} to file {name}.{ext} failed: {}",
-                    &data[..data.find(',').unwrap()],
-                    e
+    let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
+
+    use base64::*;
+    let ext = &data[..['+', ';', ',']
+        .iter()
+        .find_map(|&x| data.find(x))
+        .unwrap_or(data.len())];
+    let offset = &data[data.find(',').unwrap() + 1..];
+    let full_name = format!("{name}.{ext}");
+    if !path::Path::new(&full_name).exists() {
+        {
+            if data.contains(";base64,") {
+                let mut buf = vec![0; offset.len()];
+                let size = engine::general_purpose::STANDARD
+                    .decode_slice(offset, &mut buf)
+                    .unwrap_or_else(|e| quit!("{e}"));
+                buf.truncate(size);
+                fs::write(full_name, buf)
+            } else {
+                fs::write(
+                    full_name,
+                    percent_encoding::percent_decode_str(offset)
+                        .decode_utf8_lossy()
+                        .as_ref(),
                 )
-            });
+            }
         }
+        .unwrap_or_else(|e| {
+            quit!(
+                "Write {} to file {name}.{ext} failed: {}",
+                &data[..data.find(',').unwrap()],
+                e
+            )
+        });
     }
 }
 
@@ -962,7 +963,7 @@ mod img {
 
     #[test]
     fn r#try() {
-        // https://girlsteam.club https://legskr.com https://bisipic.online/portal.php?page=9
+        // https://bisipic.online/portal.php?page=9
 
         parse(&arg("https://girldreamy.com"));
     }
@@ -1051,13 +1052,11 @@ mod img {
         magic_number_type(f);
     }
 
+    #[cfg(feature = "embed")]
     #[test]
     fn embed() {
-        if cfg!(not(feature = "embed")) {
-            return;
-        }
         let data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
-
+        #[cfg(feature = "embed")]
         save_to_file(data);
     }
 
