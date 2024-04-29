@@ -53,7 +53,7 @@ jobs:
 
           cargo s x86_64-pc-windows-msvc
           cargo s aarch64-pc-windows-msvc
-          # cargo s arm64ec-pc-windows-msvc
+          cargo s arm64ec-pc-windows-msvc
 
           cmd /r dir /s target\Img.exe
           systeminfo
@@ -81,12 +81,12 @@ jobs:
           overwrite: true
           body: "Windows AArch64 binary executable."
 
-      # - name: Upload Windows-Arm64EC to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/arm64ec-pc-windows-msvc/src/Img.exe
-      #     asset_name: Windows-Arm64EC.exe
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Windows Arm64EC binary executable."
+      - name: Upload Windows-Arm64EC to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/arm64ec-pc-windows-msvc/src/Img.exe
+          asset_name: Windows-Arm64EC.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows Arm64EC binary executable."
