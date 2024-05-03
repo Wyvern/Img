@@ -158,11 +158,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
+    "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Copt-level=s",
     "-Cno-redzone",
     "-Cstrip=symbols",
+    "-Cdebuginfo=0",
     # "-Clink-self-contained=+linker",
 
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
