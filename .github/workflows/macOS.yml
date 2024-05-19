@@ -8,8 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  # SCCACHE_GHA_ENABLED: "true"
-  # RUSTC_WRAPPER: "sccache"
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
 
 jobs:
   macOS:
@@ -31,18 +31,8 @@ jobs:
           targets: x86_64-apple-darwin
           components: rust-src
 
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
-      # - name: Run sccache-cache
-      #   uses: mozilla-actions/sccache-action@main
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
 
       - name: Build Release
         run: |
