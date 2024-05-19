@@ -194,7 +194,7 @@ rustflags = [
 
 [build]
 incremental = true
-rustc-wrapper = "sccache"
+# rustc-wrapper = "sccache"
 
 [package.metadata.docs.rs]
 all-features = true
