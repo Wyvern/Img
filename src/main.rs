@@ -901,7 +901,6 @@ fn terminal_emulator() -> bool {
 
 #[cfg(test)]
 mod img {
-
     use super::*;
 
     #[test]
