@@ -308,7 +308,7 @@
   },
   {
     "Site": "bisipic.online,bisipic.xyz",
-    "Img": "div.pct img[file]",
+    "Img": "div.t_fsz img[file]",
     "Album": "div.cacklist h2"
   },
   {
