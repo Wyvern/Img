@@ -109,7 +109,7 @@
     "Img": "div#rl-gallery-1 a[href]"
   },
   {
-    "Site": "mmm.red,mmm666.red,mmm000.com",
+    "Site": "mmm.red,mmm666.red,mmm777.red,mmm000.com",
     "Img": "div[data-fancybox=\"gallery\"] img[data-original]",
     "Album": "a.item-link div"
   },
