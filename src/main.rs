@@ -452,6 +452,11 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
 
+    use sync::mpsc::*;
+    let (s, r) = channel();
+    let sender = sync::Arc::new(s);
+    let mut no_ext = collections::HashMap::new();
+
     for url in urls {
         if url.starts_with("data:image/") {
             #[cfg(feature = "embed")]
@@ -468,11 +473,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         }
 
         let lr = url.rsplit_once('|');
-        let u = lr.map_or(url.as_ref(), |(l, _)| l);
+        let u = lr.map_or(url.as_str(), |(l, _)| l);
+
         let mut name = u.rfind('/').map_or_else(
             || quit!("Invalid URL: {}", u),
             |slash| u[slash + 1..].trim_start_matches(['-', '_']),
         );
+
         name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
         let name_no_query = &name[..name.find('?').unwrap_or(name.len())];
         let has_ext = name_no_query.rfind('.');
@@ -482,15 +489,25 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             {
                 need_file_type_detection.push(name.to_owned());
             }
+
             #[cfg(not(feature = "infer"))]
             {
-                name_ext = lr.map_or_else(
-                    || content_header_info(url.as_ref(), name),
-                    |(_, file_name)| file_name.into(),
+                lr.map_or_else(
+                    || {
+                        no_ext.insert(url.clone(), String::default());
+                        let (u, n, s) = (url.clone(), name.to_owned(), sender.clone());
+                        thread::spawn(|| {
+                            content_header_info(u, n, s);
+                        });
+                    },
+                    |(_, file_name)| name_ext = file_name.into(),
                 )
             }
         } else {
             name = name_no_query
+        }
+        if no_ext.contains_key(&url) {
+            continue;
         }
         let file_name = if name_ext.is_empty() {
             name
@@ -506,57 +523,79 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     // tdbg!(curl.get_args(), (curl.get_args().len() - 1) / 3);
-    if curl.get_args().len() == 1 {
-        return;
-    }
 
-    if cfg!(feature = "curl") {
+    if curl.get_args().len() > 1 && cfg!(feature = "curl") {
         create_dir();
         let cmd = curl
             .args(CURL)
             .args(["-e", &format!("https://{host}"), "--parallel-immediate"]);
         #[cfg(not(feature = "infer"))]
         let _ = cmd.spawn();
+    }
 
-        #[cfg(feature = "infer")]
-        if !need_file_type_detection.is_empty() {
-            cmd.output();
-            for f in need_file_type_detection {
-                let file = path.join(&f);
-                if file.exists() {
-                    magic_number_type(file);
+    if !no_ext.is_empty() {
+        create_dir();
+        curl = process::Command::new("curl");
+        curl.current_dir(path).arg("-Z");
+        while no_ext.values().any(|v| v.is_empty()) {
+            match r.recv() {
+                Ok((url, name_ext)) => {
+                    curl.args([url.as_str(), "-o", name_ext.as_str()]);
+                    no_ext.insert(url, name_ext);
+                }
+                Err(e) => {
+                    pl!("receive error: {}", e);
                 }
             }
-
-            //async
-            // let p = path.to_owned();
-            // let h = host.to_owned();
-
-            // thread::spawn(move || {
-            //     curl.args(CURL).args(["-e",&h, "--parallel-immediate"]).output();
-            //     for f in need_file_type_detection {
-            //         let file = p.join(&f);
-            //         if file.exists() {
-            //             magic_number_type(file);
-            //         }
-            //     }
-            // });
         }
+        let _ = curl
+            .args(CURL)
+            .args(["-e", &format!("https://{host}"), "--parallel-immediate"])
+            .spawn();
+    }
+
+    #[cfg(feature = "infer")]
+    if !need_file_type_detection.is_empty() {
+        cmd.output();
+        for f in need_file_type_detection {
+            let file = path.join(&f);
+            if file.exists() {
+                magic_number_type(file);
+            }
+        }
+
+        //async
+        // let p = path.to_owned();
+        // let h = host.to_owned();
+
+        // thread::spawn(move || {
+        //     curl.args(CURL).args(["-e",&h, "--parallel-immediate"]).output();
+        //     for f in need_file_type_detection {
+        //         let file = p.join(&f);
+        //         if file.exists() {
+        //             magic_number_type(file);
+        //         }
+        //     }
+        // });
     }
     // thread::sleep(time::Duration::from_secs(3));
 }
 
 /// Get `url` content header info to generate full `name.ext`
-fn content_header_info(url: &str, name: &str) -> String {
+fn content_header_info(
+    url: String,
+    name: String,
+    s: sync::Arc<sync::mpsc::Sender<(String, String)>>,
+) {
     let mut name_ext = String::default();
-    tdbg!(url);
+    // tdbg!(&url);
     process::Command::new("curl")
         .args(["-J", "-w", "%{content_type}"])
         .args(CURL)
-        .arg(url)
+        .arg(&url)
         .output()
         .map_or_else(
-            |e| pl!("Get {} content type info failed: {}", url, e),
+            |e| pl!("Get {} content type info failed: {}", &url, e),
             |o| {
                 let header = String::from_utf8_lossy(&o.stdout);
                 if let Some(l) = header.lines().last() {
@@ -565,14 +604,20 @@ fn content_header_info(url: &str, name: &str) -> String {
                             .iter()
                             .find_map(|&x| ctx.find(x))
                             .unwrap_or(ctx.len())];
-                        if !name.ends_with(format!(".{ext}").as_str()) {
-                            name_ext = format!("{name}.{ext}")
+                        name_ext = if !name.ends_with(format!(".{ext}").as_str()) {
+                            format!("{name}.{ext}")
+                        } else {
+                            name.clone()
                         }
                     }
                 }
             },
         );
-    name_ext
+    if name_ext.is_empty() {
+        name_ext = format!("{name}.ext!")
+    }
+    s.send((url, name_ext))
+        .unwrap_or_else(|e| pl!("send error: {}", e));
 }
 
 /// Infer file type through magic number
@@ -985,7 +1030,7 @@ mod img {
         });
         thread::yield_now();
         thread::sleep(time::Duration::from_secs(3));
-        let _ = s.send(());
+        s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
     }
 
     #[test]
