@@ -351,7 +351,7 @@ fn parse(addr: &str) -> String {
                                 || quit!("NO album title can be found."),
                                 |x| {
                                     if x.trim().is_empty() {
-                                        quit!("Album title is empty.")
+                                        quit!("[Album title is empty]")
                                     } else {
                                         x
                                     }
@@ -451,10 +451,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
-
+    #[cfg(not(feature = "infer"))]
     use sync::mpsc::*;
+    #[cfg(not(feature = "infer"))]
     let (s, r) = channel();
+    #[cfg(not(feature = "infer"))]
     let sender = sync::Arc::new(s);
+    #[cfg(not(feature = "infer"))]
     let mut no_ext = collections::HashMap::new();
 
     for url in urls {
@@ -483,6 +486,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
         let name_no_query = &name[..name.find('?').unwrap_or(name.len())];
         let has_ext = name_no_query.rfind('.');
+        #[cfg(not(feature = "infer"))]
         let mut name_ext = String::default();
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
@@ -506,16 +510,30 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name = name_no_query
         }
+
+        #[cfg(not(feature = "infer"))]
         if no_ext.contains_key(&url) {
             continue;
         }
+        #[cfg(not(feature = "infer"))]
         let file_name = if name_ext.is_empty() {
             name
         } else {
             name_ext.as_str()
         };
+        #[cfg(feature = "infer")]
+        let file_name = name;
 
-        let enc_url = u.replace(' ', "%20");
+        let slash = u
+            .find("://")
+            .and_then(|x| u[x + 3..].find('/').map(|y| x + 3 + y))
+            .unwrap();
+        let enc = percent_encoding::utf8_percent_encode(
+            &u[slash + 1..],
+            percent_encoding::NON_ALPHANUMERIC,
+        );
+        let enc_url = format!("{}{enc}", &u[..=slash]);
+
         if !path.join(file_name).exists() {
             // tdbg!(&url);
             curl.args([&enc_url, "-o", file_name]);
@@ -531,8 +549,37 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             .args(["-e", &format!("https://{host}"), "--parallel-immediate"]);
         #[cfg(not(feature = "infer"))]
         let _ = cmd.spawn();
+
+        #[cfg(feature = "infer")]
+        if !need_file_type_detection.is_empty() {
+            let _ = cmd.output();
+            let sync = true;
+            if sync {
+                for f in need_file_type_detection {
+                    let file = path.join(&f);
+                    if file.exists() {
+                        magic_number_type(file);
+                    }
+                }
+            } else {
+                let (p, h) = (path.to_owned(), host.to_owned());
+                thread::spawn(move || {
+                    let _ = curl
+                        .args(CURL)
+                        .args(["-e", &h, "--parallel-immediate"])
+                        .output();
+                    for f in need_file_type_detection {
+                        let file = p.join(&f);
+                        if file.exists() {
+                            magic_number_type(file);
+                        }
+                    }
+                });
+            }
+        }
     }
 
+    #[cfg(not(feature = "infer"))]
     if !no_ext.is_empty() {
         create_dir();
         curl = process::Command::new("curl");
@@ -554,30 +601,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             .spawn();
     }
 
-    #[cfg(feature = "infer")]
-    if !need_file_type_detection.is_empty() {
-        cmd.output();
-        for f in need_file_type_detection {
-            let file = path.join(&f);
-            if file.exists() {
-                magic_number_type(file);
-            }
-        }
-
-        //async
-        // let p = path.to_owned();
-        // let h = host.to_owned();
-
-        // thread::spawn(move || {
-        //     curl.args(CURL).args(["-e",&h, "--parallel-immediate"]).output();
-        //     for f in need_file_type_detection {
-        //         let file = p.join(&f);
-        //         if file.exists() {
-        //             magic_number_type(file);
-        //         }
-        //     }
-        // });
-    }
     // thread::sleep(time::Duration::from_secs(3));
 }
 
@@ -627,7 +650,8 @@ fn magic_number_type(pb: path::PathBuf) {
 
     let mut f = fs::File::open(&pb).unwrap_or_else(|e| quit!("{e} : {}", pb.display()));
     let mut buf = [0u8; 16];
-    f.read_exact(&mut buf);
+    f.read_exact(&mut buf)
+        .unwrap_or_else(|e| pl!("Read file magic number error: {}", e));
 
     let t = infer::get(&buf);
     // tdbg!(&t);
@@ -946,6 +970,7 @@ fn terminal_emulator() -> bool {
 
 #[cfg(test)]
 mod img {
+
     use super::*;
 
     #[test]
@@ -1094,7 +1119,7 @@ mod img {
         let dir = env::current_dir().unwrap();
         let _f = dir.join("demo.file");
         #[cfg(feature = "infer")]
-        magic_number_type(f);
+        magic_number_type(_f);
     }
 
     #[cfg(feature = "embed")]

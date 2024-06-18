@@ -109,7 +109,7 @@
     "Img": "div#rl-gallery-1 a[href]"
   },
   {
-    "Site": "mmm.red,mmm666.red,mmm000.com",
+    "Site": "mmm.red,mmm666.red,mmm777.red,mmm000.com",
     "Img": "div[data-fancybox=\"gallery\"] img[data-original]",
     "Album": "a.item-link div"
   },
@@ -289,7 +289,7 @@
     "Album": "div.td-module-thumb a[title]"
   },
   {
-    "Site": "smilemask.net,shoucangpai88.com,0k3f.com,zhainq.net,3i2n.com",
+    "Site": "smilemask.net,shoucangpai88.com,0k3f.com,zhainq.net,3i2n.com,3pxa.com",
     "Img": "article.article-content img",
     "Next": "div.article-paging span.current",
     "Album": "article.excerpt h2 a"
@@ -439,5 +439,16 @@
     "Site": "chaomv.com,chaomc.com",
     "Img": "div.row img",
     "Next": "ul.pagination a"
+  },
+  {
+    "Site": "mntuce.com",
+    "Img": "figure.size-large img",
+    "Next": "p.post-nav-links span.current",
+    "Album": "div.item-body > h2 > a"
+  },
+  {
+    "Site": "4k.beauty",
+    "Img": "div.entry-content img",
+    "Album": "h2.entry-title a"
   }
 ]
