@@ -524,34 +524,29 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         #[cfg(feature = "infer")]
         let file_name = name;
 
-        static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
-
-        let enc_url = percent_encoding::utf8_percent_encode(
-            u,
-            NAN.get_or_init(|| {
-                percent_encoding::NON_ALPHANUMERIC
-                    .remove(b':')
-                    .remove(b'/')
-                    .remove(b'.')
-                    .remove(b'-')
-                    .remove(b'_')
-                    .remove(b'?')
-                    .remove(b'=')
-            }),
-        )
-        .to_string();
-
         if !path.join(file_name).exists() {
+            static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
+            let enc_url = percent_encoding::utf8_percent_encode(
+                u,
+                NAN.get_or_init(|| {
+                    percent_encoding::NON_ALPHANUMERIC
+                        .remove(b':')
+                        .remove(b'/')
+                        .remove(b'.')
+                        .remove(b'-')
+                        .remove(b'_')
+                        .remove(b'?')
+                        .remove(b'=')
+                }),
+            )
+            .to_string();
+
             // tdbg!(&url, &enc_url);
             curl.args([&enc_url, "-o", file_name]);
         }
     }
 
-    // tdbg!(
-    //     curl.get_args(),
-    //     (curl.get_args().len() - 1) / 3,
-    //     no_ext.keys()
-    // );
+    // tdbg!(no_ext.keys());
 
     if curl.get_args().len() > 1 && cfg!(feature = "curl") {
         create_dir();
