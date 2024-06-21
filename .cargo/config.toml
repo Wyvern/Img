@@ -130,7 +130,7 @@ rustflags = [
     "-Cdebuginfo=0",
     # "-Clink-self-contained=+linker",
 
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -Clink-arg=-fuse-ld=lld",
 
     "-Aunused",
     "-Anonstandard_style",
@@ -168,7 +168,7 @@ rustflags = [
     "-Cdebuginfo=0",
     # "-Clink-self-contained=+linker",
 
-    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -Clink-arg=-fuse-ld=lld",
 
     "-Aunused",
     "-Anonstandard_style",
