@@ -142,8 +142,8 @@
     "Img": "div.container img"
   },
   {
-    "Site": "tuxiuren.com",
-    "Img": "div.entry-wrapper img",
+    "Site": "tuxiuren.com,ikxiuren.com,aixiurentu.com",
+    "Img": "div.entry-content img",
     "Next": "div.fenye a"
   },
   {
