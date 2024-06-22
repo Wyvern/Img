@@ -142,8 +142,8 @@
     "Img": "div.container img"
   },
   {
-    "Site": "tuxiuren.com",
-    "Img": "div.entry-wrapper img",
+    "Site": "tuxiuren.com,ikxiuren.com,aixiurentu.com",
+    "Img": "div.entry-content img",
     "Next": "div.fenye a"
   },
   {
@@ -450,5 +450,27 @@
     "Site": "4k.beauty",
     "Img": "div.entry-content img",
     "Album": "h2.entry-title a"
+  },
+  {
+    "Site": "meitb.com,whongw.com",
+    "Img": "div.text-center > img",
+    "Next": "ul.pagination a",
+    "Album": "a > div > img"
+  },
+  {
+    "Site": "4kup.net",
+    "Img": "a.thumb-photo[href]",
+    "Album": "h2.entry-title > a"
+  },
+  {
+    "Site": "06se.com",
+    "Img": "div.article-content img",
+    "Album": "h2.item-heading a"
+  },
+  {
+    "Site": "meitu8.cc",
+    "Img": "article#lightgallery img",
+    "Next": "div.pagelist a.next",
+    "Album": "div.list-content > h2 > a"
   }
 ]

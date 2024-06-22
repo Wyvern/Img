@@ -526,7 +526,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         if !path.join(file_name).exists() {
             static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
-
             let enc_url = percent_encoding::utf8_percent_encode(
                 u,
                 NAN.get_or_init(|| {
@@ -547,11 +546,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         }
     }
 
-    // tdbg!(
-    //     curl.get_args(),
-    //     (curl.get_args().len() - 1) / 3,
-    //     no_ext.keys()
-    // );
+    // tdbg!(no_ext.keys());
 
     if curl.get_args().len() > 1 && cfg!(feature = "curl") {
         create_dir();
