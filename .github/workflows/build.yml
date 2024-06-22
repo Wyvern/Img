@@ -32,8 +32,8 @@ jobs:
           targets: aarch64-unknown-linux-gnu,x86_64-unknown-linux-musl
           components: rust-src,llvm-tools
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
+      # - name: Install cargo-binstall
+      #   uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -197,8 +197,8 @@ jobs:
           targets: aarch64-pc-windows-msvc
           components: rust-src,llvm-tools
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
+      # - name: Install cargo-binstall
+      #   uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
