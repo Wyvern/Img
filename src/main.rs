@@ -710,9 +710,13 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String
                 .collect::<Vec<_>>();
 
             next_link = a.first().map_or(String::default(), |f| {
-                f.attr("href")
-                    .or_else(|| f.children().first().and_then(|x| x.attr("href")))
-                    .unwrap()
+                if f.text().map_or(true, |t| t.trim().is_empty()) && f.children().is_empty() {
+                    String::default()
+                } else {
+                    f.attr("href")
+                        .or_else(|| f.children().first().and_then(|x| x.attr("href")))
+                        .unwrap()
+                }
             });
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr("href").unwrap();
@@ -766,9 +770,7 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String
                 }
             });
             next_link = match last2 {
-                Some(v) => v
-                    .attr("href")
-                    .expect("NO [href] attr found in <next> link."),
+                Some(v) => v.attr("href").unwrap_or(String::default()),
                 None => {
                     let pos = nexts.iter().rposition(|e| {
                         e.attr("href").is_some_and(|h| {

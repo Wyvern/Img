@@ -289,9 +289,9 @@
     "Album": "div.td-module-thumb a[title]"
   },
   {
-    "Site": "smilemask.net,shoucangpai88.com,0k3f.com,zhainq.net,3i2n.com,3pxa.com",
+    "Site": "smilemask.net,shoucangpai88.com,0k3f.com,zhainq.net,3i2n.com,3pxa.com,eshh.net,alibaixiu.com",
     "Img": "article.article-content img",
-    "Next": "div.article-paging span.current",
+    "Next": "div.article-paging > span.current",
     "Album": "article.excerpt h2 a"
   },
   {
@@ -472,5 +472,34 @@
     "Img": "article#lightgallery img",
     "Next": "div.pagelist a.next",
     "Album": "div.list-content > h2 > a"
+  },
+  {
+    "Site": "656g.com,MMZZSS.com",
+    "Img": "div.imgg img",
+    "Next": "div.imgg a",
+    "Album": "div.img > a > span > img"
+  },
+  {
+    "Site": "h688h.com",
+    "Img": "div.fed-arti-content img",
+    "Next": "div.fed-page-info a"
+  },
+  {
+    "Site": "meirentu.me,meirentu.org",
+    "Img": "div.content img",
+    "Next": "div.page a",
+    "Album": "div.case_info div.meta-title"
+  },
+  {
+    "Site": "emonl.com",
+    "Img": "div.single-content img",
+    "Next": "div.page-links > span",
+    "Album": "h2.grid-title > a"
+  },
+  {
+    "Site": "meitulu.me",
+    "Img": "div.container-inner-fix-m img",
+    "Next": "ul.pagination a",
+    "Album": "div.my-card-title"
   }
 ]
