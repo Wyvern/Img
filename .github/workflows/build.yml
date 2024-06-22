@@ -104,15 +104,15 @@ jobs:
           targets: x86_64-apple-darwin
           components: rust-src,llvm-tools
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
+      # - name: Install cargo-binstall
+      #   uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Build Release
         run: |
-          cargo binstall cargo-pgo -y
+          # cargo binstall cargo-pgo -y
 
           cargo update
 
