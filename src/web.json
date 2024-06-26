@@ -129,7 +129,7 @@
     "Img": "li figure img"
   },
   {
-    "Site": "z227m.cc",
+    "Site": "z227m.cc,xxx7788.com",
     "Img": "div#read_tpc img"
   },
   {
@@ -358,7 +358,7 @@
     "Album": "header.entry-header h2 a"
   },
   {
-    "Site": "plmn5.cc",
+    "Site": "plmn5.cc,plmn.cc",
     "Img": "div.newstext img",
     "Next": "div.page a",
     "Album": "div.videos-list li > a"
@@ -436,8 +436,8 @@
     "Album": "div.teaser-file-detail div.teaser-file-title"
   },
   {
-    "Site": "chaomv.com,chaomc.com",
-    "Img": "div.row img",
+    "Site": "chaomv.com,chaomc.com,nenmb.com",
+    "Img": "div.row > div > img",
     "Next": "ul.pagination a"
   },
   {
