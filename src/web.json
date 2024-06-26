@@ -501,5 +501,21 @@
     "Img": "div.container-inner-fix-m img",
     "Next": "ul.pagination a",
     "Album": "div.my-card-title"
+  },
+  {
+    "Site": "taotu8.cc",
+    "Img": "div.sg_img img",
+    "Next": "div.page_navi a",
+    "Album": "div.tit > a"
+  },
+  {
+    "Site": "qqdk2019.net",
+    "Img": "div.blog-details-text img",
+    "Album": "div.blog-title > a"
+  },
+  {
+    "Site": "aitaotu.cc",
+    "Img": "figure.uk-inline > a > img",
+    "Next": "div.page_navi a"
   }
 ]
