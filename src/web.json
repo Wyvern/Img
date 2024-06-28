@@ -73,7 +73,8 @@
   },
   {
     "Site": "xiuren.biz",
-    "Img": "div.content-inner img.alignnone.size-full"
+    "Img": "div.content-inner img.alignnone.size-full",
+    "Album": "h3.jeg_post_title a"
   },
   {
     "Site": "nudegirls4u.com",
@@ -129,7 +130,7 @@
     "Img": "li figure img"
   },
   {
-    "Site": "z227m.cc",
+    "Site": "z227m.cc,xxx7788.com",
     "Img": "div#read_tpc img"
   },
   {
@@ -358,7 +359,7 @@
     "Album": "header.entry-header h2 a"
   },
   {
-    "Site": "plmn5.cc",
+    "Site": "plmn5.cc,plmn.cc",
     "Img": "div.newstext img",
     "Next": "div.page a",
     "Album": "div.videos-list li > a"
@@ -436,8 +437,8 @@
     "Album": "div.teaser-file-detail div.teaser-file-title"
   },
   {
-    "Site": "chaomv.com,chaomc.com",
-    "Img": "div.row img",
+    "Site": "chaomv.com,chaomc.com,nenmb.com",
+    "Img": "div.row > div > img",
     "Next": "ul.pagination a"
   },
   {
@@ -501,5 +502,21 @@
     "Img": "div.container-inner-fix-m img",
     "Next": "ul.pagination a",
     "Album": "div.my-card-title"
+  },
+  {
+    "Site": "taotu8.cc",
+    "Img": "div.sg_img img",
+    "Next": "div.page_navi a",
+    "Album": "div.tit > a"
+  },
+  {
+    "Site": "qqdk2019.net",
+    "Img": "div.blog-details-text img",
+    "Album": "div.blog-title > a"
+  },
+  {
+    "Site": "aitaotu.cc",
+    "Img": "figure.uk-inline > a > img",
+    "Next": "div.page_navi a"
   }
 ]
