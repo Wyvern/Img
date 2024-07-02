@@ -61,27 +61,27 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/riscv64gc-unknown-linux-gnu/src/Img
+          file: target/riscv64gc-unknown-linux-gnu/lto/Img
           asset_name: Linux-riscv64gc-gnu
           tag: Stable
           overwrite: true
           body: "Ubuntu Linux-riscv64gc-gnu binary executable."
 
-      - name: Upload Linux-riscv64gc-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/riscv64gc-unknown-linux-musl/src/Img
-          asset_name: Linux-riscv64gc-musl
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-riscv64gc-musl binary executable."
+      # - name: Upload Linux-riscv64gc-musl to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/riscv64gc-unknown-linux-musl/lto/Img
+      #     asset_name: Linux-riscv64gc-musl
+      #     tag: Stable
+      #     overwrite: true
+      #     body: "Ubuntu Linux-riscv64gc-musl binary executable."
 
       - name: Upload Linux-x86_64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-gnu/src/Img
+          file: target/x86_64-unknown-linux-gnu/lto/Img
           asset_name: Linux-x86_64-gnu
           tag: Stable
           overwrite: true
@@ -91,7 +91,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-musl/src/Img
+          file: target/x86_64-unknown-linux-musl/lto/Img
           asset_name: Linux-x86_64-musl
           tag: Stable
           overwrite: true
@@ -101,7 +101,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-gnu/src/Img
+          file: target/aarch64-unknown-linux-gnu/lto/Img
           asset_name: Linux-aarch64-gnu
           tag: Stable
           overwrite: true
@@ -111,7 +111,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-musl/src/Img
+          file: target/aarch64-unknown-linux-musl/lto/Img
           asset_name: Linux-aarch64-musl
           tag: Stable
           overwrite: true
