@@ -273,10 +273,12 @@ rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 
 [target.'cfg(target_arch="aarch64")']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
+[target.'cfg(all(target_arch="aarch64",target_os="linux"))']
 linker = "aarch64-linux-gnu-gcc"
 
 [target.'cfg(target_arch="riscv64")']
 rustflags = ["-Ctarget-cpu=generic", "-Ztune-cpu=generic"]
+[target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
 
 [target.'cfg(target_os="android")']
