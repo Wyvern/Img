@@ -275,7 +275,7 @@ rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
 [target.'cfg(target_arch="riscv64")']
-rustflags = ["-Ctarget-cpu=riscv64", "-Ztune-cpu=riscv64"]
+rustflags = ["-Ctarget-cpu=generic", "-Ztune-cpu=generic"]
 
 [target.'cfg(target_os="android")']
 rustflags = ["-Zhas-thread-local=no"]
@@ -287,4 +287,4 @@ rustflags = ["-Zrelax-elf-relocations"]
 linker = "aarch64-linux-gnu-gcc"
 
 [target.riscv64gc-unknown-linux-gnu]
-linker = "gcc-riscv64-linux-gnu"
+linker = "riscv64-linux-gnu-gcc"
