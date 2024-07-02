@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-unknown-linux-gnu,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl
           components: rust-src
 
       - name: Run sccache-cache
@@ -48,9 +48,13 @@ jobs:
           cargo update
 
           time cargo s riscv64gc-unknown-linux-gnu
+          time cargo s riscv64gc-unknown-linux-musl
+
           time cargo s x86_64-unknown-linux-gnu
-          time cargo s aarch64-unknown-linux-gnu
           time cargo s x86_64-unknown-linux-musl
+
+          time cargo s aarch64-unknown-linux-gnu
+          time cargo s aarch64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -59,42 +63,62 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload Linux-RISCv to a GitHub release
+      - name: Upload Linux-riscv64gc-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/riscv64gc-unknown-linux-gnu/src/Img
-          asset_name: Linux-RISCv
+          asset_name: Linux-riscv64gc-gnu
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Linux-RISCv binary executable."
+          body: "Ubuntu Linux-riscv64gc-gnu binary executable."
 
-      - name: Upload Linux-Gnu to a GitHub release
+      - name: Upload Linux-riscv64gc-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/riscv64gc-unknown-linux-musl/src/Img
+          asset_name: Linux-riscv64gc-musl
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-riscv64gc-musl binary executable."
+
+      - name: Upload Linux-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-gnu/src/Img
-          asset_name: Linux-Gnu
+          asset_name: Linux-gnu
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Linux-Gnu binary executable."
+          body: "Ubuntu Linux-gnu binary executable."
 
-      - name: Upload Linux-AArch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-gnu/src/Img
-          asset_name: Linux-AArch64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-AArch64 binary executable."
-
-      - name: Upload Linux-Musl to a GitHub release
+      - name: Upload Linux-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-musl/src/Img
-          asset_name: Linux-Musl
+          asset_name: Linux-musl
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Linux-Musl binary executable."
+          body: "Ubuntu Linux-musl binary executable."
+
+      - name: Upload Linux-aarch64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-linux-gnu/src/Img
+          asset_name: Linux-aarch64-gnu
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-aarch64-gnu binary executable."
+
+      - name: Upload Linux-aarch64-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-linux-musl/src/Img
+          asset_name: Linux-aarch64-musl
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-aarch64-musl binary executable."
