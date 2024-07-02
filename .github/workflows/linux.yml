@@ -48,7 +48,7 @@ jobs:
           cargo update
 
           time cargo s riscv64gc-unknown-linux-gnu
-          # time cargo s riscv64gc-unknown-linux-musl
+          time cargo s riscv64gc-unknown-linux-musl
 
           time cargo s x86_64-unknown-linux-gnu
           time cargo s x86_64-unknown-linux-musl
@@ -73,15 +73,15 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-riscv64gc-gnu binary executable."
 
-      # - name: Upload Linux-riscv64gc-musl to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/riscv64gc-unknown-linux-musl/src/Img
-      #     asset_name: Linux-riscv64gc-musl
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Ubuntu Linux-riscv64gc-musl binary executable."
+      - name: Upload Linux-riscv64gc-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/riscv64gc-unknown-linux-musl/src/Img
+          asset_name: Linux-riscv64gc-musl
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-riscv64gc-musl binary executable."
 
       - name: Upload Linux-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
