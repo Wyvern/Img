@@ -83,25 +83,25 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-riscv64gc-musl binary executable."
 
-      - name: Upload Linux-gnu to a GitHub release
+      - name: Upload Linux-x86_64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-gnu/src/Img
-          asset_name: Linux-gnu
+          asset_name: Linux-x86_64-gnu
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Linux-gnu binary executable."
+          body: "Ubuntu Linux-x86_64-gnu binary executable."
 
-      - name: Upload Linux-musl to a GitHub release
+      - name: Upload Linux-x86_64-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-musl/src/Img
-          asset_name: Linux-musl
+          asset_name: Linux-x86_64-musl
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Linux-musl binary executable."
+          body: "Ubuntu Linux-x86_64-musl binary executable."
 
       - name: Upload Linux-aarch64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
