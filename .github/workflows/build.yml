@@ -26,14 +26,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,x86_64-linux-android,aarch64-linux-android
           components: rust-src
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
+
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Android NDK setup
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
+          link-to-sdk: true
+          local-cache: true
 
       - name: Build Release
         run: |
@@ -49,6 +65,9 @@ jobs:
 
           time cargo l --target aarch64-unknown-linux-gnu
           time cargo l --target aarch64-unknown-linux-musl
+
+          cargo binstall cargo-ndk -y
+          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile lto
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -116,6 +135,27 @@ jobs:
           tag: Stable
           overwrite: true
           body: "Ubuntu Linux-aarch64-musl binary executable."
+
+      - name: Upload Android-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-linux-android/lto/Img
+          asset_name: Android-x86_64
+          tag: Stable
+          overwrite: true
+          body: "Android-x86_64 binary executable."
+
+      - name: Upload Android-AArch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-linux-android/lto/Img
+          asset_name: Android-AArch64
+          tag: Stable
+          overwrite: true
+          body: "Android-AArch64 binary executable."
+          
 
   macOS:
     name: Building on macOS.
