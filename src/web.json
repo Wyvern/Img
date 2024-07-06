@@ -518,5 +518,11 @@
     "Site": "aitaotu.cc",
     "Img": "figure.uk-inline > a > img",
     "Next": "div.page_navi a"
+  },
+  {
+    "Site": "hotgirlchina.com",
+    "Img": "div.entry-inner img",
+    "Next": "nav.pagination span.current",
+    "Album": "h2.post-title a"
   }
 ]
