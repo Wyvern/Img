@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,x86_64-linux-android,aarch64-linux-android
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,x86_64-linux-android,aarch64-linux-android
           components: rust-src
 
       - name: Run sccache-cache
@@ -58,7 +58,7 @@ jobs:
           cargo update
 
           time cargo l --target riscv64gc-unknown-linux-gnu
-          # time cargo l --target riscv64gc-unknown-linux-musl
+          time cargo l --target riscv64gc-unknown-linux-musl
 
           time cargo l --target x86_64-unknown-linux-gnu
           time cargo l --target x86_64-unknown-linux-musl
@@ -155,7 +155,6 @@ jobs:
           tag: Stable
           overwrite: true
           body: "Android-AArch64 binary executable."
-          
 
   macOS:
     name: Building on macOS.
