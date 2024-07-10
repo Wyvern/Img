@@ -534,5 +534,10 @@
   {
     "Site": "bbs.0-p.net,hjd2048.com",
     "Img": "div#read_tpc img"
+  },
+  {
+    "Site": "meimeicun.com",
+    "Img": "div.images-list img",
+    "Album": "h3.item-heading"
   }
 ]
