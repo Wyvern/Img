@@ -15,7 +15,7 @@
     "Img": "span.photoThum a[href]"
   },
   {
-    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,xgyw.org,12356781.xyz,ihook.cloud,jpxgmn.com",
+    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,xgyw.org,12356781.xyz,ihook.cloud,jpxgmn.com,xinggan5.top,xgmn5.top",
     "Img": "article.article-content img",
     "Next": "div.pagination a",
     "Album": "li.related_boxindex a"
@@ -539,5 +539,11 @@
     "Site": "meimeicun.com",
     "Img": "div.images-list img",
     "Album": "h3.item-heading"
+  },
+  {
+    "Site": "imn5.vip",
+    "Img": "div.imgwebp img",
+    "Next": "div.page a",
+    "Album": "div.thumbnail > h2 > a"
   }
 ]
