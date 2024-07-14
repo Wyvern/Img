@@ -15,7 +15,7 @@
     "Img": "span.photoThum a[href]"
   },
   {
-    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,xgyw.org,12356781.xyz,ihook.cloud,jpxgmn.com,xinggan5.top,xgmn5.top",
+    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,xgyw.org,12356781.xyz,ihook.cloud,jpxgmn.com,xinggan5.top,xgmn5.top,5201025.xyz",
     "Img": "article.article-content img",
     "Next": "div.pagination a",
     "Album": "li.related_boxindex a"
@@ -545,5 +545,11 @@
     "Img": "div.imgwebp img",
     "Next": "div.page a",
     "Album": "div.thumbnail > h2 > a"
+  },
+  {
+    "Site": "heisiwu.net",
+    "Img": "img.block",
+    "Next": "a[rel=\"next\"]",
+    "Album": "a > h2.font-semibold"
   }
 ]
