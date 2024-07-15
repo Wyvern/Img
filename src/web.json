@@ -83,7 +83,8 @@
   {
     "Site": "buondua.com,xiutaku.com",
     "Img": "div.article-fulltext img",
-    "Next": "div.pagination-list"
+    "Next": "div.pagination-list",
+    "Album": "div.page-header > h2 > a"
   },
   {
     "Site": "mrcong.com,misskon.com",
@@ -526,7 +527,7 @@
     "Album": "p.p_title a"
   },
   {
-    "Site": "depvailon.com",
+    "Site": "depvailon.com,kaizty.com",
     "Img": "div.contentme img",
     "Next": "ul.pagination-site a",
     "Album": "div.thcovering-video a"
@@ -551,5 +552,10 @@
     "Img": "img.block",
     "Next": "a[rel=\"next\"]",
     "Album": "a > h2.font-semibold"
+  },
+  {
+    "Site": "xsnvshen.com",
+    "Img": "div.swi-hd img[data-original]",
+    "Album": "div.camLiTitleC  a"
   }
 ]
