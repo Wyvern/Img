@@ -116,7 +116,7 @@
     "Album": "a.item-link div"
   },
   {
-    "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xrmn07.top,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr04.vip,xr05.vip,xr07.vip,xr08.vip,xr09.vip,xiurenba.com,2xiuren.cc,秀人集.com,meirentu.cc,meirentu.me,meirentu.org,meirentu.icu,123781.xyz,123782.xyz,123783.xyz,123784.xyz,quanjixiu.com,Xiurenba.Net,Xiurenba.Cc,xiu01.top",
+    "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xrmn07.top,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr04.vip,xr05.vip,xr07.vip,xr08.vip,xr09.vip,xiurenba.com,2xiuren.cc,秀人集.com,meirentu.cc,meirentu.me,meirentu.org,meirentu.icu,123781.xyz,123782.xyz,123783.xyz,123784.xyz,123785.xyz,123786.xyz,quanjixiu.com,Xiurenba.Net,Xiurenba.Cc,xiu01.top",
     "Img": "div.content img",
     "Next": "div.page a",
     "Album": "div.meta-title"
@@ -557,5 +557,11 @@
     "Site": "xsnvshen.com",
     "Img": "div.swi-hd img[data-original]",
     "Album": "div.camLiTitleC  a"
+  },
+  {
+    "Site": "hitxhot.org",
+    "Img": "div.entry-content img",
+    "Next": "ul.page-numbers a",
+    "Album": "h1.entry-title > a"
   }
 ]
