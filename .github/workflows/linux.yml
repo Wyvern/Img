@@ -48,6 +48,7 @@ jobs:
           cargo update
 
           time cargo s s390x-unknown-linux-gnu
+          # time cargo s s390x-unknown-linux-musl
 
           time cargo s riscv64gc-unknown-linux-gnu
           time cargo s riscv64gc-unknown-linux-musl
