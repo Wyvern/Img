@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu
           components: rust-src
 
       - name: Run sccache-cache
@@ -43,9 +43,11 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu musl-tools -y
+          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu musl-tools -y
 
           cargo update
+
+          time cargo s s390x-unknown-linux-gnu
 
           time cargo s riscv64gc-unknown-linux-gnu
           time cargo s riscv64gc-unknown-linux-musl
@@ -62,6 +64,16 @@ jobs:
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Linux-s390x-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/s390x-unknown-linux-gnu/src/Img
+          asset_name: Linux-s390x-gnu
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-s390x-gnu binary executable."
 
       - name: Upload Linux-riscv64gc-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2

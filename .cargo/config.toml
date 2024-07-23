@@ -276,8 +276,13 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 [target.'cfg(all(target_arch="aarch64",target_os="linux"))']
 linker = "aarch64-linux-gnu-gcc"
 
+[target.'cfg(target_arch="s390x")']
+rustflags = ["-Ctarget-cpu=s390x", "-Ztune-cpu=s390x"]
+[target.'cfg(all(target_arch="s390x",target_os="linux"))']
+linker = "s390x-linux-gnu-gcc"
+
 [target.'cfg(target_arch="riscv64")']
-rustflags = ["-Ctarget-cpu=generic", "-Ztune-cpu=generic"]
+rustflags = ["-Ctarget-cpu=riscv64", "-Ztune-cpu=riscv64"]
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
 
