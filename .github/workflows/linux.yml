@@ -48,7 +48,7 @@ jobs:
           cargo update
 
           time cargo s s390x-unknown-linux-gnu
-          # time cargo s s390x-unknown-linux-musl
+          time cargo s s390x-unknown-linux-musl
 
           time cargo s riscv64gc-unknown-linux-gnu
           time cargo s riscv64gc-unknown-linux-musl
@@ -75,6 +75,16 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Ubuntu Linux-s390x-gnu binary executable."
+
+      - name: Upload Linux-s390x-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/s390x-unknown-linux-musl/src/Img
+          asset_name: Linux-s390x-musl
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-s390x-musl binary executable."
 
       - name: Upload Linux-riscv64gc-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
