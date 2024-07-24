@@ -15,7 +15,7 @@
     "Img": "span.photoThum a[href]"
   },
   {
-    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,xgyw.org,12356781.xyz,ihook.cloud,jpxgmn.com",
+    "Site": "xgmn01.com,xgmn02.com,xgmn08.com,xgmn05.cc,xgyw.pro,xgyw.org,12356781.xyz,ihook.cloud,jpxgmn.com,xinggan5.top,xgmn5.top,5201025.xyz",
     "Img": "article.article-content img",
     "Next": "div.pagination a",
     "Album": "li.related_boxindex a"
@@ -83,7 +83,8 @@
   {
     "Site": "buondua.com,xiutaku.com",
     "Img": "div.article-fulltext img",
-    "Next": "div.pagination-list"
+    "Next": "div.pagination-list",
+    "Album": "div.page-header > h2 > a"
   },
   {
     "Site": "mrcong.com,misskon.com",
@@ -115,7 +116,7 @@
     "Album": "a.item-link div"
   },
   {
-    "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xrmn07.top,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr04.vip,xr05.vip,xr07.vip,xr08.vip,xr09.vip,xiurenba.com,2xiuren.cc,秀人集.com,meirentu.cc,meirentu.me,meirentu.org,meirentu.icu,123781.xyz,123782.xyz,123783.xyz,123784.xyz,quanjixiu.com,Xiurenba.Net,Xiurenba.Cc",
+    "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xrmn07.top,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr04.vip,xr05.vip,xr07.vip,xr08.vip,xr09.vip,xiurenba.com,2xiuren.cc,秀人集.com,meirentu.cc,meirentu.me,meirentu.org,meirentu.icu,123781.xyz,123782.xyz,123783.xyz,123784.xyz,123785.xyz,123786.xyz,1231238.xyz,quanjixiu.com,Xiurenba.Net,Xiurenba.Cc,xiu01.top",
     "Img": "div.content img",
     "Next": "div.page a",
     "Album": "div.meta-title"
@@ -526,7 +527,7 @@
     "Album": "p.p_title a"
   },
   {
-    "Site": "depvailon.com",
+    "Site": "depvailon.com,kaizty.com",
     "Img": "div.contentme img",
     "Next": "ul.pagination-site a",
     "Album": "div.thcovering-video a"
@@ -539,5 +540,28 @@
     "Site": "meimeicun.com",
     "Img": "div.images-list img",
     "Album": "h3.item-heading"
+  },
+  {
+    "Site": "imn5.vip",
+    "Img": "div.imgwebp img",
+    "Next": "div.page a",
+    "Album": "div.thumbnail > h2 > a"
+  },
+  {
+    "Site": "heisiwu.net",
+    "Img": "img.block",
+    "Next": "a[rel=\"next\"]",
+    "Album": "a > h2.font-semibold"
+  },
+  {
+    "Site": "xsnvshen.com",
+    "Img": "div.swi-hd img[data-original]",
+    "Album": "div.camLiTitleC  a"
+  },
+  {
+    "Site": "hitxhot.org",
+    "Img": "div.entry-content img",
+    "Next": "ul.page-numbers a",
+    "Album": "h1.entry-title > a"
   }
 ]
