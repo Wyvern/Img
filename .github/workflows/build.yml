@@ -47,7 +47,7 @@ jobs:
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r26d
+          ndk-version: r27
           link-to-sdk: true
           local-cache: true
 
