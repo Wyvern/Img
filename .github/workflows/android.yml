@@ -57,7 +57,7 @@ jobs:
 
           cargo update
 
-          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
+          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t riscv64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -76,12 +76,22 @@ jobs:
           overwrite: true
           body: "Android-x86_64 binary executable."
 
-      - name: Upload Android-AArch64 to a GitHub release
+      - name: Upload Android-aarch64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-linux-android/src/Img
-          asset_name: Android-AArch64
+          asset_name: Android-aarch64
           tag: Nightly
           overwrite: true
-          body: "Android-AArch64 binary executable."
+          body: "Android-aarch64 binary executable."
+
+      - name: Upload Android-riscv64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/riscv64-linux-android/src/Img
+          asset_name: Android-riscv64
+          tag: Nightly
+          overwrite: true
+          body: "Android-riscv64 binary executable."
