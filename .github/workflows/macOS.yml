@@ -65,25 +65,25 @@ jobs:
           overwrite: true
           body: "macOS x86-64h binary executable."
 
-      - name: Upload macOS-Arm64e to a GitHub release
+      - name: Upload macOS-arm64e to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/arm64e-apple-darwin/src/Img
-          asset_name: macOS-Arm64e
+          asset_name: macOS-arm64e
           tag: Nightly
           overwrite: true
-          body: "macOS Arm64e binary executable."
+          body: "macOS arm64e binary executable."
 
-      - name: Upload macOS-Universal to a GitHub release
+      - name: Upload macOS-universal to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: Img-Universal
-          asset_name: macOS-Universal
+          asset_name: macOS-universal
           tag: Nightly
           overwrite: true
-          body: "macOS Universal binary executable."
+          body: "macOS universal binary executable."
 
       - name: Upload iOS to a GitHub release
         uses: svenstaro/upload-release-action@v2
