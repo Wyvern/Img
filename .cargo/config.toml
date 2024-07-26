@@ -204,7 +204,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [target.'cfg(all())']
 rustflags = [
     "-Ctarget-feature=-crt-static",
-    "-Ctarget-cpu=native",
+    # "-Ctarget-cpu=native",
     "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Cforce-frame-pointers=no",
@@ -219,7 +219,7 @@ rustflags = [
 
     "-Zunstable-options",
     "-Zexport-executable-symbols",
-    "-Ztune-cpu=native",
+    # "-Ztune-cpu=native",
     "-Zno-profiler-runtime",
     "-Zlocation-detail=none",
     "-Zplt",
@@ -273,13 +273,9 @@ rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
-[target.'cfg(all(target_arch="aarch64",not(target_vendor="apple")))']
-rustflags = ["-Ctarget-cpu=generic", "-Ztune-cpu=generic"]
 [target.'cfg(all(target_arch="aarch64",target_os="linux"))']
 linker = "aarch64-linux-gnu-gcc"
 
-[target.'cfg(target_arch="s390x")']
-rustflags = ["-Ctarget-cpu=z10", "-Ztune-cpu=z10"]
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
 
