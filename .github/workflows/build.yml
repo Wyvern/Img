@@ -266,7 +266,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-pc-windows-msvc
+          targets: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc
           components: rust-src,llvm-tools
 
       # - name: Install cargo-binstall
@@ -281,6 +281,7 @@ jobs:
 
           cargo l --target x86_64-pc-windows-msvc
           cargo l --target aarch64-pc-windows-msvc
+          cargo l --target arm64ec-pc-windows-msvc
 
           cmd /r dir /s target\Img.exe
           systeminfo
@@ -298,12 +299,22 @@ jobs:
           overwrite: true
           body: "Windows x64 binary executable."
 
-      - name: Upload Windows-AArch64 to a GitHub release
+      - name: Upload Windows-aarch64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-pc-windows-msvc/lto/Img.exe
-          asset_name: Windows-AArch64.exe
+          asset_name: Windows-aarch64.exe
           tag: Stable
           overwrite: true
-          body: "Windows AArch64 binary executable."
+          body: "Windows aarch64 binary executable."
+
+      - name: Upload Windows-arm64ec to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/arm64ec-pc-windows-msvc/lto/Img.exe
+          asset_name: Windows-arm64ec.exe
+          tag: Stable
+          overwrite: true
+          body: "Windows arm64ec binary executable."

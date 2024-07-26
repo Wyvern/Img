@@ -158,8 +158,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 [target.'cfg(all())']
 rustflags = [
     "-Ctarget-feature=-crt-static",
-    "-Ctarget-cpu=native",
-    "-Csymbol-mangling-version=v0",
+    # "-Ctarget-cpu=native",
+    "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Cforce-frame-pointers=no",
     "-Copt-level=s",
@@ -177,11 +177,6 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(target_vendor="apple")']
-# rustflags = ["-Clinker-flavor=darwin-lld-cc"]
-
-[target.'cfg(target_env="msvc")']
-# rustflags = ["-Clinker-flavor=msvc-lld"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
@@ -191,23 +186,12 @@ rustflags = ["-Ctarget-cpu=x86-64-v3"]
 
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
 rustflags = ["-Ctarget-cpu=apple-m1"]
-[target.'cfg(all(target_arch="aarch64",not(target_vendor="apple")))']
-rustflags = ["-Ctarget-cpu=generic"]
+
 [target.'cfg(all(target_arch="aarch64",target_os="linux"))']
 linker = "aarch64-linux-gnu-gcc"
 
-[target.'cfg(target_arch="s390x")']
-rustflags = ["-Ctarget-cpu=z10"]
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
 
-[target.'cfg(target_arch="riscv64")']
-rustflags = ["-Ctarget-cpu=generic-rv64"]
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
-
-[target.'cfg(any(target_env="gnu",target_env="musl"))']
-# rustflags = ["-Clinker-flavor=gnu-lld-cc"]
-
-[target.'cfg(target_family="wasm")']
-# rustflags = ["-Clinker-flavor=wasm-lld-cc"]
