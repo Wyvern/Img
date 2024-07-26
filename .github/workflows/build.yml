@@ -173,7 +173,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin
+          targets: x86_64-apple-darwin,aarch64-apple-ios
           components: rust-src
 
       # - name: Install cargo-binstall
@@ -194,7 +194,7 @@ jobs:
 
           time cargo l --target aarch64-apple-darwin
           time cargo l --target x86_64-apple-darwin
-          # time cargo l --target arm64e-apple-darwin
+          time cargo l --target aarch64-apple-ios
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
@@ -226,6 +226,16 @@ jobs:
           tag: Stable
           overwrite: true
           body: "macOS aarch64 binary executable."
+
+      - name: Upload iOS to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-apple-ios/lto/Img
+          asset_name: iOS
+          tag: Stable
+          overwrite: true
+          body: "iOS binary executable."
 
       - name: Upload macOS-universal to a GitHub release
         uses: svenstaro/upload-release-action@v2
