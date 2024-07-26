@@ -147,15 +147,15 @@ jobs:
           overwrite: true
           body: "Android-x86_64 binary executable."
 
-      - name: Upload Android-AArch64 to a GitHub release
+      - name: Upload Android-aarch64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-linux-android/lto/Img
-          asset_name: Android-AArch64
+          asset_name: Android-aarch64
           tag: Stable
           overwrite: true
-          body: "Android-AArch64 binary executable."
+          body: "Android-aarch64 binary executable."
 
   macOS:
     name: Building on macOS.
@@ -174,7 +174,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-apple-darwin
-          components: rust-src,llvm-tools
+          components: rust-src
 
       # - name: Install cargo-binstall
       #   uses: cargo-bins/cargo-binstall@main
@@ -217,25 +217,25 @@ jobs:
           overwrite: true
           body: "macOS x86-64 binary executable."
 
-      - name: Upload macOS-AArch64 to a GitHub release
+      - name: Upload macOS-aarch64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-darwin/lto/Img
-          asset_name: macOS-AArch64
+          asset_name: macOS-aarch64
           tag: Stable
           overwrite: true
-          body: "macOS AArch64 binary executable."
+          body: "macOS aarch64 binary executable."
 
-      - name: Upload macOS-Universal to a GitHub release
+      - name: Upload macOS-universal to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: Img-Universal
-          asset_name: macOS-Universal
+          asset_name: macOS-universal
           tag: Stable
           overwrite: true
-          body: "macOS Universal binary executable."
+          body: "macOS universal binary executable."
 
   Windows:
     name: Building on Windows.
@@ -267,7 +267,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc
-          components: rust-src,llvm-tools
+          components: rust-src
 
       # - name: Install cargo-binstall
       #   uses: cargo-bins/cargo-binstall@main
