@@ -11,6 +11,7 @@ static CURL: [&str; 7] = [
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
     "--tcp-nodelay",
+    //"--mptcp",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
@@ -643,6 +644,7 @@ fn content_header_info(
             },
         );
     if name_ext.is_empty() {
+        pl!("Get `{}` with `{}` extension error,", url, name);
         name_ext = format!("{name}.ext!")
     }
     s.send((url, name_ext))
