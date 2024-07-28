@@ -53,8 +53,6 @@ jobs:
 
           cargo s x86_64-pc-windows-msvc
           cargo s aarch64-pc-windows-msvc
-
-          cmd /r vsdevcmd -host_arch=x64 -arch=arm64
           cargo s arm64ec-pc-windows-msvc
 
           cmd /r dir /s target\Img.exe
