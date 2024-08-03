@@ -28,7 +28,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,riscv64-linux-android,armv7-linux-androideabi
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
           components: rust-src
 
       - name: Run sccache-cache
@@ -50,7 +50,7 @@ jobs:
 
           cargo update
 
-          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi -t riscv64-linux-android b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
+          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
 
           find ./target -iname img -type f | xargs ls -hl
           sw_vers
