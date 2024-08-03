@@ -12,30 +12,23 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Linux:
-    name: Building for Android
-    runs-on: ubuntu-latest
+  Android:
+    name: Building on macOS
+    runs-on: macos-14
 
     steps:
-      - name: Purge Ubuntu
+      - name: Disable macos spotlight index
         run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-
-          sudo systemctl mask systemd-journald.service systemd-journald.socket
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
 
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,arm-linux-androideabi,armv7-linux-androideabi
+          targets: x86_64-linux-android,aarch64-linux-android
           components: rust-src
 
       - name: Run sccache-cache
