@@ -44,13 +44,6 @@ jobs:
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@main
 
-      - name: Android NDK setup
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r27
-          link-to-sdk: true
-          local-cache: true
-
       - name: Build Release
         run: |
           sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu musl-tools -y
@@ -66,9 +59,6 @@ jobs:
 
           time cargo l --target aarch64-unknown-linux-gnu
           time cargo l --target aarch64-unknown-linux-musl
-
-          cargo binstall cargo-ndk -y
-          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android b --profile lto
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -137,26 +127,6 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-aarch64-musl binary executable."
 
-      - name: Upload Android-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-linux-android/lto/Img
-          asset_name: Android-x86_64
-          tag: Stable
-          overwrite: true
-          body: "Android-x86_64 binary executable."
-
-      - name: Upload Android-aarch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-linux-android/lto/Img
-          asset_name: Android-aarch64
-          tag: Stable
-          overwrite: true
-          body: "Android-aarch64 binary executable."
-
   macOS:
     name: Building on macOS.
     runs-on: macos-14
@@ -173,11 +143,18 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios
+          targets: x86_64-apple-darwin,aarch64-apple-ios,armv7-linux-androideabi
           components: rust-src
 
-      # - name: Install cargo-binstall
-      #   uses: cargo-bins/cargo-binstall@main
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Android NDK setup
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r27
+          link-to-sdk: true
+          local-cache: true
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -198,6 +175,9 @@ jobs:
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
+          cargo binstall cargo-ndk -y
+          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto
+
           find ./target -iname img -type f | xargs ls -hl
           ls -hl Img-Universal
           sw_vers
@@ -212,7 +192,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-apple-darwin/lto/Img
-          asset_name: macOS-x86_64
+          asset_name: -macOS-x86_64
           tag: Stable
           overwrite: true
           body: "macOS x86-64 binary executable."
@@ -222,7 +202,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-darwin/lto/Img
-          asset_name: macOS-aarch64
+          asset_name: -macOS-aarch64
           tag: Stable
           overwrite: true
           body: "macOS aarch64 binary executable."
@@ -232,7 +212,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-ios/lto/Img
-          asset_name: iOS
+          asset_name: -iOS
           tag: Stable
           overwrite: true
           body: "iOS binary executable."
@@ -242,10 +222,40 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: Img-Universal
-          asset_name: macOS-universal
+          asset_name: -macOS-universal
           tag: Stable
           overwrite: true
           body: "macOS universal binary executable."
+
+      - name: Upload Android-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-linux-android/lto/Img
+          asset_name: Android-x86_64
+          tag: Stable
+          overwrite: true
+          body: "Android-x86_64 binary executable."
+
+      - name: Upload Android-aarch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-linux-android/lto/Img
+          asset_name: Android-aarch64
+          tag: Stable
+          overwrite: true
+          body: "Android-aarch64 binary executable."
+
+      - name: Upload Android-armv7 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/armv7-linux-androideabi/lto/Img
+          asset_name: Android-armv7
+          tag: Stable
+          overwrite: true
+          body: "Android-armv7 binary executable."
 
   Windows:
     name: Building on Windows.

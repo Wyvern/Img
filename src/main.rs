@@ -11,7 +11,7 @@ static CURL: [&str; 7] = [
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
     "--tcp-nodelay",
-    //"--mptcp",
+    // "--mptcp",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {
