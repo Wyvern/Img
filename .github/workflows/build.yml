@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,x86_64-linux-android,aarch64-linux-android,s390x-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu
           components: rust-src
 
       - name: Run sccache-cache
@@ -143,7 +143,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,armv7-linux-androideabi
+          targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
           components: rust-src
 
       - name: Install cargo-binstall
@@ -192,7 +192,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-apple-darwin/lto/Img
-          asset_name: -macOS-x86_64
+          asset_name: Apple-macOS-x86_64
           tag: Stable
           overwrite: true
           body: "macOS x86-64 binary executable."
@@ -202,7 +202,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-darwin/lto/Img
-          asset_name: -macOS-aarch64
+          asset_name: Apple-macOS-aarch64
           tag: Stable
           overwrite: true
           body: "macOS aarch64 binary executable."
@@ -212,7 +212,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-ios/lto/Img
-          asset_name: -iOS
+          asset_name: Apple-iOS
           tag: Stable
           overwrite: true
           body: "iOS binary executable."
@@ -222,7 +222,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: Img-Universal
-          asset_name: -macOS-universal
+          asset_name: Apple-macOS-universal
           tag: Stable
           overwrite: true
           body: "macOS universal binary executable."
