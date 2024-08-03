@@ -60,7 +60,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64h-apple-darwin/src/Img
-          asset_name: macOS-x86_64h
+          asset_name: -macOS-x86_64h
           tag: Nightly
           overwrite: true
           body: "macOS x86-64h binary executable."
@@ -70,7 +70,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/arm64e-apple-darwin/src/Img
-          asset_name: macOS-arm64e
+          asset_name: -macOS-arm64e
           tag: Nightly
           overwrite: true
           body: "macOS arm64e binary executable."
@@ -80,7 +80,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: Img-Universal
-          asset_name: macOS-universal
+          asset_name: -macOS-universal
           tag: Nightly
           overwrite: true
           body: "macOS universal binary executable."
@@ -90,7 +90,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/arm64e-apple-ios/src/Img
-          asset_name: iOS
+          asset_name: -iOS
           tag: Nightly
           overwrite: true
           body: "iOS binary executable."
@@ -100,7 +100,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-tvos/src/Img
-          asset_name: tvOS
+          asset_name: -tvOS
           tag: Nightly
           overwrite: true
           body: "tvOS binary executable."
@@ -110,7 +110,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-visionos/src/Img
-          asset_name: visionOS
+          asset_name: -visionOS
           tag: Nightly
           overwrite: true
           body: "visionOS binary executable."
