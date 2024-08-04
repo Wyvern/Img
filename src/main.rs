@@ -817,14 +817,14 @@ fn website() -> serde_json::Value {
     })
 }
 
-///Save inline/embed `data:image/..+..;..,...` or `base64/url-escaped` content to file.
+///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` content to file.
 #[cfg(feature = "embed")]
 fn save_to_file(data: &str) {
     if cfg!(not(feature = "embed")) {
         return;
     }
-    let t = &format!("{:?}", time::Instant::now());
-    let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
+    let mut t = format!("{:?}", time::Instant::now());
+    let mut name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
 
     let ctx = &data["data:image/".len()..data.find(',').unwrap()];
     let ext = &ctx[..['+', ';']
@@ -833,8 +833,13 @@ fn save_to_file(data: &str) {
         .unwrap_or(ctx.len())];
 
     let content = &data[data.find(',').unwrap() + 1..];
-    let full_name = format!("{name}.{ext}");
-
+    let mut full_name = format!("{name}.{ext}");
+    //Prevent overwriting other images with the same file name.
+    while path::Path::new(&full_name).exists() {
+        t = format!("{:?}", time::Instant::now());
+        name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
+        full_name = format!("{name}.{ext}");
+    }
     use base64::*;
     if !path::Path::new(&full_name).exists() {
         {
