@@ -826,38 +826,35 @@ fn save_to_file(data: &str) {
     let t = &format!("{:?}", time::Instant::now());
     let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
 
-    use base64::*;
-    let ext = &data[..['+', ';', ',']
+    let ctx = &data["data:image/".len()..data.find(',').unwrap()];
+    let ext = &ctx[..['+', ';']
         .iter()
-        .find_map(|&x| data.find(x))
-        .unwrap_or(data.len())];
-    let offset = &data[data.find(',').unwrap() + 1..];
+        .find_map(|&x| ctx.find(x))
+        .unwrap_or(ctx.len())];
+
+    let content = &data[data.find(',').unwrap() + 1..];
     let full_name = format!("{name}.{ext}");
+
+    use base64::*;
     if !path::Path::new(&full_name).exists() {
         {
-            if data.contains(";base64,") {
-                let mut buf = vec![0; offset.len()];
+            if ctx.contains(";base64") {
+                let mut buf = vec![0; content.len()];
                 let size = engine::general_purpose::STANDARD
-                    .decode_slice(offset, &mut buf)
+                    .decode_slice(content, &mut buf)
                     .unwrap_or_else(|e| quit!("{e}"));
                 buf.truncate(size);
-                fs::write(full_name, buf)
+                fs::write(&full_name, buf)
             } else {
                 fs::write(
-                    full_name,
-                    percent_encoding::percent_decode_str(offset)
+                    &full_name,
+                    percent_encoding::percent_decode_str(content)
                         .decode_utf8_lossy()
                         .as_ref(),
                 )
             }
         }
-        .unwrap_or_else(|e| {
-            quit!(
-                "Write {} to file {name}.{ext} failed: {}",
-                &data[..data.find(',').unwrap()],
-                e
-            )
-        });
+        .unwrap_or_else(|e| quit!("Write {ctx} to file {full_name} failed: {}", e));
     }
 }
 
