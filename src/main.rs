@@ -824,24 +824,23 @@ fn save_to_file(data: &str) {
         return;
     }
 
-    let generate_name = || -> String {
-        let t = format!("{:?}", time::Instant::now());
-        let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
-        name.into()
-    };
-    let mut name = generate_name();
     let ctx = &data["data:image/".len()..data.find(',').unwrap()];
     let ext = &ctx[..['+', ';']
         .iter()
         .find_map(|&x| ctx.find(x))
         .unwrap_or(ctx.len())];
 
-    let mut full_name = format!("{name}.{ext}");
+    let generate_name = || -> String {
+        let t = format!("{:?}", time::Instant::now());
+        let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
+        format!("{name}.{ext}")
+    };
+    let mut full_name = generate_name();
     //Prevent overwriting other images with the same file name.
     while path::Path::new(&full_name).exists() {
-        name = generate_name();
-        full_name = format!("{name}.{ext}");
+        full_name = generate_name();
     }
+
     let content = &data[data.find(',').unwrap() + 1..];
     use base64::*;
     {
