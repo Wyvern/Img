@@ -823,8 +823,6 @@ fn save_to_file(data: &str) {
     if cfg!(not(feature = "embed")) {
         return;
     }
-    let mut t = format!("{:?}", time::Instant::now());
-    let mut name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
 
     let ctx = &data["data:image/".len()..data.find(',').unwrap()];
     let ext = &ctx[..['+', ';']
@@ -832,35 +830,37 @@ fn save_to_file(data: &str) {
         .find_map(|&x| ctx.find(x))
         .unwrap_or(ctx.len())];
 
-    let content = &data[data.find(',').unwrap() + 1..];
-    let mut full_name = format!("{name}.{ext}");
+    let generate_name = || -> String {
+        let t = format!("{:?}", time::Instant::now());
+        let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
+        format!("{name}.{ext}")
+    };
+    let mut full_name = generate_name();
     //Prevent overwriting other images with the same file name.
     while path::Path::new(&full_name).exists() {
-        t = format!("{:?}", time::Instant::now());
-        name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
-        full_name = format!("{name}.{ext}");
+        full_name = generate_name();
     }
+
+    let content = &data[data.find(',').unwrap() + 1..];
     use base64::*;
-    if !path::Path::new(&full_name).exists() {
-        {
-            if ctx.contains(";base64") {
-                let mut buf = vec![0; content.len()];
-                let size = engine::general_purpose::STANDARD
-                    .decode_slice(content, &mut buf)
-                    .unwrap_or_else(|e| quit!("{e}"));
-                buf.truncate(size);
-                fs::write(&full_name, buf)
-            } else {
-                fs::write(
-                    &full_name,
-                    percent_encoding::percent_decode_str(content)
-                        .decode_utf8_lossy()
-                        .as_ref(),
-                )
-            }
+    {
+        if ctx.contains(";base64") {
+            let mut buf = vec![0; content.len()];
+            let size = engine::general_purpose::STANDARD
+                .decode_slice(content, &mut buf)
+                .unwrap_or_else(|e| quit!("{e}"));
+            buf.truncate(size);
+            fs::write(&full_name, buf)
+        } else {
+            fs::write(
+                &full_name,
+                percent_encoding::percent_decode_str(content)
+                    .decode_utf8_lossy()
+                    .as_ref(),
+            )
         }
-        .unwrap_or_else(|e| quit!("Write {ctx} to file {full_name} failed: {}", e));
     }
+    .unwrap_or_else(|e| quit!("Write {ctx} to file {full_name} failed: {}", e));
 }
 
 ///Show `circle` progress indicator
