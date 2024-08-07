@@ -28,7 +28,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
+          # targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
           components: rust-src
 
       - name: Run sccache-cache

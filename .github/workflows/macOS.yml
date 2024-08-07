@@ -28,7 +28,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: x86_64-apple-darwin
+          # targets: x86_64-apple-darwin
           components: rust-src
 
       - name: Run sccache-cache
