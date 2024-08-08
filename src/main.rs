@@ -175,6 +175,7 @@ fn parse(addr: &str) -> String {
         (true, true) => {
             pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}")
         }
+
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{term_title}"),
         (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
