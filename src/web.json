@@ -233,7 +233,7 @@
   },
   {
     "Site": "8se.me,xchina.co,xchina.biz",
-    "Img": "div.photos figure img",
+    "Img": "div.photos > a[href] | div.container > img",
     "Next": "div.pager a",
     "Album": "div.item > a[href] > img"
   },
