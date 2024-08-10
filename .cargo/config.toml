@@ -265,6 +265,9 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
+[target.'cfg(target_vendor="apple")']
+rustflags = ["-Clink-arg=-undefined dynamic_lookup"]
+
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
 
@@ -286,5 +289,5 @@ linker = "riscv64-linux-gnu-gcc"
 [target.'cfg(target_os="android")']
 rustflags = ["-Zhas-thread-local=no"]
 
-[target.'cfg(target_os="linux")']
+[target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
