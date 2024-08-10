@@ -41,9 +41,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Build Release
         run: |
           sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu musl-tools -y
@@ -159,7 +156,7 @@ jobs:
           components: rust-src
 
       - name: Install cargo-binstall
-        uses: cargo-bins/cargo-binstall@main
+        run: brew install cargo-binstall
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
@@ -300,9 +297,6 @@ jobs:
         with:
           targets: aarch64-pc-windows-msvc
           components: rust-src
-
-      # - name: Install cargo-binstall
-      #   uses: cargo-bins/cargo-binstall@main
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
