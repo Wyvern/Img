@@ -177,6 +177,8 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
+[target.'cfg(target_vendor="apple")']
+rustflags = ["-Clink-arg=-undefined dynamic_lookup"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
