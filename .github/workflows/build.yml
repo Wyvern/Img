@@ -155,8 +155,8 @@ jobs:
           targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
           components: rust-src
 
-      - name: Install cargo-binstall
-        run: brew install cargo-binstall
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
@@ -184,7 +184,7 @@ jobs:
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
-          cargo binstall cargo-ndk -y
+          # cargo binstall cargo-ndk -y
           time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto
 
           find ./target -iname img -type f | xargs ls -hl
