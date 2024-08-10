@@ -34,8 +34,8 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Install cargo-binstall
-        run: brew install cargo-binstall
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Release
         run: |
-          cargo binstall cargo-ndk -y
+          # cargo binstall cargo-ndk -y
 
           cargo update
 
