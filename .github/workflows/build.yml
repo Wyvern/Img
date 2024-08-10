@@ -166,7 +166,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Install cargo-ndk
-        run: cargo install --git https://github.com/bbqsrc/cargo-ndk/releases/tag/v3.5.6
+        run: cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.6
 
       - name: Build Release
         run: |
