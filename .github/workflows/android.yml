@@ -35,7 +35,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Install cargo-ndk
-        run: cargo install cargo-ndk
+        run: cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.6
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
