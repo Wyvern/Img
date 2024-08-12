@@ -271,10 +271,11 @@ fn parse(addr: &str) -> String {
                     let src = e.attr("src").unwrap();
                     let title_alt = ["title", "alt"].iter().find_map(|a| {
                         e.attr(a).and_then(|x| {
-                            if !x.is_empty()
+                            let attr = x.trim();
+                            if !attr.is_empty()
                                 && [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"]
                                     .iter()
-                                    .any(|&ext| x.trim_end().to_lowercase().ends_with(ext))
+                                    .any(|&ext| attr.ends_with(ext))
                             {
                                 Some(x)
                             } else {
