@@ -141,8 +141,8 @@ fn parse(addr: &str) -> String {
     let mut t = title.trim();
 
     t = t
-        .split(['/', '-', '_', '|', '–'])
-        .max_by_key(|x| x.len())
+        .rsplit(['/', '-', '_', '|', '–'])
+        .max_by_key(|x| x.trim().len())
         .unwrap()
         .trim();
 
@@ -272,9 +272,9 @@ fn parse(addr: &str) -> String {
                     let title_alt = ["title", "alt"].iter().find_map(|a| {
                         e.attr(a).and_then(|x| {
                             if !x.is_empty()
-                                && [".jpg", ".jpeg", ".png", ".webp"]
+                                && [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"]
                                     .iter()
-                                    .any(|&ext| x.trim_end().ends_with(ext))
+                                    .any(|&ext| x.trim_end().to_lowercase().ends_with(ext))
                             {
                                 Some(x)
                             } else {
@@ -282,16 +282,8 @@ fn parse(addr: &str) -> String {
                             }
                         })
                     });
-
-                    if title_alt.is_some() {
-                        urls.insert(format!(
-                            "{}|{}",
-                            canonicalize(src, scheme, addr),
-                            title_alt.unwrap()
-                        ));
-                    } else {
-                        urls.insert(canonicalize(src, scheme, addr));
-                    }
+                    let url = canonicalize(src, scheme, addr);
+                    urls.insert(title_alt.map_or_else(|| url.to_owned(), |x| format!("{url}|{x}")));
                 }
             }
             // tdbg!(&urls, &css_img);
