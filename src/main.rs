@@ -269,14 +269,13 @@ fn parse(addr: &str) -> String {
                 urls.clear();
                 for e in html_img {
                     let src = e.attr("src").unwrap();
-                    let ext = src[src.rfind('.').unwrap()..].trim_end();
                     let title_alt = ["title", "alt"].iter().find_map(|a| {
                         e.attr(a).and_then(|x| {
                             let attr = x.trim();
                             if !attr.is_empty()
-                                && attr
-                                    .rfind('.')
-                                    .map_or(false, |dot| attr[dot..].eq_ignore_ascii_case(ext))
+                                && [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"]
+                                    .iter()
+                                    .any(|&ext| attr.ends_with(ext))
                             {
                                 Some(x)
                             } else {
