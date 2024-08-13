@@ -36,6 +36,8 @@ jobs:
 
       - name: Build Release
         run: |
+          curl https://raw.githubusercontent.com/Wyvern/Rust/main/config.toml -o ~/.cargo/config.toml;
+
           cargo update
 
           time cargo s arm64e-apple-ios

@@ -49,6 +49,8 @@ jobs:
 
       - name: Build release
         run: |
+          curl https://raw.githubusercontent.com/Wyvern/Rust/main/config.toml -o ~/.cargo/config.toml;
+
           cargo update
 
           cargo s x86_64-pc-windows-msvc

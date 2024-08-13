@@ -39,6 +39,8 @@ jobs:
 
       - name: Build Release
         run: |
+          curl https://raw.githubusercontent.com/Wyvern/Rust/main/config.toml -o ~/.cargo/config.toml;
+
           cargo binstall cargo-pgo -y
 
           cargo update
