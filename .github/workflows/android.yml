@@ -37,7 +37,7 @@ jobs:
       - name: Install cargo-ndk
         run: |
           # curl https://raw.githubusercontent.com/Wyvern/Rust/main/config.toml -o ~/.cargo/config.toml;
-          cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.6 -- -Clto -Ctarget-cpu=native -Clink-self-contained=+linker -Ztune-cpu=native -Zthreads=0 -Zlinker-features=+lld
+          cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.6
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
