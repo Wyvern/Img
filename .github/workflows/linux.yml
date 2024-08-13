@@ -45,8 +45,6 @@ jobs:
         run: |
           sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu musl-tools -y
 
-          curl https://raw.githubusercontent.com/Wyvern/Rust/main/config.toml -o ~/.cargo/config.toml;
-
           cargo update
 
           time cargo s s390x-unknown-linux-gnu

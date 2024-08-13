@@ -36,7 +36,7 @@ jobs:
 
       - name: Install cargo-ndk
         run: |
-          curl https://raw.githubusercontent.com/Wyvern/Rust/main/config.toml -o ~/.cargo/config.toml;
+          # curl https://raw.githubusercontent.com/Wyvern/Rust/main/config.toml -o ~/.cargo/config.toml;
           cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.6
 
       - name: Android NDK setup
@@ -48,6 +48,8 @@ jobs:
 
       - name: Build Release
         run: |
+          # cargo binstall cargo-ndk -y
+
           cargo update
 
           time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
