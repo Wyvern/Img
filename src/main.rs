@@ -2,6 +2,7 @@
 mod util;
 use {std::*, util::*};
 
+static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; 7] = [
@@ -121,7 +122,7 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-    let sels = img.and_then(|i| i.split_once(" | "));
+    let sels = img.and_then(|i| i.split_once(SEP));
     let sel = sels.map(|(l, _)| l).or(img);
     let page = crabquery::Document::from(html);
     let html_img = page.select(sel.unwrap_or("img"));
@@ -289,7 +290,7 @@ fn parse(addr: &str) -> String {
                     });
                     let url = canonicalize(src, scheme, addr);
                     urls.insert(
-                        title_alt.map_or_else(|| url.to_owned(), |x| format!("{url} <|> {x}")),
+                        title_alt.map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
                     );
                 }
             }
@@ -370,7 +371,7 @@ fn parse(addr: &str) -> String {
                         stdout,
                         "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
                         u = char::from_u32(0x332).unwrap(),
-                        s = " | ",
+                        s = SEP,
                     );
                     let _ = stdout.flush();
 
@@ -476,7 +477,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let lr = url.rsplit_once(" <|> ");
+        let lr = url.split_once(SEP);
         let u = lr.map_or(url.as_str(), |(l, _)| l);
 
         let mut name = u.rfind('/').map_or_else(
