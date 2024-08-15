@@ -30,6 +30,7 @@ jobs:
         with:
           # targets: x86_64-apple-darwin
           components: rust-src
+          toolchain: nightly-2024-08-14
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main

@@ -37,6 +37,7 @@ jobs:
         with:
           # targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu
           components: rust-src
+          toolchain: nightly-2024-08-14
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
