@@ -275,7 +275,11 @@ fn parse(addr: &str) -> String {
                             if !attr.is_empty()
                                 && [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"]
                                     .iter()
-                                    .any(|&ext| attr.ends_with(ext))
+                                    .any(|&ext| {
+                                        attr.rfind('.').map_or(false, |dot| {
+                                            attr[dot..].eq_ignore_ascii_case(ext)
+                                        })
+                                    })
                             {
                                 Some(x)
                             } else {
@@ -284,7 +288,9 @@ fn parse(addr: &str) -> String {
                         })
                     });
                     let url = canonicalize(src, scheme, addr);
-                    urls.insert(title_alt.map_or_else(|| url.to_owned(), |x| format!("{url}|{x}")));
+                    urls.insert(
+                        title_alt.map_or_else(|| url.to_owned(), |x| format!("{url} <|> {x}")),
+                    );
                 }
             }
             // tdbg!(&urls, &css_img);
@@ -470,7 +476,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             continue;
         }
 
-        let lr = url.rsplit_once('|');
+        let lr = url.rsplit_once(" <|> ");
         let u = lr.map_or(url.as_str(), |(l, _)| l);
 
         let mut name = u.rfind('/').map_or_else(
@@ -532,6 +538,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                         .remove(b'_')
                         .remove(b'?')
                         .remove(b'=')
+                        .remove(b'%')
                 }),
             )
             .to_string();
