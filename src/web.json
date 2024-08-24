@@ -563,5 +563,10 @@
     "Img": "div.entry-content img",
     "Next": "ul.page-numbers a",
     "Album": "h1.entry-title > a"
+  },
+  {
+    "Site": "inewgirl.com,nshens.com",
+    "Img": "json: photourl",
+    "Next": "<script>"
   }
 ]

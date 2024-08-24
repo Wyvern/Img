@@ -48,21 +48,18 @@ fn main() {
 }
 
 ///Get `scheme` and `host` info from valid url string
-fn check_host(addr: &str) -> [&str; 2] {
-    let split = addr.split_once("://").unwrap_or(("http", addr));
+fn check_host(addr: &str) -> &str {
+    let (scheme, rest) = addr.split_once("://").unwrap_or(("http", addr));
 
-    let scheme = split.0;
-    if scheme.is_empty()
-        || !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https"))
-    {
-        quit!("{}: Invalid {U}http(s) protocol.", scheme);
+    if !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https")) {
+        quit!("Scheme {} is NOT valid {} protocol.", scheme, "http(s)");
     }
-    let rest = split.1;
+
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
-    if host.is_empty() || !host.contains('.') {
+    if !host.contains('.') {
         quit!("{}: Invalid host info.", host);
     }
-    [scheme, host]
+    host
 }
 
 ///Get `host` info and Generate `img/next/album` selector data
@@ -84,8 +81,8 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
-    let scheme_host @ [_, host] = check_host(addr);
+fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
+    let host = check_host(addr);
     let host_info = host_info(host);
     use sync::mpsc::*;
     let (s, r) = channel();
@@ -111,21 +108,45 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], [&str; 2]) {
         quit!("Fetch {} failed - {err}", addr);
     }
     let res = String::from_utf8_lossy(&out.stdout);
-    (res.into_owned(), host_info, scheme_host)
+    (res.into_owned(), host_info, host)
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (html, [img, mut next_sel, album], [scheme, host]) = get_html(addr);
+    let (html, [img, mut next_sel, album], host) = get_html(addr);
+
     let css_img = if img.is_none() {
-        css_image(&html, scheme, addr)
+        css_image(&html, addr)
     } else {
         collections::HashSet::new()
     };
+
     let sels = img.and_then(|i| i.split_once(SEP));
     let sel = sels.map(|(l, _)| l).or(img);
     let page = crabquery::Document::from(html);
-    let html_img = page.select(sel.unwrap_or("img"));
+
+    let mut json_img = collections::HashSet::new();
+    let mut html_img = vec![];
+
+    if sel.is_some_and(|s| s.starts_with("json:")) {
+        let key = sel.unwrap().split_once(':').unwrap().1.trim();
+        let script = page.select("script");
+        for s in script.iter().filter(|&s| s.text().is_some()) {
+            let t = s.text().unwrap();
+            let urls = t.split(key).skip(1);
+            for u in urls {
+                let url = u
+                    .split('"')
+                    .nth(1)
+                    .map(|u| u.replace(r"\u002F", "/"))
+                    .unwrap();
+                json_img.insert(url);
+            }
+        }
+    } else {
+        html_img = page.select(sel.unwrap_or("img"));
+    }
+
     let attr = sel.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
         [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
         _ => "src",
@@ -150,11 +171,12 @@ fn parse(addr: &str) -> String {
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-    let [albums_len, imgs_len, html, css] = [
+    let [albums_len, imgs_len, html, css, json] = [
         albums.as_ref().map_or(0, |a| a.len()),
-        html_img.len() + css_img.len(),
+        html_img.len() + css_img.len() + json_img.len(),
         html_img.len(),
         css_img.len(),
+        json_img.len(),
     ];
 
     let term_title = if terminal_emulator() {
@@ -166,11 +188,13 @@ fn parse(addr: &str) -> String {
     let htmlcss = if html > 0 && css > 0 {
         format!(": HTML({html}) + CSS({css})")
     } else if html > 0 {
-        format!(": HTML({html})")
+        ": HTML".to_owned()
+    } else if json > 0 {
+        ": JSON".to_owned()
     } else if css > 0 {
-        format!(": CSS({css})")
+        ": CSS".to_owned()
     } else {
-        String::new()
+        <_>::default()
     };
     match (has_album, imgs_len > 0) {
         (true, true) => {
@@ -212,7 +236,7 @@ fn parse(addr: &str) -> String {
                                         } else {
                                             embed += 1;
                                         }
-                                    } else if !urls.insert(canonicalize(u, scheme, addr)) {
+                                    } else if !urls.insert(canonicalize(u, addr)) {
                                         empty_dup += 1;
                                     }
                                 }
@@ -233,7 +257,7 @@ fn parse(addr: &str) -> String {
                             };
 
                             // tdbg!(&url);
-                            if url.is_empty() || !urls.insert(canonicalize(url, scheme, addr)) {
+                            if url.is_empty() || !urls.insert(canonicalize(url, addr)) {
                                 empty_dup += 1;
                             }
                         }
@@ -288,7 +312,7 @@ fn parse(addr: &str) -> String {
                             }
                         })
                     });
-                    let url = canonicalize(src, scheme, addr);
+                    let url = canonicalize(src, addr);
                     urls.insert(
                         title_alt.map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
                     );
@@ -327,7 +351,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize(href, scheme, addr);
+                        let album_url = canonicalize(href, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -403,26 +427,41 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    next_sel.map_or_else(<_>::default, |n| check_next(page.select(n), scheme, addr))
+    next_sel.map_or_else(<_>::default, |n| {
+        if n == "<script>" {
+            if json == 0 {
+                String::default()
+            } else {
+                let slash = addr.rfind('/').unwrap_or(addr.len() - 1);
+                let num = addr[slash + 1..].parse::<u8>().unwrap_or(1);
+                let next_page = format!(
+                    "{}/{}",
+                    addr.trim_end_matches(format!("/{num}").as_str()),
+                    num + 1
+                );
+                tdbg!(next_page)
+            }
+        } else {
+            check_next(page.select(n), addr)
+        }
+    })
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: String, scheme: &str, addr: &str) -> String {
+fn canonicalize(url: String, addr: &str) -> String {
     if url.is_empty() {
         return url;
     }
-
+    let (scheme, path) = addr.split_once("://").unwrap_or(("http", addr));
     if !url.starts_with("http") {
         if url.starts_with("//") {
             format!("{scheme}:{url}")
         } else if url.starts_with('/') {
-            let path = addr.split_once("://").unwrap_or((scheme, addr)).1;
             format!(
                 "{scheme}://{}{url}",
                 &path[..path.find('/').unwrap_or(path.len())]
             )
         } else {
-            let path = addr.split_once("://").unwrap_or((scheme, addr)).1;
             format!(
                 "{scheme}://{}/{url}",
                 &path[..path.rfind('/').unwrap_or(path.len())]
@@ -683,7 +722,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String {
+fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
     let splitter = |tag: &crabquery::Element| {
         tag.attr("class")
@@ -807,7 +846,7 @@ fn check_next(nexts: Vec<crabquery::Element>, scheme: &str, cur: &str) -> String
         next_link = String::default();
     }
 
-    next_link = canonicalize(next_link, scheme, cur);
+    next_link = canonicalize(next_link, cur);
 
     tdbg!(next_link)
 }
@@ -945,14 +984,14 @@ fn url_image(content: &str) -> Option<String> {
 }
 
 ///Get `page` css style `url(),image(),image-set()`
-fn css_image(html: &str, scheme: &str, addr: &str) -> collections::HashSet<String> {
+fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
     CSS.map(|s| {
         let segments = html.split(s);
         if s == "image-set(" {
             for seg in segments.skip(1) {
                 images = images
-                    .union(&css_image(seg, scheme, addr))
+                    .union(&css_image(seg, addr))
                     .map(Into::into)
                     .collect();
             }
@@ -964,7 +1003,7 @@ fn css_image(html: &str, scheme: &str, addr: &str) -> collections::HashSet<Strin
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(u, scheme, addr));
+                        images.insert(canonicalize(u, addr));
                     }
                 }
             }
@@ -1052,10 +1091,18 @@ mod img {
     }
 
     #[test]
+    fn raw_op() {
+        let x = "";
+        let y = &raw const x;
+        let z = &x as *const _ as *mut char;
+        tdbg!(x, y, z);
+    }
+
+    #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let (html, _, [scheme, _]) = get_html(&addr);
-        let r = css_image(&html, scheme, &addr);
+        let (html, ..) = get_html(&addr);
+        let r = css_image(&html, &addr);
         tdbg!(&r, r.len());
     }
 
