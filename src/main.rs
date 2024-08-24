@@ -161,6 +161,7 @@ fn parse(addr: &str) -> String {
         .text()
         .expect("NO title text.");
     let mut t = title.trim();
+
     t = t
         .rsplit(['/', '-', '_', '|', '–'])
         .max_by_key(|x| x.trim().len())
@@ -187,13 +188,13 @@ fn parse(addr: &str) -> String {
     let htmlcss = if html > 0 && css > 0 {
         format!(": HTML({html}) + CSS({css})")
     } else if html > 0 {
-        ": HTML".to_string()
+        ": HTML".to_owned()
     } else if json > 0 {
-        ": JSON".to_string()
+        ": JSON".to_owned()
     } else if css > 0 {
-        ": CSS".to_string()
+        ": CSS".to_owned()
     } else {
-        String::new()
+        <_>::default()
     };
     match (has_album, imgs_len > 0) {
         (true, true) => {
