@@ -449,7 +449,7 @@ fn parse(addr: &str) -> String {
 
     next_sel.map_or_else(<_>::default, |n| {
         if n == "<script>" {
-            if json_len > 0 {
+            if json_len == 0 {
                 String::default()
             } else {
                 let num = addr
