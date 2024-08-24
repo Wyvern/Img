@@ -152,14 +152,36 @@ fn parse(addr: &str) -> String {
         _ => "src",
     });
 
-    let titles = page.select("title");
-    let title = titles
-        .first()
-        .unwrap_or_else(|| {
-            quit!("Not a valid HTML page.");
-        })
-        .text()
-        .expect("NO title text.");
+    let titles = page.select(if !json_img.is_empty() {
+        "script"
+    } else {
+        "title"
+    });
+    let title = if !json_img.is_empty() {
+        titles
+            .iter()
+            .find_map(|s| {
+                s.text()
+                    .and_then(|t| t.split_once("metaKeywords").map(|kw| kw.1.to_owned()))
+            })
+            .unwrap()
+            .split('"')
+            .nth(1)
+            .unwrap()
+            .split(',')
+            .max_by_key(|&seg| seg.trim().len())
+            .unwrap()
+            .to_owned()
+    } else {
+        titles
+            .first()
+            .unwrap_or_else(|| {
+                quit!("Not a valid HTML page.");
+            })
+            .text()
+            .expect("NO title text.")
+    };
+
     let mut t = title.trim();
 
     t = t
@@ -318,8 +340,8 @@ fn parse(addr: &str) -> String {
                     );
                 }
             }
-            // tdbg!(&urls, &css_img);
-            download(t, urls.into_iter().chain(css_img), host)
+            // tdbg!(&urls, &css_img,&json_img);
+            download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
         (true, false) => {
             let mut all = false;
