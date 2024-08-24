@@ -1091,14 +1091,6 @@ mod img {
     }
 
     #[test]
-    fn raw_op() {
-        let x = "";
-        let y = &raw const x;
-        let z = &x as *const _ as *mut char;
-        tdbg!(x, y, z);
-    }
-
-    #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
         let (html, ..) = get_html(&addr);
