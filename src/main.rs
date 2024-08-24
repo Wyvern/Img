@@ -193,11 +193,9 @@ fn parse(addr: &str) -> String {
     let albums = album.map(|a| page.select(a));
 
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-    let [albums_len, imgs_len, html, css, json] = [
+    let [albums_len, imgs_len, json_len] = [
         albums.as_ref().map_or(0, |a| a.len()),
         html_img.len() + css_img.len() + json_img.len(),
-        html_img.len(),
-        css_img.len(),
         json_img.len(),
     ];
 
@@ -207,13 +205,13 @@ fn parse(addr: &str) -> String {
         format!("{G} {t}")
     };
 
-    let htmlcss = if html > 0 && css > 0 {
-        format!(": HTML({html}) + CSS({css})")
-    } else if html > 0 {
+    let htmlcss = if !html_img.is_empty() && !css_img.is_empty() {
+        format!(": HTML({}) + CSS({})", html_img.len(), css_img.len())
+    } else if !html_img.is_empty() {
         ": HTML".to_owned()
-    } else if json > 0 {
+    } else if !json_img.is_empty() {
         ": JSON".to_owned()
-    } else if css > 0 {
+    } else if !css_img.is_empty() {
         ": CSS".to_owned()
     } else {
         <_>::default()
@@ -451,14 +449,19 @@ fn parse(addr: &str) -> String {
 
     next_sel.map_or_else(<_>::default, |n| {
         if n == "<script>" {
-            if json == 0 {
+            if json_len > 0 {
                 String::default()
             } else {
-                let slash = addr.rfind('/').unwrap_or(addr.len() - 1);
-                let num = addr[slash + 1..].parse::<u8>().unwrap_or(1);
+                let num = addr
+                    .split_terminator('/')
+                    .last()
+                    .unwrap_or("")
+                    .parse::<u8>()
+                    .unwrap_or(1);
                 let next_page = format!(
                     "{}/{}",
-                    addr.trim_end_matches(format!("/{num}").as_str()),
+                    addr.trim_end_matches('/')
+                        .trim_end_matches(format!("/{num}").as_str()),
                     num + 1
                 );
                 tdbg!(next_page)
@@ -1109,7 +1112,7 @@ mod img {
     fn r#try() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
 
-        parse(&arg("https://girldreamy.com"));
+        parse(&arg("https://xiutaku.com"));
     }
 
     #[test]
