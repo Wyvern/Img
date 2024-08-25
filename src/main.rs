@@ -129,18 +129,35 @@ fn parse(addr: &str) -> String {
     let mut html_img = vec![];
 
     if sel.is_some_and(|s| s.starts_with("json:")) {
-        let key = sel.unwrap().split_once(':').unwrap().1.trim();
+        let kind = sel.unwrap().trim_start_matches("json:").trim();
+        let name = sels.map(|(_, r)| r).unwrap().trim();
         let script = page.select("script");
         for s in script.iter().filter(|&s| s.text().is_some()) {
             let t = s.text().unwrap();
-            let urls = t.split(key).skip(1);
+            let urls = t.split(name).skip(1);
             for u in urls {
-                let url = u
-                    .split('"')
-                    .nth(1)
-                    .map(|u| u.replace(r"\u002F", "/"))
-                    .unwrap();
-                json_img.insert(url);
+                match kind {
+                    "key" => {
+                        let url = u
+                            .split('"')
+                            .nth(1)
+                            .map(|u| u.replace(r"\u002F", "/"))
+                            .unwrap();
+                        json_img.insert(url);
+                    }
+                    "array" => {
+                        u.split(['[', ']'])
+                            .nth(1)
+                            .unwrap()
+                            .split('"')
+                            .filter(|&x| !x.trim().is_empty() && x.trim() != ",")
+                            .map(|u| u.replace(r"\u002F", "/"))
+                            .for_each(|url| {
+                                json_img.insert(url);
+                            });
+                    }
+                    _ => (),
+                }
             }
         }
     } else {
