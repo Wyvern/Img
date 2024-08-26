@@ -76,7 +76,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
             })
         });
     site.map_or([None; 3], |s| {
-        ["Img", "Next", "Album"].map(|key| s[key].as_str())
+        ["Img", "Next", "Album"].map(|key| s[key].as_str().map(|v| v.trim()))
     })
 }
 
@@ -164,9 +164,13 @@ fn parse(addr: &str) -> String {
         html_img = page.select(sel.unwrap_or("img"));
     }
 
-    let attr = sel.map_or("src", |i| match ['[', ']'].map(|x| i.rfind(x)) {
-        [Some(lbrace), Some(rbrace)] if i.trim_end().ends_with(']') => &i[lbrace + 1..rbrace],
-        _ => "src",
+    let attr = sel.map_or("src", |i| {
+        i.split_whitespace()
+            .last()
+            .unwrap()
+            .rsplit(['[', ']'])
+            .nth(1)
+            .unwrap_or("src")
     });
 
     let titles = page.select(if !json_img.is_empty() {
