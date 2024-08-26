@@ -339,7 +339,7 @@ fn parse(addr: &str) -> String {
                         e.attr(a).and_then(|x| {
                             let attr = x.trim();
                             if !attr.is_empty()
-                                && [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"]
+                                && [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp"]
                                     .iter()
                                     .any(|&ext| {
                                         attr.rfind('.').map_or(false, |dot| {
@@ -482,7 +482,7 @@ fn parse(addr: &str) -> String {
                 let next_page = format!(
                     "{}/{}",
                     addr.trim_end_matches('/')
-                        .trim_end_matches(format!("/{num}").as_str()),
+                        .trim_end_matches(&format!("/{num}")),
                     num + 1
                 );
                 tdbg!(next_page)
