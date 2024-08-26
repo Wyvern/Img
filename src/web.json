@@ -566,7 +566,12 @@
   },
   {
     "Site": "inewgirl.com,nshens.com",
-    "Img": "json: photourl",
+    "Img": "json: key | photourl",
+    "Next": "<script>"
+  },
+  {
+    "Site": "chottie.com",
+    "Img": "json: array | imgList",
     "Next": "<script>"
   }
 ]
