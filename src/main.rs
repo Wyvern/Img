@@ -793,19 +793,14 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                         || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
             });
 
-            let a = tags
-                .next_back()
-                .unwrap()
-                .iter()
-                .filter(|e| {
-                    e.tag().unwrap() == "a"
-                        || e.children()
-                            .first()
-                            .is_some_and(|c| c.tag().unwrap() == "a")
-                })
-                .collect::<Vec<_>>();
+            let a = tags.next_back().unwrap().iter().find(|e| {
+                e.tag().unwrap() == "a"
+                    || e.children()
+                        .first()
+                        .is_some_and(|c| c.tag().unwrap() == "a")
+            });
 
-            next_link = a.first().map_or(String::default(), |f| {
+            next_link = a.map_or(String::default(), |f| {
                 if f.text().map_or(true, |t| t.trim().is_empty()) && f.children().is_empty() {
                     String::default()
                 } else {
@@ -828,8 +823,8 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     .first()
                     .map_or_else(|| tag.tag().unwrap() == "span" || splitter(tag), splitter)
             });
-            let s = rest.next_back().unwrap();
-            next_link = s.first().map_or(String::default(), |f| {
+            let s = rest.next_back().unwrap().first();
+            next_link = s.map_or(String::default(), |f| {
                 f.children()
                     .first()
                     .map_or_else(|| f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
@@ -1211,7 +1206,6 @@ mod img {
                     None
                 }
             })
-            // .map(|(k, l)| format!("`{k}` : {l}"))
             .collect::<Vec<_>>();
         pl!(
             "Todally find {} Img Sels, with duplicated {} selectors.",
