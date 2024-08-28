@@ -418,7 +418,7 @@ fn parse(addr: &str) -> String {
                                 || quit!("NO album title can be found."),
                                 |x| {
                                     if x.trim().is_empty() {
-                                        quit!("[Album title is empty]")
+                                        quit!("Album title text is empty.")
                                     } else {
                                         x
                                     }
@@ -1191,7 +1191,9 @@ mod img {
             sites.len(),
             dup_site.len()
         );
-        dbg!(dup_site);
+        if !dup_site.is_empty() {
+            dbg!(dup_site);
+        }
 
         let dup_sel = img_sel
             .keys()
@@ -1209,7 +1211,11 @@ mod img {
             img_sel.len(),
             dup_sel.len()
         );
-        dbg!(dup_sel);
+        if !dup_sel.is_empty() {
+            for (sel, count) in dup_sel {
+                pl!("({sel} , {count})");
+            }
+        }
     }
 
     #[test]
