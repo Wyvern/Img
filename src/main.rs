@@ -247,8 +247,13 @@ fn parse(addr: &str) -> String {
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
-    t = if t.contains("page") || t.contains('页') {
-        t[..t.rfind("page").or_else(|| t.rfind('第')).unwrap_or(t.len())].trim()
+    t = if t.to_ascii_lowercase().contains(" page") || t.contains('页') {
+        t[..t
+            .to_ascii_lowercase()
+            .rfind(" page")
+            .or_else(|| t.rfind('第'))
+            .unwrap_or(t.len())]
+            .trim()
     } else {
         t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
     };
@@ -773,6 +778,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let splitter = |tag: &crabquery::Element| {
         tag.attr("class")
             .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
+            || tag.attr("aria-current").is_some()
     };
     if nexts.is_empty() {
         next_link = String::default();
@@ -786,6 +792,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     && (splitter(e)
                         || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
             });
+
             let a = tags
                 .next_back()
                 .unwrap()
@@ -1133,7 +1140,7 @@ mod img {
     fn r#try() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
 
-        parse(&arg("https://xiutaku.com"));
+        parse(&arg("https://ugirls.pics/"));
     }
 
     #[test]

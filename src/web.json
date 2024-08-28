@@ -573,5 +573,11 @@
     "Site": "chottie.com,chinesehottie.com",
     "Img": "json: array | imgList",
     "Next": "<script>"
+  },
+  {
+    "Site": "ugirls.pics",
+    "Img": "div.my-2 > img",
+    "Next": "span[aria-current]",
+    "Album": "div.my-1 h2"
   }
 ]
