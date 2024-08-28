@@ -1208,13 +1208,14 @@ mod img {
             })
             .collect::<Vec<_>>();
         pl!(
-            "Todally find {} Img Sels, with duplicated {} selectors.",
+            "Todally find {} Img selectors, with duplicated {} selectors.",
             img_sel.len(),
             dup_sel.len()
         );
+
         if !dup_sel.is_empty() {
             for (sel, count) in dup_sel {
-                pl!("({sel} , {count})");
+                pl!("({},{})", sel, count);
             }
         }
     }

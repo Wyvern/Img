@@ -177,6 +177,13 @@ mod macros {
     }
 
     #[macro_export]
+    macro_rules! p {
+        ($l:literal $(,$e:expr)*) => {{
+            print!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*));
+        }}
+    }
+
+    #[macro_export]
     macro_rules! tdbg {
         ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
