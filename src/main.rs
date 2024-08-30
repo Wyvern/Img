@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), no_main)]
 mod util;
-use {crabquery::Element, std::*, util::*};
+use {std::*, util::*};
 
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
@@ -780,7 +780,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
             || tag.attr("aria-current").is_some()
     };
-    let set_next = |tags: &[Element]| -> String {
+    let set_next = |tags: &[crabquery::Element]| -> String {
         let tag = tags.iter().find(|e| {
             e.tag().unwrap() == "a"
                 || e.children()
