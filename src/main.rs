@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), no_main)]
 mod util;
-use {std::*, util::*};
+use {crabquery::Element, std::*, util::*};
 
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
@@ -780,6 +780,23 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
             || tag.attr("aria-current").is_some()
     };
+    let set_next = |tags: &[Element]| -> String {
+        let tag = tags.iter().find(|e| {
+            e.tag().unwrap() == "a"
+                || e.children()
+                    .first()
+                    .is_some_and(|c| c.tag().unwrap() == "a")
+        });
+        tag.map_or(String::default(), |f| {
+            if f.text().map_or(true, |t| t.trim().is_empty()) && f.children().is_empty() {
+                String::default()
+            } else {
+                f.attr("href")
+                    .or_else(|| f.children().first().and_then(|x| x.attr("href")))
+                    .unwrap()
+            }
+        })
+    };
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
@@ -787,28 +804,15 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr("href").is_none() {
             let items = element.parent().unwrap().children();
-            let mut tags = items.split(|e| {
-                (e.tag().unwrap() == "span" || e.attr("href").is_none())
-                    && (splitter(e)
-                        || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
-            });
-
-            let a = tags.next_back().unwrap().iter().find(|e| {
-                e.tag().unwrap() == "a"
-                    || e.children()
-                        .first()
-                        .is_some_and(|c| c.tag().unwrap() == "a")
-            });
-
-            next_link = a.map_or(String::default(), |f| {
-                if f.text().map_or(true, |t| t.trim().is_empty()) && f.children().is_empty() {
-                    String::default()
-                } else {
-                    f.attr("href")
-                        .or_else(|| f.children().first().and_then(|x| x.attr("href")))
-                        .unwrap()
-                }
-            });
+            let tags = items
+                .split(|e| {
+                    (e.tag().unwrap() == "span" || e.attr("href").is_none())
+                        && (splitter(e)
+                            || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
+                })
+                .next_back()
+                .unwrap();
+            next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr("href").unwrap();
         } else {
@@ -817,22 +821,20 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     } else {
         let element = &nexts[0];
         if element.tag().unwrap() == "div" && nexts.len() == 2 {
-            let tags = element.children();
-            let mut rest = tags.split(|tag| {
-                tag.children()
-                    .first()
-                    .map_or_else(|| tag.tag().unwrap() == "span" || splitter(tag), splitter)
-            });
-            let s = rest.next_back().unwrap().first();
-            next_link = s.map_or(String::default(), |f| {
-                f.children()
-                    .first()
-                    .map_or_else(|| f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
-            });
+            let items = element.children();
+            let tags = items
+                .split(|e| {
+                    e.children()
+                        .first()
+                        .map_or_else(|| e.tag().unwrap() == "span" || splitter(e), splitter)
+                })
+                .next_back()
+                .unwrap();
+            next_link = set_next(tags);
         } else {
             let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
                 let mut t = n.text();
-                if t.is_some() && t.as_deref().unwrap().is_empty() {
+                if t.is_some() && t.as_deref().unwrap().trim().is_empty() {
                     t.take();
                 }
                 let next_下 = |mut t: String| {
@@ -867,9 +869,10 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                         e.attr("href").is_some_and(|h| {
                             cur.trim().ends_with(h.trim())
                                 || h.trim() == "#"
-                                || format!("{}/1", cur.trim_end_matches('/')).ends_with(h.trim())
-                                || format!("{}?page=1", cur.trim_end_matches('/'))
-                                    .ends_with(h.trim())
+                                || ["/1", "?page=1"].iter().any(|suffix| {
+                                    format!("{}{suffix}", cur.trim_end_matches('/'))
+                                        .ends_with(h.trim())
+                                })
                         })
                     });
                     match pos {
