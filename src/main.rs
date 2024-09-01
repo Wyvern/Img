@@ -165,8 +165,7 @@ fn parse(addr: &str) -> String {
     }
 
     let attr = sel.map_or("src", |i| {
-        i.split_whitespace()
-            .last()
+        i.split_whitespace().next_back()
             .unwrap()
             .rsplit(['[', ']'])
             .nth(1)
@@ -775,10 +774,10 @@ fn magic_number_type(pb: path::PathBuf) {
 /// Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
-    let splitter = |tag: &crabquery::Element| {
-        tag.attr("class")
+    let splitter = |e: &crabquery::Element| {
+        e.attr("class")
             .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
-            || tag.attr("aria-current").is_some()
+            || e.attr("aria-current").is_some()
     };
     let set_next = |tags: &[crabquery::Element]| -> String {
         let tag = tags.iter().find(|e| {
@@ -787,12 +786,12 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     .first()
                     .is_some_and(|c| c.tag().unwrap() == "a")
         });
-        tag.map_or(String::default(), |f| {
-            if f.text().map_or(true, |t| t.trim().is_empty()) && f.children().is_empty() {
-                String::default()
+        tag.map_or(String::default(), |e| {
+            if e.text().map_or(true, |t| t.trim().is_empty()) && e.children().is_empty() {
+                <_>::default()
             } else {
-                f.attr("href")
-                    .or_else(|| f.children().first().and_then(|x| x.attr("href")))
+                e.attr("href")
+                    .or_else(|| e.children().first().and_then(|x| x.attr("href")))
                     .unwrap()
             }
         })
@@ -1081,6 +1080,7 @@ mod img {
         dbg!(terminal_emulator());
     }
 
+    #[inline]
     fn arg(default: &str) -> String {
         let arg = env::args().nth(4);
         arg.unwrap_or(String::from(default))
