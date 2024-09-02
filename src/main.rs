@@ -165,7 +165,8 @@ fn parse(addr: &str) -> String {
     }
 
     let attr = sel.map_or("src", |i| {
-        i.split_whitespace().next_back()
+        i.split_whitespace()
+            .next_back()
             .unwrap()
             .rsplit(['[', ']'])
             .nth(1)
