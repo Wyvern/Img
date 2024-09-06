@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu
           components: rust-src
 
       - name: Run sccache-cache
@@ -51,7 +51,7 @@ jobs:
           # time cargo l --target s390x-unknown-linux-musl
 
           time cargo l --target riscv64gc-unknown-linux-gnu
-          # time cargo l --target riscv64gc-unknown-linux-musl
+          time cargo l --target riscv64gc-unknown-linux-musl
 
           time cargo l --target x86_64-unknown-linux-gnu
           time cargo l --target x86_64-unknown-linux-musl
@@ -76,15 +76,15 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-riscv64gc-gnu binary executable."
 
-      # - name: Upload Linux-riscv64gc-musl to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/riscv64gc-unknown-linux-musl/lto/Img
-      #     asset_name: Linux-riscv64gc-musl
-      #     tag: Stable
-      #     overwrite: true
-      #     body: "Ubuntu Linux-riscv64gc-musl binary executable."
+      - name: Upload Linux-riscv64gc-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/riscv64gc-unknown-linux-musl/lto/Img
+          asset_name: Linux-riscv64gc-musl
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-riscv64gc-musl binary executable."
 
       - name: Upload Linux-s390x-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
@@ -295,7 +295,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-pc-windows-msvc
+          targets: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc
           components: rust-src
 
       - name: Run sccache-cache
@@ -307,7 +307,7 @@ jobs:
 
           cargo l --target x86_64-pc-windows-msvc
           cargo l --target aarch64-pc-windows-msvc
-          # cargo l --target arm64ec-pc-windows-msvc
+          cargo l --target arm64ec-pc-windows-msvc
 
           cmd /r dir /s target\Img.exe
           systeminfo
@@ -335,12 +335,12 @@ jobs:
           overwrite: true
           body: "Windows aarch64 binary executable."
 
-      # - name: Upload Windows-arm64ec to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/arm64ec-pc-windows-msvc/lto/Img.exe
-      #     asset_name: Windows-arm64ec.exe
-      #     tag: Stable
-      #     overwrite: true
-      #     body: "Windows arm64ec binary executable."
+      - name: Upload Windows-arm64ec to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/arm64ec-pc-windows-msvc/lto/Img.exe
+          asset_name: Windows-arm64ec.exe
+          tag: Stable
+          overwrite: true
+          body: "Windows arm64ec binary executable."
