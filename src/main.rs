@@ -166,7 +166,7 @@ fn parse(addr: &str) -> String {
 
     let attr = sel.map_or("src", |i| {
         i.split_whitespace()
-            .last()
+            .next_back()
             .unwrap()
             .rsplit(['[', ']'])
             .nth(1)
@@ -247,8 +247,13 @@ fn parse(addr: &str) -> String {
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
-    t = if t.contains("page") || t.contains('页') {
-        t[..t.rfind("page").or_else(|| t.rfind('第')).unwrap_or(t.len())].trim()
+    t = if t.to_ascii_lowercase().contains(" page") || t.contains('页') {
+        t[..t
+            .to_ascii_lowercase()
+            .rfind(" page")
+            .or_else(|| t.rfind('第'))
+            .unwrap_or(t.len())]
+            .trim()
     } else {
         t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
     };
@@ -418,7 +423,7 @@ fn parse(addr: &str) -> String {
                                 || quit!("NO album title can be found."),
                                 |x| {
                                     if x.trim().is_empty() {
-                                        quit!("[Album title is empty]")
+                                        quit!("Album title text is empty.")
                                     } else {
                                         x
                                     }
@@ -770,9 +775,27 @@ fn magic_number_type(pb: path::PathBuf) {
 /// Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
-    let splitter = |tag: &crabquery::Element| {
-        tag.attr("class")
+    let splitter = |e: &crabquery::Element| {
+        e.attr("class")
             .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
+            || e.attr("aria-current").is_some()
+    };
+    let set_next = |tags: &[crabquery::Element]| -> String {
+        let tag = tags.iter().find(|e| {
+            e.tag().unwrap() == "a"
+                || e.children()
+                    .first()
+                    .is_some_and(|c| c.tag().unwrap() == "a")
+        });
+        tag.map_or(String::default(), |e| {
+            if e.text().map_or(true, |t| t.trim().is_empty()) && e.children().is_empty() {
+                <_>::default()
+            } else {
+                e.attr("href")
+                    .or_else(|| e.children().first().and_then(|x| x.attr("href")))
+                    .unwrap()
+            }
+        })
     };
     if nexts.is_empty() {
         next_link = String::default();
@@ -781,32 +804,15 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr("href").is_none() {
             let items = element.parent().unwrap().children();
-            let mut tags = items.split(|e| {
-                (e.tag().unwrap() == "span" || e.attr("href").is_none())
-                    && (splitter(e)
-                        || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
-            });
-            let a = tags
-                .next_back()
-                .unwrap()
-                .iter()
-                .filter(|e| {
-                    e.tag().unwrap() == "a"
-                        || e.children()
-                            .first()
-                            .is_some_and(|c| c.tag().unwrap() == "a")
+            let tags = items
+                .split(|e| {
+                    (e.tag().unwrap() == "span" || e.attr("href").is_none())
+                        && (splitter(e)
+                            || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
                 })
-                .collect::<Vec<_>>();
-
-            next_link = a.first().map_or(String::default(), |f| {
-                if f.text().map_or(true, |t| t.trim().is_empty()) && f.children().is_empty() {
-                    String::default()
-                } else {
-                    f.attr("href")
-                        .or_else(|| f.children().first().and_then(|x| x.attr("href")))
-                        .unwrap()
-                }
-            });
+                .next_back()
+                .unwrap();
+            next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr("href").unwrap();
         } else {
@@ -815,22 +821,20 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     } else {
         let element = &nexts[0];
         if element.tag().unwrap() == "div" && nexts.len() == 2 {
-            let tags = element.children();
-            let mut rest = tags.split(|tag| {
-                tag.children()
-                    .first()
-                    .map_or_else(|| tag.tag().unwrap() == "span" || splitter(tag), splitter)
-            });
-            let s = rest.next_back().unwrap();
-            next_link = s.first().map_or(String::default(), |f| {
-                f.children()
-                    .first()
-                    .map_or_else(|| f.attr("href").unwrap(), |ff| ff.attr("href").unwrap())
-            });
+            let items = element.children();
+            let tags = items
+                .split(|e| {
+                    e.children()
+                        .first()
+                        .map_or_else(|| e.tag().unwrap() == "span" || splitter(e), splitter)
+                })
+                .next_back()
+                .unwrap();
+            next_link = set_next(tags);
         } else {
             let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
                 let mut t = n.text();
-                if t.is_some() && t.as_deref().unwrap().is_empty() {
+                if t.is_some() && t.as_deref().unwrap().trim().is_empty() {
                     t.take();
                 }
                 let next_下 = |mut t: String| {
@@ -865,9 +869,10 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                         e.attr("href").is_some_and(|h| {
                             cur.trim().ends_with(h.trim())
                                 || h.trim() == "#"
-                                || format!("{}/1", cur.trim_end_matches('/')).ends_with(h.trim())
-                                || format!("{}?page=1", cur.trim_end_matches('/'))
-                                    .ends_with(h.trim())
+                                || ["/1", "?page=1"].iter().any(|suffix| {
+                                    format!("{}{suffix}", cur.trim_end_matches('/'))
+                                        .ends_with(h.trim())
+                                })
                         })
                     });
                     match pos {
@@ -1076,6 +1081,7 @@ mod img {
         dbg!(terminal_emulator());
     }
 
+    #[inline]
     fn arg(default: &str) -> String {
         let arg = env::args().nth(4);
         arg.unwrap_or(String::from(default))
@@ -1133,7 +1139,7 @@ mod img {
     fn r#try() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
 
-        parse(&arg("https://xiutaku.com"));
+        parse(&arg("https://ugirls.pics/"));
     }
 
     #[test]
@@ -1191,7 +1197,9 @@ mod img {
             sites.len(),
             dup_site.len()
         );
-        dbg!(dup_site);
+        if !dup_site.is_empty() {
+            dbg!(dup_site);
+        }
 
         let dup_sel = img_sel
             .keys()
@@ -1202,14 +1210,18 @@ mod img {
                     None
                 }
             })
-            // .map(|(k, l)| format!("`{k}` : {l}"))
             .collect::<Vec<_>>();
         pl!(
-            "Todally find {} Img Sels, with duplicated {} selectors.",
+            "Todally find {} Img selectors, with duplicated {} selectors.",
             img_sel.len(),
             dup_sel.len()
         );
-        dbg!(dup_sel);
+
+        if !dup_sel.is_empty() {
+            for (sel, count) in dup_sel {
+                pl!("({},{})", sel, count);
+            }
+        }
     }
 
     #[test]

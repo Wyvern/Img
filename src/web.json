@@ -122,8 +122,8 @@
     "Album": "div.meta-title"
   },
   {
-    "Site": "yaomitao.com,deepxt.top,deepxt.cfd,deepxt.sbs,deepxt.com",
-    "Img": "img.aligncenter",
+    "Site": "yaomitao.com,deepxt.top,deepxt.cfd,deepxt.sbs,deepxt.com,flj.mobi",
+    "Img": "article.post-content img",
     "Album": "div.entry-media a"
   },
   {
@@ -570,8 +570,14 @@
     "Next": "<script>"
   },
   {
-    "Site": "chottie.com,chinesehottie.com",
+    "Site": "chottie.org,chottie.net,chottie.com,chinesehottie.com",
     "Img": "json: array | imgList",
     "Next": "<script>"
+  },
+  {
+    "Site": "ugirls.pics",
+    "Img": "div.my-2 > img",
+    "Next": "span[aria-current]",
+    "Album": "div.my-1 h2"
   }
 ]
