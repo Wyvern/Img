@@ -351,7 +351,7 @@
   {
     "Site": "nudebird.biz,hotgirl.biz",
     "Img": "div.thecontent a[href]",
-    "Album": "div.slide-caption h2"
+    "Album": "h2.title > a"
   },
   {
     "Site": "jrants.com",
