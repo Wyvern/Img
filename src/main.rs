@@ -1,17 +1,19 @@
 #![cfg_attr(not(debug_assertions), no_main)]
+
 mod util;
 use {std::*, util::*};
 
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; 7] = [
+static CURL: [&str; 8] = [
     "--compressed",
     "-k",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
     "--tcp-nodelay",
+    "--no-clobber",
     // "--mptcp",
     if cfg!(debug_assertions) {
         "-fsSL"
@@ -1140,6 +1142,18 @@ mod img {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
 
         parse(&arg("https://ugirls.pics/"));
+    }
+
+    fn semver(s: &str) -> [u8; 3] {
+        let mut ver = [0; 3];
+        for (i, v) in s.split('.').take(3).enumerate() {
+            if let Ok(n) = v.parse::<u8>() {
+                ver[i] = n;
+            } else {
+                break;
+            }
+        }
+        ver
     }
 
     #[test]
