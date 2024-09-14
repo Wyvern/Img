@@ -52,9 +52,8 @@ jobs:
         run: |
           cargo update
 
-          curl https://aka.ms/vs/17/release/vs_BuildTools.exe -o vs_BuildTools.exe
-          # Start-Process -Wait -FilePath vs_BuildTools.exe -ArgumentList '--quiet', '--wait', '--norestart'
-          cmd /r vs_BuildTools.exe --add Microsoft.VisualStudio.Workload.VCTools --quiet --wait
+          curl https://aka.ms/vs/17/release/vs_BuildTools.exe -O
+          cmd /r vs_BuildTools.exe --add Microsoft.VisualStudio.Workload.VCTools  --wait --norestart
 
           cargo s x86_64-pc-windows-msvc
           cargo s aarch64-pc-windows-msvc
