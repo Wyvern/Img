@@ -50,13 +50,13 @@ jobs:
 
       - name: Build release
         run: |
-          %ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat
+          "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
 
           cargo update
 
+          cargo s arm64ec-pc-windows-msvc
           cargo s x86_64-pc-windows-msvc
           cargo s aarch64-pc-windows-msvc
-          cargo s arm64ec-pc-windows-msvc
 
           cmd /r dir /s target\Img.exe
           systeminfo
