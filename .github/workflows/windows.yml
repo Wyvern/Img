@@ -50,10 +50,9 @@ jobs:
 
       - name: Build release
         run: |
-          cargo update
+          "%ProgramFiles%\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
 
-          # curl https://aka.ms/vs/17/release/vs_BuildTools.exe -O
-          # cmd /r vs_BuildTools.exe --add Microsoft.VisualStudio.Workload.VCTools --quiet --wait --norestart
+          cargo update
 
           cargo s x86_64-pc-windows-msvc
           cargo s aarch64-pc-windows-msvc
