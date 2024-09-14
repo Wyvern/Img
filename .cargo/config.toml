@@ -232,4 +232,4 @@ rustflags = ["-Zhas-thread-local=no"]
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.arm64ec-pc-windows-msvc]
-rustflags = ["-Zunstable-options", "-Zlinker-features=-lld"]
+rustflags = ["-Clinker-flavor=msvc"]
