@@ -231,9 +231,6 @@ rustflags = ["-Zhas-thread-local=no"]
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
 
-[target.s390x-unknown-linux-musl]
-rustflags = ["-Zunstable-options", "-Clinker-flavor=gnu"]
-
 [target.arm64ec-pc-windows-msvc]
-rustflags = ["-Clinker-flavor=msvc"]
-# linker = "msvc"
+# rustflags = ["-Clinker-flavor=msvc"]
+linker = "msvc"

@@ -55,8 +55,6 @@ jobs:
           # curl https://aka.ms/vs/17/release/vs_BuildTools.exe -O
           # cmd /r vs_BuildTools.exe --add Microsoft.VisualStudio.Workload.VCTools --quiet --wait --norestart
 
-          cmd /r cl --version
-
           cargo s x86_64-pc-windows-msvc
           cargo s aarch64-pc-windows-msvc
           cargo s arm64ec-pc-windows-msvc
