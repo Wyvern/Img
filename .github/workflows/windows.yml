@@ -50,9 +50,9 @@ jobs:
 
       - name: MSVC build tool for Developer prompt
         run: |
-          cd %VS170COMNTOOLS%
+          cd C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\Common7\Tools
           dir *
-          call "%VS170COMNTOOLS%\VsDevCmd.bat"
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
         shell: cmd
 
       - name: Build release
