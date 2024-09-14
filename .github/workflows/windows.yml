@@ -53,6 +53,8 @@ jobs:
           cargo update
 
           curl https://aka.ms/vs/17/release/vs_BuildTools.exe -o vs_BuildTools.exe
+          Invoke-WebRequest https://aka.ms/vs/17/release/vs_BuildTools.exe -OutFile vs_BuildTools.exe
+
           vs_buildtools.exe --add Microsoft.VisualStudio.Workload.VCTools --quiet --wait
 
           cargo s x86_64-pc-windows-msvc
