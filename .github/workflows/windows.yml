@@ -50,8 +50,8 @@ jobs:
 
       - name: Build release
         run: |
-          # cmd /k "%VS170COMNTOOLS%VsDevCmd.bat"
-          & "$env:VS170COMNTOOLS VsDevCmd.bat"
+          cmd /k "%VS170COMNTOOLS%\VsDevCmd.bat"
+          # & "$env:VS170COMNTOOLS\VsDevCmd.bat"
 
           cargo update
 
