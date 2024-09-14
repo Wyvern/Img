@@ -50,7 +50,8 @@ jobs:
 
       - name: MSVC Build Tools
         run: |
-          echo %VS170COMNTOOLS%
+          call "%VS170COMNTOOLS%VsDevCmd.bat"
+          dir "C:\Program Files (x86)\Microsoft Visual Studio"
         shell: cmd
 
       - name: Build release
