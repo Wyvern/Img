@@ -49,8 +49,9 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Build release
+        shell: cmd
         run: |
-          cmd /c "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
+          "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
 
           cargo update
 
@@ -58,7 +59,7 @@ jobs:
           cargo s aarch64-pc-windows-msvc
           cargo s x86_64-pc-windows-msvc
 
-          cmd /r dir /s target\Img.exe
+          dir /s target\Img.exe
           systeminfo
 
       - name: Rust Versions
