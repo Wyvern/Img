@@ -210,6 +210,9 @@ rustflags = ["-Clink-arg=-undefined dynamic_lookup"]
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
 
+# [target.'cfg(target_os="windows")']
+# linker = "msvc"
+
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 
@@ -233,4 +236,4 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.arm64ec-pc-windows-msvc]
 # rustflags = ["-Clinker-flavor=msvc"]
-linker = "msvc"
+linker = "link.exe"
