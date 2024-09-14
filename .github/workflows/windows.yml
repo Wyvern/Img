@@ -48,9 +48,11 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Set up MSVC environment
+      - name: MSVC build tool for Developer prompt
         run: |
-          call "%VS170COMNTOOLS%VsDevCmd.bat"
+          cd %VS170COMNTOOLS%
+          dir *
+          call "%VS170COMNTOOLS%\VsDevCmd.bat"
         shell: cmd
 
       - name: Build release
