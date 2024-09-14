@@ -232,7 +232,7 @@ rustflags = ["-Zhas-thread-local=no"]
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.s390x-unknown-linux-musl]
-rustflags = ["-Clinker-flavor=gnu"]
+rustflags = ["-Zunstable-options", "-Clinker-flavor=gnu"]
 
 [target.arm64ec-pc-windows-msvc]
 rustflags = ["-Clinker-flavor=msvc"]
