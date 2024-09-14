@@ -50,12 +50,9 @@ jobs:
 
       - name: Build release
         run: |
-          # cmd /k 'C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat'
-          # cmd.exe /k %VS170COMNTOOLS%VsDevCmd.bat
-
           echo $env:VS170COMNTOOLS
 
-          & $env:VS170COMNTOOLS\VsDevCmd.bat
+          & $env:VS170COMNTOOLS VsDevCmd.bat
 
           cargo update
 
