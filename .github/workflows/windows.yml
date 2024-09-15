@@ -59,6 +59,7 @@ jobs:
           cargo s arm64ec-pc-windows-msvc
 
           cmd /r dir /s target\Img.exe
+          cmd /r dir /s *.obj
           systeminfo
 
       - name: Rust Versions

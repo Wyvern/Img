@@ -237,8 +237,6 @@ rustflags = ["-Zrelax-elf-relocations"]
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"
 rustflags = [
-    "-Clink-args=",
     "-Ltarget/arm64ec-pc-windows-msvc/src/",
     "-Ltarget/arm64ec-pc-windows-msvc/src/deps",
-    "-Ltarget/arm64ec-pc-windows-msvc/src/build",
 ]
