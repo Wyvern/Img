@@ -11,11 +11,6 @@ download = []
 infer = ["dep:infer"]
 embed = ["dep:base64"]
 
-[[bin]]
-name = "Img"
-path = "main.rs"
-crate-type = ["rlib", "cdylib", "staticlib"]
-
 [[example]]
 name = "color"
 path = "src/color.rs"
