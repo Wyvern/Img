@@ -236,5 +236,9 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"
-
+# rustc-link-search = { native = "target/arm64ec-pc-windows-msvc/src/" }
+rustflags = [
+    "-Ltarget/arm64ec-pc-windows-msvc/src/",
+    "-Ltarget/arm64ec-pc-windows-msvc/src/deps",
+]
 # rustc-link-lib = ["link.obj"]
