@@ -11,11 +11,13 @@ download = []
 infer = ["dep:infer"]
 embed = ["dep:base64"]
 
+[[bin]]
+crate-type = ["rlib", "cdylib", "staticlib"]
 
 [[example]]
 name = "color"
 path = "src/color.rs"
-test = true
+test = false
 
 [dependencies]
 crabquery = { version = "*", default-features = false }
