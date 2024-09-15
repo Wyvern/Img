@@ -1,4 +1,6 @@
 #![cfg_attr(not(debug_assertions), no_main)]
+#![crate_type = "staticlib"]
+#![crate_type = "cdylib"]
 
 mod util;
 use {std::*, util::*};
@@ -14,7 +16,7 @@ static CURL: [&str; 8] = [
     "--tcp-fastopen",
     "--tcp-nodelay",
     "--no-clobber",
-    // "--mptcp",
+    // "-OJ",
     if cfg!(debug_assertions) {
         "-fsSL"
     } else {

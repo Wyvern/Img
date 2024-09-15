@@ -188,7 +188,7 @@ mod macros {
         ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
                 let _ = io::stdout().lock();
-                let r = $crate::dbg!(($($e),*));
+                let r = dbg!(($($e),*));
                 #[cfg(test)]{pause("")}
                 r
             } else {($($e),*)}
