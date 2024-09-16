@@ -1,6 +1,4 @@
 #![cfg_attr(not(debug_assertions), no_main)]
-#![crate_type = "staticlib"]
-#![crate_type = "cdylib"]
 
 mod util;
 use {std::*, util::*};
