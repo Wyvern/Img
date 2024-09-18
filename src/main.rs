@@ -1136,24 +1136,12 @@ mod img {
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
-
+    struct T(char);
     #[test]
     fn r#try() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
 
         parse(&arg("https://ugirls.pics/"));
-    }
-
-    fn semver(s: &str) -> [u8; 3] {
-        let mut ver = [0; 3];
-        for (i, v) in s.split('.').take(3).enumerate() {
-            if let Ok(n) = v.parse::<u8>() {
-                ver[i] = n;
-            } else {
-                break;
-            }
-        }
-        ver
     }
 
     #[test]

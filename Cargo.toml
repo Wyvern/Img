@@ -1,7 +1,10 @@
+cargo-features = ["edition2024"]
+
 [package]
 name = "Img"
 version = "1.0.0"
-edition = "2021"
+edition = "2024"
+build = "build.rs"
 # default-run = "Img"
 
 [features]
@@ -14,7 +17,6 @@ embed = ["dep:base64"]
 [[example]]
 name = "color"
 path = "src/color.rs"
-test = false
 
 [dependencies]
 crabquery = { version = "*", default-features = false }
