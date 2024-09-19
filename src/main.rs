@@ -1136,7 +1136,7 @@ mod img {
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
-    struct T(char);
+
     #[test]
     fn r#try() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
