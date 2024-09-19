@@ -9,7 +9,6 @@ fn main() {
             D!(&t, &o);
 
             if t == "arm64ec-pc-windows-msvc" {
-                println!("cargo::rustc-flags=-Clinker=link.exe");
                 println!("cargo::rustc-link-arg=");
                 println!("cargo::rustc-link-arg-bins=");
                 println!("cargo::rustc-link-search={}", o);
