@@ -233,7 +233,7 @@ pub fn pause(msg: &str) {
     let _ = stdin().lock().read_line(&mut String::default());
 }
 
-pub fn dyn_value<T>(var: &dyn any::Any, val: T) {
+pub fn dyn_set<T>(var: &dyn any::Any, val: T) {
     let ptr = var as *const _ as *mut _;
     let cell = cell::Cell::new(ptr);
     unsafe {
@@ -246,32 +246,37 @@ pub fn dyn_cast<T: Copy>(var: &dyn any::Any) -> T {
     unsafe { *ptr }
 }
 
-const fn is_target_little_endian() -> bool {
-    u16::from_ne_bytes([1, 0]) == 1
+const fn target_endian() -> &'static str {
+    if u16::from_ne_bytes([1, 0]) == 1 {
+        "Little Endian"
+    } else {
+        "Big Endian"
+    }
 }
 
 #[cfg(test)]
 mod test {
+    use crate::tdbg;
+
     use super::*;
-    use crate::*;
 
     #[test]
     fn dyn_any() {
-        tdbg!(is_target_little_endian());
-        let x = [&mut 7 as &dyn any::Any, &4.3];
+        tdbg!(target_endian());
 
+        let x = [&mut 7 as &dyn any::Any, &4.3];
         let y = 123;
         dbg!(y, dyn_cast::<char>(&y));
-        dyn_value(&y, 456);
+        dyn_set(&y, 456);
         dbg!(y, dyn_cast::<char>(&y));
 
-        dyn_value(x[0], "rust");
+        dyn_set(x[0], "rust");
         dbg!(dyn_cast::<&str>(x[0]));
-        dyn_value(x[0], -123);
+        dyn_set(x[0], -123);
         dbg!(dyn_cast::<u8>(x[0]));
 
         dbg!(dyn_cast::<f32>(x[1]));
-        dbg!(dyn_cast::<char>(x[1]));
+        dbg!(dyn_cast::<&str>(x[1]));
         dbg!(dyn_cast::<f64>(x[1]));
 
         let mut z = 111;

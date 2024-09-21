@@ -18,7 +18,7 @@ fn main() {
     }
 
     println!("cargo::rerun-if-changed=build.rs");
-    println!("cargo::rerun-if-env-changed=TARGET");
+    // println!("cargo::rerun-if-env-changed=TARGET");
     // println!("cargo::rustc-flags=-l{}", "");
     // println!("cargo::rustc-check-cfg=cfg(x,y)");
     // println!("cargo::rustc-cfg=x");
