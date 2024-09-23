@@ -52,7 +52,7 @@ jobs:
 
       - name: Build Release
         run: |
-          brew install zigbuild
+          brew install cargo-zigbuild
 
           cargo update
 
