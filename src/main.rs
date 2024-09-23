@@ -16,9 +16,7 @@ static CURL: [&str; if cfg!(debug_assertions) { 9 } else { 8 }] = [
     "--no-clobber",
     "-fsL",
     #[cfg(debug_assertions)]
-    {
-        "-S"
-    },
+    "-S",
     // "-OJ",
 ];
 
