@@ -10,7 +10,6 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
-  BINSTALL_DISABLE_TELEMETRY: true
 
 jobs:
   macOS:
