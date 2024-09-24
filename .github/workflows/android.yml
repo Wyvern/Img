@@ -10,6 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  BINSTALL_DISABLE_TELEMETRY: true
 
 jobs:
   Android:
@@ -47,10 +48,8 @@ jobs:
           link-to-sdk: true
           local-cache: true
 
-      # - name: Zig setup
-      #   uses: goto-bus-stop/setup-zig@v2
-      #   with:
-      #       version: 0.13.0
+      - name: cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
 
       - name: Build Release
         run: |
