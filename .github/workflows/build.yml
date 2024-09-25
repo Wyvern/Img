@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64-unknown-linux-gnu
           # components: rust-src
 
       - name: Run sccache-cache
@@ -43,9 +43,13 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu musl-tools -y
+          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu musl-tools -y
+          # pip install cargo-zigbuild
 
           cargo update
+
+          time cargo l powerpc64-unknown-linux-gnu
+          # time cargo l powerpc64-unknown-linux-musl
 
           time cargo l --target s390x-unknown-linux-gnu
           # time cargo l --target s390x-unknown-linux-musl
@@ -65,6 +69,16 @@ jobs:
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload powerpc64-linux-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/powerpc64-unknown-linux-gnu/lto/Img
+          asset_name: Linux-powerpc64-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu powerpc64-linux-gnu binary executable."
 
       - name: Upload Linux-riscv64gc-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
