@@ -147,7 +147,7 @@ rustflags = [
     "-Cno-redzone",
     "-Cstrip=symbols",
     "-Cdebuginfo=0",
-    "-Clinker=rust-lld",
+    # "-Clinker=rust-lld",
     # "-Clink-self-contained=+linker",
 
     "-Clink-args=-fuse-ld=lld -fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
