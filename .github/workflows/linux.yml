@@ -49,6 +49,12 @@ jobs:
           cargo update
 
           time cargo s s390x-unknown-linux-gnu
+
+          git clone --filter=tree:0 --depth=1 https://github.com/richfelker/musl-cross-make.git
+          cd musl-cross-make
+          make TARGET=s390x-linux-musl
+          sudo make install PREFIX=/usr/bin
+
           time cargo s s390x-unknown-linux-musl
 
           time cargo s riscv64gc-unknown-linux-gnu
