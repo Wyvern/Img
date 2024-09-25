@@ -71,7 +71,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-pc-windows-msvc/src/Img.exe
-          asset_name: Windows.exe
+          asset_name: Windows-x86_64.exe
           tag: Nightly
           overwrite: true
           body: "Windows x64 binary executable."
