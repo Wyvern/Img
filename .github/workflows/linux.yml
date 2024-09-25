@@ -49,7 +49,7 @@ jobs:
 
           cargo update
 
-          # time cargo s powerpc64-ibm-aix
+          time cargo z powerpc64-ibm-aix
           time cargo z powerpc64-unknown-linux-gnu
           time cargo z powerpc64-unknown-linux-musl
 
@@ -87,7 +87,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/powerpc64-unknown-linux-gnu/src/Img
-          asset_name: powerpc64-linux-gnu
+          asset_name: Linux-powerpc64-gnu
           tag: Nightly
           overwrite: true
           body: "Ubuntu powerpc64-linux-gnu binary executable."
@@ -97,7 +97,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/powerpc64-unknown-linux-musl/src/Img
-          asset_name: powerpc64-linux-musl
+          asset_name: Linux-powerpc64-musl
           tag: Nightly
           overwrite: true
           body: "Ubuntu powerpc64-linux-musl binary executable."
