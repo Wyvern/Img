@@ -48,8 +48,8 @@ jobs:
 
           cargo update
 
-          time cargo l powerpc64-unknown-linux-gnu
-          # time cargo l powerpc64-unknown-linux-musl
+          time cargo l --target powerpc64-unknown-linux-gnu
+          # time cargo l --target powerpc64-unknown-linux-musl
 
           time cargo l --target s390x-unknown-linux-gnu
           # time cargo l --target s390x-unknown-linux-musl
