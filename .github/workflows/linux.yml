@@ -50,8 +50,8 @@ jobs:
           cargo update
 
           # time cargo s powerpc64-ibm-aix
-          time cargo s powerpc64-unknown-linux-gnu
-          time cargo s powerpc64-unknown-linux-musl
+          time cargo z powerpc64-unknown-linux-gnu
+          time cargo z powerpc64-unknown-linux-musl
 
           time cargo s s390x-unknown-linux-gnu
           time cargo s s390x-unknown-linux-musl
