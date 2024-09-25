@@ -49,7 +49,7 @@ jobs:
 
           cargo update
 
-          time cargo s powerpc64-ibm-aix
+          # time cargo s powerpc64-ibm-aix
           time cargo s powerpc64-unknown-linux-gnu
           time cargo s powerpc64-unknown-linux-musl
 
@@ -72,15 +72,15 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload powerpc64-ibm-aix to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64-ibm-aix/src/Img
-          asset_name: powerpc64-ibm-aix
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu powerpc64-ibm-aix binary executable."
+      # - name: Upload powerpc64-ibm-aix to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/powerpc64-ibm-aix/src/Img
+      #     asset_name: powerpc64-ibm-aix
+      #     tag: Nightly
+      #     overwrite: true
+      #     body: "Ubuntu powerpc64-ibm-aix binary executable."
 
       - name: Upload powerpc64-linux-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
