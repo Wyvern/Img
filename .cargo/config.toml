@@ -150,7 +150,7 @@ rustflags = [
     # "-Clinker=rust-lld",
     # "-Clink-self-contained=+linker",
 
-    "-Clink-args=-fuse-ld=lld -fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
+    "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -dynamic-lookup -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables",
 
     "-Aunused",
     "-Anonstandard_style",
