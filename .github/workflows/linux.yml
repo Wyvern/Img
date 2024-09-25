@@ -54,7 +54,7 @@ jobs:
           time cargo z powerpc64-unknown-linux-musl
 
           time cargo s s390x-unknown-linux-gnu
-          time cargo z s390x-unknown-linux-musl
+          time cargo s s390x-unknown-linux-musl
 
           time cargo s riscv64gc-unknown-linux-gnu
           time cargo s riscv64gc-unknown-linux-musl
