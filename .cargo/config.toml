@@ -223,6 +223,11 @@ linker = "aarch64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
+[target.'cfg(all(target_arch="s390x",target_os="linux",target_env="musl"))']
+linker = "s390x-linux-musl-gcc"
+
+[target.'cfg(all(target_arch="powerpc64",target_os="linux"))']
+linker = "powerpc64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
@@ -235,6 +240,9 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"
+
+[target.powerpc64-ibm-aix]
+linker = "powerpc64-linux-gnu-gcc"
 
 # [target.s390x-unknown-linux-musl]
 # linker = "/usr/bin/musl-cross-make"
