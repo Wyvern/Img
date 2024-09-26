@@ -51,8 +51,8 @@ jobs:
       - name: Build release
         run: |
           cmd /k "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
-          cmd /k "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64_arm64
-          cmd /k cl
+          "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" amd64_arm64
+          cl
 
           cargo update
 
@@ -60,7 +60,7 @@ jobs:
           cargo s x86_64-pc-windows-msvc
           cargo s arm64ec-pc-windows-msvc
 
-          cmd /r dir /s target\Img.exe
+          dir /s target\Img.exe
           systeminfo
 
       - name: Rust Versions

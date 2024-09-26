@@ -237,7 +237,8 @@ rustflags = ["-Zhas-thread-local=no"]
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.arm64ec-pc-windows-msvc]
-linker = "link.exe"
+# linker = "link.exe"
+rustflags = ["-Clink-arg=/MACHINE:ARM64EC"]
 
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-linux-gnu-gcc"
