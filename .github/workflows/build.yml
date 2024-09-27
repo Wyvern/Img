@@ -184,14 +184,12 @@ jobs:
 
       - name: Build Release
         run: |
-          brew install cargo-zigbuild
-
+          # brew install cargo-zigbuild
           cargo update
 
-          time cargo zigbuild --profile lto --target x86_64-unknown-freebsd
           time cargo l --target aarch64-apple-darwin
-          time cargo l --target x86_64-apple-darwin
           time cargo l --target aarch64-apple-ios
+          time cargo l --target x86_64-apple-darwin
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
