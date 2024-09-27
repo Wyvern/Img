@@ -188,14 +188,13 @@ jobs:
 
           cargo update
 
-          time cargo l --target x86_64-unknown-freebsd
+          time cargo zigbuild --profile lto --target x86_64-unknown-freebsd
           time cargo l --target aarch64-apple-darwin
           time cargo l --target x86_64-apple-darwin
           time cargo l --target aarch64-apple-ios
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
-          # cargo binstall cargo-ndk -y
           time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto
 
           find ./target -iname img -type f | xargs ls -hl
