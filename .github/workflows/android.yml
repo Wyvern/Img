@@ -49,11 +49,11 @@ jobs:
 
       - name: Build Release
         run: |
-          brew install cargo-zigbuild
+          # brew install cargo-zigbuild
 
           cargo update
 
-          time cargo z riscv64-linux-android
+          # time cargo z riscv64-linux-android
 
           time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort
 
