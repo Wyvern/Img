@@ -166,7 +166,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
+          targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,x86_64-unknown-freebsd
           # components: rust-src
 
       - name: Android NDK setup
@@ -184,14 +184,11 @@ jobs:
 
       - name: Build Release
         run: |
-          # cargo binstall cargo-pgo -y
+          brew install cargo-zigbuild
 
           cargo update
 
-          # cargo pgo run -- --profile lto --target aarch64-apple-darwin https://bisipic.online/thread-18097-1-1.html
-
-          # cargo pgo optimize build -- --profile lto --target aarch64-apple-darwin
-
+          time cargo l --target x86_64-unknown-freebsd
           time cargo l --target aarch64-apple-darwin
           time cargo l --target x86_64-apple-darwin
           time cargo l --target aarch64-apple-ios
@@ -209,6 +206,16 @@ jobs:
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload FreeBSD x86-64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-freebsd/lto/Img
+          asset_name: FreeBSD-x86_64
+          tag: Stable
+          overwrite: true
+          body: "FreeBSD x86-64 binary executable."
 
       - name: Upload macOS x86-64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
