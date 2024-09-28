@@ -35,20 +35,18 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          # targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu
           components: rust-src
-          # toolchain: nightly-2024-08-14
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu musl-tools -y
+          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
+
           pip install cargo-zigbuild
 
           cargo update
-
 
           time cargo s sparc64-unknown-linux-gnu
           time cargo s sparcv9-sun-solaris
@@ -76,15 +74,25 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      # - name: Upload powerpc64-ibm-aix to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/powerpc64-ibm-aix/src/Img
-      #     asset_name: powerpc64-ibm-aix
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Ubuntu powerpc64-ibm-aix binary executable."
+      - name: Upload Linux-sparc64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/sparc64-unknown-linux-gnu/src/Img
+          asset_name: Linux-sparc64-gnu
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-sparc64-gnu binary executable."
+
+      - name: Upload Solaris-sparcv9 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/sparcv9-sun-solaris/src/Img
+          asset_name: Solaris-sparcv9
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Solaris-sparcv9 binary executable."
 
       - name: Upload powerpc64-linux-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
