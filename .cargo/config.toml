@@ -231,9 +231,10 @@ linker = "powerpc64-linux-gnu-gcc"
 linker = "riscv64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="sparc64",target_os="linux"))']
+rustflags = ["-Zlinker-features=-lld"]
 linker = "sparc64-linux-gnu-gcc"
 
-[target.'cfg(and(any(target_os="linux",target_os="android"),not(target_arch="sparc64")))']
+[target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(target_os="android")']
