@@ -43,10 +43,13 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu musl-tools -y
+          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu musl-tools -y
           # pip install cargo-zigbuild
 
           cargo update
+
+          time cargo l sparc64-unknown-linux-gnu
+          time cargo l sparcv9-sun-solaris
 
           time cargo l --target powerpc64-unknown-linux-gnu
           # time cargo l --target powerpc64-unknown-linux-musl
