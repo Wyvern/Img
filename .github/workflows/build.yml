@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu
           # components: rust-src
 
       - name: Run sccache-cache
@@ -43,13 +43,13 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu musl-tools -y
+          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
           # pip install cargo-zigbuild
 
           cargo update
 
-          time cargo l sparc64-unknown-linux-gnu
-          time cargo l sparcv9-sun-solaris
+          time cargo l --target sparc64-unknown-linux-gnu
+          time cargo l --target sparcv9-sun-solaris
 
           time cargo l --target powerpc64-unknown-linux-gnu
           # time cargo l --target powerpc64-unknown-linux-musl
