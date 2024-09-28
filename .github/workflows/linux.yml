@@ -42,11 +42,11 @@ jobs:
 
       - name: Build Release
         run: |
-          wget -qO- https://public.dhe.ibm.com/software/server/POWER/Linux/toolchain/at/ubuntu/dists/jammy/615d762f.gpg.key | sudo tee -a /etc/apt/trusted.gpg.d/615d762f.asc
+          wget -qO- https://public.dhe.ibm.com/software/server/POWER/Linux/toolchain/at/ubuntu/dists/jammy/615d762f.gpg.key | sudo tee /etc/apt/trusted.gpg.d/615d762f.asc
 
           echo "deb [signed-by=/etc/apt/trusted.gpg.d/615d762f.asc] https://public.dhe.ibm.com/software/server/POWER/Linux/toolchain/at/ubuntu jammy atX.X" | sudo tee -a /etc/apt/sources.list
 
-          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools advance-toolchain-atX.X-cross-ppc64le -y
+          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools advance-toolchain-at7.1-cross-ppc64le -y
 
           pip install cargo-zigbuild
 
