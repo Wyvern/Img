@@ -44,7 +44,7 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu musl-tools gcc-multilib -y
+          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu musl-tools gcc -y
           pip install cargo-zigbuild
 
           cargo update
