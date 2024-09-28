@@ -57,7 +57,7 @@ jobs:
 
           cargo s aarch64-pc-windows-msvc
           cargo s x86_64-pc-windows-msvc
-          RUSTFLAGS="-Clink-args=" cargo s arm64ec-pc-windows-msvc
+          $env:RUSTFLAGS="-Clink-args="; cargo s arm64ec-pc-windows-msvc
 
           cmd /c dir /s target\Img.exe
           systeminfo
