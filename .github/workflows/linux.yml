@@ -77,6 +77,26 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
+      - name: Upload Linux-mips64-gnuabi64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/mips64-unknown-linux-gnuabi64/src/Img
+          asset_name: Linux-mips64-gnuabi64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-mips64-gnuabi64 binary executable."
+
+      - name: Upload Linux-mips64-muslabi64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/mips64-unknown-linux-muslabi64/src/Img
+          asset_name: Linux-mips64-muslabi64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-mips64-muslabi64 binary executable."
+
       - name: Upload Linux-sparc64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
