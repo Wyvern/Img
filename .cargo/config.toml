@@ -233,7 +233,7 @@ linker = "riscv64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="sparc64",target_os="linux"))']
 linker = "sparc64-linux-gnu-gcc"
 
-[target.'cfg(any(target_os="linux",target_os="android"))']
+[target.'cfg(and(any(target_os="linux",target_os="android"),not(target_arch="sparc64")))']
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(target_os="android")']
