@@ -241,7 +241,7 @@ rustflags = ["-Zrelax-elf-relocations"]
 rustflags = ["-Zhas-thread-local=no"]
 
 [target.sparcv9-sun-solaris]
-linker = "sparcv9-solaris-gcc"
+# linker = "sparcv9-solaris-gcc"
 
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-linux-gnu-gcc"
