@@ -42,11 +42,16 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
+          wget -qO- https://public.dhe.ibm.com/software/server/POWER/Linux/toolchain/at/ubuntu/dists/jammy/615d762f.gpg.key | sudo tee -a /etc/apt/trusted.gpg.d/615d762f.asc
+
+          sudo echo "deb [signed-by=/etc/apt/trusted.gpg.d/615d762f.asc] https://public.dhe.ibm.com/software/server/POWER/Linux/toolchain/at/ubuntu jammy atX.X" >> /etc/apt/sources.list
+
+          sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools advance-toolchain-atX.X-cross-ppc64le -y
 
           pip install cargo-zigbuild
 
           cargo update
+          time cargo s powerpc64-ibm-aix
 
           time cargo s mips64-unknown-linux-gnuabi64
           time cargo s mips64-unknown-linux-muslabi64
@@ -54,7 +59,7 @@ jobs:
           time cargo s sparc64-unknown-linux-gnu
           # time cargo s sparcv9-sun-solaris
 
-          # time cargo s powerpc64-ibm-aix
+
           time cargo z powerpc64-unknown-linux-gnu
           time cargo z powerpc64-unknown-linux-musl
 

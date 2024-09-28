@@ -248,7 +248,7 @@ linker = "sparcv9-solaris-gcc"
 ar = "sparcv9-solaris-ar"
 
 [target.powerpc64-ibm-aix]
-linker = "powerpc64-linux-gnu-gcc"
+linker = "powerpc64le-linux-gnu-gcc"
 
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"
