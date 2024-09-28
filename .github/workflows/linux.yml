@@ -49,7 +49,7 @@ jobs:
           cargo update
 
           time cargo s sparc64-unknown-linux-gnu
-          time cargo s sparcv9-sun-solaris
+          # time cargo s sparcv9-sun-solaris
 
           # time cargo s powerpc64-ibm-aix
           time cargo z powerpc64-unknown-linux-gnu
@@ -84,15 +84,15 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-sparc64-gnu binary executable."
 
-      - name: Upload Solaris-sparcv9 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/sparcv9-sun-solaris/src/Img
-          asset_name: Solaris-sparcv9
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Solaris-sparcv9 binary executable."
+      # - name: Upload Solaris-sparcv9 to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/sparcv9-sun-solaris/src/Img
+      #     asset_name: Solaris-sparcv9
+      #     tag: Nightly
+      #     overwrite: true
+      #     body: "Ubuntu Solaris-sparcv9 binary executable."
 
       - name: Upload powerpc64-linux-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
