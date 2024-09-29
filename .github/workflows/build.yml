@@ -47,6 +47,7 @@ jobs:
       - name: Build Release
         run: |
           sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
+
           # pip install cargo-zigbuild
 
           cargo update
@@ -75,6 +76,26 @@ jobs:
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
+
+      - name: Upload Solaris-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-pc-solaris/lto/Img
+          asset_name: Solaris-x86_64
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Solaris-x86_64 binary executable."
+
+      - name: Upload Solaris-sparcv9 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/sparcv9-sun-solaris/lto/Img
+          asset_name: Solaris-sparcv9
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Solaris-sparcv9 binary executable."
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
