@@ -35,11 +35,14 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu,x86_64-pc-solaris
           # components: rust-src
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
+
+      - name: Cargo-Cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
 
       - name: Build Release
         run: |
@@ -48,8 +51,9 @@ jobs:
 
           cargo update
 
-          time cargo l --target sparc64-unknown-linux-gnu
+          time cargo l --target x86_64-pc-solaris
           # time cargo l --target sparcv9-sun-solaris
+          time cargo l --target sparc64-unknown-linux-gnu
 
           time cargo l --target powerpc64-unknown-linux-gnu
           # time cargo l --target powerpc64-unknown-linux-musl
@@ -82,16 +86,6 @@ jobs:
           tag: Stable
           overwrite: true
           body: "Ubuntu Linux-sparc64-gnu binary executable."
-
-      # - name: Upload Solaris-sparcv9 to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/sparcv9-sun-solaris/lto/Img
-      #     asset_name: Solaris-sparcv9
-      #     tag: Stable
-      #     overwrite: true
-      #     body: "Ubuntu Solaris-sparcv9 binary executable."
 
       - name: Upload powerpc64-linux-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
