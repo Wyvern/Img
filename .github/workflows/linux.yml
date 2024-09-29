@@ -40,19 +40,19 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Cargo-Cross
+        uses: cargo install cross --git https://github.com/cross-rs/cross
+
       - name: Build Release
         run: |
-          # wget -qO- https://public.dhe.ibm.com/software/server/POWER/Linux/toolchain/at/ubuntu/dists/jammy/615d762f.gpg.key | sudo tee /etc/apt/trusted.gpg.d/615d762f.asc
-
-          # echo "deb [signed-by=/etc/apt/trusted.gpg.d/615d762f.asc] https://public.dhe.ibm.com/software/server/POWER/Linux/toolchain/at/ubuntu jammy at17.0" | sudo tee -a /etc/apt/sources.list
-
           sudo apt update && sudo apt upgrade && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
-          # advance-toolchain-at17.0-cross-ppc64le
+
           pip install cargo-zigbuild
 
           cargo update
 
-          time cargo s x86_64-pc-solaris
+          time cargo cross build --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
+
           time cargo s mips64-unknown-linux-gnuabi64
           time cargo s mips64-unknown-linux-muslabi64
 
