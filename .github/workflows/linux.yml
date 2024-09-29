@@ -2,9 +2,9 @@ name: Linux
 
 on:
   push:
-    branches: ["dev"]
+    branches: [" "]
   pull_request:
-    branches: ["dev"]
+    branches: [" "]
 
 env:
   CARGO_TERM_COLOR: always
@@ -105,26 +105,6 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Ubuntu Linux-sparc64-gnu binary executable."
-
-      - name: Upload Solaris-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-solaris/src/Img
-          asset_name: Solaris-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Solaris-x86_64 binary executable."
-
-      - name: Upload Solaris-sparcv9 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/sparcv9-sun-solaris/src/Img
-          asset_name: Solaris-sparcv9
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Solaris-sparcv9 binary executable."
 
       - name: Upload powerpc64-linux-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
