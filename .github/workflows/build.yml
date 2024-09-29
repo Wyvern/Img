@@ -222,10 +222,18 @@ jobs:
       - name: Install cargo-ndk
         run: cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.7
 
+      - name: Cargo-Cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
       - name: Build Release
         run: |
           # brew install cargo-zigbuild
+
           cargo update
+
+          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-freebsd
+
+          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-netbsd
 
           time cargo l --target aarch64-apple-darwin
           time cargo l --target aarch64-apple-ios
