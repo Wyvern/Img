@@ -234,9 +234,6 @@ linker = "riscv64-linux-gnu-gcc"
 rustflags = ["-Zlinker-features=-lld"]
 linker = "sparc64-linux-gnu-gcc"
 
-[target.'cfg(any(target_os="netbsd",target_os="freebsd"))']
-rustflags = ["-Zlinker-features=-lld"]
-
 [target.'cfg(all(target_arch="mips64",target_os="linux"))']
 linker = "mips64-linux-gnuabi64-gcc"
 
