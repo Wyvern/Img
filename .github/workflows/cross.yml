@@ -1,0 +1,191 @@
+name: Stable
+
+on:
+  push:
+    branches: ["stable"]
+  pull_request:
+    branches: ["stable"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Building on Ubuntu.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge Ubuntu
+        run: |
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+
+          sudo systemctl mask systemd-journald.service systemd-journald.socket
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Cargo-Cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build Release
+        run: |
+          cargo update
+
+          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-freebsd
+
+          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-netbsd
+
+          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-pc-solaris
+
+          time cross build --config 'build.rustc-wrapper=""' --profile lto --target sparcv9-sun-solaris
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Upload Freebsd-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-freebsd/lto/Img
+          asset_name: Freebsd-x86_64
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Freebsd-x86_64 binary executable."
+
+      - name: Upload Netbsd-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-netbsd/lto/Img
+          asset_name: Netbsd-x86_64
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Netbsd-x86_64 binary executable."
+
+      - name: Upload Solaris-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-pc-solaris/lto/Img
+          asset_name: Solaris-x86_64
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Solaris-x86_64 binary executable."
+
+      - name: Upload Solaris-sparcv9 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/sparcv9-sun-solaris/lto/Img
+          asset_name: Solaris-sparcv9
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Solaris-sparcv9 binary executable."
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload Linux-sparc64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/sparc64-unknown-linux-gnu/lto/Img
+          asset_name: Linux-sparc64-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-sparc64-gnu binary executable."
+
+      - name: Upload powerpc64-linux-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/powerpc64-unknown-linux-gnu/lto/Img
+          asset_name: Linux-powerpc64-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu powerpc64-linux-gnu binary executable."
+
+      - name: Upload Linux-riscv64gc-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/riscv64gc-unknown-linux-gnu/lto/Img
+          asset_name: Linux-riscv64gc-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-riscv64gc-gnu binary executable."
+
+      # - name: Upload Linux-riscv64gc-musl to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/riscv64gc-unknown-linux-musl/lto/Img
+      #     asset_name: Linux-riscv64gc-musl
+      #     tag: Stable
+      #     overwrite: true
+      #     body: "Ubuntu Linux-riscv64gc-musl binary executable."
+
+      - name: Upload Linux-s390x-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/s390x-unknown-linux-gnu/lto/Img
+          asset_name: Linux-s390x-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-s390x-gnu binary executable."
+
+      - name: Upload Linux-x86_64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-linux-gnu/lto/Img
+          asset_name: Linux-x86_64-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-x86_64-gnu binary executable."
+
+      - name: Upload Linux-x86_64-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-linux-musl/lto/Img
+          asset_name: Linux-x86_64-musl
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-x86_64-musl binary executable."
+
+      - name: Upload Linux-aarch64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-linux-gnu/lto/Img
+          asset_name: Linux-aarch64-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-aarch64-gnu binary executable."
+
+      - name: Upload Linux-aarch64-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-linux-musl/lto/Img
+          asset_name: Linux-aarch64-musl
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-aarch64-musl binary executable."

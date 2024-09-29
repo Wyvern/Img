@@ -36,13 +36,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu
-          # components: rust-src
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-
-      - name: Cargo-Cross
-        run: cargo install cross --git https://github.com/cross-rs/cross
 
       - name: Build Release
         run: |
@@ -51,10 +47,6 @@ jobs:
           # pip install cargo-zigbuild
 
           cargo update
-
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-pc-solaris
-
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target sparcv9-sun-solaris
 
           time cargo l --target sparc64-unknown-linux-gnu
 
@@ -76,26 +68,6 @@ jobs:
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
-
-      - name: Upload Solaris-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-solaris/lto/Img
-          asset_name: Solaris-x86_64
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Solaris-x86_64 binary executable."
-
-      - name: Upload Solaris-sparcv9 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/sparcv9-sun-solaris/lto/Img
-          asset_name: Solaris-sparcv9
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Solaris-sparcv9 binary executable."
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
@@ -222,18 +194,11 @@ jobs:
       - name: Install cargo-ndk
         run: cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.7
 
-      - name: Cargo-Cross
-        run: cargo install cross --git https://github.com/cross-rs/cross
-
       - name: Build Release
         run: |
           # brew install cargo-zigbuild
 
           cargo update
-
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-freebsd
-
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-netbsd
 
           time cargo l --target aarch64-apple-darwin
           time cargo l --target aarch64-apple-ios
