@@ -13,7 +13,7 @@ env:
 
 jobs:
   Linux:
-    name: Building on Cross.
+    name: Building on Cross-rs.
     runs-on: ubuntu-latest
 
     steps:
