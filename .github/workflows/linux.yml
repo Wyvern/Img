@@ -51,7 +51,9 @@ jobs:
 
           cargo update
 
-          time cargo cross build --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
+          time cross build --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
+
+          time cross build --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target sparcv9-sun-solaris
 
           time cargo s mips64-unknown-linux-gnuabi64
           time cargo s mips64-unknown-linux-muslabi64
