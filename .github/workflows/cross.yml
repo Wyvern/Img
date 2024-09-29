@@ -1,0 +1,98 @@
+name: Nightly-Cross
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Building on Cross-rs.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Purge Ubuntu
+        run: |
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+
+          sudo systemctl mask systemd-journald.service systemd-journald.socket
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Cross-rs
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build Release
+        run: |
+          cargo update
+
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-unknown-freebsd
+
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-unknown-netbsd
+
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
+
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=core,std,alloc,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target sparcv9-sun-solaris
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Upload Freebsd-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-freebsd/src/Img
+          asset_name: Freebsd-x86_64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Freebsd-x86_64 binary executable."
+
+      - name: Upload Netbsd-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-netbsd/src/Img
+          asset_name: Netbsd-x86_64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Netbsd-x86_64 binary executable."
+
+      - name: Upload Solaris-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-pc-solaris/src/Img
+          asset_name: Solaris-x86_64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Solaris-x86_64 binary executable."
+
+      - name: Upload Solaris-sparcv9 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/sparcv9-sun-solaris/src/Img
+          asset_name: Solaris-sparcv9
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Solaris-sparcv9 binary executable."
