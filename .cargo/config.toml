@@ -98,7 +98,7 @@ inherits = "lto"
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Cforce-frame-pointers=no", "-Zforce-unstable-if-unmarked"]
+rustflags = ["-Zforce-unstable-if-unmarked"]
 [profile.src.build-override]
 inherits = "src"
 [profile.src.package."*"]
