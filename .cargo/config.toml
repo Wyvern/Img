@@ -17,10 +17,10 @@ ti = "t -- --exact --nocapture"
 
 l = "b --profile lto"
 
-h = "b --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target x86_64h-apple-darwin"
-e = "b --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin"
-s = "b --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target "
-z = "zigbuild --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target "
+h = "b --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target x86_64h-apple-darwin"
+e = "b --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin"
+s = "b --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target "
+z = "zigbuild --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target "
 
 
 [cargo-new]

@@ -47,13 +47,13 @@ jobs:
         run: |
           cargo update
 
-          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target x86_64-unknown-freebsd
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target x86_64-unknown-freebsd
 
-          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target x86_64-unknown-netbsd
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort,compiler-builtins-mem --target x86_64-unknown-netbsd
 
-          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
 
-          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target sparcv9-sun-solaris
+          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target sparcv9-sun-solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu

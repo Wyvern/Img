@@ -53,7 +53,7 @@ jobs:
 
           # time cargo z riscv64-linux-android
 
-          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile src -Zbuild-std=proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort
+          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort
 
           find ./target -iname img -type f | xargs ls -hl
           sw_vers
