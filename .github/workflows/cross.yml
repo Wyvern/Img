@@ -100,15 +100,15 @@ jobs:
           overwrite: true
           body: "Ubuntu Illumos-x86_64 binary executable."
 
-      - name: Upload Illumos-aarch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-illumos/src/Img
-          asset_name: Illumos-aarch64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Illumos-aarch64 binary executable."
+      # - name: Upload Illumos-aarch64 to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/aarch64-unknown-illumos/src/Img
+      #     asset_name: Illumos-aarch64
+      #     tag: Nightly
+      #     overwrite: true
+      #     body: "Ubuntu Illumos-aarch64 binary executable."
 
       - name: Upload Linux-loongarch64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
