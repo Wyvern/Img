@@ -5,6 +5,7 @@ dr = "d -r --no-deps"
 rr = "r -r"
 re = "r --example"
 rb = "r --bin"
+bi = "binstall --disable-telemetry"
 
 cf = "clippy --fix --allow-no-vcs --no-deps"
 fx = "fix --allow-no-vcs"
@@ -177,7 +178,7 @@ rustflags = [
     "-Zinline-mir-preserve-debug=n",
     "-Zinline-in-all-cgus",
     "-Zcombine-cgu",
-    "-Zmir-opt-level=5",
+    "-Zmir-opt-level=4",
     "-Zpacked-bundled-libs",
     "-Zmaximal-hir-to-mir-coverage",
     "-Zno-jump-tables",
