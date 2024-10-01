@@ -42,15 +42,15 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu binutils-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools binutils build-essential -y
+          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
 
-          # pip install cargo-zigbuild
+          pip install cargo-zigbuild
 
           cargo update
 
           # time cargo s powerpc64-ibm-aix
-          time cargo s powerpc64-unknown-linux-gnu
-          time cargo s powerpc64-unknown-linux-musl
+          time cargo z powerpc64-unknown-linux-gnu
+          time cargo z powerpc64-unknown-linux-musl
 
           time cargo s sparc64-unknown-linux-gnu
 
