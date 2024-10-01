@@ -45,11 +45,11 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install musl-tools freebsd-glue freebsd-buildutils binutils build-essential gcc-multilib clang llvm -y
+          sudo apt update && sudo apt install musl-tools binutils build-essential gcc-multilib clang llvm -y
 
           cargo update
 
-          time cargo s x86_64-unknown-freebsd
+          # time cargo s x86_64-unknown-freebsd
           time cargo s x86_64-unknown-openbsd
           time cargo s x86_64-unknown-netbsd
 
