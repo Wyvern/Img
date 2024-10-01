@@ -244,6 +244,18 @@ rustflags = ["-Zrelax-elf-relocations"]
 [target.'cfg(target_os="android")']
 rustflags = ["-Zhas-thread-local=no"]
 
+[target.x86_64-unknown-freebsd]
+linker = "freebsd-cc"
+
+[target.x86_64-unknown-netbsd]
+linker = "netbsd-cc"
+
+[target.x86_64-unknown-openbsd]
+linker = "clang"
+
+[target.powerpc64-ibm-aix]
+linker = "powerpc64-ibm-aix-gcc"
+
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"
 rustflags = ["-Clink-arg=/MACHINE:ARM64EC"]
