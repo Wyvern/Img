@@ -56,7 +56,7 @@ jobs:
           # src x86_64-unknown-netbsd
           # src x86_64-unknown-openbsd
           cb x86_64-unknown-illumos
-          cb aarch64-unknown-illumos
+          # cb aarch64-unknown-illumos
           cb x86_64-pc-solaris
           cb sparcv9-sun-solaris
 
