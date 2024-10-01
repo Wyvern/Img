@@ -13,7 +13,7 @@ env:
 
 jobs:
   Linux:
-    name: Building on {Free,Open,Net}BSD and Solaris.
+    name: Building for {Free,Open,Net}BSD and Solaris.
     runs-on: ubuntu-latest
 
     steps:
@@ -46,13 +46,13 @@ jobs:
       - name: Build Release
         run: |
           sudo add-apt-repository universe
-          sudo apt update && sudo apt install musl-tools freebsd-toolchain freebsd-glue freebsd-buildutils binutils build-essential gcc-multilib libexecinfo-dev compiler-rt clang llvm -y
+          sudo apt update && sudo apt install musl-tools binutils build-essential gcc-multilib clang llvm -y
 
           cargo update
 
-          time cargo s x86_64-unknown-freebsd
-          time cargo s x86_64-unknown-openbsd
+          # time cargo s x86_64-unknown-freebsd
           time cargo s x86_64-unknown-netbsd
+          time cargo s x86_64-unknown-openbsd
 
           time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
 
