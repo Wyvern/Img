@@ -45,8 +45,6 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install build-essential gcc-multilib g++-multilib libillumos-dev aarch64-illumos-gcc -y
-
           cargo update
 
           function cb() {
