@@ -57,8 +57,8 @@ jobs:
           # src x86_64-unknown-freebsd
           # src x86_64-unknown-netbsd
           # src x86_64-unknown-openbsd
-          cargo s x86_64-unknown-illumos
-          cargo s aarch64-unknown-illumos
+          cb x86_64-unknown-illumos
+          cb aarch64-unknown-illumos
           cb x86_64-pc-solaris
           cb sparcv9-sun-solaris
 
@@ -85,6 +85,26 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Ubuntu Solaris-sparcv9 binary executable."
+
+      - name: Upload Illumos-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-illumos/src/Img
+          asset_name: Illumos-x86_64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Illumos-x86_64 binary executable."
+
+      - name: Upload Illumos-aarch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-illumos/src/Img
+          asset_name: Illumos-aarch64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Illumos-aarch64 binary executable."
 
       - name: Upload Freebsd-x86_64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
