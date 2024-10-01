@@ -52,10 +52,10 @@ jobs:
             time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target $target
           }
 
-          # src x86_64-unknown-freebsd
-          # src x86_64-unknown-netbsd
-          # src x86_64-unknown-openbsd
-          cb powerpc64-ibm-aix
+          # cb x86_64-unknown-freebsd
+          # cb x86_64-unknown-netbsd
+          # cb x86_64-unknown-openbsd
+          # cb powerpc64-ibm-aix
 
           cb loongarch64-unknown-linux-gnu
           cb loongarch64-unknown-linux-musl
