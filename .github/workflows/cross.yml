@@ -46,7 +46,7 @@ jobs:
       - name: Build Release
         run: |
           sudo add-apt-repository universe
-          sudo apt update && sudo apt install musl-tools binutils build-essential gcc-multilib clang llvm -y
+          sudo apt update && sudo apt install musl-tools binutils build-essential gcc-multilib gcc-netbsd clang llvm libclang-dev libexecinfo-dev -y
 
           cargo update
 
