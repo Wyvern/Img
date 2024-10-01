@@ -233,7 +233,7 @@ pub fn pause(msg: &str) {
     let _ = stdin().lock().read_line(&mut String::default());
 }
 
-pub fn dyn_set<T>(var: &dyn any::Any, val: T) {
+fn dyn_set<T>(var: &dyn any::Any, val: T) {
     let ptr = var as *const _ as *mut _;
     let cell = cell::Cell::new(ptr);
     unsafe {
@@ -241,7 +241,7 @@ pub fn dyn_set<T>(var: &dyn any::Any, val: T) {
     }
 }
 
-pub fn dyn_cast<T: Copy>(var: &dyn any::Any) -> T {
+fn dyn_cast<T: Copy>(var: &dyn any::Any) -> T {
     let ptr = var as *const _ as *const _;
     unsafe { *ptr }
 }
@@ -256,9 +256,8 @@ const fn target_endian() -> &'static str {
 
 #[cfg(test)]
 mod test {
-    use crate::tdbg;
-
     use super::*;
+    use crate::*;
 
     #[test]
     fn dyn_any() {

@@ -1143,6 +1143,25 @@ mod img {
     }
 
     #[test]
+    fn union_match() {
+        //fields superimpose over one another
+        union IntOrFloat {
+            i: u32,
+            f: f32,
+        }
+
+        let u = IntOrFloat { f: 1.0 };
+
+        unsafe {
+            match u {
+                IntOrFloat { i: 10 } => println!("Found exactly ten!"),
+                // Matching the field `f` provides an `f32`.
+                IntOrFloat { f } => println!("Found f = {f} !"),
+            }
+        }
+    }
+
+    #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
         let (html, ..) = get_html(&addr);
