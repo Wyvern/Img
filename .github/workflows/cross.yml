@@ -44,8 +44,12 @@ jobs:
         run: cargo install cross --git https://github.com/cross-rs/cross --branch main
 
       - name: Build Release
+        shell: bash
         run: |
           cargo update
+
+          alias myalias='echo "Hello World"'
+          myalias
 
           alias cb='time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target';
 
