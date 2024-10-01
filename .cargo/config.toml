@@ -244,15 +244,6 @@ rustflags = ["-Zrelax-elf-relocations"]
 [target.'cfg(target_os="android")']
 rustflags = ["-Zhas-thread-local=no"]
 
-[target.aarch64-unknown-freebsd]
-linker = "aarch64-unknown-freebsd-gcc"
-
-[target.aarch64-unknown-netbsd]
-linker = "aarch64-unknown-netbsd-gcc"
-
-[target.aarch64-unknown-openbsd]
-linker = "aarch64-unknown-openbsd-gcc"
-
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-ibm-aix-gcc"
 
