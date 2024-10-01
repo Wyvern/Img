@@ -13,8 +13,8 @@ env:
 
 jobs:
   Linux:
-    name: Building on Cross-rs.
-    runs-on: ubuntu-latest
+    name: Building for {Free,Net,Open}BSD and Solaris/Illumos.
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Purge Ubuntu
@@ -45,13 +45,16 @@ jobs:
         run: |
           cargo update
 
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-freebsd
+          function cb(){
+            local target="$1"
+            time cross build --config 'build.rustc-wrapper=""' --profile lto --target $target
+          }
 
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-unknown-netbsd
-
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target x86_64-pc-solaris
-
-          time cross build --config 'build.rustc-wrapper=""' --profile lto --target sparcv9-sun-solaris
+          cb x86_64-unknown-freebsd
+          cb x86_64-unknown-netbsd
+          cb x86_64-unknown-illumos
+          cb x86_64-pc-solaris
+          cb sparcv9-sun-solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -76,6 +79,16 @@ jobs:
           tag: Stable
           overwrite: true
           body: "Ubuntu Netbsd-x86_64 binary executable."
+
+      - name: Upload Illumos-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-illumos/lto/Img
+          asset_name: Illumos-x86_64
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Illumos-x86_64 binary executable."
 
       - name: Upload Solaris-x86_64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
