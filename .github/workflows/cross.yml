@@ -39,7 +39,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Cross-rs
-        run: cargo install cross --git https://github.com/cross-rs/cross
+        run: cargo install cross --git https://github.com/cross-rs/cross --branch main
 
       - name: Build Release
         run: |
@@ -55,6 +55,8 @@ jobs:
           cb x86_64-unknown-illumos
           cb x86_64-pc-solaris
           cb sparcv9-sun-solaris
+          cb loongarch64-unknown-linux-gnu
+          cb loongarch64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -109,3 +111,23 @@ jobs:
           tag: Stable
           overwrite: true
           body: "Ubuntu Solaris-sparcv9 binary executable."
+
+      - name: Upload Linux-loongarch64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/loongarch64-unknown-linux-gnu/lto/Img
+          asset_name: Linux-loongarch64-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-loongarch64-gnu binary executable."
+
+      - name: Upload Linux-loongarch64-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/loongarch64-unknown-linux-musl/lto/Img
+          asset_name: Linux-loongarch64-musl
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-loongarch64-musl binary executable."
