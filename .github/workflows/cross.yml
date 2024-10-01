@@ -47,20 +47,19 @@ jobs:
         run: |
           cargo update
 
-          function cb() {
+          function src() {
             local target="$1"
             time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target $target
           }
+          function lto() {
+            local target="$1"
+            time cross build --config 'build.rustc-wrapper=""' --profile lto --target $target
+          }
 
-          cb x86_64-unknown-freebsd
-
-          # time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-unknown-freebsd
-
-          # time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-unknown-netbsd
-
-          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64-pc-solaris
-
-          time cross build --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target sparcv9-sun-solaris
+          lto x86_64-unknown-freebsd
+          lto x86_64-unknown-netbsd
+          src x86_64-pc-solaris
+          src sparcv9-sun-solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
