@@ -48,7 +48,6 @@ jobs:
 
           cargo update
 
-          # time cargo s powerpc64-ibm-aix
           time cargo z powerpc64-unknown-linux-gnu
           time cargo z powerpc64-unknown-linux-musl
 

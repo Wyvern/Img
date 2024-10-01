@@ -13,7 +13,7 @@ env:
 
 jobs:
   Linux:
-    name: Building for {Free,Open,Net}BSD and Solaris.
+    name: Building for {Free,Open,Net}BSD and Solaris/Illumos.
     runs-on: ubuntu-24.04
 
     steps:
@@ -55,6 +55,10 @@ jobs:
           # src x86_64-unknown-freebsd
           # src x86_64-unknown-netbsd
           # src x86_64-unknown-openbsd
+          cb powerpc64-ibm-aix
+
+          cb loongarch64-unknown-linux-gnu
+          cb loongarch64-unknown-linux-musl
 
           cb x86_64-unknown-illumos
           # cb aarch64-unknown-illumos
@@ -105,6 +109,26 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Ubuntu Illumos-aarch64 binary executable."
+
+      - name: Upload Linux-loongarch64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/loongarch64-unknown-linux-gnu/src/Img
+          asset_name: Linux-loongarch64-gnu
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-loongarch64-gnu binary executable."
+
+      - name: Upload Linux-loongarch64-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/loongarch64-unknown-linux-musl/src/Img
+          asset_name: Linux-loongarch64-musl
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-loongarch64-musl binary executable."
 
       - name: Upload Freebsd-x86_64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
