@@ -219,7 +219,7 @@ rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
-[target.'cfg(all(target_arch="aarch64",target_os="linux"))']
+[target.'cfg(all(target_arch="aarch64",target_os="linux")))']
 linker = "aarch64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
@@ -244,14 +244,14 @@ rustflags = ["-Zrelax-elf-relocations"]
 [target.'cfg(target_os="android")']
 rustflags = ["-Zhas-thread-local=no"]
 
-[target.x86_64-unknown-freebsd]
-linker = "freebsd-cc"
+[target.aarch64-unknown-freebsd]
+linker = "aarch64-unknown-freebsd-gcc"
 
-[target.x86_64-unknown-netbsd]
-linker = "netbsd-cc"
+[target.aarch64-unknown-netbsd]
+linker = "aarch64-unknown-netbsd-gcc"
 
-[target.x86_64-unknown-openbsd]
-linker = "clang"
+[target.aarch64-unknown-openbsd]
+linker = "aarch64-unknown-openbsd-gcc"
 
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-ibm-aix-gcc"
