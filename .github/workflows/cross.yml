@@ -46,7 +46,7 @@ jobs:
       - name: Build Release
         run: |
           sudo add-apt-repository universe
-          sudo apt update && sudo apt install musl-tools gcc-multilib gcc-aarch64-linux-gnu aarch64-unknown-netbsd-gcc aarch64-unknown-openbsd-gcc aarch64-unknown-freebsd-gcc -y
+          sudo apt update && sudo apt install musl-tools gcc-multilib gcc-aarch64-linux-gnu -y
 
           cargo update
 
