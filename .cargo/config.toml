@@ -250,6 +250,3 @@ linker = "powerpc64-ibm-aix-gcc"
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"
 rustflags = ["-Clink-arg=/MACHINE:ARM64EC"]
-
-# [target.s390x-unknown-linux-musl]
-# linker = "/usr/bin/musl-cross-make"
