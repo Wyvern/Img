@@ -44,7 +44,7 @@ jobs:
         run: |
           sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
 
-          snap install zig --classic
+          sudo snap install zig --classic
           pipx install cargo-zigbuild
 
           cargo update
