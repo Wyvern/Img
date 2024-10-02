@@ -42,15 +42,15 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
+          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
 
-          sudo snap install zig --classic --beta
-          pipx install cargo-zigbuild
+          # sudo snap install zig --classic --beta
+          # pipx install cargo-zigbuild
 
           cargo update
 
-          time cargo z powerpc64-unknown-linux-gnu
-          time cargo z powerpc64-unknown-linux-musl
+          time cargo s powerpc64le-unknown-linux-gnu
+          time cargo s powerpc64le-unknown-linux-musl
 
           time cargo s sparc64-unknown-linux-gnu
 

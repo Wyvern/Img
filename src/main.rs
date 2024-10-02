@@ -969,7 +969,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             let secs = t.elapsed().as_secs();
             print!(
                 "{BEG}{char}...{}",
-                if secs >= 1 {
+                if secs > 0 {
                     format!("{secs:>2}s")
                 } else {
                     String::default()
