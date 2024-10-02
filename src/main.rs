@@ -963,10 +963,18 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     let chars = ['◯', '◔', '◑', '◕', '●'];
     // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
     let mut o = stdout().lock();
-
+    let t = time::Instant::now();
     'l: loop {
         for char in chars {
-            print!("{BEG}{char}");
+            let secs = t.elapsed().as_secs();
+            print!(
+                "{BEG}{char}...{}",
+                if secs >= 1 {
+                    format!("{secs:>2}s")
+                } else {
+                    String::default()
+                }
+            );
             let _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
@@ -1177,7 +1185,7 @@ mod img {
             circle_indicator(r);
         });
         thread::yield_now();
-        thread::sleep(time::Duration::from_secs(3));
+        thread::sleep(time::Duration::from_secs(5));
         s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
     }
 
