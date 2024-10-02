@@ -219,7 +219,7 @@ rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
-[target.'cfg(all(target_arch="aarch64",target_os="linux")))']
+[target.'cfg(all(target_arch="aarch64",target_os="linux"))']
 linker = "aarch64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
