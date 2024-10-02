@@ -963,10 +963,18 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     let chars = ['◯', '◔', '◑', '◕', '●'];
     // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
     let mut o = stdout().lock();
-
+    let t = time::Instant::now();
     'l: loop {
         for char in chars {
-            print!("{BEG}{char}");
+            let secs = t.elapsed().as_secs();
+            print!(
+                "{BEG}{char}...{}",
+                if secs >= 1 {
+                    format!("{secs:>2}s")
+                } else {
+                    String::default()
+                }
+            );
             let _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
@@ -1143,6 +1151,25 @@ mod img {
     }
 
     #[test]
+    fn union_match() {
+        //fields superimpose over one another
+        union IntOrFloat {
+            i: u32,
+            f: f32,
+        }
+
+        let u = IntOrFloat { f: 1.0 };
+
+        unsafe {
+            match u {
+                IntOrFloat { i: 10 } => println!("Found exactly ten!"),
+                // Matching the field `f` provides an `f32`.
+                IntOrFloat { f } => println!("Found f = {f} !"),
+            }
+        }
+    }
+
+    #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
         let (html, ..) = get_html(&addr);
@@ -1158,7 +1185,7 @@ mod img {
             circle_indicator(r);
         });
         thread::yield_now();
-        thread::sleep(time::Duration::from_secs(3));
+        thread::sleep(time::Duration::from_secs(5));
         s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
     }
 
