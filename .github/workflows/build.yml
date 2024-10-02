@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
+          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
 
           # pip install cargo-zigbuild
 
@@ -50,8 +50,8 @@ jobs:
 
           time cargo l --target sparc64-unknown-linux-gnu
 
-          time cargo l --target powerpc64-unknown-linux-gnu
-          # time cargo l --target powerpc64-unknown-linux-musl
+          time cargo l --target powerpc64le-unknown-linux-gnu
+          # time cargo l --target powerpc64le-unknown-linux-musl
 
           time cargo l --target s390x-unknown-linux-gnu
           # time cargo l --target s390x-unknown-linux-musl
@@ -82,15 +82,15 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-sparc64-gnu binary executable."
 
-      - name: Upload powerpc64-linux-gnu to a GitHub release
+      - name: Upload Linux-powerpc64le-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64-unknown-linux-gnu/lto/Img
-          asset_name: Linux-powerpc64-gnu
+          file: target/powerpc64le-unknown-linux-gnu/lto/Img
+          asset_name: Linux-powerpc64le-gnu
           tag: Stable
           overwrite: true
-          body: "Ubuntu powerpc64-linux-gnu binary executable."
+          body: "Ubuntu Linux-powerpc64le-gnu binary executable."
 
       - name: Upload Linux-riscv64gc-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
