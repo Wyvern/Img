@@ -225,8 +225,11 @@ linker = "aarch64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc64le",target_os="linux"))']
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little"))']
 linker = "powerpc64le-linux-gnu-gcc"
+
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
+linker = "powerpc64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
@@ -235,8 +238,11 @@ linker = "riscv64-linux-gnu-gcc"
 rustflags = ["-Zlinker-features=-lld"]
 linker = "sparc64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips64",target_os="linux"))']
+[target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "big"))']
 linker = "mips64-linux-gnuabi64-gcc"
+
+[target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "little"))']
+linker = "mips64el-linux-gnuabi64-gcc"
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
