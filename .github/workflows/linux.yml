@@ -44,8 +44,8 @@ jobs:
         run: |
           sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
 
-          # sudo snap install zig --classic --beta
-          # pipx install cargo-zigbuild
+          sudo snap install zig --classic --beta
+          pipx install cargo-zigbuild
 
           cargo update
 
@@ -106,25 +106,25 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-sparc64-gnu binary executable."
 
-      - name: Upload powerpc64-linux-gnu to a GitHub release
+      - name: Upload Linux-powerpc64le-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64-unknown-linux-gnu/src/Img
-          asset_name: Linux-powerpc64-gnu
+          file: target/powerpc64le-unknown-linux-gnu/src/Img
+          asset_name: Linux-powerpc64le-gnu
           tag: Nightly
           overwrite: true
-          body: "Ubuntu powerpc64-linux-gnu binary executable."
+          body: "Ubuntu Linux-powerpc64le-gnu binary executable."
 
-      - name: Upload powerpc64-linux-musl to a GitHub release
+      - name: Upload Linux-powerpc64le-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64-unknown-linux-musl/src/Img
-          asset_name: Linux-powerpc64-musl
+          file: target/powerpc64le-unknown-linux-musl/src/Img
+          asset_name: Linux-powerpc64le-musl
           tag: Nightly
           overwrite: true
-          body: "Ubuntu powerpc64-linux-musl binary executable."
+          body: "Ubuntu Linux-powerpc64le-musl binary executable."
 
       - name: Upload Linux-s390x-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
