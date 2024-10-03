@@ -8,7 +8,7 @@ fn main() {
             // println!("cargo::rustc-link-arg=");
             // println!("cargo::rustc-link-arg-bins=");
             // println!("cargo::rustc-link-search={}", o);
-            println!("cargo::rustc-link-lib=msvcrt");
+            // println!("cargo::rustc-link-lib=msvcrt");
         }
     }
 
