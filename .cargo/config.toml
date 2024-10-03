@@ -253,6 +253,9 @@ rustflags = ["-Zhas-thread-local=no"]
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-ibm-aix-gcc"
 
+[target.x86_64-unknown-haiku]
+linker = "x86_64-unknown-haiku-gcc"
+
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"
 rustflags = ["-Clink-arg=/MACHINE:ARM64EC"]
