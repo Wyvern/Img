@@ -1,11 +1,9 @@
 use std::*;
 
 fn main() {
-    let out = env::var("OUT_DIR");
+    // let out = env::var("OUT_DIR");
     let target = env::var("TARGET");
-    if let (Ok(o), Ok(t)) = (out, target) {
-        // D!(&t, &o);
-
+    if let Ok(t) = target {
         if t == "arm64ec-pc-windows-msvc" {
             // println!("cargo::rustc-link-arg=");
             // println!("cargo::rustc-link-arg-bins=");
