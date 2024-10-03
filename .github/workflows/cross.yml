@@ -130,32 +130,32 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-loongarch64-musl binary executable."
 
-      - name: Upload Freebsd-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-freebsd/src/Img
-          asset_name: Freebsd-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Freebsd-x86_64 binary executable."
+      # - name: Upload Freebsd-x86_64 to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/x86_64-unknown-freebsd/src/Img
+      #     asset_name: Freebsd-x86_64
+      #     tag: Nightly
+      #     overwrite: true
+      #     body: "Ubuntu Freebsd-x86_64 binary executable."
 
-      - name: Upload Netbsd-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-netbsd/src/Img
-          asset_name: Netbsd-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Netbsd-x86_64 binary executable."
+      # - name: Upload Netbsd-x86_64 to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/x86_64-unknown-netbsd/src/Img
+      #     asset_name: Netbsd-x86_64
+      #     tag: Nightly
+      #     overwrite: true
+      #     body: "Ubuntu Netbsd-x86_64 binary executable."
 
-      - name: Upload Openbsd-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-openbsd/src/Img
-          asset_name: Openbsd-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Openbsd-x86_64 binary executable."
+      # - name: Upload Openbsd-x86_64 to a GitHub release
+      #   uses: svenstaro/upload-release-action@v2
+      #   with:
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     file: target/x86_64-unknown-openbsd/src/Img
+      #     asset_name: Openbsd-x86_64
+      #     tag: Nightly
+      #     overwrite: true
+      #     body: "Ubuntu Openbsd-x86_64 binary executable."
