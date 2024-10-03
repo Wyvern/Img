@@ -4,7 +4,7 @@ cargo-features = ["edition2024"]
 name = "Img"
 version = "1.0.0"
 edition = "2021"
-# build = "build.rs"
+build = "build.rs"
 # default-run = "Img"
 
 [features]
