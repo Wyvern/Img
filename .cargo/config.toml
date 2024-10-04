@@ -197,6 +197,7 @@ rustflags = [
     "-Zshell-argfiles",
     "-Zub-checks=off",
     "-Zlinker-features=+lld",
+    "-Zchecksum-hash-algorithm=blake3",
 
     "-Anonstandard_style",
     "-Adead_code",
@@ -252,9 +253,6 @@ rustflags = ["-Zhas-thread-local=no"]
 
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-ibm-aix-gcc"
-
-[target.x86_64-unknown-haiku]
-linker = "x86_64-unknown-haiku-gcc"
 
 [target.arm64ec-pc-windows-msvc]
 linker = "link.exe"

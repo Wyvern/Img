@@ -42,14 +42,12 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools haikuporter -y
+          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
 
           # sudo snap install zig --classic --beta
           # pipx install cargo-zigbuild
 
           cargo update
-
-          time cargo s x86_64-unknown-haiku
 
           time cargo s powerpc64le-unknown-linux-gnu
           time cargo s powerpc64le-unknown-linux-musl
