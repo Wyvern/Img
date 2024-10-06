@@ -84,11 +84,6 @@ mod color {
         bf.flush()
     }
 
-    pub fn color256_full(text: &str) -> Result<()> {
-        color(Range::_256(0), text, Kind::FG, true)?;
-        color(Range::_256(0), text, Kind::BG, true)
-    }
-
     pub enum Range {
         _256(u8),
         _RGB(u8, u8, u8),
@@ -97,27 +92,39 @@ mod color {
     pub enum Kind {
         FG,
         BG,
+        Both,
     }
 
     pub fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-
-        writeln!(
-            bf,
-            "\n{B}{U}{}-color {}:{N}",
-            match r {
-                Range::_256(_) => "256",
-                Range::_RGB(..) => "RGB",
-            },
-            match k {
-                Kind::FG => "foreground",
-                Kind::BG => "background",
+        match k {
+            Kind::Both => {
+                color(Range::_256(0), text, Kind::FG, true)?;
+                color(Range::_256(0), text, Kind::BG, true)?;
+                return Ok(());
             }
-        )?;
+            Kind::FG => writeln!(
+                bf,
+                "\n{B}{U}{}-color foreground:{N}",
+                match r {
+                    Range::_256(_) => "256",
+                    Range::_RGB(..) => "RGB",
+                }
+            )?,
+            Kind::BG => writeln!(
+                bf,
+                "\n{B}{U}{}-color background:{N}",
+                match r {
+                    Range::_256(_) => "256",
+                    Range::_RGB(..) => "RGB",
+                }
+            )?,
+        }
 
         let fb: u8 = match k {
             Kind::FG => 38,
             Kind::BG => 48,
+            _ => unreachable!(),
         };
 
         if full {

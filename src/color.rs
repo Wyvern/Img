@@ -22,10 +22,12 @@ fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
     match args {
         [None, None, None, None] => {
             color8(TEXT)?;
-            color256_full(TEXT)
+            color(Range::_256(0), TEXT, Kind::Both, true)
         }
         [Some(v), None, None, None] if v.parse::<u8>() == Ok(8) => color8(TEXT),
-        [Some(v), None, None, None] if v.parse::<u16>() == Ok(256) => color256_full(TEXT),
+        [Some(v), None, None, None] if v.parse::<u16>() == Ok(256) => {
+            color(Range::_256(0), TEXT, Kind::Both, true)
+        }
         [Some(v1), Some(v2), None, None] => match (
             v1.parse::<u16>().as_ref(),
             v2.parse::<u8>()
