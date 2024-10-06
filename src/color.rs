@@ -32,12 +32,12 @@ fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
                 .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16)),
         ) {
             (Ok(256), Ok(c)) => {
-                color(Range::_256(c), TEXT, Kind::FG)?;
-                color(Range::_256(c), TEXT, Kind::BG)
+                color(Range::_256(c), TEXT, Kind::FG, false)?;
+                color(Range::_256(c), TEXT, Kind::BG, false)
             }
             (Ok(256), _) => match v2 {
-                "fg" => color256(TEXT, Kind::FG),
-                "bg" => color256(TEXT, Kind::BG),
+                "fg" => color(Range::_256(0), TEXT, Kind::FG, true),
+                "bg" => color(Range::_256(0), TEXT, Kind::BG, true),
                 _ => {
                     exit();
                     Ok(())
@@ -54,8 +54,8 @@ fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
                     .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
             }) {
                 [Ok(r), Ok(g), Ok(b)] => {
-                    color(Range::_RGB(r, g, b), TEXT, Kind::FG)?;
-                    color(Range::_RGB(r, g, b), TEXT, Kind::BG)
+                    color(Range::_RGB(r, g, b), TEXT, Kind::FG, false)?;
+                    color(Range::_RGB(r, g, b), TEXT, Kind::BG, false)
                 }
                 _ => {
                     exit();

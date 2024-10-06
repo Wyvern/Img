@@ -85,8 +85,8 @@ mod color {
     }
 
     pub fn color256_full(text: &str) -> Result<()> {
-        color256(text, Kind::FG)?;
-        color256(text, Kind::BG)
+        color(Range::_256(0), text, Kind::FG, true)?;
+        color(Range::_256(0), text, Kind::BG, true)
     }
 
     pub enum Range {
@@ -99,31 +99,9 @@ mod color {
         BG,
     }
 
-    pub fn color256(text: &str, k: Kind) -> Result<()> {
+    pub fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        writeln!(
-            bf,
-            "\n{B}{U}256-color {}:{N}",
-            match k {
-                Kind::FG => "foreground",
-                Kind::BG => "background",
-            }
-        )?;
-        (0u8..=255).for_each(|c| {
-            let _ = writeln!(
-                bf,
-                "\"\\x1b[{0};5;{c}m\": - \x1b[{0};5;{c}m {text} {N}",
-                match k {
-                    Kind::FG => 38u8,
-                    Kind::BG => 48,
-                }
-            );
-        });
-        bf.flush()
-    }
 
-    pub fn color(r: Range, text: &str, k: Kind) -> Result<()> {
-        let mut bf = BufWriter::new(stdout());
         writeln!(
             bf,
             "\n{B}{U}{}-color {}:{N}",
@@ -136,35 +114,41 @@ mod color {
                 Kind::BG => "background",
             }
         )?;
-        let k: u8 = match k {
+
+        let fb: u8 = match k {
             Kind::FG => 38,
             Kind::BG => 48,
         };
-        match r {
-            Range::_256(c) => writeln!(bf, "\"\\x1b[{k};5;{c}m\": - \x1b[{k};5;{c}m {text} {N}")?,
-            Range::_RGB(r, g, b) => writeln!(
-                bf,
-                "\"\\x1b[{k};2;{r};{g};{b}m\": - \x1b[{k};2;{r};{g};{b}m {text} {N}"
-            )?,
-        }
-        bf.flush()
-    }
 
-    pub fn color_rgb_full(k: Kind) {
-        let mut bf = BufWriter::new(stdout());
-        (0u8..=255).for_each(|r| {
-            (0u8..=255).for_each(|g| {
-                (0u8..=255).for_each(|b| {
-                    let _=writeln!(bf,"\"\\x1b[{0};2;{r};{g};{b}m\": - \x1b[{0};2;{r};{g};{b}m Full-range {1} RGB-color {N}",match k {
-                        Kind::FG => 38,
-                        Kind::BG => 48u8,
-                    },match k {
-                        Kind::FG => "foreground",
-                        Kind::BG => "background",
+        if full {
+            match r {
+                Range::_256(_) => (0u8..=255).for_each(|c| {
+                    let _ = writeln!(
+                        bf,
+                        "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}"
+                    );
+                }),
+                Range::_RGB(..) => (0u8..=255).for_each(|r| {
+                    (0u8..=255).for_each(|g| {
+                        (0u8..=255).for_each(|b| {
+                            let _=writeln!(bf,"\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}");
+                        });let _=bf.flush();super::pause("")
                     });
-                });let _=bf.flush();super::pause("")
-            });
-        });
+                }),
+            }
+        } else {
+            match r {
+                Range::_256(c) => {
+                    writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}")?
+                }
+                Range::_RGB(r, g, b) => writeln!(
+                    bf,
+                    "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}"
+                )?,
+            }
+        }
+
+        bf.flush()
     }
 }
 
