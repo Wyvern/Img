@@ -30,27 +30,35 @@ use std::*;
     100-107 	bright background color (non-standard)
 */
 mod color {
-    pub static N: &str = "\x1b[0m";
-    pub static B: &str = "\x1b[1m";
-    pub static _B: &str = "\x1b[22m";
-    pub static I: &str = "\x1b[3m";
-    pub static _I: &str = "\x1b[23m";
-    pub static U: &str = "\x1b[4m";
-    pub static _U: &str = "\x1b[24m";
-    pub static BEG: &str = "\x1b[G"; //Move to begin of line
-    pub static CL: &str = "\x1b[2K"; //Erase the entire line
-    pub static UU: &str = "\x1b[21m";
-    pub static R: &str = "\x1b[91m";
-    pub static G: &str = "\x1b[92m";
-    pub static Y: &str = "\x1b[93m";
-    pub static BLUE: &str = "\x1b[94m";
-    pub static HL: &str = "\x1b[103m";
-    pub static BG: &str = "\x1b[100m";
-    pub static FG: &str = "\x1b[97m";
-    pub static SAVE: &str = "\x1b[s"; //"\x1b7" save cursor & attrs
-    pub static REST: &str = "\x1b[u"; //"\x1b8" unsave cursor & attrs
-    pub static MARK: &str = "\x1b]1337;SetMark\x07";
-    pub static TEXT: &str = "The quick brown fox jumps over the lazy dog";
+    macro_rules! color {
+            ($($i:ident = $l:literal),+) => {
+                $(pub static $i: &str = $l;)+
+            };
+        }
+
+    color!(
+        N = "\x1b[0m",
+        B = "\x1b[1m",
+        _B = "\x1b[22m",
+        I = "\x1b[3m",
+        _I = "\x1b[23m",
+        U = "\x1b[4m",
+        _U = "\x1b[24m",
+        BEG = "\x1b[G", //Move to begin of line
+        CL = "\x1b[2K", //Erase the entire line
+        UU = "\x1b[21m",
+        R = "\x1b[91m",
+        G = "\x1b[92m",
+        Y = "\x1b[93m",
+        BLUE = "\x1b[94m",
+        HL = "\x1b[103m",
+        BG = "\x1b[100m",
+        FG = "\x1b[97m",
+        SAVE = "\x1b[s", //"\x1b7" save cursor & attrs
+        REST = "\x1b[u", //"\x1b8" unsave cursor & attrs
+        MARK = "\x1b]1337;SetMark\x07",
+        TEXT = "The quick brown fox jumps over the lazy dog"
+    );
 
     use std::io::*;
 
@@ -76,87 +84,90 @@ mod color {
         bf.flush()
     }
 
-    pub fn color256(text: &str) -> Result<()> {
-        color256_fg(text)?;
-        color256_bg(text)
+    pub fn color256_full(text: &str) -> Result<()> {
+        color256(text, Kind::FG)?;
+        color256(text, Kind::BG)
     }
 
-    pub fn color256_fg(text: &str) -> Result<()> {
+    pub enum Range {
+        _256(u8),
+        _RGB(u8, u8, u8),
+    }
+
+    pub enum Kind {
+        FG,
+        BG,
+    }
+
+    pub fn color256(text: &str, k: Kind) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color foreground:{N}")?;
+        writeln!(
+            bf,
+            "\n{B}{U}256-color {}:{N}",
+            match k {
+                Kind::FG => "foreground",
+                Kind::BG => "background",
+            }
+        )?;
         (0u8..=255).for_each(|c| {
-            let _ = writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}");
+            let _ = writeln!(
+                bf,
+                "\"\\x1b[{0};5;{c}m\": - \x1b[{0};5;{c}m {text} {N}",
+                match k {
+                    Kind::FG => 38u8,
+                    Kind::BG => 48,
+                }
+            );
         });
         bf.flush()
     }
 
-    pub fn color256_bg(text: &str) -> Result<()> {
+    pub fn color(r: Range, text: &str, k: Kind) -> Result<()> {
         let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color background:{N}")?;
-        (0u8..=255).for_each(|c| {
-            let _ = writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}");
-        });
-        bf.flush()
-    }
-
-    pub fn color_256_fg(c: u8, text: &str) -> Result<()> {
-        let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color foreground:{N}")?;
-        writeln!(bf, "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m {text} {N}")?;
-        bf.flush()
-    }
-
-    pub fn color_256_bg(c: u8, text: &str) -> Result<()> {
-        let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}256-color background:{N}")?;
-        writeln!(bf, "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m {text} {N}")?;
-        bf.flush()
-    }
-
-    pub fn color_rgb_fg(rgb: [u8; 3], text: &str) -> Result<()> {
-        let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}RGB-color foreground:{N}")?;
         writeln!(
             bf,
-            "\"\\x1b[38;2;{0};{1};{2}m\": - \x1b[38;2;{0};{1};{2}m {text} {N}",
-            rgb[0], rgb[1], rgb[2]
+            "\n{B}{U}{}-color {}:{N}",
+            match r {
+                Range::_256(_) => "256",
+                Range::_RGB(..) => "RGB",
+            },
+            match k {
+                Kind::FG => "foreground",
+                Kind::BG => "background",
+            }
         )?;
+        let k: u8 = match k {
+            Kind::FG => 38,
+            Kind::BG => 48,
+        };
+        match r {
+            Range::_256(c) => writeln!(bf, "\"\\x1b[{k};5;{c}m\": - \x1b[{k};5;{c}m {text} {N}")?,
+            Range::_RGB(r, g, b) => writeln!(
+                bf,
+                "\"\\x1b[{k};2;{r};{g};{b}m\": - \x1b[{k};2;{r};{g};{b}m {text} {N}"
+            )?,
+        }
         bf.flush()
     }
 
-    pub fn color_rgb_bg(rgb: [u8; 3], text: &str) -> Result<()> {
-        let mut bf = BufWriter::new(stdout());
-        writeln!(bf, "\n{B}{U}RGB-color background:{N}")?;
-        writeln!(
-            bf,
-            "\"\\x1b[48;2;{0};{1};{2}m\": - \x1b[48;2;{0};{1};{2}m {text} {N}",
-            rgb[0], rgb[1], rgb[2]
-        )?;
-        bf.flush()
-    }
-
-    pub fn color_rgb_fg_full() {
+    pub fn color_rgb_full(k: Kind) {
         let mut bf = BufWriter::new(stdout());
         (0u8..=255).for_each(|r| {
             (0u8..=255).for_each(|g| {
                 (0u8..=255).for_each(|b| {
-                    let _=writeln!(bf,"\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m Full-range foreground RGB-color {N}");
+                    let _=writeln!(bf,"\"\\x1b[{0};2;{r};{g};{b}m\": - \x1b[{0};2;{r};{g};{b}m Full-range {1} RGB-color {N}",match k {
+                        Kind::FG => 38,
+                        Kind::BG => 48u8,
+                    },match k {
+                        Kind::FG => "foreground",
+                        Kind::BG => "background",
+                    });
                 });let _=bf.flush();super::pause("")
             });
         });
     }
-
-    pub fn color_rgb_bg_full() {
-        let mut bf = BufWriter::new(stdout());
-        (0u8..=255).for_each(|r| {
-            (0u8..=255).for_each(|g| {
-                (0u8..=255).for_each(|b| {
-                    let _=writeln!(bf,"\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m Full-range background RGB-color {N}");
-                });let _=bf.flush();super::pause("")
-            })
-        });
-    }
 }
+
 pub use color::*;
 
 mod macros {
@@ -258,7 +269,6 @@ const fn target_endian() -> &'static str {
 mod test {
     use super::*;
     use crate::*;
-
     #[test]
     fn dyn_any() {
         tdbg!(target_endian());
