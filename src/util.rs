@@ -29,134 +29,35 @@ use std::*;
     90-97 	bright foreground color (non-standard)
     100-107 	bright background color (non-standard)
 */
-mod color {
-    macro_rules! color {
+macro_rules! color {
             ($($i:ident = $l:literal),+) => {
                 $(pub static $i: &str = $l;)+
             };
         }
 
-    color!(
-        N = "\x1b[0m",
-        B = "\x1b[1m",
-        _B = "\x1b[22m",
-        I = "\x1b[3m",
-        _I = "\x1b[23m",
-        U = "\x1b[4m",
-        _U = "\x1b[24m",
-        BEG = "\x1b[G", //Move to begin of line
-        CL = "\x1b[2K", //Erase the entire line
-        UU = "\x1b[21m",
-        R = "\x1b[91m",
-        G = "\x1b[92m",
-        Y = "\x1b[93m",
-        BLUE = "\x1b[94m",
-        HL = "\x1b[103m",
-        BG = "\x1b[100m",
-        FG = "\x1b[97m",
-        SAVE = "\x1b[s", //"\x1b7" save cursor & attrs
-        REST = "\x1b[u", //"\x1b8" unsave cursor & attrs
-        MARK = "\x1b]1337;SetMark\x07",
-        TEXT = "The quick brown fox jumps over the lazy dog"
-    );
-
-    use std::io::*;
-
-    pub fn color8(text: &str) -> Result<()> {
-        let mut bf = BufWriter::new(stdout());
-        (0u8..10)
-            .chain(21..=21)
-            .chain(30..=37)
-            .chain(40..=47)
-            .chain(90..=97)
-            .chain(100..=107)
-            .for_each(|c| {
-                let _ = match c {
-                    0 => writeln!(bf, "\n{B}{U}Basic Style:{N}"),
-                    30 => writeln!(bf, "\n{B}{U}8-color regular foreground:{N}"),
-                    40 => writeln!(bf, "\n{B}{U}8-color regular background:{N}"),
-                    90 => writeln!(bf, "\n{B}{U}8-color bright foreground:{N}"),
-                    100 => writeln!(bf, "\n{B}{U}8-color bright background:{N}"),
-                    _ => Ok(()),
-                };
-                let _ = writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
-            });
-        bf.flush()
-    }
-
-    pub enum Range {
-        _256(u8),
-        _RGB(u8, u8, u8),
-    }
-
-    pub enum Kind {
-        FG,
-        BG,
-        Both,
-    }
-
-    pub fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
-        let mut bf = BufWriter::new(stdout());
-        match k {
-            Kind::Both => {
-                color(Range::_256(0), text, Kind::FG, true)?;
-                color(Range::_256(0), text, Kind::BG, true)?;
-                return Ok(());
-            }
-            _ => writeln!(
-                bf,
-                "\n{B}{U}{}-color {}:{N}",
-                match r {
-                    Range::_256(_) => "256",
-                    Range::_RGB(..) => "RGB",
-                },
-                match k {
-                    Kind::FG => "foreground",
-                    Kind::BG => "background",
-                    Kind::Both => unreachable!(),
-                }
-            )?,
-        }
-
-        let fb: u8 = match k {
-            Kind::FG => 38,
-            Kind::BG => 48,
-            _ => unreachable!(),
-        };
-
-        if full {
-            match r {
-                Range::_256(_) => (0u8..=255).for_each(|c| {
-                    let _ = writeln!(
-                        bf,
-                        "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}"
-                    );
-                }),
-                Range::_RGB(..) => (0u8..=255).for_each(|r| {
-                    (0u8..=255).for_each(|g| {
-                        (0u8..=255).for_each(|b| {
-                            let _=writeln!(bf,"\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}");
-                        });let _=bf.flush();super::pause("")
-                    });
-                }),
-            }
-        } else {
-            match r {
-                Range::_256(c) => {
-                    writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}")?
-                }
-                Range::_RGB(r, g, b) => writeln!(
-                    bf,
-                    "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}"
-                )?,
-            }
-        }
-
-        bf.flush()
-    }
-}
-
-pub use color::*;
+color!(
+    N = "\x1b[0m",
+    B = "\x1b[1m",
+    _B = "\x1b[22m",
+    I = "\x1b[3m",
+    _I = "\x1b[23m",
+    U = "\x1b[4m",
+    _U = "\x1b[24m",
+    BEG = "\x1b[G", //Move to begin of line
+    CL = "\x1b[2K", //Erase the entire line
+    UU = "\x1b[21m",
+    R = "\x1b[91m",
+    G = "\x1b[92m",
+    Y = "\x1b[93m",
+    BLUE = "\x1b[94m",
+    HL = "\x1b[103m",
+    BG = "\x1b[100m",
+    FG = "\x1b[97m",
+    SAVE = "\x1b[s", //"\x1b7" save cursor & attrs
+    REST = "\x1b[u", //"\x1b8" unsave cursor & attrs
+    MARK = "\x1b]1337;SetMark\x07",
+    TEXT = "The quick brown fox jumps over the lazy dog"
+);
 
 mod macros {
 
