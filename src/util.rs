@@ -103,20 +103,17 @@ mod color {
                 color(Range::_256(0), text, Kind::BG, true)?;
                 return Ok(());
             }
-            Kind::FG => writeln!(
+            _ => writeln!(
                 bf,
-                "\n{B}{U}{}-color foreground:{N}",
+                "\n{B}{U}{}-color {}:{N}",
                 match r {
                     Range::_256(_) => "256",
                     Range::_RGB(..) => "RGB",
-                }
-            )?,
-            Kind::BG => writeln!(
-                bf,
-                "\n{B}{U}{}-color background:{N}",
-                match r {
-                    Range::_256(_) => "256",
-                    Range::_RGB(..) => "RGB",
+                },
+                match k {
+                    Kind::FG => "foreground",
+                    Kind::BG => "background",
+                    Kind::Both => unreachable!(),
                 }
             )?,
         }
