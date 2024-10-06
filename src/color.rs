@@ -22,22 +22,24 @@ fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
     match args {
         [None, None, None, None] => {
             color8(TEXT)?;
-            color256(TEXT)
+            color(Range::_256(0), TEXT, Kind::Both, true)
         }
         [Some(v), None, None, None] if v.parse::<u8>() == Ok(8) => color8(TEXT),
-        [Some(v), None, None, None] if v.parse::<u16>() == Ok(256) => color256(TEXT),
+        [Some(v), None, None, None] if v.parse::<u16>() == Ok(256) => {
+            color(Range::_256(0), TEXT, Kind::Both, true)
+        }
         [Some(v1), Some(v2), None, None] => match (
             v1.parse::<u16>().as_ref(),
             v2.parse::<u8>()
                 .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16)),
         ) {
             (Ok(256), Ok(c)) => {
-                color_256_fg(c, TEXT)?;
-                color_256_bg(c, TEXT)
+                color(Range::_256(c), TEXT, Kind::FG, false)?;
+                color(Range::_256(c), TEXT, Kind::BG, false)
             }
             (Ok(256), _) => match v2 {
-                "fg" => color256_fg(TEXT),
-                "bg" => color256_bg(TEXT),
+                "fg" => color(Range::_256(0), TEXT, Kind::FG, true),
+                "bg" => color(Range::_256(0), TEXT, Kind::BG, true),
                 _ => {
                     exit();
                     Ok(())
@@ -54,8 +56,8 @@ fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
                     .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
             }) {
                 [Ok(r), Ok(g), Ok(b)] => {
-                    color_rgb_fg([r, g, b], TEXT)?;
-                    color_rgb_bg([r, g, b], TEXT)
+                    color(Range::_RGB(r, g, b), TEXT, Kind::FG, false)?;
+                    color(Range::_RGB(r, g, b), TEXT, Kind::BG, false)
                 }
                 _ => {
                     exit();
