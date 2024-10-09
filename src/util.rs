@@ -87,7 +87,7 @@ mod macros {
     macro_rules! tdbg {
         ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                let _ = io::stdout().lock();
+                _ = io::stdout().lock();
                 let r = dbg!(($($e),*));
                 #[cfg(test)]{pause("")}
                 r
@@ -120,7 +120,7 @@ mod macros {
 pub fn pause(msg: &str) {
     use io::*;
     let mut o = stdout().lock();
-    let _ = write!(
+    _ = write!(
         o,
         "{}",
         if msg.is_empty() {
@@ -129,8 +129,8 @@ pub fn pause(msg: &str) {
             msg
         }
     );
-    let _ = o.flush();
-    let _ = stdin().lock().read_line(&mut String::default());
+    _ = o.flush();
+    _ = stdin().lock().read_line(&mut String::default());
 }
 
 fn dyn_set<T>(var: &dyn any::Any, val: T) {

@@ -105,7 +105,7 @@ fn color8(text: &str) -> Result<()> {
         .chain(90..=97)
         .chain(100..=107)
         .for_each(|c| {
-            let _ = match c {
+            _ = match c {
                 0 => writeln!(bf, "\n{B}{U}Basic Style:{N}"),
                 30 => writeln!(bf, "\n{B}{U}8-color regular foreground:{N}"),
                 40 => writeln!(bf, "\n{B}{U}8-color regular background:{N}"),
@@ -113,7 +113,7 @@ fn color8(text: &str) -> Result<()> {
                 100 => writeln!(bf, "\n{B}{U}8-color bright background:{N}"),
                 _ => Ok(()),
             };
-            let _ = writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
+            _ = writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
         });
     bf.flush()
 }
@@ -161,17 +161,17 @@ fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
     if full {
         match r {
             Range::_256(_) => (0u8..=255).for_each(|c| {
-                let _ = writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}");
+                _ = writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}");
             }),
             Range::_RGB(..) => (0u8..=255).for_each(|r| {
                 (0u8..=255).for_each(|g| {
                     (0u8..=255).for_each(|b| {
-                        let _ = writeln!(
+                        _ = writeln!(
                             bf,
                             "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}"
                         );
                     });
-                    let _ = bf.flush();
+                    _ = bf.flush();
                     pause("")
                 });
             }),
