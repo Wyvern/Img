@@ -164,7 +164,7 @@ jobs:
 
   macOS:
     name: Building on macOS.
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Disable macos spotlight index
@@ -179,7 +179,6 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
-          # components: rust-src
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
