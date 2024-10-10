@@ -14,7 +14,7 @@ env:
 jobs:
   Android:
     name: Building on macOS
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Disable macos spotlight index
