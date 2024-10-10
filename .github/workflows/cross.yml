@@ -14,28 +14,23 @@ env:
 jobs:
   Linux:
     name: Building for {Free,Open,Net}BSD and Solaris/Illumos.
-    runs-on: macos-15
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Disable macos spotlight index
+      - name: Purge Ubuntu
         run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
 
-      # - name: Purge Ubuntu
-      #   run: |
-      #     sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-
-      #     sudo systemctl mask systemd-journald.service systemd-journald.socket
+          sudo systemctl mask systemd-journald.service systemd-journald.socket
 
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Enable KVM group perms
-      #   run: |
-      #     echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-      #     sudo udevadm control --reload-rules
-      #     sudo udevadm trigger --name-match=kvm
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -45,13 +40,13 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Podman
-        run: |
-          brew upgrade
-          brew install podman
-          podman machine init
-          podman machine start
-          podman --version
+      # - name: Podman
+      #   run: |
+      #     brew upgrade
+      #     brew install podman
+      #     podman machine init
+      #     podman machine start
+      #     podman --version
 
       - name: Cross-rs
         run: cargo install cross --git https://github.com/cross-rs/cross --branch main
