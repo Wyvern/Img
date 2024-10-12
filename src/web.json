@@ -533,7 +533,7 @@
     "Album": "div.thcovering-video a"
   },
   {
-    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com,zgogc.com",
+    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com,zgogc.com,dunovels.com",
     "Img": "div#read_tpc img"
   },
   {
@@ -579,5 +579,11 @@
     "Img": "div.my-2 > img",
     "Next": "span[aria-current]",
     "Album": "div.my-1 h2"
+  },
+  {
+    "Site": "3w8n.com",
+    "Img": "div[align=\"center\"] > img",
+    "Next": "div#page a.next",
+    "Album": "ul.list > li > a"
   }
 ]
