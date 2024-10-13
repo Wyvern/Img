@@ -1144,7 +1144,7 @@ mod img {
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
 
     #[test]
-    fn r#try() {
+    fn run() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
 
         parse(&arg("https://ugirls.pics/"));
@@ -1187,11 +1187,6 @@ mod img {
         thread::yield_now();
         thread::sleep(time::Duration::from_secs(5));
         s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
-    }
-
-    #[test]
-    fn run() {
-        main();
     }
 
     #[test]

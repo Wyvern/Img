@@ -32,7 +32,7 @@ use std::*;
 macro_rules! color {
             ($($i:ident = $l:literal),+) => {
                 $(pub static $i: &str = $l;)+
-            };
+            }
         }
 
 color!(
@@ -60,7 +60,6 @@ color!(
 );
 
 mod macros {
-
     #[macro_export]
     macro_rules! quit {
         ($l:literal $(,$e:expr)*) => {{
@@ -71,16 +70,16 @@ mod macros {
 
     #[macro_export]
     macro_rules! pl {
-        ($l:literal $(,$e:expr)*) => {{
-            println!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*));
-        }}
+        ($l:literal $(,$e:expr)*) => {
+            println!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*))
+        }
     }
 
     #[macro_export]
     macro_rules! p {
-        ($l:literal $(,$e:expr)*) => {{
-            print!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*));
-        }}
+        ($l:literal $(,$e:expr)*) => {
+            print!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*))
+        }
     }
 
     #[macro_export]
