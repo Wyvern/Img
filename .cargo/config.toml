@@ -199,6 +199,7 @@ rustflags = [
     "-Zub-checks=off",
     "-Zlinker-features=+lld",
     "-Zchecksum-hash-algorithm=blake3",
+    "-Ztrap-unreachable=no",
 
     "-Anonstandard_style",
     "-Adead_code",
