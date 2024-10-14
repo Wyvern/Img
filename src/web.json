@@ -438,9 +438,10 @@
     "Album": "div.teaser-file-detail div.teaser-file-title"
   },
   {
-    "Site": "chaomv.com,chaomc.com,nenmb.com",
+    "Site": "chaomv.com,chaomc.com,nenmb.com,nenmv.com",
     "Img": "div.row > div > img",
-    "Next": "ul.pagination a"
+    "Next": "ul.pagination a",
+    "Album": "div.row > a > div > img"
   },
   {
     "Site": "mntuce.com",
@@ -533,7 +534,7 @@
     "Album": "div.thcovering-video a"
   },
   {
-    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com,zgogc.com,dunovels.com,switzerlandwatchshop.com",
+    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com,zgogc.com,dunovels.com,switzerlandwatchshop.com,heartanddepth.com",
     "Img": "div#read_tpc img"
   },
   {
@@ -601,5 +602,11 @@
     "Site": "heto5.com",
     "Img": "div#image img",
     "Album": "div.tit a"
+  },
+  {
+    "Site": "phimvuspot.com",
+    "Img": "div.contentme img",
+    "Next": "div.pagination a",
+    "Album": "h2.post-title > a"
   }
 ]

@@ -862,7 +862,6 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     }
                 }
             });
-
             next_link = match last2 {
                 Some(v) => v.attr("href").unwrap_or(String::default()),
                 None => {
@@ -1155,7 +1154,7 @@ mod img {
     fn union_match() {
         //fields superimpose over one another
         union IntOrFloat {
-            i: u32,
+            i: i32,
             f: f32,
         }
 
