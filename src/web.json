@@ -585,5 +585,21 @@
     "Img": "div[align=\"center\"] > img",
     "Next": "div#page a.next",
     "Album": "ul.list > li > a"
+  },
+  {
+    "Site": "mitaoclub.com",
+    "Img": "p > img",
+    "Album": "a.elementor-post__thumbnail__link"
+  },
+  {
+    "Site": "4khd.com",
+    "Img": "p img",
+    "Next": "ul.page-links li.current",
+    "Album": "h2.wp-block-post-title.has-medium-font-size > a"
+  },
+  {
+    "Site": "heto5.com",
+    "Img": "div#image img",
+    "Album": "div.tit a"
   }
 ]
