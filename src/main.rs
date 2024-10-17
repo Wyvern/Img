@@ -6,7 +6,7 @@ use {std::*, util::*};
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; if cfg!(debug_assertions) { 9 } else { 8 }] = [
+static CURL: [&str; if cfg!(debug_assertions) { 10 } else { 9 }] = [
     "--compressed",
     "-k",
     "-A",
@@ -17,6 +17,7 @@ static CURL: [&str; if cfg!(debug_assertions) { 9 } else { 8 }] = [
     "-fsL",
     #[cfg(debug_assertions)]
     "-S",
+    "-C-",
     // "-OJ",
 ];
 
@@ -551,7 +552,18 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let sender = sync::Arc::new(s);
     #[cfg(not(feature = "infer"))]
     let mut no_ext = collections::HashMap::new();
-
+    static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
+    let nan = NAN.get_or_init(|| {
+        percent_encoding::NON_ALPHANUMERIC
+            .remove(b':')
+            .remove(b'/')
+            .remove(b'.')
+            .remove(b'-')
+            .remove(b'_')
+            .remove(b'?')
+            .remove(b'=')
+            .remove(b'%')
+    });
     for url in urls {
         if url.starts_with("data:image/") {
             #[cfg(feature = "embed")]
@@ -616,27 +628,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         #[cfg(feature = "infer")]
         let file_name = name;
 
-        if !path.join(file_name).exists() {
-            static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
-            let enc_url = percent_encoding::utf8_percent_encode(
-                u,
-                NAN.get_or_init(|| {
-                    percent_encoding::NON_ALPHANUMERIC
-                        .remove(b':')
-                        .remove(b'/')
-                        .remove(b'.')
-                        .remove(b'-')
-                        .remove(b'_')
-                        .remove(b'?')
-                        .remove(b'=')
-                        .remove(b'%')
-                }),
-            )
-            .to_string();
+        let enc_url = percent_encoding::utf8_percent_encode(u, nan).to_string();
 
-            // tdbg!(&url, &enc_url);
-            curl.args([&enc_url, "-o", file_name]);
-        }
+        // tdbg!(&url, &enc_url);
+        curl.args([&enc_url, "-o", file_name]);
     }
 
     // tdbg!(no_ext.keys());
