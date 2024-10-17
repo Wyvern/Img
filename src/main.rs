@@ -6,18 +6,16 @@ use {std::*, util::*};
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; if cfg!(debug_assertions) { 10 } else { 9 }] = [
+static CURL: [&str; if cfg!(debug_assertions) { 8 } else { 7 }] = [
     "--compressed",
-    "-k",
+    "-kfsLC-",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
     "--tcp-nodelay",
     "--no-clobber",
-    "-fsL",
     #[cfg(debug_assertions)]
     "-S",
-    "-C-",
     // "-OJ",
 ];
 
