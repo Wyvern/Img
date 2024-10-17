@@ -116,7 +116,7 @@
     "Album": "a.item-link div"
   },
   {
-    "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xrmn07.top,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr04.vip,xr05.vip,xr07.vip,xr08.vip,xr09.vip,xiurenba.com,2xiuren.cc,秀人集.com,meirentu.cc,meirentu.me,meirentu.org,meirentu.icu,123781.xyz,123782.xyz,123783.xyz,123784.xyz,123785.xyz,123786.xyz,1231238.xyz,quanjixiu.com,Xiurenba.Net,Xiurenba.Cc,xiu01.top,xiuren009.top",
+    "Site": "xrmn01.cc,xrmnw.xyz,xrmnw.com,xrmn03.com,xrmn05.com,xrmn07.top,xiuren5.com,xiuren5.vip,xiuren5.cc,xiuren01.cc,xiuren02.cc,xiuren03.cc,xiuren05.cc,xiuren06.cc,xiuren05.xyz,xiuren07.xyz,xiuren08.xyz,xiuren09.xyz,xr01.xyz,xr02.xyz,xr03.xyz,xr04.xyz,xr05.xyz,xr06.xyz,xr07.xyz,xr08.xyz,xr09.xyz,xr01.vip,xr02.vip,xr03.vip,xr04.vip,xr05.vip,xr07.vip,xr08.vip,xr09.vip,xiurenba.com,2xiuren.cc,秀人集.com,meirentu.cc,meirentu.me,meirentu.org,meirentu.icu,123781.xyz,123782.xyz,123783.xyz,123784.xyz,123785.xyz,123786.xyz,1231238.xyz,quanjixiu.com,Xiurenba.Net,Xiurenba.Cc,xiu01.top,xiuren009.top,xiuren51.top",
     "Img": "div.content img",
     "Next": "div.page a",
     "Album": "div.meta-title"
@@ -438,9 +438,10 @@
     "Album": "div.teaser-file-detail div.teaser-file-title"
   },
   {
-    "Site": "chaomv.com,chaomc.com,nenmb.com",
+    "Site": "chaomv.com,chaomc.com,nenmb.com,nenmv.com",
     "Img": "div.row > div > img",
-    "Next": "ul.pagination a"
+    "Next": "ul.pagination a",
+    "Album": "div.row > a > div > img"
   },
   {
     "Site": "mntuce.com",
@@ -533,7 +534,7 @@
     "Album": "div.thcovering-video a"
   },
   {
-    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com",
+    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com,zgogc.com,dunovels.com,switzerlandwatchshop.com,heartanddepth.com",
     "Img": "div#read_tpc img"
   },
   {
@@ -579,5 +580,33 @@
     "Img": "div.my-2 > img",
     "Next": "span[aria-current]",
     "Album": "div.my-1 h2"
+  },
+  {
+    "Site": "3w8n.com",
+    "Img": "div[align=\"center\"] > img",
+    "Next": "div#page a.next",
+    "Album": "ul.list > li > a"
+  },
+  {
+    "Site": "mitaoclub.com",
+    "Img": "p > img",
+    "Album": "a.elementor-post__thumbnail__link"
+  },
+  {
+    "Site": "4khd.com",
+    "Img": "p img",
+    "Next": "ul.page-links li.current",
+    "Album": "h2.wp-block-post-title.has-medium-font-size > a"
+  },
+  {
+    "Site": "heto5.com",
+    "Img": "div#image img",
+    "Album": "div.tit a"
+  },
+  {
+    "Site": "phimvuspot.com",
+    "Img": "div.contentme img",
+    "Next": "div.pagination a",
+    "Album": "h2.post-title > a"
   }
 ]
