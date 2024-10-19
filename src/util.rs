@@ -31,9 +31,21 @@ use std::*;
 */
 macro_rules! color {
             ($($i:ident = $l:literal),+) => {
-                $(pub static $i: &str = $l;)+
+                STATIC!(pub &str;$($i=$l),+);
             }
         }
+
+macro_rules! STATIC {
+            ($v:vis $t:ty; $($i:ident = $e:expr),+) => {
+                $($v static $i: $t = $e;)+
+            }
+        }
+
+// macro_rules! CONST {
+//             ($v:vis $t:ty; $($i:ident = $e:expr),+) => {
+//                 $($v const $i: $t = $e;)+
+//             }
+//         }
 
 color!(
     N = "\x1b[0m",
