@@ -135,13 +135,17 @@ pub fn pause(msg: &str) {
         o,
         "{}",
         if msg.is_empty() {
-            "Press any key to continue..."
+            "Press any key to continue...[q] to quit: "
         } else {
             msg
         }
     );
     _ = o.flush();
-    _ = stdin().lock().read_line(&mut String::default());
+    let mut s = String::default();
+    _ = stdin().lock().read_line(&mut s);
+    if s.trim() == "q" {
+        process::exit(0);
+    }
 }
 
 fn dyn_set<T>(var: &dyn any::Any, val: T) {
