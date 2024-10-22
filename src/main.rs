@@ -1139,8 +1139,21 @@ mod img {
     #[test]
     fn run() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
-
-        parse(&arg("https://ugirls.pics/"));
+        if let Some(arg) = env::args().nth(4) {
+            parse(&arg);
+        } else {
+            [
+                "https://xiutaku.com",
+                "https://ugirls.pics/",
+                "https://bisipic.online",
+            ]
+            .into_iter()
+            .for_each(|u| {
+                pl!("Parsing... {}", u);
+                parse(u);
+                pause("");
+            });
+        }
     }
 
     #[test]
@@ -1213,8 +1226,9 @@ mod img {
             dup_site.len()
         );
         if !dup_site.is_empty() {
-            dbg!(dup_site);
+            dbg!(&dup_site);
         }
+        assert!(dup_site.is_empty());
 
         let dup_sel = img_sel
             .keys()
