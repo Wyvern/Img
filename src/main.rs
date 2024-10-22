@@ -1139,18 +1139,21 @@ mod img {
     #[test]
     fn run() {
         // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
-
-        [
-            "https://xiutaku.com",
-            "https://ugirls.pics/",
-            "https://bisipic.online",
-        ]
-        .into_iter()
-        .for_each(|u| {
-            pl!("Parsing... {}", &arg(u));
-            parse(&arg(u));
-            pause("");
-        });
+        if let Some(arg) = env::args().nth(4) {
+            parse(&arg);
+        } else {
+            [
+                "https://xiutaku.com",
+                "https://ugirls.pics/",
+                "https://bisipic.online",
+            ]
+            .into_iter()
+            .for_each(|u| {
+                pl!("Parsing... {}", u);
+                parse(u);
+                pause("");
+            });
+        }
     }
 
     #[test]
