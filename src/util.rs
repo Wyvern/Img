@@ -133,12 +133,13 @@ pub fn pause(msg: &str) {
     let mut o = stdout().lock();
     _ = write!(
         o,
-        "{}... [q] to quit:",
+        "{} | [q{}] to quit:",
         if msg.is_empty() {
             "Press any key to continue"
         } else {
             msg
-        }
+        },
+        char::from_u32(0x332).unwrap()
     );
     _ = o.flush();
     let mut s = String::default();
