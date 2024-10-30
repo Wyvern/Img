@@ -189,7 +189,7 @@ rustflags = [
     "-Zno-trait-vptr",
     "-Znext-solver=coherence",
     "-Zpanic-in-drop=abort",
-    "-Zcross-crate-inline-threshold=yes",
+    # "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
     "-Zno-implied-bounds-compat",
     "-Zgraphviz-dark-mode",
