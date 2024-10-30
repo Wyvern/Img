@@ -100,7 +100,7 @@ mod macros {
             if cfg!(test) || cfg!(debug_assertions) {
                 _ = io::stdout().lock();
                 let r = dbg!(($($e),*));
-                #[cfg(test)]{pause("")}
+                #[cfg(test)]pause("");
                 r
             } else {($($e),*)}
         }

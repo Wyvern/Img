@@ -680,7 +680,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     while !*mg {
                         mg = cv.wait(mg).unwrap();
                     }
-
                     for f in need_file_type_detection {
                         let file = p.join(&f);
                         if file.exists() {
