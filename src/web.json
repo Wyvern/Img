@@ -608,5 +608,17 @@
     "Img": "div.contentme img",
     "Next": "div.pagination a",
     "Album": "h2.post-title > a"
+  },
+  {
+    "Site": "lovedan.net",
+    "Img": "div#image-wrapper > img",
+    "Next": "ul.page a",
+    "Album": "h4.artlist_title_girl a"
+  },
+  {
+    "Site": "913wen.com",
+    "Img": "div.ssimg img",
+    "Next": "div.page_navi a",
+    "Album": "div.tit > a"
   }
 ]

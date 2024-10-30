@@ -8,7 +8,7 @@ static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
 static CURL: [&str; if cfg!(debug_assertions) { 8 } else { 7 }] = [
     "--compressed",
-    "-kfsLC-",
+    "-kfsL",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
@@ -330,7 +330,7 @@ fn parse(addr: &str) -> String {
                 }
                 let o = curl
                     .args(CURL)
-                    .arg("--parallel-immediate")
+                    .args(["--parallel-immediate", "-C-"])
                     .output()
                     .unwrap();
                 let html = String::from_utf8_lossy(&o.stdout).into_owned();
@@ -636,17 +636,20 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     if curl.get_args().len() > 1 && cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl
-            .args(CURL)
-            .args(["-e", &format!("https://{host}"), "--parallel-immediate"]);
+        let cmd = curl.args(CURL).args([
+            "-e",
+            &format!("https://{host}"),
+            "--parallel-immediate",
+            "-C-",
+        ]);
         #[cfg(not(feature = "infer"))]
         let _ = cmd.spawn();
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            let _ = cmd.output();
-            let sync = true;
+            let sync = false;
             if sync {
+                _ = cmd.output();
                 for f in need_file_type_detection {
                     let file = path.join(&f);
                     if file.exists() {
@@ -655,11 +658,29 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 }
             } else {
                 let (p, h) = (path.to_owned(), host.to_owned());
+                let pair = sync::Arc::new((sync::Condvar::new(), sync::Mutex::new(false)));
+                let pair2 = pair.clone();
+
+                //download thread
                 thread::spawn(move || {
-                    let _ = curl
+                    _ = curl
                         .args(CURL)
-                        .args(["-e", &h, "--parallel-immediate"])
+                        .args(["-e", &h, "--parallel-immediate", "-C-"])
                         .output();
+                    let (cv, mu) = &*pair;
+                    let mut mg = mu.lock().unwrap();
+                    *mg = true;
+                    cv.notify_one();
+                });
+
+                //rename thread
+                thread::spawn(move || {
+                    let (cv, mu) = &*pair2;
+                    let mut mg = mu.lock().unwrap();
+                    while !*mg {
+                        mg = cv.wait(mg).unwrap();
+                    }
+
                     for f in need_file_type_detection {
                         let file = p.join(&f);
                         if file.exists() {
@@ -689,7 +710,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         }
         let _ = curl
             .args(CURL)
-            .args(["-e", &format!("https://{host}"), "--parallel-immediate"])
+            .args([
+                "-e",
+                &format!("https://{host}"),
+                "--parallel-immediate",
+                "-C-",
+            ])
             .spawn();
     }
 
@@ -705,9 +731,8 @@ fn content_header_info(
     let mut name_ext = String::default();
     // tdbg!(&url);
     process::Command::new("curl")
-        .args(["-J", "-w", "%{content_type}"])
         .args(CURL)
-        .arg(&url)
+        .args(["-J", "-w", "%{content_type}", &url])
         .output()
         .map_or_else(
             |e| pl!("Get {} content type info failed: {}", &url, e),
@@ -729,7 +754,7 @@ fn content_header_info(
             },
         );
     if name_ext.is_empty() {
-        pl!("Get `{}` with `{}` extension failed.", url, name);
+        pl!("Get {} with {} extension failed.", url, name);
         name_ext = format!("{name}.ext!")
     }
     s.send((url, name_ext))
@@ -1075,6 +1100,7 @@ fn terminal_emulator() -> bool {
 
 #[cfg(test)]
 mod img {
+
     use super::*;
 
     #[test]
