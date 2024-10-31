@@ -89,7 +89,6 @@ trim-paths = true
 #lto
 [profile.lto]
 inherits = "release"
-rustflags = ["-Zcross-crate-inline-threshold=yes"]
 panic = "abort"
 [profile.lto.build-override]
 inherits = "lto"
@@ -187,7 +186,7 @@ rustflags = [
     "-Zstaticlib-prefer-dynamic",
     "-Znext-solver=coherence",
     "-Zpanic-in-drop=abort",
-    "-Zcross-crate-inline-threshold=yes",
+    # "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
     "-Zgraphviz-dark-mode",
     "-Zhas-thread-local",
