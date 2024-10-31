@@ -133,7 +133,7 @@ pub fn pause(msg: &str) {
     let mut o = stdout().lock();
     _ = write!(
         o,
-        "{} | [q{}] to quit:",
+        "{} or [q{}]uit:",
         if msg.is_empty() {
             "Press any key to continue"
         } else {
