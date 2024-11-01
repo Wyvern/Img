@@ -100,7 +100,7 @@ mod macros {
             if cfg!(test) || cfg!(debug_assertions) {
                 _ = io::stdout().lock();
                 let r = dbg!(($($e),*));
-                #[cfg(test)]pause("");
+                #[cfg(test)]pause();
                 r
             } else {($($e),*)}
         }
@@ -128,17 +128,12 @@ mod macros {
 }
 }
 
-pub fn pause(msg: &str) {
+pub fn pause() {
     use io::*;
     let mut o = stdout().lock();
     _ = write!(
         o,
-        "{} or [q{}]uit:",
-        if msg.is_empty() {
-            "Press any key to continue"
-        } else {
-            msg
-        },
+        "Press any key to continue or [q{}]uit:",
         char::from_u32(0x332).unwrap()
     );
     _ = o.flush();

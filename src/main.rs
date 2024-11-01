@@ -1177,7 +1177,7 @@ mod img {
             .for_each(|u| {
                 pl!("Parsing... {}", u);
                 parse(u);
-                pause("");
+                pause();
             });
         }
     }
