@@ -642,52 +642,20 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             "--parallel-immediate",
             "-C-",
         ]);
-        #[cfg(not(feature = "infer"))]
-        let _ = cmd.spawn();
+        let _t = cmd.spawn();
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            let sync = false;
-            if sync {
-                _ = cmd.output();
+            let p = path.to_owned();
+            thread::spawn(move || {
+                _t.unwrap().wait().expect("curl download didn't run.");
                 for f in need_file_type_detection {
-                    let file = path.join(&f);
+                    let file = p.join(&f);
                     if file.exists() {
                         magic_number_type(file);
                     }
                 }
-            } else {
-                let (p, h) = (path.to_owned(), host.to_owned());
-                let pair = sync::Arc::new((sync::Condvar::new(), sync::Mutex::new(false)));
-                let pair2 = pair.clone();
-
-                //download thread
-                thread::spawn(move || {
-                    _ = curl
-                        .args(CURL)
-                        .args(["-e", &h, "--parallel-immediate", "-C-"])
-                        .output();
-                    let (cv, mu) = &*pair;
-                    let mut mg = mu.lock().unwrap();
-                    *mg = true;
-                    cv.notify_one();
-                });
-
-                //rename thread
-                thread::spawn(move || {
-                    let (cv, mu) = &*pair2;
-                    let mut mg = mu.lock().unwrap();
-                    while !*mg {
-                        mg = cv.wait(mg).unwrap();
-                    }
-                    for f in need_file_type_detection {
-                        let file = p.join(&f);
-                        if file.exists() {
-                            magic_number_type(file);
-                        }
-                    }
-                });
-            }
+            });
         }
     }
 
