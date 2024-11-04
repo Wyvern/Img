@@ -70,10 +70,19 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
         .iter()
         .find(|&s| {
             s["Site"].as_str().map_or(false, |s| {
-                s.split_terminator(',')
-                    .any(|s| host.trim_end().ends_with(s.trim()))
+                s.split_terminator(',').any(|s| {
+                    host.rsplit('.')
+                        .take(2)
+                        .collect::<Vec<_>>()
+                        .into_iter()
+                        .rev()
+                        .collect::<Vec<_>>()
+                        .join(".")
+                        .eq_ignore_ascii_case(s.trim())
+                })
             })
         });
+
     site.map_or([None; 3], |s| {
         ["Img", "Next", "Album"].map(|key| s[key].as_str().map(|v| v.trim()))
     })
@@ -1090,7 +1099,8 @@ mod img {
     #[test]
     fn htmlq() {
         let addr =
-            arg("https;://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7689-tang-an-qi/");
+            arg("https://52xiuren.cc/2024/10/30/xiuren-vol-9300-%e8%bd%af%e8%bd%af%e9%85%b1/");
+
         let (html, [img, .., album], _) = get_html(&addr);
 
         use process::*;

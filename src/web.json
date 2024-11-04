@@ -626,5 +626,15 @@
     "Img": "div.picture_content img",
     "Next": "ul.pagination a",
     "Album": "div.diy-box-title a"
+  },
+  {
+    "Site": "52xiuren.cc",
+    "Img": "img.lightbox-image",
+    "Album": "h3.jeg_post_title a"
+  },
+  {
+    "Site": "oorpg.com",
+    "Img": "div.text-center > img",
+    "Album": "div.gallery img"
   }
 ]
