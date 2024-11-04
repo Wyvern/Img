@@ -186,7 +186,7 @@ rustflags = [
     "-Zstaticlib-prefer-dynamic",
     "-Znext-solver=coherence",
     "-Zpanic-in-drop=abort",
-    # "-Zcross-crate-inline-threshold=yes",
+    "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
     "-Zgraphviz-dark-mode",
     "-Zhas-thread-local",
