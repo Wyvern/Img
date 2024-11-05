@@ -71,14 +71,9 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
         .find(|&s| {
             s["Site"].as_str().map_or(false, |s| {
                 s.split_terminator(',').any(|s| {
-                    host.rsplit('.')
-                        .take(2)
-                        .collect::<Vec<_>>()
-                        .into_iter()
-                        .rev()
-                        .collect::<Vec<_>>()
-                        .join(".")
-                        .eq_ignore_ascii_case(s.trim())
+                    let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
+                    parts.reverse();
+                    parts.join(".").eq_ignore_ascii_case(s.trim())
                 })
             })
         });
