@@ -70,10 +70,14 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
         .iter()
         .find(|&s| {
             s["Site"].as_str().map_or(false, |s| {
-                s.split_terminator(',')
-                    .any(|s| host.trim_end().ends_with(s.trim()))
+                s.split_terminator(',').any(|s| {
+                    let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
+                    parts.reverse();
+                    parts.join(".").eq_ignore_ascii_case(s.trim())
+                })
             })
         });
+
     site.map_or([None; 3], |s| {
         ["Img", "Next", "Album"].map(|key| s[key].as_str().map(|v| v.trim()))
     })
@@ -642,53 +646,20 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             "--parallel-immediate",
             "-C-",
         ]);
-        #[cfg(not(feature = "infer"))]
-        let _ = cmd.spawn();
+        let _t = cmd.spawn();
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            let sync = false;
-            if sync {
-                _ = cmd.output();
+            let p = path.to_owned();
+            thread::spawn(move || {
+                _t.unwrap().wait().expect("curl download didn't run.");
                 for f in need_file_type_detection {
-                    let file = path.join(&f);
+                    let file = p.join(&f);
                     if file.exists() {
                         magic_number_type(file);
                     }
                 }
-            } else {
-                let (p, h) = (path.to_owned(), host.to_owned());
-                let pair = sync::Arc::new((sync::Condvar::new(), sync::Mutex::new(false)));
-                let pair2 = pair.clone();
-
-                //download thread
-                thread::spawn(move || {
-                    _ = curl
-                        .args(CURL)
-                        .args(["-e", &h, "--parallel-immediate", "-C-"])
-                        .output();
-                    let (cv, mu) = &*pair;
-                    let mut mg = mu.lock().unwrap();
-                    *mg = true;
-                    cv.notify_one();
-                });
-
-                //rename thread
-                thread::spawn(move || {
-                    let (cv, mu) = &*pair2;
-                    let mut mg = mu.lock().unwrap();
-                    while !*mg {
-                        mg = cv.wait(mg).unwrap();
-                    }
-
-                    for f in need_file_type_detection {
-                        let file = p.join(&f);
-                        if file.exists() {
-                            magic_number_type(file);
-                        }
-                    }
-                });
-            }
+            });
         }
     }
 
@@ -1123,7 +1094,8 @@ mod img {
     #[test]
     fn htmlq() {
         let addr =
-            arg("https;://girldreamy.com/xiuren%e7%a7%80%e4%ba%ba%e7%bd%91-no-7689-tang-an-qi/");
+            arg("https://52xiuren.cc/2024/10/30/xiuren-vol-9300-%e8%bd%af%e8%bd%af%e9%85%b1/");
+
         let (html, [img, .., album], _) = get_html(&addr);
 
         use process::*;
@@ -1178,7 +1150,7 @@ mod img {
             .for_each(|u| {
                 pl!("Parsing... {}", u);
                 parse(u);
-                pause("");
+                pause();
             });
         }
     }

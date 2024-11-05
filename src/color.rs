@@ -172,7 +172,7 @@ fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
                         );
                     });
                     _ = bf.flush();
-                    pause("")
+                    pause()
                 });
             }),
         }
