@@ -1,5 +1,3 @@
-#![cfg_attr(not(debug_assertions), no_main)]
-
 mod util;
 use {std::*, util::*};
 
@@ -34,7 +32,6 @@ fn check_args() -> String {
     })
 }
 
-#[cfg_attr(not(debug_assertions), no_mangle)]
 fn main() {
     let arg = check_args();
     let mut next_page = parse(&arg);
