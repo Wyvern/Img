@@ -1138,6 +1138,7 @@ mod img {
             parse(&arg);
         } else {
             [
+                "chottie.com",
                 "https://xiutaku.com",
                 "https://ugirls.pics/",
                 "https://bisipic.online",
