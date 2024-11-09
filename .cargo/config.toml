@@ -170,7 +170,7 @@ rustflags = [
     "-Zno-generate-arange-section",
     "-Zdep-info-omit-d-target",
     "-Zpolonius",
-    "-Zpolymorphize",
+    # "-Zpolymorphize",
     "-Ztrim-diagnostic-paths",
     "-Zoom=abort",
     "-Zshare-generics",
