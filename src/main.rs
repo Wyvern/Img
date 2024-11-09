@@ -149,9 +149,8 @@ fn parse(addr: &str) -> String {
                         u.split(['[', ']'])
                             .nth(1)
                             .unwrap()
-                            .split('"')
-                            .filter(|&x| !x.trim().is_empty() && x.trim() != ",")
-                            .map(|u| u.replace(r"\u002F", "/"))
+                            .split(',')
+                            .map(|s| s.trim().trim_matches('"').replace(r"\u002F", "/"))
                             .for_each(|url| {
                                 json_img.insert(url);
                             });
@@ -1138,7 +1137,6 @@ mod img {
             parse(&arg);
         } else {
             [
-                "chottie.com",
                 "https://xiutaku.com",
                 "https://ugirls.pics/",
                 "https://bisipic.online",
