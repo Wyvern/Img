@@ -477,7 +477,7 @@
     "Album": "div.list-content > h2 > a"
   },
   {
-    "Site": "656g.com,MMZZSS.com",
+    "Site": "656g.com,MMZZSS.com,mmww.cc",
     "Img": "div.imgg img",
     "Next": "div.imgg a",
     "Album": "div.img > a > span > img"
@@ -522,7 +522,7 @@
     "Album": "h2.post-title a"
   },
   {
-    "Site": "mhgirl.com",
+    "Site": "mhgirl.com,kunv.cc",
     "Img": "div#showimg img",
     "Next": "div#page a",
     "Album": "p.p_title a"
@@ -635,6 +635,11 @@
   {
     "Site": "oorpg.com",
     "Img": "div.text-center > img",
+    "Album": "div.gallery img"
+  },
+  {
+    "Site": "aiavr.uk",
+    "Img": "img.responsive-image",
     "Album": "div.gallery img"
   }
 ]

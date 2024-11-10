@@ -1,5 +1,3 @@
-#![cfg_attr(not(debug_assertions), no_main)]
-
 mod util;
 use {std::*, util::*};
 
@@ -34,7 +32,6 @@ fn check_args() -> String {
     })
 }
 
-#[cfg_attr(not(debug_assertions), no_mangle)]
 fn main() {
     let arg = check_args();
     let mut next_page = parse(&arg);
@@ -152,9 +149,8 @@ fn parse(addr: &str) -> String {
                         u.split(['[', ']'])
                             .nth(1)
                             .unwrap()
-                            .split('"')
-                            .filter(|&x| !x.trim().is_empty() && x.trim() != ",")
-                            .map(|u| u.replace(r"\u002F", "/"))
+                            .split(',')
+                            .map(|s| s.trim().trim_matches('"').replace(r"\u002F", "/"))
                             .for_each(|url| {
                                 json_img.insert(url);
                             });
@@ -1071,7 +1067,6 @@ fn terminal_emulator() -> bool {
 
 #[cfg(test)]
 mod img {
-
     use super::*;
 
     #[test]
