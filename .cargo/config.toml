@@ -248,9 +248,6 @@ rustflags = ["-Zrelax-elf-relocations"]
 [target.'cfg(target_os="android")']
 rustflags = ["-Zhas-thread-local=no"]
 
-[target.'cfg(any(target_os="freebsd",target_os="openbsd",target_os="netbsd"))']
-linker = "ld"
-
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-ibm-aix-gcc"
 
