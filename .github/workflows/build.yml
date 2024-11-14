@@ -199,7 +199,7 @@ jobs:
 
           cargo update
 
-          time cargo l x86_64-fortanix-unknown-sgx
+          time cargo l --target x86_64-fortanix-unknown-sgx
 
           time cargo l --target aarch64-apple-darwin
           time cargo l --target aarch64-apple-ios
