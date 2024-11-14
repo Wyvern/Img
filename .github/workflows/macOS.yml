@@ -37,6 +37,7 @@ jobs:
         run: |
           cargo update
 
+          time cargo s x86_64-fortanix-unknown-sgx
           time cargo s arm64e-apple-ios
           time cargo s arm64e-apple-tvos
           time cargo s aarch64-apple-watchos
