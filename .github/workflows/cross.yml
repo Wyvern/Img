@@ -63,7 +63,7 @@ jobs:
           # cb x86_64-unknown-freebsd
           # cb x86_64-unknown-netbsd
           # cb x86_64-unknown-openbsd
-          # cb powerpc64-ibm-aix
+          cb powerpc64-ibm-aix
 
           cb loongarch64-unknown-linux-gnu
           cb loongarch64-unknown-linux-musl
