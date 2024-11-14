@@ -178,7 +178,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,x86_64-fortanix-unknown-sgx
+          targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
@@ -198,8 +198,6 @@ jobs:
           # brew install cargo-zigbuild
 
           cargo update
-
-          time cargo l --target x86_64-fortanix-unknown-sgx
 
           time cargo l --target aarch64-apple-darwin
           time cargo l --target aarch64-apple-ios
