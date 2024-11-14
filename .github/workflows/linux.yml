@@ -49,9 +49,6 @@ jobs:
 
           cargo update
 
-          cargo install fortanix-sgx-tools sgxs-tools
-          time cargo s x86_64-fortanix-unknown-sgx
-
           time cargo s powerpc64le-unknown-linux-gnu
           time cargo s powerpc64le-unknown-linux-musl
 
