@@ -733,10 +733,11 @@ fn content_header_info(
 fn magic_number_type(pb: path::PathBuf) {
     use io::*;
 
-    let mut f = fs::File::open(&pb).unwrap_or_else(|e| quit!("{e} : {}", pb.display()));
+    let mut f =
+        fs::File::open(&pb).unwrap_or_else(|e| quit!("Open file {} failed: {}", pb.display(), e));
     let mut buf = [0u8; 16];
     f.read_exact(&mut buf)
-        .unwrap_or_else(|e| pl!("Read file magic number error: {}", e));
+        .unwrap_or_else(|e| pl!("Read file {} magic number error: {}", pb.display(), e));
 
     let t = infer::get(&buf);
     // tdbg!(&t);
