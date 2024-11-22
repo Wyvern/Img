@@ -83,12 +83,13 @@ jobs:
           overwrite: true
           body: "Windows aarch64 binary executable."
 
-      # - name: Upload Windows-arm64ec to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/arm64ec-pc-windows-msvc/src/Img.exe
-      #     asset_name: Windows-arm64ec.exe
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Windows arm64ec binary executable."
+      - name: Upload Windows-arm64ec to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/arm64ec-pc-windows-msvc/src/Img.exe
+          asset_name: Windows-arm64ec.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows arm64ec binary executable."

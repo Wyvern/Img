@@ -40,14 +40,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      # - name: Podman
-      #   run: |
-      #     brew upgrade
-      #     brew install podman
-      #     podman machine init
-      #     podman machine start
-      #     podman --version
-
       - name: Cross-rs
         run: cargo install cross --git https://github.com/cross-rs/cross --branch main
 
@@ -64,7 +56,6 @@ jobs:
 
           cb x86_64-unknown-freebsd
           cb x86_64-unknown-netbsd
-          cb x86_64-unknown-openbsd
           # cb powerpc64-ibm-aix
 
           cb loongarch64-unknown-linux-gnu
@@ -82,6 +73,7 @@ jobs:
 
       - name: Upload Solaris-x86_64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-pc-solaris/src/Img
@@ -92,6 +84,7 @@ jobs:
 
       - name: Upload Solaris-sparcv9 to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/sparcv9-sun-solaris/src/Img
@@ -102,6 +95,7 @@ jobs:
 
       - name: Upload Illumos-x86_64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-illumos/src/Img
@@ -110,15 +104,16 @@ jobs:
           overwrite: true
           body: "Ubuntu Illumos-x86_64 binary executable."
 
-      # - name: Upload Illumos-aarch64 to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/aarch64-unknown-illumos/src/Img
-      #     asset_name: Illumos-aarch64
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Ubuntu Illumos-aarch64 binary executable."
+      - name: Upload Illumos-aarch64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-unknown-illumos/src/Img
+          asset_name: Illumos-aarch64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Illumos-aarch64 binary executable."
 
       - name: Upload Linux-loongarch64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
@@ -140,32 +135,24 @@ jobs:
           overwrite: true
           body: "Ubuntu Linux-loongarch64-musl binary executable."
 
-      # - name: Upload Freebsd-x86_64 to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/x86_64-unknown-freebsd/src/Img
-      #     asset_name: Freebsd-x86_64
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Ubuntu Freebsd-x86_64 binary executable."
+      - name: Upload Freebsd-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-freebsd/src/Img
+          asset_name: Freebsd-x86_64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Freebsd-x86_64 binary executable."
 
-      # - name: Upload Netbsd-x86_64 to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/x86_64-unknown-netbsd/src/Img
-      #     asset_name: Netbsd-x86_64
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Ubuntu Netbsd-x86_64 binary executable."
-
-      # - name: Upload Openbsd-x86_64 to a GitHub release
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: target/x86_64-unknown-openbsd/src/Img
-      #     asset_name: Openbsd-x86_64
-      #     tag: Nightly
-      #     overwrite: true
-      #     body: "Ubuntu Openbsd-x86_64 binary executable."
+      - name: Upload Netbsd-x86_64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-unknown-netbsd/src/Img
+          asset_name: Netbsd-x86_64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Netbsd-x86_64 binary executable."
