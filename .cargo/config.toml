@@ -98,7 +98,7 @@ inherits = "lto"
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Zforce-unstable-if-unmarked"]
+rustflags = ["-Zforce-unstable-if-unmarked","-Zcross-crate-inline-threshold=yes",]
 [profile.src.build-override]
 inherits = "src"
 [profile.src.package."*"]
@@ -186,7 +186,6 @@ rustflags = [
     "-Zstaticlib-prefer-dynamic",
     "-Znext-solver=coherence",
     "-Zpanic-in-drop=abort",
-    "-Zcross-crate-inline-threshold=yes",
     "-Zuse-sync-unwind",
     "-Zgraphviz-dark-mode",
     "-Zhas-thread-local",
