@@ -39,14 +39,8 @@ RUSTC_BOOTSTRAP = "1"
 
 #dev
 [profile.dev]
-rustflags = [
-    "-Cprefer-dynamic",
-    "-Cdebug-assertions",
-    "-Zlocation-detail=file,line,column",
-    "-Zcodegen-backend=cranelift",
-]
+rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
 rpath = true
-codegen-backend = "cranelift"
 debug = false
 strip = true
 trim-paths = true
