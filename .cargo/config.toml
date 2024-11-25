@@ -203,7 +203,7 @@ rustflags = [
     "-Zhas-thread-local",
     "-Zshell-argfiles",
     "-Zlinker-features=+lld",
-    "-Zchecksum-hash-algorithm=blake3",
+    # "-Zchecksum-hash-algorithm=blake3",
     "-Ztrap-unreachable=no",
 
     "-Anonstandard_style",
