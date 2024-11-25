@@ -32,6 +32,7 @@ RUST_BACKTRACE = "0"
 RUST_LIB_BACKTRACE = "0"
 RUST_PANIC_STRATEGY = "abort"
 RUSTC_ICE = "0"
+RUSTC_BOOTSTRAP = "1"
 
 [net]
 #offline = true
@@ -81,12 +82,12 @@ inherits = "release"
 inherits = "release"
 [profile.release]
 rustflags = ["-Cprefer-dynamic"]
-lto = true
 rpath = true
 trim-paths = true
 
 #lto
 [profile.lto]
+lto = true
 inherits = "release"
 panic = "abort"
 codegen-units = 1
@@ -98,7 +99,10 @@ inherits = "lto"
 #src
 [profile.src]
 inherits = "lto"
-rustflags = ["-Zforce-unstable-if-unmarked","-Zcross-crate-inline-threshold=yes",]
+rustflags = [
+    "-Zforce-unstable-if-unmarked",
+    "-Zcross-crate-inline-threshold=yes",
+]
 [profile.src.build-override]
 inherits = "src"
 [profile.src.package."*"]
@@ -190,7 +194,6 @@ rustflags = [
     "-Zgraphviz-dark-mode",
     "-Zhas-thread-local",
     "-Zshell-argfiles",
-    "-Zub-checks=off",
     "-Zlinker-features=+lld",
     "-Zchecksum-hash-algorithm=blake3",
     "-Ztrap-unreachable=no",
