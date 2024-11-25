@@ -252,6 +252,10 @@ rustflags = ["-Zhas-thread-local=no"]
 linker = "powerpc64-ibm-aix-gcc"
 
 [target.arm64ec-pc-windows-msvc]
-rustflags = ["-Clink-self-contained=no", "-Zlinker-features=native"]
+rustflags = [
+    "-Zunstable-options",
+    "-Clink-self-contained=no",
+    # "-Zlinker-features=native",
+]
 # linker = "link.exe"
 # rustflags = ["-Clink-arg=/MACHINE:ARM64EC"]
