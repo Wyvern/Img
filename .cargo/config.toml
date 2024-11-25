@@ -43,7 +43,7 @@ RUSTC_BOOTSTRAP = "1"
 rpath = true
 debug = false
 strip = true
-trim-paths = true
+# trim-paths = true
 [profile.dev.package."*"]
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
@@ -81,7 +81,7 @@ inherits = "release"
 [profile.release]
 # rustflags = ["-Cprefer-dynamic"]
 rpath = true
-trim-paths = true
+# trim-paths = true
 
 #lto
 [profile.lto]
