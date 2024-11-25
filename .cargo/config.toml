@@ -32,7 +32,7 @@ RUST_BACKTRACE = "0"
 RUST_LIB_BACKTRACE = "0"
 RUST_PANIC_STRATEGY = "abort"
 RUSTC_ICE = "0"
-RUSTC_BOOTSTRAP = 1
+RUSTC_BOOTSTRAP = "1"
 
 [net]
 #offline = true
@@ -49,7 +49,6 @@ rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
 [profile.dev.build-override]
-rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
 
@@ -61,7 +60,6 @@ inherits = "dev"
 rustflags = ["-Cprefer-dynamic"]
 inherits = "test"
 [profile.test.build-override]
-rustflags = ["-Cprefer-dynamic"]
 inherits = "test"
 
 #bench
@@ -70,7 +68,6 @@ inherits = "bench"
 rustflags = ["-Cprefer-dynamic"]
 [profile.bench.build-override]
 inherits = "bench"
-rustflags = ["-Cprefer-dynamic"]
 [profile.bench]
 rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
