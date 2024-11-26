@@ -208,8 +208,8 @@ jobs:
 
           time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto
 
-          find ./target -iname img -iname img.wasm -type f | xargs ls -hl
-          ls -hl Img-Universal
+          find . -iname img -iname img.wasm -type f | xargs ls -hl
+          # ls -hl Img-Universal
           sw_vers
           hostinfo
           sysctl -a | grep brand
