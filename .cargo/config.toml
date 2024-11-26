@@ -205,7 +205,7 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(any(target_arch="arm64ec",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris",target_os="dragonfly"))']
+[target.'cfg(any(target_arch="arm64ec",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = ["-Zlinker-features=-lld"]
 
 [target.'cfg(target_vendor="apple")']
