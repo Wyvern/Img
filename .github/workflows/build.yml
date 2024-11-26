@@ -208,7 +208,7 @@ jobs:
 
           time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto
 
-          find ./target -iname img -type f | xargs ls -hl
+          find ./target -iname img img.wasm -type f | xargs ls -hl
           ls -hl Img-Universal
           sw_vers
           hostinfo
@@ -246,6 +246,17 @@ jobs:
           tag: Stable
           overwrite: true
           body: "iOS binary executable."
+
+      - name: Upload Wasm-wasip2 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/wasm32-wasip2/lto/Img.wasm
+          asset_name: wasm32-wasip2.wasm
+          tag: Stable
+          overwrite: true
+          body: "Wasm-wasip2"
 
       - name: Upload macOS-universal to a GitHub release
         uses: svenstaro/upload-release-action@v2
