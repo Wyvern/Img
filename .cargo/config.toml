@@ -208,6 +208,9 @@ rustflags = [
 [target.'cfg(any(target_arch="arm64ec",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = ["-Zlinker-features=-lld"]
 
+[target.'cfg(target_os="wasi")']
+rustflags = ["-Clink-args="]
+
 [target.'cfg(target_vendor="apple")']
 rustflags = ["-Clink-arg=-undefined dynamic_lookup"]
 

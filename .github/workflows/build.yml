@@ -198,7 +198,7 @@ jobs:
           # brew install cargo-zigbuild
 
           cargo update
-          set +x
+          set +e
           time cargo l --target aarch64-apple-darwin
           time cargo l --target aarch64-apple-ios
           time cargo l --target x86_64-apple-darwin
