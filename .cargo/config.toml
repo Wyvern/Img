@@ -203,10 +203,10 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(any(target_arch="arm64ec",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
+[target.'cfg(any(target_arch="arm64ec",target_arch="sparc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris",target_os="haiku"))']
 rustflags = ["-Zlinker-features=-lld"]
 
-[target.'cfg(not(any(target_os="wasi",target_arch="wasm",target_env="emscripten")))']
+[target.'cfg(not(any(target_family="wasm",target_os="none")))']
 rustflags = [
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined -fPIC -fPIE",
 ]

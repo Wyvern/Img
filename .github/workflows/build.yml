@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Purge Ubuntu
         run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport -q
 
           sudo systemctl mask systemd-journald.service systemd-journald.socket
 
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo apt update && sudo apt install gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
 
           # pip install cargo-zigbuild
 
@@ -336,9 +336,9 @@ jobs:
         run: |
           cargo update
 
-          cargo l --target x86_64-pc-windows-msvc
-          cargo l --target aarch64-pc-windows-msvc
-          cargo l --target arm64ec-pc-windows-msvc
+          Measure-Command {cargo l --target x86_64-pc-windows-msvc}
+          Measure-Command {cargo l --target aarch64-pc-windows-msvc}
+          Measure-Command {cargo l --target arm64ec-pc-windows-msvc}
 
           cmd /r dir /s target\Img.exe
           systeminfo
