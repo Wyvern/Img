@@ -38,13 +38,13 @@ jobs:
         run: |
           cargo update
           set +e -x
-          time cargo s arm64e-apple-ios
-          time cargo s arm64e-apple-tvos
-          time cargo s aarch64-apple-watchos
-          time cargo s aarch64-apple-visionos
-          time cargo s arm64e-apple-darwin
-          time cargo s x86_64h-apple-darwin
-          time cargo s wasm32-wasip2
+          time cargo s --target arm64e-apple-ios
+          time cargo s --target arm64e-apple-tvos
+          time cargo s --target aarch64-apple-watchos
+          time cargo s --target aarch64-apple-visionos
+          time cargo s --target arm64e-apple-darwin
+          time cargo s --target x86_64h-apple-darwin
+          time cargo s --target wasm32-wasip2
 
           lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 

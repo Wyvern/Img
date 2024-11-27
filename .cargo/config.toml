@@ -16,12 +16,12 @@ all = "r --all-features"
 tn = "tree -e normal"
 ti = "t -- --exact --nocapture"
 
-l = "b --profile lto"
+l = "b -q --profile lto"
 
-h = "b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target x86_64h-apple-darwin"
-e = "b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target arm64e-apple-darwin"
-s = "b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target "
-z = "zigbuild --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target "
+h = "s --target x86_64h-apple-darwin"
+e = "s --target arm64e-apple-darwin"
+s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort"
+z = "zigbuild -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target "
 
 
 [cargo-new]

@@ -49,25 +49,25 @@ jobs:
 
           cargo update
           set +e -x
-          time cargo s powerpc64le-unknown-linux-gnu
-          time cargo s powerpc64le-unknown-linux-musl
+          time cargo s --target powerpc64le-unknown-linux-gnu
+          time cargo s --target powerpc64le-unknown-linux-musl
 
-          time cargo s sparc64-unknown-linux-gnu
+          time cargo s --target sparc64-unknown-linux-gnu
 
-          time cargo s mips64-unknown-linux-gnuabi64
-          time cargo s mips64-unknown-linux-muslabi64
+          time cargo s --target mips64-unknown-linux-gnuabi64
+          time cargo s --target mips64-unknown-linux-muslabi64
 
-          time cargo s s390x-unknown-linux-gnu
-          time cargo s s390x-unknown-linux-musl
+          time cargo s --target s390x-unknown-linux-gnu
+          time cargo s --target s390x-unknown-linux-musl
 
-          time cargo s riscv64gc-unknown-linux-gnu
-          time cargo s riscv64gc-unknown-linux-musl
+          time cargo s --target riscv64gc-unknown-linux-gnu
+          time cargo s --target riscv64gc-unknown-linux-musl
 
-          time cargo s x86_64-unknown-linux-gnu
-          time cargo s x86_64-unknown-linux-musl
+          time cargo s --target x86_64-unknown-linux-gnu
+          time cargo s --target x86_64-unknown-linux-musl
 
-          time cargo s aarch64-unknown-linux-gnu
-          time cargo s aarch64-unknown-linux-musl
+          time cargo s --target aarch64-unknown-linux-gnu
+          time cargo s --target aarch64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
