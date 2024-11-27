@@ -47,7 +47,7 @@ jobs:
           # pip install cargo-zigbuild
 
           cargo update
-
+          set +e -x
           time cargo l --target sparc64-unknown-linux-gnu
 
           time cargo l --target powerpc64le-unknown-linux-gnu
@@ -198,7 +198,7 @@ jobs:
           # brew install cargo-zigbuild
 
           cargo update
-          set +e
+          set +e -x
           time cargo l --target aarch64-apple-darwin
           time cargo l --target aarch64-apple-ios
           time cargo l --target x86_64-apple-darwin
@@ -206,7 +206,7 @@ jobs:
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
-          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto
+          time cargo ndk -q -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto
 
           find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
