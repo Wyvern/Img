@@ -28,6 +28,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
+          target: wasm32-wasip2
           components: rust-src
 
       - name: Run sccache-cache
@@ -47,7 +48,7 @@ jobs:
 
           lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
-          find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
+          find . \( -iname img -o -iname img.wasm -o -iname img-* \) -type f | xargs ls -hl
           sw_vers
           hostinfo
           sysctl -a | grep brand
