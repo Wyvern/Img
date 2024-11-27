@@ -36,18 +36,18 @@ jobs:
       - name: Build Release
         run: |
           cargo update
-
+          set +e
           time cargo s arm64e-apple-ios
           time cargo s arm64e-apple-tvos
           time cargo s aarch64-apple-watchos
           time cargo s aarch64-apple-visionos
           time cargo s arm64e-apple-darwin
           time cargo s x86_64h-apple-darwin
+          time cargo s wasm32-wasip2
 
           lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
-          find ./target -iname img -type f | xargs ls -hl
-          ls -hl Img-Universal
+          find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
           hostinfo
           sysctl -a | grep brand
@@ -124,3 +124,14 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "watchOS binary executable."
+
+      - name: Upload Wasm32-wasip2 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/wasm32-wasip2/src/Img.wasm
+          asset_name: wasm32-wasip2.wasm
+          tag: Nightly
+          overwrite: true
+          body: "Wasm32-wasip2"
