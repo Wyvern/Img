@@ -48,7 +48,7 @@ jobs:
           # pipx install cargo-zigbuild
 
           cargo update
-          set +e
+          set +e -x
           time cargo s powerpc64le-unknown-linux-gnu
           time cargo s powerpc64le-unknown-linux-musl
 

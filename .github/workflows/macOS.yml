@@ -37,7 +37,7 @@ jobs:
       - name: Build Release
         run: |
           cargo update
-          set +e
+          set +e -x
           time cargo s arm64e-apple-ios
           time cargo s arm64e-apple-tvos
           time cargo s aarch64-apple-watchos
