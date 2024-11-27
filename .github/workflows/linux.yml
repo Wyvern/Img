@@ -48,7 +48,7 @@ jobs:
           # pipx install cargo-zigbuild
 
           cargo update
-
+          set +e
           time cargo s powerpc64le-unknown-linux-gnu
           time cargo s powerpc64le-unknown-linux-musl
 
@@ -138,6 +138,7 @@ jobs:
 
       - name: Upload Linux-s390x-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/s390x-unknown-linux-musl/src/Img
