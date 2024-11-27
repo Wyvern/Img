@@ -159,6 +159,7 @@ jobs:
 
       - name: Upload Linux-riscv64gc-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/riscv64gc-unknown-linux-musl/src/Img
