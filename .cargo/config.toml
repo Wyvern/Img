@@ -108,7 +108,7 @@ rustflags = [
     "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.src.build-override]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 [profile.src.package."*"]
 rustflags = ["-Cprefer-dynamic"]
@@ -224,6 +224,9 @@ rustflags = ["-Clink-arg=-undefined dynamic_lookup"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
+
+[target.'cfg(target_os="windows")']
+rustflags = ["-Cprefer-dynamic=no"]
 
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
