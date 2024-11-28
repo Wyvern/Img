@@ -55,7 +55,7 @@ debug-assertions = false
 
 #test
 [profile.test]
-rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
 inherits = "dev"
 [profile.test.package."*"]
 rustflags = ["-Cprefer-dynamic"]
@@ -146,9 +146,10 @@ checksum-freshness = true
 # build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 
 [host]
-rustflags = ["-Ctarget-cpu=native", "-Ztune-cpu=native"]
+rustflags = ["-Cprefer-dynamic", "-Ctarget-cpu=native", "-Ztune-cpu=native"]
 
 [build]
+rustflags = ["-Zpanic-in-drop=abort"]
 incremental = true
 rustc-wrapper = "sccache"
 
@@ -224,9 +225,6 @@ rustflags = ["-Clink-arg=-undefined dynamic_lookup"]
 
 [target.'cfg(any(target_vendor="apple",target_os="windows"))']
 rustflags = ["-Clink-arg=-fno-async-exceptions"]
-
-[target.'cfg(target_os="windows")']
-rustflags = ["-Cprefer-dynamic=no"]
 
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
