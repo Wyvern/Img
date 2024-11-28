@@ -29,9 +29,11 @@ jobs:
           sc stop "pla"
 
           $pattern = "telemetry|ceip|diag|experience|feedback";
+          $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
+          $services | ForEach-Object { Write-Host "Matched services: $_.DisplayName" }
 
-          Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern | Set-Service -StartMode Disabled
-          Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern | ? Status -eq "running" | Stop-Service
+          $services | Set-Service -StartMode Disabled
+          $services | ? Status -match "running|pending|unknown" | Stop-Service
 
       - name: Checkout
         uses: actions/checkout@v4
