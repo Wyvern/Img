@@ -28,12 +28,10 @@ jobs:
           sc stop "DPS"
           sc stop "pla"
 
-          Get-Service -ErrorAction SilentlyContinue|? name -Like "*TELEMETRY*" | Set-Service -StartMode Disabled
-          Get-Service -ErrorAction SilentlyContinue|? name -Like "*TELEMETRY*" | ? status -eq "running" | Stop-Service
-          Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | Set-Service -StartMode Disabled
-          Get-Service -ErrorAction SilentlyContinue|? name -Like "*CEIP*" | ? status -eq "running" | Stop-Service
-          Get-Service -ErrorAction SilentlyContinue|? name -Like "*Diagnostic*" | Set-Service -StartMode Disabled
-          Get-Service -ErrorAction SilentlyContinue|? name -Like "*Diagnostic*" | ? status -eq "running" | Stop-Service
+          $pattern = "telemetry|ceip|diag|experience|feedback";
+
+          Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern | Set-Service -StartMode Disabled
+          Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern | ? Status -eq "running" | Stop-Service
 
       - name: Checkout
         uses: actions/checkout@v4
