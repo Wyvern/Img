@@ -28,9 +28,9 @@ jobs:
           sc stop "DPS"
           sc stop "pla"
 
-          $pattern = "telemetry|ceip|diag|experience|feedback";
+          $pattern = "telemetry|ceip|diag|experience|feedback|help|search|index";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
-          $services | ForEach-Object { Write-Host "Matched services: $_.DisplayName" }
+          $services | ForEach-Object { $_.DisplayName }
 
           $services | Set-Service -StartMode Disabled
           $services | ? Status -match "running|pending|unknown" | Stop-Service
