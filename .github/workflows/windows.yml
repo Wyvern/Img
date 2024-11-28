@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Disable and Stop windows services
         run: |
-          $pattern = "tele|diag|track|exper|search|logs|assist|report|compat|logg";
+          $pattern = "tele|diag|exper|search|logs|assist|report|logg|program";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
           $services | ForEach-Object { $_.DisplayName }
 
