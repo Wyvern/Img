@@ -108,10 +108,10 @@ rustflags = [
     "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.src.build-override]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 [profile.src.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 
 [unstable]
