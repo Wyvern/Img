@@ -76,12 +76,12 @@ inherits = "dev"
 [profile.release.build-override]
 inherits = "release"
 [profile.release.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 rpath = true
-# trim-paths = true
+trim-paths = true
 
 #lto
 [profile.lto]
