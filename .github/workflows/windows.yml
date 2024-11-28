@@ -42,13 +42,13 @@ jobs:
           cargo update
 
           Write-Host "Building: aarch64-pc-windows-msvc"
-          Measure-Command {RUSTFLAGS="-C prefer-dynamic=no" cargo s --target aarch64-pc-windows-msvc}
+          Measure-Command {cargo s --target aarch64-pc-windows-msvc}
 
           Write-Host "Building: x86_64-pc-windows-msvc"
-          Measure-Command {RUSTFLAGS="-C prefer-dynamic=no" cargo s --target x86_64-pc-windows-msvc}
+          Measure-Command {cargo s --target x86_64-pc-windows-msvc}
 
           Write-Host "Building: arm64ec-pc-windows-msvc"
-          Measure-Command {RUSTFLAGS="-C prefer-dynamic=no" cargo s --target arm64ec-pc-windows-msvc}
+          Measure-Command {cargo s --target arm64ec-pc-windows-msvc}
 
           cmd /c dir /s target\Img.exe
           systeminfo
