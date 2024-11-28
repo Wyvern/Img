@@ -24,7 +24,7 @@ jobs:
           $services | ForEach-Object { $_.DisplayName }
 
           $services | Set-Service -StartMode Disabled
-          $services | ? Status -match "running|pending|unknown" | Stop-Service
+          $services | Stop-Service
 
       - name: Checkout
         uses: actions/checkout@v4
