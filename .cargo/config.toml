@@ -94,10 +94,10 @@ inherits = "release"
 panic = "abort"
 codegen-units = 1
 [profile.lto.build-override]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 [profile.lto.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 
 #src
