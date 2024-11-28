@@ -39,40 +39,40 @@ RUSTC_BOOTSTRAP = "1"
 
 #dev
 [profile.dev]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
+# rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
 rpath = true
 debug = false
 strip = true
-trim-paths = true
+# trim-paths = true
 [profile.dev.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
 [profile.dev.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
 
 #test
 [profile.test]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 [profile.test.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "test"
 [profile.test.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "test"
 
 #bench
 [profile.bench.package."*"]
 inherits = "bench"
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 [profile.bench.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "bench"
 [profile.bench]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 
 #release
@@ -80,12 +80,12 @@ inherits = "dev"
 rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 rpath = true
-trim-paths = true
+# trim-paths = true
 
 #lto
 [profile.lto]
@@ -94,10 +94,10 @@ lto = true
 panic = "abort"
 codegen-units = 1
 [profile.lto.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 [profile.lto.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 
 #src
@@ -108,10 +108,10 @@ rustflags = [
     "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.src.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 [profile.src.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 
 [unstable]
