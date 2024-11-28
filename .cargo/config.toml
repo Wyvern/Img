@@ -146,7 +146,11 @@ checksum-freshness = true
 # build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 
 [host]
-rustflags = ["-Cprefer-dynamic", "-Ctarget-cpu=native", "-Ztune-cpu=native"]
+rustflags = [
+    # "-Cprefer-dynamic",
+    "-Ctarget-cpu=native",
+    "-Ztune-cpu=native",
+]
 
 [build]
 rustflags = ["-Zpanic-in-drop=abort"]
