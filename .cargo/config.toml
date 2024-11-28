@@ -77,7 +77,7 @@ inherits = "dev"
 
 #release
 [profile.release.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
 # rustflags = ["-Cprefer-dynamic"]
@@ -103,10 +103,10 @@ inherits = "lto"
 #src
 [profile.src]
 inherits = "lto"
-rustflags = [
-    "-Zforce-unstable-if-unmarked",
-    "-Zcross-crate-inline-threshold=yes",
-]
+# rustflags = [
+#     "-Zforce-unstable-if-unmarked",
+#     "-Zcross-crate-inline-threshold=yes",
+# ]
 [profile.src.build-override]
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
