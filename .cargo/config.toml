@@ -77,7 +77,7 @@ inherits = "dev"
 
 #release
 [profile.release.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
 rustflags = ["-Cprefer-dynamic"]
@@ -89,12 +89,12 @@ trim-paths = true
 
 #lto
 [profile.lto]
-lto = true
 inherits = "release"
+lto = true
 panic = "abort"
 codegen-units = 1
 [profile.lto.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 [profile.lto.package."*"]
 rustflags = ["-Cprefer-dynamic"]
@@ -111,7 +111,7 @@ rustflags = [
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 [profile.src.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 
 [unstable]
