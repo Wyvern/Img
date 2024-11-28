@@ -80,7 +80,7 @@ inherits = "dev"
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
 rustflags = ["-Cprefer-dynamic"]
@@ -97,7 +97,7 @@ codegen-units = 1
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 [profile.lto.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 
 #src
@@ -111,7 +111,7 @@ rustflags = [
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 [profile.src.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 
 [unstable]
@@ -146,11 +146,7 @@ checksum-freshness = true
 # build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 
 [host]
-rustflags = [
-    # "-Cprefer-dynamic",
-    "-Ctarget-cpu=native",
-    "-Ztune-cpu=native",
-]
+rustflags = ["-Cprefer-dynamic", "-Ctarget-cpu=native", "-Ztune-cpu=native"]
 
 [build]
 rustflags = ["-Zpanic-in-drop=abort"]
