@@ -47,7 +47,7 @@ jobs:
 
           function cb(){
             local target="$1"
-            time cross build -q --config 'build.rustc-wrapper=""' --profile lto --target $target > /dev/null
+            time cross build -q --config 'build.rustc-wrapper=""' --profile lto --target $target
           }
 
           set +e -x
