@@ -28,7 +28,7 @@ jobs:
           sc stop "DPS"
           sc stop "pla"
 
-          $pattern = "anal|tele|ceip|diag|track|exper|search|index|log";
+          $pattern = "tele|ceip|diag|track|exper|search|index|logs|assist|report";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
           $services | ForEach-Object { $_.DisplayName }
 
