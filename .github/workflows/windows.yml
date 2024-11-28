@@ -50,6 +50,8 @@ jobs:
         run: |
           cargo update
 
+          Set-PSDebug -Trace 1
+
           Measure-Command { cargo s --target aarch64-pc-windows-msvc }
           Measure-Command { cargo s --target x86_64-pc-windows-msvc }
           Measure-Command { cargo s --target arm64ec-pc-windows-msvc }
