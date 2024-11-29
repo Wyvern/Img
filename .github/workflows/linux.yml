@@ -42,7 +42,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-powerpc64-aix musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
 
       - name: Build Release
         run: |
@@ -53,7 +53,7 @@ jobs:
 
           set +e -x
 
-          time cargo s --target powerpc64-ibm-aix
+          # time cargo s --target powerpc64-ibm-aix
 
           time cargo s --target powerpc64le-unknown-linux-gnu
           time cargo s --target powerpc64le-unknown-linux-musl
