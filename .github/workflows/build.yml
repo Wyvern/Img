@@ -40,6 +40,9 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Setup mold linker
+        uses: rui314/setup-mold@v1
+
       - name: Ubuntu apt update and install
         run: |
           sudo apt update -qq && sudo apt install -qq gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu musl-tools -y

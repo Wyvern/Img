@@ -38,6 +38,9 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Setup mold linker
+        uses: rui314/setup-mold@v1
+
       - name: Cross-rs
         run: cargo install cross --git https://github.com/cross-rs/cross --branch main
 

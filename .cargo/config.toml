@@ -259,8 +259,8 @@ linker = "mips64el-linux-gnuabi64-gcc"
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
 
-[target.'cfg(target_os="android")']
-rustflags = ["-Zhas-thread-local=no"]
+[target.'cfg(target_os="linux")']
+rustflags = ["-Clink-arg=-fuse-ld=mold"]
 
 [target.powerpc64-ibm-aix]
 linker = "powerpc64-ibm-aix-gcc"
