@@ -57,8 +57,6 @@ jobs:
           cb x86_64-unknown-illumos
           cb x86_64-pc-solaris
           cb sparcv9-sun-solaris
-          cb loongarch64-unknown-linux-gnu
-          cb loongarch64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu

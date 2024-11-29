@@ -250,6 +250,9 @@ linker = "riscv64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="sparc64",target_os="linux"))']
 linker = "sparc64-linux-gnu-gcc"
 
+[target.'cfg(all(target_arch="loongarch64",target_os="linux"))']
+linker = "loongarch64-linux-gnu-gcc"
+
 [target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "big"))']
 linker = "mips64-linux-gnuabi64-gcc"
 

@@ -35,21 +35,23 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -qq && sudo apt install -qq gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
+          sudo apt update -qq && sudo apt install -qq gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-loongarch64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
           # pip install cargo-zigbuild
 
           cargo update
+
           set +e -x
+
           time cargo l --target sparc64-unknown-linux-gnu
 
           time cargo l --target powerpc64le-unknown-linux-gnu
@@ -66,6 +68,9 @@ jobs:
 
           time cargo l --target aarch64-unknown-linux-gnu
           time cargo l --target aarch64-unknown-linux-musl
+
+          time cargo l --target loongarch64-unknown-linux-gnu
+          time cargo l --target loongarch64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
