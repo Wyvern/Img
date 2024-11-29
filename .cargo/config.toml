@@ -51,36 +51,29 @@ debug-assertions = false
 [profile.dev.build-override]
 rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
-debug-assertions = false
 
 #test
 [profile.test]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
 inherits = "dev"
 [profile.test.package."*"]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "test"
+inherits = "dev"
 [profile.test.build-override]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "test"
+inherits = "dev"
 
 #bench
 [profile.bench.package."*"]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "bench"
+inherits = "dev"
 [profile.bench.build-override]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "bench"
+inherits = "dev"
 [profile.bench]
-rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 
 #release
 [profile.release.build-override]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
 rustflags = ["-Cprefer-dynamic"]
@@ -217,7 +210,7 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(any(target_arch="arm64ec",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
+[target.'cfg(any(target_arch="arm64ec",target_arch="sparc64",all(target_arch="powerpc64",target_env="gnu"),target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = ["-Zlinker-features=-lld"]
 
 [target.'cfg(not(any(target_family="wasm",target_os="none")))']
@@ -268,4 +261,4 @@ linker = "mips64el-linux-gnuabi64-gcc"
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.powerpc64-ibm-aix]
-linker = "powerpc64-ibm-aix-gcc"
+linker = "powerpc64-aix-gcc"
