@@ -35,15 +35,16 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Ubuntu apt update and install
+        continue-on-error: true
         run: |
           sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
-          sudo apt install -q gcc-loongarch64-linux-gnu || true
+          sudo apt install -q gcc-loongarch64-linux-gnu
 
       - name: Build Release
         run: |
@@ -102,6 +103,7 @@ jobs:
 
       - name: Upload Linux-powerpc64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/powerpc64-unknown-linux-gnu/lto/Img
