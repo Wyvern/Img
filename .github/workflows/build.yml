@@ -42,7 +42,8 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -qq && sudo apt install -m gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-loongarch64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
+          sudo apt install -q gcc-loongarch64-linux-gnu || true
 
       - name: Build Release
         run: |
