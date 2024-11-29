@@ -42,9 +42,8 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          set +e -x
           sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu musl-tools -y
-          sudo apt install -q gcc-loongarch64-linux-gnu
+          sudo apt install -q gcc-loongarch64-linux-gnu || true
 
       - name: Build Release
         run: |
@@ -58,7 +57,6 @@ jobs:
 
           time cargo l --target powerpc64le-unknown-linux-gnu
           time cargo l --target powerpc64-unknown-linux-gnu
-          # time cargo l --target powerpc64le-unknown-linux-musl
 
           time cargo l --target s390x-unknown-linux-gnu
           # time cargo l --target s390x-unknown-linux-musl
@@ -72,8 +70,8 @@ jobs:
           time cargo l --target aarch64-unknown-linux-gnu
           time cargo l --target aarch64-unknown-linux-musl
 
-          time cargo l --target loongarch64-unknown-linux-gnu
-          time cargo l --target loongarch64-unknown-linux-musl
+          # time cargo l --target loongarch64-unknown-linux-gnu
+          # time cargo l --target loongarch64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -101,6 +99,16 @@ jobs:
           tag: Stable
           overwrite: true
           body: "Ubuntu Linux-powerpc64le-gnu binary executable."
+
+      - name: Upload Linux-powerpc64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/powerpc64-unknown-linux-gnu/lto/Img
+          asset_name: Linux-powerpc64-gnu
+          tag: Stable
+          overwrite: true
+          body: "Ubuntu Linux-powerpc64-gnu binary executable."
 
       - name: Upload Linux-riscv64gc-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
