@@ -94,10 +94,8 @@ lto = true
 panic = "abort"
 codegen-units = 1
 [profile.lto.build-override]
-rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 [profile.lto.package."*"]
-rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 
 #src
@@ -108,16 +106,14 @@ rustflags = [
     "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.src.build-override]
-# rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 [profile.src.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
 inherits = "src"
 
-[profile.'cfg(target_os = "windows")'.build-overide]
-rustflags = ["-Cprefer-dynamic=no"]
-[profile.'cfg(target_os = "windows")'.package."*"]
-rustflags = ["-Cprefer-dynamic=no"]
+[profile.'cfg(not(target_os = "windows"))'.build-overide]
+rustflags = ["-Cprefer-dynamic"]
+[profile.'cfg(not(target_os = "windows"))'.package."*"]
+rustflags = ["-Cprefer-dynamic"]
 
 [unstable]
 unstable-options = true
