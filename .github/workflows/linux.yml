@@ -42,7 +42,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-14-loongarch64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
@@ -63,6 +63,9 @@ jobs:
 
           time cargo s --target mips64-unknown-linux-gnuabi64
           time cargo s --target mips64-unknown-linux-muslabi64
+
+          time cargo s --target mips64el-unknown-linux-gnuabi64
+          time cargo s --target mips64el-unknown-linux-muslabi64
 
           time cargo s --target s390x-unknown-linux-gnu
           time cargo s --target s390x-unknown-linux-musl
@@ -105,6 +108,28 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Ubuntu Linux-mips64-muslabi64 binary executable."
+
+      - name: Upload Linux-mips64el-gnuabi64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/mips64el-unknown-linux-gnuabi64/src/Img
+          asset_name: Linux-mips64el-gnuabi64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-mips64el-gnuabi64 binary executable."
+
+      - name: Upload Linux-mips64el-muslabi64 to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/mips64el-unknown-linux-muslabi64/src/Img
+          asset_name: Linux-mips64el-muslabi64
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-mips64el-muslabi64 binary executable."
 
       - name: Upload Linux-sparc64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
