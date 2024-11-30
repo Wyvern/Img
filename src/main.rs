@@ -770,7 +770,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     .is_some_and(|c| c.tag().unwrap() == "a")
         });
         tag.map_or(String::default(), |e| {
-            if e.text().map_or(true, |t| t.trim().is_empty()) && e.children().is_empty() {
+            if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
                 <_>::default()
             } else {
                 e.attr("href")
