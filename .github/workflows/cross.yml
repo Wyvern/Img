@@ -59,9 +59,6 @@ jobs:
           # cb x86_64-unknown-dragonfly
           # cb powerpc64-ibm-aix
 
-          cb loongarch64-unknown-linux-gnu
-          cb loongarch64-unknown-linux-musl
-
           cb x86_64-unknown-illumos
           # cb aarch64-unknown-illumos
 

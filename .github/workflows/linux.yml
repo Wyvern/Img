@@ -42,7 +42,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-14-loongarch64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
@@ -75,6 +75,9 @@ jobs:
 
           time cargo s --target aarch64-unknown-linux-gnu
           time cargo s --target aarch64-unknown-linux-musl
+
+          time cargo s --target loongarch64-unknown-linux-gnu
+          time cargo s --target loongarch64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -235,3 +238,23 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Ubuntu Linux-aarch64-musl binary executable."
+
+      - name: Upload Linux-loongarch64-gnu to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/loongarch64-unknown-linux-gnu/src/Img
+          asset_name: Linux-loongarch64-gnu
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-loongarch64-gnu binary executable."
+
+      - name: Upload Linux-loongarch64-musl to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/loongarch64-unknown-linux-musl/src/Img
+          asset_name: Linux-loongarch64-musl
+          tag: Nightly
+          overwrite: true
+          body: "Ubuntu Linux-loongarch64-musl binary executable."
