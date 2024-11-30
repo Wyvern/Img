@@ -636,10 +636,5 @@
     "Site": "oorpg.com",
     "Img": "div.text-center > img",
     "Album": "div.gallery img"
-  },
-  {
-    "Site": "aiavr.uk",
-    "Img": "img.responsive-image",
-    "Album": "div.gallery img"
   }
 ]

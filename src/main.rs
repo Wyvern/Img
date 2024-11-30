@@ -66,7 +66,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
         .expect("Json file parse error.")
         .iter()
         .find(|&s| {
-            s["Site"].as_str().map_or(false, |s| {
+            s["Site"].as_str().is_some_and(|s| {
                 s.split_terminator(',').any(|s| {
                     let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
                     parts.reverse();
@@ -346,7 +346,7 @@ fn parse(addr: &str) -> String {
                                 && [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp"]
                                     .iter()
                                     .any(|&ext| {
-                                        attr.rfind('.').map_or(false, |dot| {
+                                        attr.rfind('.').is_some_and(|dot| {
                                             attr[dot..].eq_ignore_ascii_case(ext)
                                         })
                                     })
@@ -733,10 +733,11 @@ fn content_header_info(
 fn magic_number_type(pb: path::PathBuf) {
     use io::*;
 
-    let mut f = fs::File::open(&pb).unwrap_or_else(|e| quit!("{e} : {}", pb.display()));
+    let mut f =
+        fs::File::open(&pb).unwrap_or_else(|e| quit!("Open file {} failed: {}", pb.display(), e));
     let mut buf = [0u8; 16];
     f.read_exact(&mut buf)
-        .unwrap_or_else(|e| pl!("Read file magic number error: {}", e));
+        .unwrap_or_else(|e| pl!("Read file {} magic number error: {}", pb.display(), e));
 
     let t = infer::get(&buf);
     // tdbg!(&t);
@@ -745,11 +746,7 @@ fn magic_number_type(pb: path::PathBuf) {
         pb.with_extension(t.map_or_else(
             || {
                 let str = String::from_utf8_lossy(&buf);
-                if str.contains("<svg") {
-                    "svg"
-                } else {
-                    ""
-                }
+                if str.contains("<svg") { "svg" } else { "" }
             },
             |ty| ty.extension(),
         )),
@@ -773,7 +770,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     .is_some_and(|c| c.tag().unwrap() == "a")
         });
         tag.map_or(String::default(), |e| {
-            if e.text().map_or(true, |t| t.trim().is_empty()) && e.children().is_empty() {
+            if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
                 <_>::default()
             } else {
                 e.attr("href")
@@ -1058,7 +1055,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
 
 ///Detect terminal emulator using `echo $TERM`
 fn terminal_emulator() -> bool {
-    env::var("TERM").map_or(false, |o| {
+    env::var("TERM").is_ok_and(|o| {
         ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
             .iter()
             .any(|x| o.contains(x))
@@ -1258,7 +1255,7 @@ mod img {
     #[cfg(feature = "embed")]
     #[test]
     fn embed() {
-        let data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
+        let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
         #[cfg(feature = "embed")]
         save_to_file(data);
     }
