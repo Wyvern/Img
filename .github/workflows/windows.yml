@@ -21,10 +21,11 @@ jobs:
         run: |
           $pattern = "tele|diag|exper|search|logs|assist|report|logg";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
-          $services | ForEach-Object { $_.DisplayName }
 
           $services | Set-Service -StartMode Disabled
           $services | Stop-Service
+
+          $services | ForEach-Object { $_.DisplayName $_.Status}
 
       - name: Checkout
         uses: actions/checkout@v4
