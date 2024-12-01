@@ -21,7 +21,6 @@ jobs:
         run: |
           sudo mdutil -a -i off
           sudo mdutil -a -d
-          sudo softwareupdate --schedule off
           sudo pmset -a powernap 0
           sudo pmset -a sleep 0
 
