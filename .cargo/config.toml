@@ -76,7 +76,7 @@ inherits = "release"
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 rpath = true
 trim-paths = true
 
@@ -86,7 +86,6 @@ inherits = "release"
 lto = true
 panic = "abort"
 codegen-units = 1
-rustflags = []
 [profile.lto.build-override]
 inherits = "lto"
 [profile.lto.package."*"]
