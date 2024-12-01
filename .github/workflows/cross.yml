@@ -20,8 +20,8 @@ jobs:
       - name: Purge Ubuntu
         run: |
           sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-
-          sudo systemctl mask systemd-journald.service systemd-journald.socket systemd-journald-dev-log.socket
+          sudo apt autoremove && sudo apt clean
+          sudo systemctl disable --now systemd-journald systemd-journald.socket systemd-journald-dev-log.socket
 
       - name: Checkout
         uses: actions/checkout@v4

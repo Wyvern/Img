@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
           sudo apt autoremove && sudo apt clean
-          sudo systemctl mask systemd-journald.service systemd-journald.socket systemd-journald-dev-log.socket
+          sudo systemctl disable --now systemd-journald systemd-journald.socket systemd-journald-dev-log.socket
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -211,6 +211,8 @@ jobs:
         run: |
           sudo mdutil -a -i off
           sudo mdutil -a -d
+          sudo pmset -a powernap 0
+          sudo pmset -a sleep 0
 
       - name: Checkout
         uses: actions/checkout@v4
