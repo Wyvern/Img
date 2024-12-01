@@ -21,9 +21,7 @@ jobs:
         run: |
           sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
           sudo apt autoremove && sudo apt clean
-          sudo systemctl disable --now systemd-journald
-          sudo systemctl disable --now systemd-journal-flush
-          sudo systemctl status systemd-journald.socket systemd-journald-dev-log.socket
+          sudo systemctl disable --now systemd-journald systemd-journald.socket systemd-journald-dev-log.socket
 
       - name: Checkout
         uses: actions/checkout@v4
