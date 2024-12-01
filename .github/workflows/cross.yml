@@ -1,4 +1,4 @@
-name: Stable-Cross
+name: BSD Unix
 
 on:
   push:
