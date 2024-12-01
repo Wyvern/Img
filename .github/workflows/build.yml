@@ -19,9 +19,9 @@ jobs:
     steps:
       - name: Purge Ubuntu
         run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport -q
+          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
 
-          sudo systemctl mask systemd-journald.service systemd-journald.socket
+          sudo systemctl mask systemd-journald.service systemd-journald.socket systemd-journald-dev-log.socket
 
       - name: Checkout
         uses: actions/checkout@v4
