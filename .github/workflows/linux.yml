@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: Purge Ubuntu
         run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-          sudo apt autoremove && sudo apt clean
+          sudo apt purge -y ufw rsyslog logrotate sysstat python3-problem-report sosreport apport linux-crashdump kexec-tools crash systemd-coredump linux-kdump-tools kdump-tools abrt kerneloops collectd metrics-daemon
+          sudo apt autoremove -y && sudo apt clean
           sudo systemctl disable --now systemd-journald
 
       - name: Checkout
