@@ -23,6 +23,8 @@ jobs:
           sudo apt autoremove -y && sudo apt clean
           sudo systemctl disable --now systemd-journald
 
+          dpkg -l | egrep -i "error|report|dump|stat|log|metric"
+
       - name: Checkout
         uses: actions/checkout@v4
 
