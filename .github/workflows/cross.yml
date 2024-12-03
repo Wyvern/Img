@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Purge Ubuntu
         run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
+          sudo apt purge -y ufw rsyslog logrotate sysstat python3-problem-report sosreport apport linux-crashdump kexec-tools crash systemd-coredump  kdump-tools kerneloops collectd
           sudo apt autoremove && sudo apt clean
           sudo systemctl disable --now systemd-journald
 
