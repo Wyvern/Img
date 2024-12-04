@@ -19,11 +19,11 @@ jobs:
     steps:
       - name: Disable and Stop windows services
         run: |
-          $pattern = "tele|diag|exper|search|logs|assist|report|logg|task";
+          $pattern = "tele|diag|exper|search|logs|assist|report|logg|sched";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
 
-          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
-          $services | Stop-Service -Force -ErrorAction SilentlyContinue
+          $services | Set-Service -StartMode Disabled
+          $services | Stop-Service -Force
           $services | ForEach-Object {$_.DisplayName}
 
           reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
