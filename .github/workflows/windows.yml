@@ -23,7 +23,7 @@ jobs:
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
 
           $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
-          $services | Stop-Service
+          $services | Stop-Service -Force -ErrorAction SilentlyContinue
           $services | ForEach-Object {$_.DisplayName}
 
           reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
