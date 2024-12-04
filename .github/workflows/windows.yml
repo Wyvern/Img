@@ -19,21 +19,17 @@ jobs:
     steps:
       - name: Disable and Stop windows services
         run: |
-          $pattern = "tele|diag|exper|search|logs|assist|report|logg";
+          $pattern = "tele|diag|exper|search|logs|assist|report|logg|task";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
 
           $services | Set-Service -StartMode Disabled
           $services | Stop-Service
+          $services | ForEach-Object {$_.DisplayName}
 
           reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
           reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
           reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
           reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
-
-          schtasks /change /TN "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /DISABLE
-          schtasks /change /TN "\Microsoft\Windows\Application Experience\ProgramDataUpdater" /DISABLE
-          schtasks /change /TN "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /DISABLE
-          schtasks /change /TN "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" /DISABLE
 
       - name: Checkout
         uses: actions/checkout@v4
