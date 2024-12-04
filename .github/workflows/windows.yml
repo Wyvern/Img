@@ -22,7 +22,7 @@ jobs:
           $pattern = "tele|diag|exper|search|logs|assist|report|logg|sched";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
 
-          $services | Set-Service -StartMode Disabled
+          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
           $services | Stop-Service -Force
           $services | ForEach-Object {$_.DisplayName}
 
