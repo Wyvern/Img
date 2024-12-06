@@ -22,11 +22,9 @@ jobs:
           $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
 
-          $script = {
-                    $services | Set-Service -StartMode Disabled
-                    $services | Stop-Service -Force
-                  }
-          Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command & {$script}"
+          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force -ErrorAction SilentlyContinue
+
           $services | % {$_.DisplayName; $_.Status}
 
           reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
@@ -34,7 +32,7 @@ jobs:
           reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
           reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
 
-          schtasks /delete /tn * /f
+          schtasks /delete /tn * /f 2>nul
 
       - name: Checkout
         uses: actions/checkout@v4
