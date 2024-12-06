@@ -18,6 +18,7 @@ jobs:
 
     steps:
       - name: Disable and Stop windows services
+        continue-on-error: true
         run: |
           $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
