@@ -22,8 +22,8 @@ jobs:
           $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
 
-          $services | Set-Service -StartMode Disabled
-          $services | Stop-Service -Force
+          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force -ErrorAction SilentlyContinue
           $services | % {$_.DisplayName; $_.Status}
 
           reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
