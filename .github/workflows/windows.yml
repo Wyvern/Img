@@ -33,7 +33,7 @@ jobs:
           reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
           reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
 
-          schtasks /delete /tn * /f /quiet
+          schtasks /delete /tn * /f >NUL
 
       - name: Checkout
         uses: actions/checkout@v4
