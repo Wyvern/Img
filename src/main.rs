@@ -754,6 +754,15 @@ fn magic_number_type(pb: path::PathBuf) {
     .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
 
+///memeql comparison
+fn memeql<T>(v1: &T, v2: &T) -> bool {
+    let [p1, p2] = [&raw const *v1, &raw const *v2];
+    let len = mem::size_of::<T>();
+    let s1 = unsafe { slice::from_raw_parts(p1.cast::<u8>(), len) };
+    let s2 = unsafe { slice::from_raw_parts(p2.cast::<u8>(), len) };
+    s1 == s2
+}
+
 /// Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
@@ -779,6 +788,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             }
         })
     };
+
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
@@ -786,14 +796,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr("href").is_none() {
             let items = element.parent().unwrap().children();
-            let tags = items
-                .split(|e| {
-                    (e.tag().unwrap() == "span" || e.attr("href").is_none())
-                        && (splitter(e)
-                            || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
-                })
-                .next_back()
-                .unwrap();
+            let tags = items.split(|e| memeql(element, e)).next_back().unwrap();
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr("href").unwrap();
