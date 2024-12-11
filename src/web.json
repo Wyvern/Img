@@ -594,7 +594,7 @@
   },
   {
     "Site": "4khd.com,xxtt.info",
-    "Img": "p img",
+    "Img": "p img | i0.wp.com/pic -> img",
     "Next": "ul.page-links li.current",
     "Album": "h2.wp-block-post-title.has-medium-font-size > a"
   },
