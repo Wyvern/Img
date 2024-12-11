@@ -323,57 +323,60 @@ fn parse(addr: &str) -> String {
             }
 
             if let Some((_, r)) = sels {
-                if r.contains("->") {
-                    let mut newurls = collections::HashSet::new();
-                    for mut u in urls {
-                        let (mut old, mut new) = r.trim().split_once("->").unwrap();
+                match r.trim().split_once("->") {
+                    Some((mut old, mut new)) => {
                         old = old.trim();
                         new = new.trim();
-                        if let Some(pos) = u.find(old) {
-                            u.replace_range(pos..pos + old.len(), new);
+                        let mut newurls = collections::HashSet::new();
+                        for mut u in urls {
+                            if let Some(pos) = u.find(old) {
+                                u.replace_range(pos..pos + old.len(), new);
+                            }
+                            newurls.insert(u);
                         }
-                        newurls.insert(u);
+                        urls = newurls;
                     }
-                    urls = newurls;
-                } else {
-                    let mut curl = process::Command::new("curl");
-                    curl.arg("-Z");
-                    for u in &urls {
-                        curl.arg(u);
-                    }
-                    let o = curl
-                        .args(CURL)
-                        .args(["--parallel-immediate", "-C-"])
-                        .output()
-                        .unwrap();
-                    let html = String::from_utf8_lossy(&o.stdout).into_owned();
-                    let page = crabquery::Document::from(html);
-                    let html_img = page.select(r);
-                    urls.clear();
-                    for e in html_img {
-                        let src = e.attr("src").unwrap();
-                        let title_alt = ["title", "alt"].iter().find_map(|a| {
-                            e.attr(a).and_then(|x| {
-                                let attr = x.trim();
-                                if !attr.is_empty()
-                                    && [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp"]
-                                        .iter()
-                                        .any(|&ext| {
-                                            attr.rfind('.').is_some_and(|dot| {
-                                                attr[dot..].eq_ignore_ascii_case(ext)
+                    None => {
+                        let mut curl = process::Command::new("curl");
+                        curl.arg("-Z");
+                        for u in &urls {
+                            curl.arg(u);
+                        }
+                        let o = curl
+                            .args(CURL)
+                            .args(["--parallel-immediate", "-C-"])
+                            .output()
+                            .unwrap();
+                        let html = String::from_utf8_lossy(&o.stdout).into_owned();
+                        let page = crabquery::Document::from(html);
+                        let html_img = page.select(r);
+                        urls.clear();
+                        for e in html_img {
+                            let src = e.attr("src").unwrap();
+                            let title_alt = ["title", "alt"].iter().find_map(|a| {
+                                e.attr(a).and_then(|x| {
+                                    let attr = x.trim();
+                                    if !attr.is_empty()
+                                        && [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp"]
+                                            .iter()
+                                            .any(|&ext| {
+                                                attr.rfind('.').is_some_and(|dot| {
+                                                    attr[dot..].eq_ignore_ascii_case(ext)
+                                                })
                                             })
-                                        })
-                                {
-                                    Some(x)
-                                } else {
-                                    None
-                                }
-                            })
-                        });
-                        let url = canonicalize(src, addr);
-                        urls.insert(
-                            title_alt.map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
-                        );
+                                    {
+                                        Some(x)
+                                    } else {
+                                        None
+                                    }
+                                })
+                            });
+                            let url = canonicalize(src, addr);
+                            urls.insert(
+                                title_alt
+                                    .map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
+                            );
+                        }
                     }
                 }
             }
