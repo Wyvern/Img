@@ -4,14 +4,13 @@ use {std::*, util::*};
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; if cfg!(debug_assertions) { 8 } else { 7 }] = [
+static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
     "--compressed",
     "-kfsL",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
     "--tcp-nodelay",
-    "--no-clobber",
     #[cfg(debug_assertions)]
     "-S",
     // "-OJ",
@@ -344,10 +343,7 @@ fn parse(addr: &str) -> String {
                         }
                         let o = curl
                             .args(CURL)
-                            .args([
-                                "--parallel-immediate",
-                                // "-C-"
-                            ])
+                            .args(["--parallel-immediate"])
                             .output()
                             .unwrap();
                         let html = String::from_utf8_lossy(&o.stdout).into_owned();
@@ -662,7 +658,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             "-e",
             &format!("https://{host}"),
             "--parallel-immediate",
-            // "-C-",
+            "-C-",
         ]);
         let _t = cmd.spawn();
 
@@ -703,7 +699,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 "-e",
                 &format!("https://{host}"),
                 "--parallel-immediate",
-                // "-C-",
+                "-C-",
             ])
             .spawn();
     }
