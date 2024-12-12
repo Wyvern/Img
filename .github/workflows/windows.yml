@@ -59,12 +59,6 @@ jobs:
           Write-Host "Building: arm64ec-pc-windows-msvc"
           Measure-Command {cargo s --target arm64ec-pc-windows-msvc}
 
-          Write-Host "Building: aarch64-pc-windows-gnullvm"
-          Measure-Command {cargo s --target aarch64-pc-windows-gnullvm}
-
-          Write-Host "Building: x86_64-pc-windows-gnullvm"
-          Measure-Command {cargo s --target x86_64-pc-windows-gnullvm}
-
           cmd /c dir /s target\Img.exe
           systeminfo
 
@@ -101,25 +95,3 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Windows arm64ec binary executable."
-
-      - name: Upload Windows-aarch64-gnullvm to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-pc-windows-gnullvm/src/Img.exe
-          asset_name: Windows-aarch64-gnullvm.exe
-          tag: Nightly
-          overwrite: true
-          body: "Windows aarch64 gnullvm binary executable."
-
-      - name: Upload Windows-x86_64-gnullvm to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-windows-gnullvm/src/Img.exe
-          asset_name: Windows-x86_64-gnullvm.exe
-          tag: Nightly
-          overwrite: true
-          body: "Windows x86_64 gnullvm binary executable."
