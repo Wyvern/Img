@@ -336,7 +336,7 @@ fn parse(addr: &str) -> String {
                         }
                         urls = newurls;
                     }
-                    None if !l.starts_with("json:") => {
+                    _ if !l.starts_with("json:") => {
                         let mut curl = process::Command::new("curl");
                         curl.arg("-Z");
                         for u in &urls {
@@ -344,7 +344,10 @@ fn parse(addr: &str) -> String {
                         }
                         let o = curl
                             .args(CURL)
-                            .args(["--parallel-immediate", "-C-"])
+                            .args([
+                                "--parallel-immediate",
+                                // "-C-"
+                            ])
                             .output()
                             .unwrap();
                         let html = String::from_utf8_lossy(&o.stdout).into_owned();
@@ -659,7 +662,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             "-e",
             &format!("https://{host}"),
             "--parallel-immediate",
-            "-C-",
+            // "-C-",
         ]);
         let _t = cmd.spawn();
 
@@ -700,7 +703,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 "-e",
                 &format!("https://{host}"),
                 "--parallel-immediate",
-                "-C-",
+                // "-C-",
             ])
             .spawn();
     }
