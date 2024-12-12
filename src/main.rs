@@ -322,7 +322,7 @@ fn parse(addr: &str) -> String {
                 pl!("Skipped <{embed}> Embed 🏞️");
             }
 
-            if let Some((_, r)) = sels {
+            if let Some((l, r)) = sels {
                 match r.trim().split_once("->") {
                     Some((mut old, mut new)) => {
                         old = old.trim();
@@ -336,7 +336,7 @@ fn parse(addr: &str) -> String {
                         }
                         urls = newurls;
                     }
-                    None => {
+                    None if !l.starts_with("json:") => {
                         let mut curl = process::Command::new("curl");
                         curl.arg("-Z");
                         for u in &urls {
@@ -378,6 +378,7 @@ fn parse(addr: &str) -> String {
                             );
                         }
                     }
+                    _ => (),
                 }
             }
             // tdbg!(&urls, &css_img, &json_img);
