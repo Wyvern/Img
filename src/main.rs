@@ -327,7 +327,7 @@ fn parse(addr: &str) -> String {
                     Some((mut old, mut new)) => {
                         old = old.trim();
                         new = new.trim();
-                        let mut newurls = collections::HashSet::new();
+                        let mut newurls = collections::HashSet::with_capacity(urls.len());
                         for mut u in urls {
                             if let Some(pos) = u.find(old) {
                                 u.replace_range(pos..pos + old.len(), new);
