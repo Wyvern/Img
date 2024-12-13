@@ -335,7 +335,7 @@ fn parse(addr: &str) -> String {
                         }
                         urls = newurls;
                     }
-                    _ if !l.starts_with("json:") => {
+                    _ if !l.starts_with("json:") && !urls.is_empty() => {
                         let mut curl = process::Command::new("curl");
                         curl.arg("-Z");
                         for u in &urls {
