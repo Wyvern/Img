@@ -560,14 +560,17 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
-    #[cfg(not(feature = "infer"))]
-    use sync::mpsc::*;
-    #[cfg(not(feature = "infer"))]
-    let (s, r) = channel();
-    #[cfg(not(feature = "infer"))]
-    let sender = sync::Arc::new(s);
+
     #[cfg(not(feature = "infer"))]
     let mut no_ext = collections::HashMap::new();
+    let mut no_ext_curl = process::Command::new("curl");
+    no_ext_curl.args([
+        "-Z",
+        "--parallel-immediate",
+        "-I",
+        "-w",
+        "\n%{url} |-> %{content_type}\n",
+    ]);
     static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
     let nan = NAN.get_or_init(|| {
         percent_encoding::NON_ALPHANUMERIC
@@ -618,11 +621,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             {
                 lr.map_or_else(
                     || {
-                        no_ext.insert(url.clone(), String::default());
-                        let (u, n, s) = (url.clone(), name.to_owned(), sender.clone());
-                        thread::spawn(|| {
-                            content_header_info(u, n, s);
-                        });
+                        no_ext_curl.arg(&url);
+                        no_ext.insert(url.to_owned(), name.to_owned());
                     },
                     |(_, file_name)| name_ext = file_name.into(),
                 )
@@ -682,17 +682,32 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         create_dir();
         curl = process::Command::new("curl");
         curl.current_dir(path).arg("-Z");
-        while no_ext.values().any(|v| v.is_empty()) {
-            match r.recv() {
-                Ok((url, name_ext)) => {
-                    curl.args([url.as_str(), "-o", name_ext.as_str()]);
-                    no_ext.insert(url, name_ext);
+
+        no_ext_curl.output().map_or_else(
+            |e| pl!("Get content type info failed: {}", e),
+            |o| {
+                let header = String::from_utf8_lossy(&o.stdout);
+                for (mut url, mut content_type) in
+                    header.lines().filter_map(|l| l.split_once("|->"))
+                {
+                    url = url.trim();
+                    content_type = content_type.trim();
+                    if let Some(ctx) = content_type.strip_prefix("image/") {
+                        let ext = &ctx[..['+', ';', ',']
+                            .iter()
+                            .find_map(|&x| ctx.find(x))
+                            .unwrap_or(ctx.len())];
+                        let name = no_ext[url].as_str();
+                        let name_ext = if !name.ends_with(ext) {
+                            &format!("{name}.{ext}")
+                        } else {
+                            name
+                        };
+                        curl.args([url, "-o", name_ext]);
+                    }
                 }
-                Err(e) => {
-                    pl!("receive error: {}", e);
-                }
-            }
-        }
+            },
+        );
         let _ = curl
             .args(CURL)
             .args([
@@ -705,45 +720,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     // thread::sleep(time::Duration::from_secs(3));
-}
-
-/// Get `url` content header info to generate full `name.ext`
-fn content_header_info(
-    url: String,
-    name: String,
-    s: sync::Arc<sync::mpsc::Sender<(String, String)>>,
-) {
-    let mut name_ext = String::default();
-    // tdbg!(&url);
-    process::Command::new("curl")
-        .args(CURL)
-        .args(["-J", "-w", "%{content_type}", &url])
-        .output()
-        .map_or_else(
-            |e| pl!("Get {} content type info failed: {}", &url, e),
-            |o| {
-                let header = String::from_utf8_lossy(&o.stdout);
-                if let Some(l) = header.lines().last() {
-                    if let Some((_, ctx)) = l.rsplit_once("image/") {
-                        let ext = &ctx[..['+', ';', ',']
-                            .iter()
-                            .find_map(|&x| ctx.find(x))
-                            .unwrap_or(ctx.len())];
-                        name_ext = if !name.ends_with(format!(".{ext}").as_str()) {
-                            format!("{name}.{ext}")
-                        } else {
-                            name.clone()
-                        }
-                    }
-                }
-            },
-        );
-    if name_ext.is_empty() {
-        pl!("Get {} with {} extension failed.", url, name);
-        name_ext = format!("{name}.ext!")
-    }
-    s.send((url, name_ext))
-        .unwrap_or_else(|e| pl!("send error: {}", e));
 }
 
 /// Infer file type through magic number
@@ -772,7 +748,7 @@ fn magic_number_type(pb: path::PathBuf) {
     .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
 
-///memeql comparison
+/// `memeql` implementation
 fn memeql<T>(v1: &T, v2: &T) -> bool {
     let [p1, p2] = [&raw const *v1, &raw const *v2];
     let len = mem::size_of::<T>();
