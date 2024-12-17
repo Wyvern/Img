@@ -85,7 +85,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
     let host_info = host_info(host);
     use sync::mpsc::*;
     let (s, r) = channel();
-    let _ = io::stdout().lock();
+    _ = io::stdout().lock();
     thread::spawn(|| {
         circle_indicator(r);
     });
@@ -98,10 +98,10 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
         ])
         .output()
         .unwrap_or_else(|e| {
-            let _ = s.send(());
+            _ = s.send(());
             quit!("curl: {}", e);
         });
-    let _ = s.send(());
+    _ = s.send(());
     if out.stdout.is_empty() {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
@@ -337,13 +337,12 @@ fn parse(addr: &str) -> String {
                     }
                     _ if !l.starts_with("json:") && !urls.is_empty() => {
                         let mut curl = process::Command::new("curl");
-                        curl.arg("-Z");
                         for u in &urls {
                             curl.arg(u);
                         }
                         let o = curl
                             .args(CURL)
-                            .args(["--parallel-immediate"])
+                            .args(["-Z", "--parallel-immediate"])
                             .output()
                             .unwrap();
                         let html = String::from_utf8_lossy(&o.stdout).into_owned();
@@ -447,19 +446,19 @@ fn parse(addr: &str) -> String {
                             )
                         });
 
-                    let _ = writeln!(
+                    _ = writeln!(
                         stdout,
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
                         i + 1,
                         t.trim(),
                     );
-                    let _ = write!(
+                    _ = write!(
                         stdout,
                         "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
                     );
-                    let _ = stdout.flush();
+                    _ = stdout.flush();
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
@@ -556,7 +555,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     };
 
     let mut curl = process::Command::new("curl");
-    curl.current_dir(path).arg("-Z");
+    curl.current_dir(path);
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
@@ -573,15 +572,14 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     ]);
     static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
     let nan = NAN.get_or_init(|| {
-        percent_encoding::NON_ALPHANUMERIC
-            .remove(b':')
-            .remove(b'/')
-            .remove(b'.')
-            .remove(b'-')
-            .remove(b'_')
-            .remove(b'?')
-            .remove(b'=')
-            .remove(b'%')
+        macro_rules! remove {
+            ($($c:literal),+) => {
+                percent_encoding::NON_ALPHANUMERIC$(
+                            .remove($c)
+                        )+
+            };
+        }
+        remove!(b':', b'/', b'.', b'-', b'_', b'?', b'=', b'%')
     });
     for url in urls {
         if url.starts_with("data:image/") {
@@ -589,10 +587,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             {
                 if let Ok(cur) = env::current_dir() {
                     create_dir();
-                    let _ = env::set_current_dir(path);
+                    _ = env::set_current_dir(path);
 
                     save_to_file(url.as_str());
-                    let _ = env::set_current_dir(cur);
+                    _ = env::set_current_dir(cur);
                 }
             }
             continue;
@@ -622,7 +620,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 lr.map_or_else(
                     || {
                         no_ext_curl.arg(&url);
-                        no_ext.insert(url.to_owned(), name.to_owned());
+                        no_ext.insert(url.clone(), name.to_owned());
                     },
                     |(_, file_name)| name_ext = file_name.into(),
                 )
@@ -651,15 +649,16 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     // tdbg!(no_ext.keys());
-
-    if curl.get_args().len() > 1 && cfg!(feature = "curl") {
+    let opts = [
+        "-e",
+        &format!("https://{host}"),
+        "-Z",
+        "--parallel-immediate",
+        "-C-",
+    ];
+    if curl.get_args().len() > 0 && cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl.args(CURL).args([
-            "-e",
-            &format!("https://{host}"),
-            "--parallel-immediate",
-            "-C-",
-        ]);
+        let cmd = curl.args(CURL).args(opts);
         let _t = cmd.spawn();
 
         #[cfg(feature = "infer")]
@@ -681,10 +680,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if !no_ext.is_empty() {
         create_dir();
         curl = process::Command::new("curl");
-        curl.current_dir(path).arg("-Z");
+        curl.current_dir(path);
 
         no_ext_curl.output().map_or_else(
-            |e| pl!("Get content type info failed: {}", e),
+            |e| pl!("Query content-type info failed: {}", e),
             |o| {
                 let header = String::from_utf8_lossy(&o.stdout);
                 for (mut url, mut content_type) in
@@ -708,18 +707,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 }
             },
         );
-        let _ = curl
-            .args(CURL)
-            .args([
-                "-e",
-                &format!("https://{host}"),
-                "--parallel-immediate",
-                "-C-",
-            ])
-            .spawn();
+        if curl.get_args().len() > 0 {
+            _ = curl.args(CURL).args(opts).spawn();
+        }
     }
-
-    // thread::sleep(time::Duration::from_secs(3));
 }
 
 /// Infer file type through magic number
@@ -954,7 +945,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
                     String::default()
                 }
             );
-            let _ = o.flush();
+            _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
                 _ => break 'l,
@@ -964,7 +955,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
         }
     }
     print!("{CL}{BEG}");
-    let _ = o.flush();
+    _ = o.flush();
 }
 
 ///cleanup url
