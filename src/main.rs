@@ -1,3 +1,5 @@
+#![feature(test)]
+
 mod util;
 use {std::*, util::*};
 
@@ -1279,5 +1281,12 @@ mod img {
                 idx = parse(&idx);
             }
         });
+    }
+
+    extern crate test;
+
+    #[bench]
+    fn bench_parse(b: &mut test::Bencher) {
+        b.iter(|| thread::sleep);
     }
 }

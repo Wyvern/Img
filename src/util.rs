@@ -98,9 +98,14 @@ mod macros {
     macro_rules! tdbg {
         ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                _ = io::stdout().lock();
+                dbg!(($($e),*))
+            } else {($($e),*)}
+        };
+        ($($e:expr),* ;) => {
+            if cfg!(test) || cfg!(debug_assertions) {
+                let _l = io::stdout().lock();
                 let r = dbg!(($($e),*));
-                #[cfg(test)]pause();
+                pause();
                 r
             } else {($($e),*)}
         }
