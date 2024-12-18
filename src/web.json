@@ -636,5 +636,15 @@
     "Site": "oorpg.com",
     "Img": "div.text-center > img",
     "Album": "div.gallery img"
+  },
+  {
+    "Site": "74p.net",
+    "Img": "div#image_div img",
+    "Album": "div.case_info a.meta-title"
+  },
+  {
+    "Site": "xiuren7.com",
+    "Img": "div.article-content img",
+    "Album": "h2.item-heading a"
   }
 ]
