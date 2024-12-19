@@ -133,6 +133,15 @@ mod macros {
 }
 }
 
+/// `memeql` implementation
+pub fn memeql<T>(v1: &T, v2: &T) -> bool {
+    let [p1, p2] = [&raw const *v1, &raw const *v2];
+    let len = mem::size_of::<T>();
+    let s1 = unsafe { slice::from_raw_parts(p1.cast::<u8>(), len) };
+    let s2 = unsafe { slice::from_raw_parts(p2.cast::<u8>(), len) };
+    s1 == s2
+}
+
 pub fn pause() {
     use io::*;
     let mut o = stdout().lock();

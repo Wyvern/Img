@@ -741,15 +741,6 @@ fn magic_number_type(pb: path::PathBuf) {
     .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
 
-/// `memeql` implementation
-fn memeql<T>(v1: &T, v2: &T) -> bool {
-    let [p1, p2] = [&raw const *v1, &raw const *v2];
-    let len = mem::size_of::<T>();
-    let s1 = unsafe { slice::from_raw_parts(p1.cast::<u8>(), len) };
-    let s2 = unsafe { slice::from_raw_parts(p2.cast::<u8>(), len) };
-    s1 == s2
-}
-
 /// Check `next` selector link page info
 fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
     let mut next_link: String;
