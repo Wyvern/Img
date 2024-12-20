@@ -574,14 +574,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     ]);
     static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
     let nan = NAN.get_or_init(|| {
-        macro_rules! remove {
-            ($($c:literal),+) => {
-                percent_encoding::NON_ALPHANUMERIC$(
-                            .remove($c)
-                        )+
-            };
+        let remove = b".:/-_?=%";
+        let mut ascii = percent_encoding::NON_ALPHANUMERIC.remove(remove[0]);
+        for c in &remove[1..] {
+            ascii = ascii.remove(*c);
         }
-        remove!(b':', b'/', b'.', b'-', b'_', b'?', b'=', b'%')
+        ascii
     });
     for url in urls {
         if url.starts_with("data:image/") {

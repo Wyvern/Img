@@ -638,7 +638,7 @@
     "Album": "div.gallery img"
   },
   {
-    "Site": "74p.net",
+    "Site": "74p.net,jiutianmeitu.com",
     "Img": "div#image_div img",
     "Album": "div.case_info a.meta-title"
   },
