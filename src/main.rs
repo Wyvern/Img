@@ -226,24 +226,35 @@ fn parse(addr: &str) -> String {
         format!("{G} {t}")
     };
 
-    let htmlcss = if !html_img.is_empty() && !css_img.is_empty() {
-        format!(": HTML({}) + CSS({})", html_img.len(), css_img.len())
-    } else if !html_img.is_empty() {
-        ": HTML".to_owned()
-    } else if !json_img.is_empty() {
-        ": JSON".to_owned()
-    } else if !css_img.is_empty() {
-        ": CSS".to_owned()
-    } else {
-        <_>::default()
-    };
+    let htj = [
+        if !html_img.is_empty() {
+            Some(format!("HTML({})", html_img.len()))
+        } else {
+            None
+        },
+        if !css_img.is_empty() {
+            Some(format!("CSS({})", css_img.len()))
+        } else {
+            None
+        },
+        if !json_img.is_empty() {
+            Some(format!("JSON({})", json_len))
+        } else {
+            None
+        },
+    ]
+    .into_iter()
+    .flatten()
+    .collect::<Vec<_>>()
+    .join(" + ");
+
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}")
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}")
         }
 
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{term_title}"),
-        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}"),
+        (false, true) => pl!("Totally found <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
@@ -321,23 +332,23 @@ fn parse(addr: &str) -> String {
             if skip > 0 {
                 let edm = [
                     if empty > 0 {
-                        format!("Empty({empty})")
+                        Some(format!("Empty({empty})"))
                     } else {
-                        String::default()
+                        None
                     },
                     if dup > 0 {
-                        format!("Duplicated({dup})")
+                        Some(format!("Duplicated({dup})"))
                     } else {
-                        String::default()
+                        None
                     },
                     if embed > 0 {
-                        format!("Embed({embed})")
+                        Some(format!("Embed({embed})"))
                     } else {
-                        String::default()
+                        None
                     },
                 ]
                 .into_iter()
-                .filter(|x| !x.is_empty())
+                .flatten()
                 .collect::<Vec<_>>()
                 .join(" + ");
                 pl!("Skipped <{skip}: {edm}> 🏞️");
