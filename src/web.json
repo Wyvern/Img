@@ -646,5 +646,15 @@
     "Site": "xiuren7.com",
     "Img": "div.article-content img",
     "Album": "h2.item-heading a"
+  },
+  {
+    "Site": "cangcuc.com",
+    "Img": "img.img-fluid",
+    "Album": "h5.entry-title a"
+  },
+  {
+    "Site": "xiunice.com",
+    "Img": "figure.size-large img",
+    "Album": "h3.entry-title > a"
   }
 ]
