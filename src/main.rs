@@ -226,18 +226,24 @@ fn parse(addr: &str) -> String {
         format!("{G} {t}")
     };
 
-    let htj = [html_img.len(), css_img.len(), json_len]
-        .into_iter()
-        .zip(["HTML", "CSS", "JSON"])
-        .filter_map(|(n, t)| {
-            if n > 0 {
-                Some(format!("{t}({n})"))
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<_>>()
-        .join(" + ");
+    let name_count = |name: &[&str], count: &[usize]| -> String {
+        name.iter()
+            .zip(count)
+            .filter_map(|(&n, &c)| {
+                if c > 0 {
+                    Some(format!("{n}({c})"))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" + ")
+    };
+
+    let htj = name_count(
+        ["HTML", "CSS", "JSON"].as_slice(),
+        [html_img.len(), css_img.len(), json_len].as_slice(),
+    );
 
     match (has_album, imgs_len > 0) {
         (true, true) => {
@@ -263,12 +269,12 @@ fn parse(addr: &str) -> String {
     match (has_album, imgs_len > 0) {
         (_, true) => {
             let mut urls = collections::HashSet::new();
-            let [mut empty, mut dup, mut embed] = [0u16; 3];
+            let [mut empty, mut dup, mut embed] = [0usize; 3];
 
             for elm in html_img {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
-                    .iter()
-                    .find_map(|&a| elm.attr(a));
+                    .into_iter()
+                    .find_map(|a| elm.attr(a));
                 let mut handle_embed = |s: String| {
                     if cfg!(feature = "embed") {
                         if !urls.insert(s) {
@@ -321,18 +327,10 @@ fn parse(addr: &str) -> String {
             }
             let skip = empty + dup + embed;
             if skip > 0 {
-                let edm = [empty, dup, embed]
-                    .into_iter()
-                    .zip(["Empty", "Duplicated", "Embed"])
-                    .filter_map(|(n, t)| {
-                        if n > 0 {
-                            Some(format!("{t}({n})"))
-                        } else {
-                            None
-                        }
-                    })
-                    .collect::<Vec<_>>()
-                    .join(" + ");
+                let edm = name_count(
+                    ["Empty", "Duplicated", "Embed"].as_slice(),
+                    [empty, dup, embed].as_slice(),
+                );
                 pl!("Skipped <{skip}: {edm}> 🏞️");
             }
 
