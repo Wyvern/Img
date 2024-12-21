@@ -267,7 +267,15 @@ fn parse(addr: &str) -> String {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
                     .iter()
                     .find_map(|&a| elm.attr(a));
-
+                let mut handle_embed = |s: String| {
+                    if cfg!(feature = "embed") {
+                        if !urls.insert(s) {
+                            empty_dup += 1;
+                        }
+                    } else {
+                        embed += 1;
+                    }
+                };
                 match value {
                     Some(val) => {
                         if attr == "style" {
@@ -275,26 +283,17 @@ fn parse(addr: &str) -> String {
                                 let url = url_image(frag.1);
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
-                                        if cfg!(feature = "embed") {
-                                            if !urls.insert(u) {
-                                                empty_dup += 1;
-                                            }
-                                        } else {
-                                            embed += 1;
-                                        }
-                                    } else if !urls.insert(canonicalize(u, addr)) {
+                                        handle_embed(u);
+                                    } else if !urls.insert(canonicalize(&u, addr)) {
                                         empty_dup += 1;
+                                        if !u.is_empty() {
+                                            pl!("Dup url: {}", u);
+                                        }
                                     }
                                 }
                             }
                         } else if val.starts_with("data:image/") {
-                            if cfg!(feature = "embed") {
-                                if !urls.insert(val) {
-                                    empty_dup += 1;
-                                }
-                            } else {
-                                embed += 1;
-                            }
+                            handle_embed(val);
                         } else {
                             let url = if sel == img {
                                 url_redirect_and_query_cleanup(&val)
@@ -303,8 +302,11 @@ fn parse(addr: &str) -> String {
                             };
 
                             // tdbg!(&url);
-                            if url.is_empty() || !urls.insert(canonicalize(url, addr)) {
+                            if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
                                 empty_dup += 1;
+                                if !url.is_empty() {
+                                    pl!("Dup url: {}", url);
+                                }
                             }
                         }
                     }
@@ -371,7 +373,7 @@ fn parse(addr: &str) -> String {
                                     }
                                 })
                             });
-                            let url = canonicalize(src, addr);
+                            let url = canonicalize(&src, addr);
                             urls.insert(
                                 title_alt
                                     .map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
@@ -414,7 +416,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize(href, addr);
+                        let album_url = canonicalize(&href, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -516,9 +518,9 @@ fn parse(addr: &str) -> String {
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: String, addr: &str) -> String {
+fn canonicalize(url: &str, addr: &str) -> String {
     if url.is_empty() {
-        return url;
+        return String::default();
     }
     let (scheme, path) = addr.split_once("://").unwrap_or(("http", addr));
     if !url.starts_with("http") {
@@ -536,7 +538,7 @@ fn canonicalize(url: String, addr: &str) -> String {
             )
         }
     } else {
-        url
+        url.to_owned()
     }
 }
 
@@ -858,7 +860,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         next_link = String::default();
     }
 
-    next_link = canonicalize(next_link, cur);
+    next_link = canonicalize(&next_link, cur);
 
     tdbg!(next_link)
 }
@@ -1023,7 +1025,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(u, addr));
+                        images.insert(canonicalize(&u, addr));
                     }
                 }
             }
