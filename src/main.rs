@@ -261,7 +261,7 @@ fn parse(addr: &str) -> String {
     match (has_album, imgs_len > 0) {
         (_, true) => {
             let mut urls = collections::HashSet::new();
-            let [mut empty_dup, mut embed] = [0u16; 2];
+            let [mut empty, mut dup, mut embed] = [0u16; 3];
 
             for elm in html_img {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
@@ -270,7 +270,7 @@ fn parse(addr: &str) -> String {
                 let mut handle_embed = |s: String| {
                     if cfg!(feature = "embed") {
                         if !urls.insert(s) {
-                            empty_dup += 1;
+                            dup += 1;
                         }
                     } else {
                         embed += 1;
@@ -284,10 +284,11 @@ fn parse(addr: &str) -> String {
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
                                         handle_embed(u);
-                                    } else if !urls.insert(canonicalize(&u, addr)) {
-                                        empty_dup += 1;
+                                    } else if u.is_empty() || !urls.insert(canonicalize(&u, addr)) {
                                         if !u.is_empty() {
-                                            pl!("Dup url: {}", u);
+                                            dup += 1;
+                                        } else {
+                                            empty += 1;
                                         }
                                     }
                                 }
@@ -303,26 +304,43 @@ fn parse(addr: &str) -> String {
 
                             // tdbg!(&url);
                             if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
-                                empty_dup += 1;
                                 if !url.is_empty() {
-                                    pl!("Dup url: {}", url);
+                                    dup += 1;
+                                } else {
+                                    empty += 1;
                                 }
                             }
                         }
                     }
                     None => {
-                        empty_dup += 1;
+                        empty += 1;
                     }
                 }
             }
-
-            if empty_dup > 0 && embed > 0 {
-                let skip = empty_dup + embed;
-                pl!("Skipped <{skip}> Empty/Duplicated/Embed 🏞️");
-            } else if empty_dup > 0 {
-                pl!("Skipped <{empty_dup}> Empty/Duplicated 🏞️");
-            } else if embed > 0 {
-                pl!("Skipped <{embed}> Embed 🏞️");
+            let skip = empty + dup + embed;
+            if skip > 0 {
+                let edm = [
+                    if empty > 0 {
+                        format!("Empty({empty})")
+                    } else {
+                        String::default()
+                    },
+                    if dup > 0 {
+                        format!("Duplicated({dup})")
+                    } else {
+                        String::default()
+                    },
+                    if embed > 0 {
+                        format!("Embed({embed})")
+                    } else {
+                        String::default()
+                    },
+                ]
+                .into_iter()
+                .filter(|x| !x.is_empty())
+                .collect::<Vec<_>>()
+                .join(" + ");
+                pl!("Skipped <{skip}: {edm}> 🏞️");
             }
 
             if let Some((l, r)) = sels {
@@ -705,6 +723,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                             name
                         };
                         curl.args([url, "-o", name_ext]);
+                    } else {
+                        curl.args([url, "-OJ"]);
                     }
                 }
             },
