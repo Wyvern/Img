@@ -226,27 +226,18 @@ fn parse(addr: &str) -> String {
         format!("{G} {t}")
     };
 
-    let htj = [
-        if !html_img.is_empty() {
-            Some(format!("HTML({})", html_img.len()))
-        } else {
-            None
-        },
-        if !css_img.is_empty() {
-            Some(format!("CSS({})", css_img.len()))
-        } else {
-            None
-        },
-        if !json_img.is_empty() {
-            Some(format!("JSON({})", json_len))
-        } else {
-            None
-        },
-    ]
-    .into_iter()
-    .flatten()
-    .collect::<Vec<_>>()
-    .join(" + ");
+    let htj = [html_img.len(), css_img.len(), json_len]
+        .into_iter()
+        .zip(["HTML", "CSS", "JSON"])
+        .filter_map(|(n, t)| {
+            if n > 0 {
+                Some(format!("{t}({n})"))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" + ");
 
     match (has_album, imgs_len > 0) {
         (true, true) => {
@@ -330,27 +321,18 @@ fn parse(addr: &str) -> String {
             }
             let skip = empty + dup + embed;
             if skip > 0 {
-                let edm = [
-                    if empty > 0 {
-                        Some(format!("Empty({empty})"))
-                    } else {
-                        None
-                    },
-                    if dup > 0 {
-                        Some(format!("Duplicated({dup})"))
-                    } else {
-                        None
-                    },
-                    if embed > 0 {
-                        Some(format!("Embed({embed})"))
-                    } else {
-                        None
-                    },
-                ]
-                .into_iter()
-                .flatten()
-                .collect::<Vec<_>>()
-                .join(" + ");
+                let edm = [empty, dup, embed]
+                    .into_iter()
+                    .zip(["Empty", "Duplicated", "Embed"])
+                    .filter_map(|(n, t)| {
+                        if n > 0 {
+                            Some(format!("{t}({n})"))
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" + ");
                 pl!("Skipped <{skip}: {edm}> 🏞️");
             }
 
