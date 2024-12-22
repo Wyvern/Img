@@ -231,7 +231,14 @@ fn parse(addr: &str) -> String {
             .zip(count)
             .filter_map(|(&n, &c)| {
                 if c > 0 {
-                    Some(format!("{n}({c})"))
+                    Some(format!(
+                        "{n}{}",
+                        if c == count.iter().sum::<usize>() {
+                            String::default()
+                        } else {
+                            format!("({c})")
+                        }
+                    ))
                 } else {
                     None
                 }
