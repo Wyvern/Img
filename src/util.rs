@@ -147,7 +147,7 @@ pub fn pause() {
     let mut o = stdout().lock();
     _ = write!(
         o,
-        "Press any key to continue.. or [Q{}]uit:",
+        "Press any key to continue, or [Q{}]uit:",
         char::from_u32(0x332).unwrap()
     );
     _ = o.flush();
