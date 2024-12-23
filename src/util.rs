@@ -147,12 +147,13 @@ pub fn pause() {
     let mut o = stdout().lock();
     _ = write!(
         o,
-        "Press any key to continue or [q{}]uit:",
+        "Press any key to continue.. or [Q{}]uit:",
         char::from_u32(0x332).unwrap()
     );
     _ = o.flush();
     let mut s = String::default();
     _ = stdin().lock().read_line(&mut s);
+    s.make_ascii_lowercase();
     if s.trim() == "q" {
         process::exit(0);
     }
