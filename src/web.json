@@ -534,7 +534,7 @@
     "Album": "div.thcovering-video a"
   },
   {
-    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com,zgogc.com,dunovels.com,switzerlandwatchshop.com,heartanddepth.com,breastonmanornursery.com",
+    "Site": "bbs.0-p.net,hjd2048.com,moderntalkingpoint.com,zgogc.com,dunovels.com,switzerlandwatchshop.com,heartanddepth.com,breastonmanornursery.com,cplz.org",
     "Img": "div#read_tpc img"
   },
   {
@@ -576,7 +576,7 @@
     "Next": "<script>"
   },
   {
-    "Site": "ugirls.pics",
+    "Site": "ugirls.pics,xiurentu.pics",
     "Img": "div.my-2 > img",
     "Next": "span[aria-current]",
     "Album": "div.my-1 h2"
@@ -593,8 +593,8 @@
     "Album": "a.elementor-post__thumbnail__link"
   },
   {
-    "Site": "4khd.com",
-    "Img": "p img",
+    "Site": "4khd.com,xxtt.info",
+    "Img": "p img | i0.wp.com/pic -> img",
     "Next": "ul.page-links li.current",
     "Album": "h2.wp-block-post-title.has-medium-font-size > a"
   },
@@ -636,5 +636,25 @@
     "Site": "oorpg.com",
     "Img": "div.text-center > img",
     "Album": "div.gallery img"
+  },
+  {
+    "Site": "74p.net,jiutianmeitu.com,rlxqmawj.com,meitu9.com",
+    "Img": "div#image_div img",
+    "Album": "div.case_info a.meta-title"
+  },
+  {
+    "Site": "xiuren7.com",
+    "Img": "div.article-content img",
+    "Album": "h2.item-heading a"
+  },
+  {
+    "Site": "cangcuc.com",
+    "Img": "img.img-fluid",
+    "Album": "h5.entry-title a"
+  },
+  {
+    "Site": "xiunice.com",
+    "Img": "figure.size-large img",
+    "Album": "h3.entry-title > a"
   }
 ]

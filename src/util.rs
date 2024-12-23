@@ -98,9 +98,14 @@ mod macros {
     macro_rules! tdbg {
         ($($e:expr),*) => {
             if cfg!(test) || cfg!(debug_assertions) {
-                _ = io::stdout().lock();
+                dbg!(($($e),*))
+            } else {($($e),*)}
+        };
+        ($($e:expr),* ;) => {
+            if cfg!(test) || cfg!(debug_assertions) {
+                let _l = io::stdout().lock();
                 let r = dbg!(($($e),*));
-                #[cfg(test)]pause();
+                pause();
                 r
             } else {($($e),*)}
         }
@@ -128,17 +133,27 @@ mod macros {
 }
 }
 
+/// `memeql` implementation
+pub fn memeql<T>(v1: &T, v2: &T) -> bool {
+    let [p1, p2] = [&raw const *v1, &raw const *v2];
+    let len = mem::size_of::<T>();
+    let s1 = unsafe { slice::from_raw_parts(p1.cast::<u8>(), len) };
+    let s2 = unsafe { slice::from_raw_parts(p2.cast::<u8>(), len) };
+    s1 == s2
+}
+
 pub fn pause() {
     use io::*;
     let mut o = stdout().lock();
     _ = write!(
         o,
-        "Press any key to continue or [q{}]uit:",
+        "Press any key to continue, or [Q{}]uit:",
         char::from_u32(0x332).unwrap()
     );
     _ = o.flush();
     let mut s = String::default();
     _ = stdin().lock().read_line(&mut s);
+    s.make_ascii_lowercase();
     if s.trim() == "q" {
         process::exit(0);
     }

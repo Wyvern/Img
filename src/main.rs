@@ -1,17 +1,18 @@
+#![feature(test)]
+
 mod util;
 use {std::*, util::*};
 
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; if cfg!(debug_assertions) { 8 } else { 7 }] = [
+static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
     "--compressed",
     "-kfsL",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
     "--tcp-nodelay",
-    "--no-clobber",
     #[cfg(debug_assertions)]
     "-S",
     // "-OJ",
@@ -86,7 +87,7 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
     let host_info = host_info(host);
     use sync::mpsc::*;
     let (s, r) = channel();
-    let _ = io::stdout().lock();
+    _ = io::stdout().lock();
     thread::spawn(|| {
         circle_indicator(r);
     });
@@ -99,10 +100,10 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
         ])
         .output()
         .unwrap_or_else(|e| {
-            let _ = s.send(());
+            _ = s.send(());
             quit!("curl: {}", e);
         });
-    let _ = s.send(());
+    _ = s.send(());
     if out.stdout.is_empty() {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
@@ -225,24 +226,39 @@ fn parse(addr: &str) -> String {
         format!("{G} {t}")
     };
 
-    let htmlcss = if !html_img.is_empty() && !css_img.is_empty() {
-        format!(": HTML({}) + CSS({})", html_img.len(), css_img.len())
-    } else if !html_img.is_empty() {
-        ": HTML".to_owned()
-    } else if !json_img.is_empty() {
-        ": JSON".to_owned()
-    } else if !css_img.is_empty() {
-        ": CSS".to_owned()
-    } else {
-        <_>::default()
+    let name_count = |name: &[&str], count: &[usize]| -> String {
+        name.iter()
+            .zip(count)
+            .filter_map(|(&n, &c)| {
+                if c > 0 {
+                    Some(format!(
+                        "{n}{}",
+                        if c == count.iter().sum::<usize>() {
+                            String::default()
+                        } else {
+                            format!("({c})")
+                        }
+                    ))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" + ")
     };
+
+    let htj = name_count(
+        ["HTML", "CSS", "JSON"].as_slice(),
+        [html_img.len(), css_img.len(), json_len].as_slice(),
+    );
+
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}")
+            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}")
         }
 
         (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{term_title}"),
-        (false, true) => pl!("Totally found <{imgs_len}{htmlcss}> 🏞️  in 📄:{term_title}"),
+        (false, true) => pl!("Totally found <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
@@ -260,13 +276,21 @@ fn parse(addr: &str) -> String {
     match (has_album, imgs_len > 0) {
         (_, true) => {
             let mut urls = collections::HashSet::new();
-            let [mut empty_dup, mut embed] = [0u16; 2];
+            let [mut empty, mut dup, mut embed] = [0usize; 3];
 
             for elm in html_img {
                 let value = ["data-src", "data-lazy", "data-lazy-src", attr]
-                    .iter()
-                    .find_map(|&a| elm.attr(a));
-
+                    .into_iter()
+                    .find_map(|a| elm.attr(a));
+                let mut handle_embed = |s: String| {
+                    if cfg!(feature = "embed") {
+                        if !urls.insert(s) {
+                            dup += 1;
+                        }
+                    } else {
+                        embed += 1;
+                    }
+                };
                 match value {
                     Some(val) => {
                         if attr == "style" {
@@ -274,26 +298,18 @@ fn parse(addr: &str) -> String {
                                 let url = url_image(frag.1);
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
-                                        if cfg!(feature = "embed") {
-                                            if !urls.insert(u) {
-                                                empty_dup += 1;
-                                            }
+                                        handle_embed(u);
+                                    } else if u.is_empty() || !urls.insert(canonicalize(&u, addr)) {
+                                        if !u.is_empty() {
+                                            dup += 1;
                                         } else {
-                                            embed += 1;
+                                            empty += 1;
                                         }
-                                    } else if !urls.insert(canonicalize(u, addr)) {
-                                        empty_dup += 1;
                                     }
                                 }
                             }
                         } else if val.starts_with("data:image/") {
-                            if cfg!(feature = "embed") {
-                                if !urls.insert(val) {
-                                    empty_dup += 1;
-                                }
-                            } else {
-                                embed += 1;
-                            }
+                            handle_embed(val);
                         } else {
                             let url = if sel == img {
                                 url_redirect_and_query_cleanup(&val)
@@ -302,68 +318,88 @@ fn parse(addr: &str) -> String {
                             };
 
                             // tdbg!(&url);
-                            if url.is_empty() || !urls.insert(canonicalize(url, addr)) {
-                                empty_dup += 1;
+                            if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
+                                if !url.is_empty() {
+                                    dup += 1;
+                                } else {
+                                    empty += 1;
+                                }
                             }
                         }
                     }
                     None => {
-                        empty_dup += 1;
+                        empty += 1;
                     }
                 }
             }
-
-            if empty_dup > 0 && embed > 0 {
-                let skip = empty_dup + embed;
-                pl!("Skipped <{skip}> Empty/Duplicated/Embed 🏞️");
-            } else if empty_dup > 0 {
-                pl!("Skipped <{empty_dup}> Empty/Duplicated 🏞️");
-            } else if embed > 0 {
-                pl!("Skipped <{embed}> Embed 🏞️");
+            let skip = empty + dup + embed;
+            if skip > 0 {
+                let edm = name_count(
+                    ["Empty", "Duplicated", "Embed"].as_slice(),
+                    [empty, dup, embed].as_slice(),
+                );
+                pl!("Skipped <{skip}: {edm}> 🏞️");
             }
 
-            if let Some((_, r)) = sels {
-                let mut curl = process::Command::new("curl");
-                curl.arg("-Z");
-                for u in &urls {
-                    curl.arg(u);
-                }
-                let o = curl
-                    .args(CURL)
-                    .args(["--parallel-immediate", "-C-"])
-                    .output()
-                    .unwrap();
-                let html = String::from_utf8_lossy(&o.stdout).into_owned();
-                let page = crabquery::Document::from(html);
-                let html_img = page.select(r);
-                urls.clear();
-                for e in html_img {
-                    let src = e.attr("src").unwrap();
-                    let title_alt = ["title", "alt"].iter().find_map(|a| {
-                        e.attr(a).and_then(|x| {
-                            let attr = x.trim();
-                            if !attr.is_empty()
-                                && [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp"]
-                                    .iter()
-                                    .any(|&ext| {
-                                        attr.rfind('.').is_some_and(|dot| {
-                                            attr[dot..].eq_ignore_ascii_case(ext)
-                                        })
-                                    })
-                            {
-                                Some(x)
-                            } else {
-                                None
+            if let Some((l, r)) = sels {
+                match r.trim().split_once("->") {
+                    Some((mut old, mut new)) => {
+                        old = old.trim();
+                        new = new.trim();
+                        let mut newurls = collections::HashSet::with_capacity(urls.len());
+                        for mut u in urls {
+                            if let Some(pos) = u.find(old) {
+                                u.replace_range(pos..pos + old.len(), new);
                             }
-                        })
-                    });
-                    let url = canonicalize(src, addr);
-                    urls.insert(
-                        title_alt.map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
-                    );
+                            newurls.insert(u);
+                        }
+                        urls = newurls;
+                    }
+                    _ if !l.starts_with("json:") && !urls.is_empty() => {
+                        let mut curl = process::Command::new("curl");
+                        for u in &urls {
+                            curl.arg(u);
+                        }
+                        let o = curl
+                            .args(CURL)
+                            .args(["-Z", "--parallel-immediate"])
+                            .output()
+                            .unwrap();
+                        let html = String::from_utf8_lossy(&o.stdout).into_owned();
+                        let page = crabquery::Document::from(html);
+                        let html_img = page.select(r);
+                        urls.clear();
+                        for e in html_img {
+                            let src = e.attr("src").unwrap();
+                            let title_alt = ["title", "alt"].iter().find_map(|a| {
+                                e.attr(a).and_then(|x| {
+                                    let attr = x.trim();
+                                    if !attr.is_empty()
+                                        && [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp"]
+                                            .iter()
+                                            .any(|&ext| {
+                                                attr.rfind('.').is_some_and(|dot| {
+                                                    attr[dot..].eq_ignore_ascii_case(ext)
+                                                })
+                                            })
+                                    {
+                                        Some(x)
+                                    } else {
+                                        None
+                                    }
+                                })
+                            });
+                            let url = canonicalize(&src, addr);
+                            urls.insert(
+                                title_alt
+                                    .map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
+                            );
+                        }
+                    }
+                    _ => (),
                 }
             }
-            // tdbg!(&urls, &css_img,&json_img);
+            // tdbg!(&urls, &css_img, &json_img);
             download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
         (true, false) => {
@@ -396,7 +432,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize(href, addr);
+                        let album_url = canonicalize(&href, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -430,19 +466,19 @@ fn parse(addr: &str) -> String {
                             )
                         });
 
-                    let _ = writeln!(
+                    _ = writeln!(
                         stdout,
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
                         i + 1,
                         t.trim(),
                     );
-                    let _ = write!(
+                    _ = write!(
                         stdout,
                         "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
                     );
-                    let _ = stdout.flush();
+                    _ = stdout.flush();
 
                     let mut input = String::new();
                     stdin.read_line(&mut input).unwrap_or_else(|e| {
@@ -498,9 +534,9 @@ fn parse(addr: &str) -> String {
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: String, addr: &str) -> String {
+fn canonicalize(url: &str, addr: &str) -> String {
     if url.is_empty() {
-        return url;
+        return String::default();
     }
     let (scheme, path) = addr.split_once("://").unwrap_or(("http", addr));
     if !url.starts_with("http") {
@@ -518,7 +554,7 @@ fn canonicalize(url: String, addr: &str) -> String {
             )
         }
     } else {
-        url
+        url.to_owned()
     }
 }
 
@@ -527,6 +563,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if cfg!(all(test, not(feature = "download"))) {
         return;
     }
+
     let slash2colon = dir.replace('/', ":");
     let path = path::Path::new(&slash2colon);
     let create_dir = || {
@@ -538,29 +575,29 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     };
 
     let mut curl = process::Command::new("curl");
-    curl.current_dir(path).arg("-Z");
+    curl.current_dir(path);
 
     #[cfg(feature = "infer")]
     let mut need_file_type_detection = vec![];
-    #[cfg(not(feature = "infer"))]
-    use sync::mpsc::*;
-    #[cfg(not(feature = "infer"))]
-    let (s, r) = channel();
-    #[cfg(not(feature = "infer"))]
-    let sender = sync::Arc::new(s);
+
     #[cfg(not(feature = "infer"))]
     let mut no_ext = collections::HashMap::new();
+    let mut no_ext_curl = process::Command::new("curl");
+    no_ext_curl.args([
+        "-Z",
+        "--parallel-immediate",
+        "-I",
+        "-w",
+        "\n%{url} |-> %{content_type}\n",
+    ]);
     static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
     let nan = NAN.get_or_init(|| {
-        percent_encoding::NON_ALPHANUMERIC
-            .remove(b':')
-            .remove(b'/')
-            .remove(b'.')
-            .remove(b'-')
-            .remove(b'_')
-            .remove(b'?')
-            .remove(b'=')
-            .remove(b'%')
+        let remove = b".:/-_?=%";
+        let mut ascii = percent_encoding::NON_ALPHANUMERIC.remove(remove[0]);
+        for c in &remove[1..] {
+            ascii = ascii.remove(*c);
+        }
+        ascii
     });
     for url in urls {
         if url.starts_with("data:image/") {
@@ -568,10 +605,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             {
                 if let Ok(cur) = env::current_dir() {
                     create_dir();
-                    let _ = env::set_current_dir(path);
+                    _ = env::set_current_dir(path);
 
                     save_to_file(url.as_str());
-                    let _ = env::set_current_dir(cur);
+                    _ = env::set_current_dir(cur);
                 }
             }
             continue;
@@ -600,11 +637,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             {
                 lr.map_or_else(
                     || {
-                        no_ext.insert(url.clone(), String::default());
-                        let (u, n, s) = (url.clone(), name.to_owned(), sender.clone());
-                        thread::spawn(|| {
-                            content_header_info(u, n, s);
-                        });
+                        no_ext_curl.arg(&url);
+                        no_ext.insert(url.clone(), name.to_owned());
                     },
                     |(_, file_name)| name_ext = file_name.into(),
                 )
@@ -633,15 +667,16 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     // tdbg!(no_ext.keys());
-
-    if curl.get_args().len() > 1 && cfg!(feature = "curl") {
+    let opts = [
+        "-e",
+        &format!("https://{host}"),
+        "-Z",
+        "--parallel-immediate",
+        "-C-",
+    ];
+    if curl.get_args().len() > 0 && cfg!(feature = "curl") {
         create_dir();
-        let cmd = curl.args(CURL).args([
-            "-e",
-            &format!("https://{host}"),
-            "--parallel-immediate",
-            "-C-",
-        ]);
+        let cmd = curl.args(CURL).args(opts);
         let _t = cmd.spawn();
 
         #[cfg(feature = "infer")]
@@ -663,69 +698,39 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if !no_ext.is_empty() {
         create_dir();
         curl = process::Command::new("curl");
-        curl.current_dir(path).arg("-Z");
-        while no_ext.values().any(|v| v.is_empty()) {
-            match r.recv() {
-                Ok((url, name_ext)) => {
-                    curl.args([url.as_str(), "-o", name_ext.as_str()]);
-                    no_ext.insert(url, name_ext);
-                }
-                Err(e) => {
-                    pl!("receive error: {}", e);
-                }
-            }
-        }
-        let _ = curl
-            .args(CURL)
-            .args([
-                "-e",
-                &format!("https://{host}"),
-                "--parallel-immediate",
-                "-C-",
-            ])
-            .spawn();
-    }
+        curl.current_dir(path);
 
-    // thread::sleep(time::Duration::from_secs(3));
-}
-
-/// Get `url` content header info to generate full `name.ext`
-fn content_header_info(
-    url: String,
-    name: String,
-    s: sync::Arc<sync::mpsc::Sender<(String, String)>>,
-) {
-    let mut name_ext = String::default();
-    // tdbg!(&url);
-    process::Command::new("curl")
-        .args(CURL)
-        .args(["-J", "-w", "%{content_type}", &url])
-        .output()
-        .map_or_else(
-            |e| pl!("Get {} content type info failed: {}", &url, e),
+        no_ext_curl.output().map_or_else(
+            |e| pl!("Query content-type info failed: {}", e),
             |o| {
                 let header = String::from_utf8_lossy(&o.stdout);
-                if let Some(l) = header.lines().last() {
-                    if let Some((_, ctx)) = l.rsplit_once("image/") {
+                for (mut url, mut content_type) in
+                    header.lines().filter_map(|l| l.split_once("|->"))
+                {
+                    url = url.trim();
+                    content_type = content_type.trim();
+                    if let Some(ctx) = content_type.strip_prefix("image/") {
                         let ext = &ctx[..['+', ';', ',']
                             .iter()
                             .find_map(|&x| ctx.find(x))
                             .unwrap_or(ctx.len())];
-                        name_ext = if !name.ends_with(format!(".{ext}").as_str()) {
-                            format!("{name}.{ext}")
+                        let name = no_ext[url].as_str();
+                        let name_ext = if !name.ends_with(ext) {
+                            &format!("{name}.{ext}")
                         } else {
-                            name.clone()
-                        }
+                            name
+                        };
+                        curl.args([url, "-o", name_ext]);
+                    } else {
+                        curl.args([url, "-OJ"]);
                     }
                 }
             },
         );
-    if name_ext.is_empty() {
-        pl!("Get {} with {} extension failed.", url, name);
-        name_ext = format!("{name}.ext!")
+        if curl.get_args().len() > 0 {
+            _ = curl.args(CURL).args(opts).spawn();
+        }
     }
-    s.send((url, name_ext))
-        .unwrap_or_else(|e| pl!("send error: {}", e));
 }
 
 /// Infer file type through magic number
@@ -779,6 +784,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             }
         })
     };
+
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
@@ -786,14 +792,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr("href").is_none() {
             let items = element.parent().unwrap().children();
-            let tags = items
-                .split(|e| {
-                    (e.tag().unwrap() == "span" || e.attr("href").is_none())
-                        && (splitter(e)
-                            || items.iter().filter(|x| x.tag().unwrap() == "span").count() == 1)
-                })
-                .next_back()
-                .unwrap();
+            let tags = items.split(|e| memeql(element, e)).next_back().unwrap();
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr("href").unwrap();
@@ -879,7 +878,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         next_link = String::default();
     }
 
-    next_link = canonicalize(next_link, cur);
+    next_link = canonicalize(&next_link, cur);
 
     tdbg!(next_link)
 }
@@ -957,7 +956,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
                     String::default()
                 }
             );
-            let _ = o.flush();
+            _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
                 _ => break 'l,
@@ -967,7 +966,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
         }
     }
     print!("{CL}{BEG}");
-    let _ = o.flush();
+    _ = o.flush();
 }
 
 ///cleanup url
@@ -1044,7 +1043,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(u, addr));
+                        images.insert(canonicalize(&u, addr));
                     }
                 }
             }
@@ -1291,5 +1290,12 @@ mod img {
                 idx = parse(&idx);
             }
         });
+    }
+
+    extern crate test;
+
+    #[bench]
+    fn bench_parse(b: &mut test::Bencher) {
+        b.iter(|| thread::sleep);
     }
 }
