@@ -220,11 +220,7 @@ fn parse(addr: &str) -> String {
         json_img.len(),
     ];
 
-    let term_title = if terminal_emulator() {
-        format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\")
-    } else {
-        format!("{G} {t}")
-    };
+    let term_title = link_text(t, addr);
 
     let name_count = |name: &[&str], count: &[usize]| -> String {
         name.iter()
@@ -1052,23 +1048,22 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     images
 }
 
-///Detect terminal emulator using `echo $TERM`
-fn terminal_emulator() -> bool {
-    env::var("TERM").is_ok_and(|o| {
+///Linkable Text based upon terminal type
+fn link_text(text: &str, addr: &str) -> String {
+    if env::var("TERM").is_ok_and(|o| {
         ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
             .iter()
             .any(|x| o.contains(x))
-    })
+    }) {
+        format!("{G} \x1b]8;;{addr}\x1b\\{text}\x1b]8;;\x1b\\")
+    } else {
+        format!("{G} {text}")
+    }
 }
 
 #[cfg(test)]
 mod img {
     use super::*;
-
-    #[test]
-    fn detect_terminal_emulator() {
-        dbg!(terminal_emulator());
-    }
 
     #[inline]
     fn arg(default: &str) -> String {
