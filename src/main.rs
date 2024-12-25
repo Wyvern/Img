@@ -207,7 +207,6 @@ fn parse(addr: &str) -> String {
 
     t = t
         .rsplit(['/', '-', '_', '|', '–'])
-        .skip(1)
         .max_by_key(|x| x.trim().len())
         .unwrap()
         .trim();
