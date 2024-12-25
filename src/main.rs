@@ -207,9 +207,9 @@ fn parse(addr: &str) -> String {
 
     t = t
         .rsplit(['/', '-', '_', '|', '–'])
+        .skip(1)
         .max_by_key(|x| x.trim().len())
-        .unwrap()
-        .trim();
+        .unwrap_or(t);
 
     let albums = album.map(|a| page.select(a));
 
