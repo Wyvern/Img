@@ -207,6 +207,7 @@ fn parse(addr: &str) -> String {
 
     t = t
         .rsplit(['/', '-', '_', '|', '–'])
+        .skip(1)
         .max_by_key(|x| x.trim().len())
         .unwrap()
         .trim();
@@ -1128,6 +1129,7 @@ mod img {
             parse(&arg);
         } else {
             [
+                "https://meitu9.com/",
                 "https://xiutaku.com",
                 "https://ugirls.pics/",
                 "https://bisipic.online",
