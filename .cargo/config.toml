@@ -20,8 +20,8 @@ l = "b -q --profile lto"
 
 h = "s --target x86_64h-apple-darwin"
 e = "s --target arm64e-apple-darwin"
-s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort"
-z = "zigbuild -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort --target "
+s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort"
+z = "zigbuild -q --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target "
 
 
 [cargo-new]
