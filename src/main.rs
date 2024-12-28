@@ -148,17 +148,16 @@ fn parse(addr: &str) -> String {
         }
     }
 
-    let css_img = if img.is_none() {
-        css_image(&html, addr)
-    } else {
-        collections::HashSet::new()
-    };
-
     let sels = img.and_then(|i| i.split_once(SEP));
     let sel = sels.map(|(l, _)| l).or(img);
 
     let mut json_img = collections::HashSet::new();
     let mut html_img = vec![];
+    let css_img = if img.is_none() {
+        css_image(html.as_ref(), addr)
+    } else {
+        collections::HashSet::new()
+    };
 
     if sel.is_some_and(|s| s.starts_with("json:")) {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
@@ -727,10 +726,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         no_ext_curl.output().map_or_else(
             |e| pl!("Query content-type info failed: {}", e),
             |o| {
-                let header = String::from_utf8_lossy(&o.stdout);
-                for (mut url, mut content_type) in
-                    header.lines().filter_map(|l| l.split_once("|->"))
-                {
+                let res = String::from_utf8_lossy(&o.stdout);
+                for (mut url, mut content_type) in res.lines().filter_map(|l| l.split_once("|->")) {
                     url = url.trim();
                     content_type = content_type.trim();
                     if let Some(ctx) = content_type.strip_prefix("image/") {
@@ -1101,7 +1098,8 @@ mod img {
 
     #[test]
     fn html() {
-        let (html, ..) = get_html(&arg("mmm.red"));
+        let (bytes, ..) = get_html(&arg("mmm.red"));
+        let html = String::from_utf8_lossy(&bytes);
         dbg!(&html);
     }
 
