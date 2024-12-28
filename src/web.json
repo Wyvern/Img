@@ -638,7 +638,7 @@
     "Album": "div.gallery img"
   },
   {
-    "Site": "74p.net,jiutianmeitu.com,rlxqmawj.com,meitu9.com,tnqpiydh.com,iiluysuj.com,ooyzimhv.com,crmkwpqt.com,eoxaijpd.com,hngiptmj.com,cnbkriec.com,qyqmvjob.com,jsddvgvc.com",
+    "Site": "74p.net,jiutianmeitu.com,rlxqmawj.com,meitu9.com,tnqpiydh.com,iiluysuj.com,ooyzimhv.com,crmkwpqt.com,eoxaijpd.com,hngiptmj.com,cnbkriec.com,qyqmvjob.com,jsddvgvc.com,tcyruwwr.com,snscwuft.com,lhsmkwnq.com,qfqvnbrc.com",
     "Img": "div#image_div img",
     "Album": "div.case_info a.meta-title"
   },
@@ -656,5 +656,10 @@
     "Site": "xiunice.com",
     "Img": "figure.size-large img",
     "Album": "h3.entry-title > a"
+  },
+  {
+    "Site": "girl-atlas.com",
+    "Img": "div.gallery a",
+    "Album": "h4 > a"
   }
 ]

@@ -312,8 +312,7 @@ fn parse(addr: &str) -> String {
                             } else {
                                 val
                             };
-
-                            // tdbg!(&url);
+                            // tdbg!(&url;);
                             if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
                                 if !url.is_empty() {
                                     dup += 1;
@@ -395,6 +394,7 @@ fn parse(addr: &str) -> String {
                     _ => (),
                 }
             }
+
             // tdbg!(&urls, &css_img, &json_img);
             download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
@@ -649,7 +649,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         }
         #[cfg(not(feature = "infer"))]
         let file_name = if name_ext.is_empty() {
-            name
+            name.trim_end_matches("!lrg")
         } else {
             name_ext.as_str()
         };
