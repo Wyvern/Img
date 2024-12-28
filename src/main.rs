@@ -104,7 +104,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
+fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 3], &str) {
     let host = check_host(addr);
     let host_info = host_info(host);
     use sync::mpsc::*;
@@ -130,16 +130,15 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
     }
-    let res = String::from_utf8_lossy(&out.stdout);
-    (res.into_owned(), host_info, host)
+    (out.stdout, host_info, host)
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (html, [mut img, mut next_sel, mut album], host) = get_html(addr);
-
+    let (bytes, [mut img, mut next_sel, mut album], host) = get_html(addr);
+    let html = String::from_utf8_lossy(&bytes);
+    let page = crabquery::Document::from(html.as_ref());
     if img.is_none() {
-        let page = crabquery::Document::from(html.to_owned());
         if let Some([series, _, site]) = LOGOS
             .iter()
             .find(|[_, logo, _]| !page.select(logo).is_empty())
@@ -157,7 +156,7 @@ fn parse(addr: &str) -> String {
 
     let sels = img.and_then(|i| i.split_once(SEP));
     let sel = sels.map(|(l, _)| l).or(img);
-    let page = crabquery::Document::from(html);
+
     let mut json_img = collections::HashSet::new();
     let mut html_img = vec![];
 
@@ -392,8 +391,8 @@ fn parse(addr: &str) -> String {
                             .args(["-Z", "--parallel-immediate"])
                             .output()
                             .unwrap();
-                        let html = String::from_utf8_lossy(&o.stdout).into_owned();
-                        let page = crabquery::Document::from(html);
+                        let html = String::from_utf8_lossy(&o.stdout);
+                        let page = crabquery::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
                         for e in html_img {
@@ -1111,7 +1110,7 @@ mod img {
         let addr =
             arg("https://52xiuren.cc/2024/10/30/xiuren-vol-9300-%e8%bd%af%e8%bd%af%e9%85%b1/");
 
-        let (html, [img, .., album], _) = get_html(&addr);
+        let (bytes, [img, .., album], _) = get_html(&addr);
 
         use process::*;
 
@@ -1125,14 +1124,11 @@ mod img {
             let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
             use io::*;
             stdin
-                .write_all(html.as_bytes())
+                .write_all(bytes.as_ref())
                 .expect("Failed to write stdin.");
             if let Ok(o) = cmd.wait_with_output() {
                 if !o.stdout.is_empty() {
-                    println!(
-                        "Totally found {} <img>",
-                        String::from_utf8_lossy(o.stdout.as_ref()).lines().count()
-                    );
+                    println!("Totally found {} <img>", o.stdout.lines().count());
                 }
             }
         };
@@ -1193,8 +1189,8 @@ mod img {
     #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let (html, ..) = get_html(&addr);
-        let r = css_image(&html, &addr);
+        let (bytes, ..) = get_html(&addr);
+        let r = css_image(&String::from_utf8_lossy(&bytes), &addr);
         tdbg!(&r, r.len());
     }
 
