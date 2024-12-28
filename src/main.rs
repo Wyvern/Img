@@ -18,6 +18,28 @@ static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
     // "-OJ",
 ];
 
+static LOGOS: [[&str; 3]; 7] = [
+    ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
+    ["秀人集", "div.logo > a > img[alt]", "quanjixiu.com"],
+    [
+        "爱美女",
+        "div.container > h1.logo > a[title] > img[src]",
+        "imn5.top",
+    ],
+    ["我为人人", "a[href=\"/2048\"] > img[src]", "hjd2048.com"],
+    ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],
+    [
+        "极品性感美女",
+        "h1.logo > a[title] > img[src]",
+        "jpxgmn.com",
+    ],
+    [
+        "深度学堂",
+        "div.logo-wrapper > a[href] > img[alt=\"深度学堂\"]",
+        "sdxt.de",
+    ],
+];
+
 fn check_args() -> String {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         quit!("Too many arguments.\nUsage: {}", "Img <url>");
@@ -114,7 +136,18 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (html, [img, mut next_sel, album], host) = get_html(addr);
+    let (html, [mut img, mut next_sel, mut album], host) = get_html(addr);
+
+    if img.is_none() {
+        let page = crabquery::Document::from(html.to_owned());
+        if let Some([series, _, site]) = LOGOS
+            .iter()
+            .find(|[_, logo, _]| !page.select(logo).is_empty())
+        {
+            tdbg!(series);
+            [img, next_sel, album] = host_info(site);
+        }
+    }
 
     let css_img = if img.is_none() {
         css_image(&html, addr)
@@ -125,7 +158,6 @@ fn parse(addr: &str) -> String {
     let sels = img.and_then(|i| i.split_once(SEP));
     let sel = sels.map(|(l, _)| l).or(img);
     let page = crabquery::Document::from(html);
-
     let mut json_img = collections::HashSet::new();
     let mut html_img = vec![];
 
@@ -677,16 +709,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            let p = path.to_owned();
-            thread::spawn(move || {
-                _t.unwrap().wait().expect("curl download didn't run.");
-                for f in need_file_type_detection {
-                    let file = p.join(&f);
-                    if file.exists() {
-                        magic_number_type(file);
-                    }
+            _t.unwrap().wait().expect("curl download didn't run.");
+            for f in need_file_type_detection {
+                let file = path.join(&f);
+                if file.exists() {
+                    magic_number_type(file);
                 }
-            });
+            }
         }
     }
 
