@@ -18,28 +18,6 @@ static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
     // "-OJ",
 ];
 
-static LOGOS: [[&str; 3]; 7] = [
-    ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
-    ["秀人集", "div.logo > a > img[alt]", "quanjixiu.com"],
-    [
-        "爱美女",
-        "div.container > h1.logo > a[title] > img[src]",
-        "imn5.top",
-    ],
-    ["我为人人", "a[href=\"/2048\"] > img[src]", "hjd2048.com"],
-    ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],
-    [
-        "极品性感美女",
-        "h1.logo > a[title] > img[src]",
-        "jpxgmn.com",
-    ],
-    [
-        "深度学堂",
-        "div.logo-wrapper > a[href] > img[alt=\"深度学堂\"]",
-        "sdxt.de",
-    ],
-];
-
 fn check_args() -> String {
     if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
         quit!("Too many arguments.\nUsage: {}", "Img <url>");
@@ -85,8 +63,10 @@ fn check_host(addr: &str) -> &str {
 fn host_info(host: &str) -> [Option<&str>; 3] {
     let site = JSON
         .get_or_init(website)
+        .as_object()
+        .expect("`web.json` file parse error!")["Sites"]
         .as_array()
-        .expect("Json file parse error.")
+        .expect("Parse `Sites` in `web.json` key error!")
         .iter()
         .find(|&s| {
             s["Site"].as_str().is_some_and(|s| {
@@ -138,13 +118,19 @@ fn parse(addr: &str) -> String {
     let (bytes, [mut img, mut next_sel, mut album], host) = get_html(addr);
     let html = String::from_utf8_lossy(&bytes);
     let page = crabquery::Document::from(html.as_ref());
+    let cat = JSON
+        .get_or_init(website)
+        .as_object()
+        .expect("`web.json` file parse error!")["Series"]
+        .as_array()
+        .expect("Parse `Series` in `web.json` key error!");
     if img.is_none() {
-        if let Some([series, _, site]) = LOGOS
-            .iter()
-            .find(|[_, logo, _]| !page.select(logo).is_empty())
-        {
-            tdbg!(series);
-            [img, next_sel, album] = host_info(site);
+        if let Some(x) = cat.iter().find(|v| {
+            let logo = v.as_array().unwrap()[1].as_str().unwrap();
+            !page.select(logo).is_empty()
+        }) {
+            tdbg!(x.as_array().unwrap()[0].as_str().unwrap());
+            [img, next_sel, album] = host_info(x.as_array().unwrap()[2].as_str().unwrap());
         }
     }
 
@@ -1211,8 +1197,10 @@ mod img {
         let mut img_sel = collections::HashMap::new();
 
         JSON.get_or_init(website)
+            .as_object()
+            .expect("`web.json` file parse error!")["Sites"]
             .as_array()
-            .expect("Json file parse error.")
+            .expect("Parse `Sites` in `web.json` key error!")
             .iter()
             .for_each(|s| {
                 if let Some(v) = s["Site"].as_str() {
