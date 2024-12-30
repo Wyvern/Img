@@ -125,9 +125,12 @@ fn parse(addr: &str) -> String {
         .as_array()
         .expect("Parse `Series` in `web.json` key error!");
     if img.is_none() {
-        if let Some(a) = cat.iter().find_map(|v| {
-            let arr = (0..3)
-                .map(|i| v.as_array().unwrap()[i].as_str().unwrap())
+        if let Some(series) = cat.iter().find_map(|v| {
+            let arr = v
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_str().unwrap())
                 .collect::<Vec<_>>();
             if !page.select(arr[1]).is_empty() {
                 Some(arr)
@@ -135,8 +138,8 @@ fn parse(addr: &str) -> String {
                 None
             }
         }) {
-            tdbg!(a[0]);
-            [img, next_sel, album] = host_info(a[2]);
+            tdbg!(series[0]);
+            [img, next_sel, album] = host_info(series[2]);
         }
     }
 
