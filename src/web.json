@@ -663,11 +663,18 @@
       "Site": "girl-atlas.com",
       "Img": "div.gallery a",
       "Album": "h4 > a"
+    },
+    {
+      "Site": "xrmnw.com",
+      "Img": "div.content_left img",
+      "Next": "div.page > a",
+      "Album": "div.meta-title"
     }
   ],
   "Series": [
     ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
     ["秀人集", "div.logo > a > img[alt=\"秀人集\"]", "quanjixiu.com"],
+    ["秀人美女", "div.logo > a > img[alt=\"秀人美女\"]", "xrmnw.com"],
     ["爱美女", "h1.logo > a[title=\"爱美女网\"] > img[src]", "imn5.top"],
     ["我为人人", "a[href=\"/2048\"] > img[src]", "hjd2048.com"],
     ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],

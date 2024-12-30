@@ -118,13 +118,14 @@ fn parse(addr: &str) -> String {
     let (bytes, [mut img, mut next_sel, mut album], host) = get_html(addr);
     let html = String::from_utf8_lossy(&bytes);
     let page = crabquery::Document::from(html.as_ref());
-    let cat = JSON
-        .get_or_init(website)
-        .as_object()
-        .expect("`web.json` file parse error!")["Series"]
-        .as_array()
-        .expect("Parse `Series` in `web.json` key error!");
+
     if img.is_none() {
+        let cat = JSON
+            .get_or_init(website)
+            .as_object()
+            .expect("`web.json` file parse error!")["Series"]
+            .as_array()
+            .expect("Parse `Series` in `web.json` key error!");
         if let Some(series) = cat.iter().find_map(|v| {
             let arr = v
                 .as_array()
