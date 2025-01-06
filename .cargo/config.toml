@@ -204,7 +204,7 @@ rustflags = [
 [target.'cfg(any(target_arch="arm64ec",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = ["-Zlinker-features=-lld"]
 
-[target.'cfg(not(any(target_family="wasm",target_os="none",target_arch="arm64ec",target_os="solaris",target_os="freebsd")))']
+[target.'cfg(not(any(target_family="wasm",target_os="none",target_arch="arm64ec")))']
 rustflags = [
     "-Clink-args=-fno-ident -fno-rtti -fno-exceptions -fno-backtrace -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined -fPIC -fPIE",
 ]
