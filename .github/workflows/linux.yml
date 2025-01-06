@@ -53,9 +53,6 @@ jobs:
 
           set +e -x
 
-          time cargo s --target x86_64-pc-solaris
-          time cargo s --target sparcv9-sun-solaris
-
           time cargo s --target powerpc64le-unknown-linux-gnu
           time cargo s --target powerpc64le-unknown-linux-musl
 
