@@ -53,8 +53,14 @@ jobs:
           Write-Host "Building: aarch64-pc-windows-msvc"
           Measure-Command {cargo s --target aarch64-pc-windows-msvc}
 
+          Write-Host "Building: aarch64-uwp-windows-msvc"
+          Measure-Command {cargo s --target aarch64-uwp-windows-msvc}
+
           Write-Host "Building: x86_64-pc-windows-msvc"
           Measure-Command {cargo s --target x86_64-pc-windows-msvc}
+
+          Write-Host "Building: x86_64-uwp-windows-msvc"
+          Measure-Command {cargo s --target x86_64-uwp-windows-msvc}
 
           Write-Host "Building: arm64ec-pc-windows-msvc"
           Measure-Command {cargo s --target arm64ec-pc-windows-msvc}
