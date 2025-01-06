@@ -65,7 +65,8 @@ jobs:
           Write-Host "Building: arm64ec-pc-windows-msvc"
           Measure-Command {cargo s --target arm64ec-pc-windows-msvc}
 
-          cmd /c dir /s target\Img.exe
+          # cmd /c dir /s target\src\Img.exe
+          Get-ChildItem -Path target\*\src\Img.exe -File
           systeminfo
 
       - name: Rust Versions
@@ -81,6 +82,16 @@ jobs:
           overwrite: true
           body: "Windows x64 binary executable."
 
+      - name: Upload Windows-x64-uwp to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/x86_64-uwp-windows-msvc/src/Img.exe
+          asset_name: Windows-x86_64-uwp.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows x64-uwp binary executable."
+
       - name: Upload Windows-aarch64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
@@ -90,6 +101,16 @@ jobs:
           tag: Nightly
           overwrite: true
           body: "Windows aarch64 binary executable."
+
+      - name: Upload Windows-aarch64-uwp to a GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/aarch64-uwp-windows-msvc/src/Img.exe
+          asset_name: Windows-aarch64-uwp.exe
+          tag: Nightly
+          overwrite: true
+          body: "Windows aarch64-uwp binary executable."
 
       - name: Upload Windows-arm64ec to a GitHub release
         uses: svenstaro/upload-release-action@v2
