@@ -250,15 +250,3 @@ linker = "mips64el-linux-gnuabi64-gcc"
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
-
-[target.powerpc64-ibm-aix]
-linker = "powerpc64-aix-gcc"
-
-[target.x86_64-unknown-freebsd]
-linker = "x86_64-freebsd-gcc"
-
-[target.sparcv9-sun-solaris]
-linker = "sparcv9-sun-solaris-gcc"
-
-[target.x86_64-pc-solaris]
-linker = "x86_64-pc-solaris-gcc"
