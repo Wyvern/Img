@@ -134,12 +134,11 @@ mod macros {
 }
 
 /// `memeql` implementation
-pub fn memeql<T>(v1: &T, v2: &T) -> bool {
-    let [p1, p2] = [&raw const *v1, &raw const *v2];
-    let len = mem::size_of::<T>();
-    let s1 = unsafe { slice::from_raw_parts(p1.cast::<u8>(), len) };
-    let s2 = unsafe { slice::from_raw_parts(p2.cast::<u8>(), len) };
-    s1 == s2
+pub fn memeql<T: ?Sized>(v1: &T, v2: &T) -> bool {
+    let ptr = [v1, v2].map(|v| &raw const *v);
+    let len = mem::size_of_val(v1);
+    let slice = ptr.map(|p| unsafe { slice::from_raw_parts(p.cast::<u8>(), len) });
+    slice[0] == slice[1]
 }
 
 pub fn pause() {

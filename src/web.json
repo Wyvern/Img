@@ -669,6 +669,12 @@
       "Img": "div.content_left img",
       "Next": "div.page > a",
       "Album": "div.meta-title"
+    },
+    {
+      "Site":"youfreex.com",
+      "Img":"div.file-detail img",
+      "Next":"a.page-next",
+      "Album":"div.teaser-file-title"
     }
   ],
   "Series": [
@@ -689,8 +695,8 @@
       "sdxt.de"
     ],
     ["爱看美女", "div.logo.fl > a[title] > img[alt]", "ligui.org"],
-    ["资讯热线", "div.logo > a[href=\"/\"] > img[alt]", "shzx.org"],
     ["妹妹美", "div.navbar-header a.navbar-brand", "mmm.red"],
+    ["资讯热线", "div.logo > a[href=\"/\"] > img[alt]", "shzx.org"],
     [
       "Sexy Girl Dreamy",
       "h1.elementor-heading-title > a[href]",
