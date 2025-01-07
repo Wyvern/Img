@@ -42,7 +42,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu  musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
