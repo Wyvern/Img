@@ -63,8 +63,10 @@ fn check_host(addr: &str) -> &str {
 fn host_info(host: &str) -> [Option<&str>; 3] {
     let site = JSON
         .get_or_init(website)
+        .as_object()
+        .expect("`web.json` file parse error!")["Sites"]
         .as_array()
-        .expect("Json file parse error.")
+        .expect("Parse `Sites` in `web.json` key error!")
         .iter()
         .find(|&s| {
             s["Site"].as_str().is_some_and(|s| {
@@ -82,7 +84,7 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
+fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 3], &str) {
     let host = check_host(addr);
     let host_info = host_info(host);
     use sync::mpsc::*;
@@ -108,26 +110,50 @@ fn get_html(addr: &str) -> (String, [Option<&str>; 3], &str) {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
     }
-    let res = String::from_utf8_lossy(&out.stdout);
-    (res.into_owned(), host_info, host)
+    (out.stdout, host_info, host)
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (html, [img, mut next_sel, album], host) = get_html(addr);
+    let (bytes, [mut img, mut next_sel, mut album], host) = get_html(addr);
+    let html = String::from_utf8_lossy(&bytes);
+    let page = crabquery::Document::from(html.as_ref());
 
-    let css_img = if img.is_none() {
-        css_image(&html, addr)
-    } else {
-        collections::HashSet::new()
-    };
+    if img.is_none() {
+        let cat = JSON
+            .get_or_init(website)
+            .as_object()
+            .expect("`web.json` file parse error!")["Series"]
+            .as_array()
+            .expect("Parse `Series` in `web.json` key error!");
+        if let Some(series) = cat.iter().find_map(|v| {
+            let arr = v
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_str().unwrap())
+                .collect::<Vec<_>>();
+            if !page.select(arr[1]).is_empty() {
+                Some(arr)
+            } else {
+                None
+            }
+        }) {
+            tdbg!(series[0]);
+            [img, next_sel, album] = host_info(series[2]);
+        }
+    }
 
     let sels = img.and_then(|i| i.split_once(SEP));
     let sel = sels.map(|(l, _)| l).or(img);
-    let page = crabquery::Document::from(html);
 
     let mut json_img = collections::HashSet::new();
     let mut html_img = vec![];
+    let css_img = if img.is_none() {
+        css_image(html.as_ref(), addr)
+    } else {
+        collections::HashSet::new()
+    };
 
     if sel.is_some_and(|s| s.starts_with("json:")) {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
@@ -207,9 +233,9 @@ fn parse(addr: &str) -> String {
 
     t = t
         .rsplit(['/', '-', '_', '|', '–'])
+        .skip(1)
         .max_by_key(|x| x.trim().len())
-        .unwrap()
-        .trim();
+        .unwrap_or(t);
 
     let albums = album.map(|a| page.select(a));
 
@@ -220,11 +246,7 @@ fn parse(addr: &str) -> String {
         json_img.len(),
     ];
 
-    let term_title = if terminal_emulator() {
-        format!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\")
-    } else {
-        format!("{G} {t}")
-    };
+    let term_title = link_text(t, addr);
 
     let name_count = |name: &[&str], count: &[usize]| -> String {
         name.iter()
@@ -316,8 +338,7 @@ fn parse(addr: &str) -> String {
                             } else {
                                 val
                             };
-
-                            // tdbg!(&url);
+                            // tdbg!(&url;);
                             if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
                                 if !url.is_empty() {
                                     dup += 1;
@@ -365,8 +386,8 @@ fn parse(addr: &str) -> String {
                             .args(["-Z", "--parallel-immediate"])
                             .output()
                             .unwrap();
-                        let html = String::from_utf8_lossy(&o.stdout).into_owned();
-                        let page = crabquery::Document::from(html);
+                        let html = String::from_utf8_lossy(&o.stdout);
+                        let page = crabquery::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
                         for e in html_img {
@@ -399,6 +420,7 @@ fn parse(addr: &str) -> String {
                     _ => (),
                 }
             }
+
             // tdbg!(&urls, &css_img, &json_img);
             download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
@@ -653,7 +675,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         }
         #[cfg(not(feature = "infer"))]
         let file_name = if name_ext.is_empty() {
-            name
+            name.trim_end_matches("!lrg")
         } else {
             name_ext.as_str()
         };
@@ -681,16 +703,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         #[cfg(feature = "infer")]
         if !need_file_type_detection.is_empty() {
-            let p = path.to_owned();
-            thread::spawn(move || {
-                _t.unwrap().wait().expect("curl download didn't run.");
-                for f in need_file_type_detection {
-                    let file = p.join(&f);
-                    if file.exists() {
-                        magic_number_type(file);
-                    }
+            _t.unwrap().wait().expect("curl download didn't run.");
+            for f in need_file_type_detection {
+                let file = path.join(&f);
+                if file.exists() {
+                    magic_number_type(file);
                 }
-            });
+            }
         }
     }
 
@@ -703,10 +722,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         no_ext_curl.output().map_or_else(
             |e| pl!("Query content-type info failed: {}", e),
             |o| {
-                let header = String::from_utf8_lossy(&o.stdout);
-                for (mut url, mut content_type) in
-                    header.lines().filter_map(|l| l.split_once("|->"))
-                {
+                let res = String::from_utf8_lossy(&o.stdout);
+                for (mut url, mut content_type) in res.lines().filter_map(|l| l.split_once("|->")) {
                     url = url.trim();
                     content_type = content_type.trim();
                     if let Some(ctx) = content_type.strip_prefix("image/") {
@@ -1052,23 +1069,22 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     images
 }
 
-///Detect terminal emulator using `echo $TERM`
-fn terminal_emulator() -> bool {
-    env::var("TERM").is_ok_and(|o| {
+///Linkable Text based upon terminal type
+fn link_text(text: &str, addr: &str) -> String {
+    if env::var("TERM").is_ok_and(|o| {
         ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
             .iter()
             .any(|x| o.contains(x))
-    })
+    }) {
+        format!("{G} \x1b]8;;{addr}\x1b\\{text}\x1b]8;;\x1b\\")
+    } else {
+        format!("{G} {text}")
+    }
 }
 
 #[cfg(test)]
 mod img {
     use super::*;
-
-    #[test]
-    fn detect_terminal_emulator() {
-        dbg!(terminal_emulator());
-    }
 
     #[inline]
     fn arg(default: &str) -> String {
@@ -1078,7 +1094,8 @@ mod img {
 
     #[test]
     fn html() {
-        let (html, ..) = get_html(&arg("mmm.red"));
+        let (bytes, ..) = get_html(&arg("mmm.red"));
+        let html = String::from_utf8_lossy(&bytes);
         dbg!(&html);
     }
 
@@ -1087,7 +1104,7 @@ mod img {
         let addr =
             arg("https://52xiuren.cc/2024/10/30/xiuren-vol-9300-%e8%bd%af%e8%bd%af%e9%85%b1/");
 
-        let (html, [img, .., album], _) = get_html(&addr);
+        let (bytes, [img, .., album], _) = get_html(&addr);
 
         use process::*;
 
@@ -1101,14 +1118,11 @@ mod img {
             let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
             use io::*;
             stdin
-                .write_all(html.as_bytes())
+                .write_all(bytes.as_ref())
                 .expect("Failed to write stdin.");
             if let Ok(o) = cmd.wait_with_output() {
                 if !o.stdout.is_empty() {
-                    println!(
-                        "Totally found {} <img>",
-                        String::from_utf8_lossy(o.stdout.as_ref()).lines().count()
-                    );
+                    println!("Totally found {} <img>", o.stdout.lines().count());
                 }
             }
         };
@@ -1133,6 +1147,7 @@ mod img {
             parse(&arg);
         } else {
             [
+                "https://meitu9.com/",
                 "https://xiutaku.com",
                 "https://ugirls.pics/",
                 "https://bisipic.online",
@@ -1168,8 +1183,8 @@ mod img {
     #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let (html, ..) = get_html(&addr);
-        let r = css_image(&html, &addr);
+        let (bytes, ..) = get_html(&addr);
+        let r = css_image(&String::from_utf8_lossy(&bytes), &addr);
         tdbg!(&r, r.len());
     }
 
@@ -1192,8 +1207,10 @@ mod img {
         let mut img_sel = collections::HashMap::new();
 
         JSON.get_or_init(website)
+            .as_object()
+            .expect("`web.json` file parse error!")["Sites"]
             .as_array()
-            .expect("Json file parse error.")
+            .expect("Parse `Sites` in `web.json` key error!")
             .iter()
             .for_each(|s| {
                 if let Some(v) = s["Site"].as_str() {
