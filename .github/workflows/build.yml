@@ -35,7 +35,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64le-unknown-linux-musl,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -345,6 +345,7 @@ jobs:
 
     steps:
       - name: Disable and Stop windows services
+        continue-on-error: true
         run: |
           $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
           $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
@@ -360,7 +361,6 @@ jobs:
           reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
 
           schtasks /delete /tn * /f >NUL
-
       - name: Checkout
         uses: actions/checkout@v4
 
