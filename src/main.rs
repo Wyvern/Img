@@ -809,7 +809,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr("href").is_none() {
             let items = element.parent().unwrap().children();
-            let tags = items.split(|e| memeql(element, e)).next_back().unwrap();
+            let tags = items.split(|e| element.eql(e)).next_back().unwrap();
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr("href").unwrap();
