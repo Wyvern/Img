@@ -133,13 +133,19 @@ mod macros {
 }
 }
 
-/// `memeql` implementation
-pub fn memeql<T>(v1: &T, v2: &T) -> bool {
-    let len = mem::size_of::<T>();
-    let slice =
-        [v1, v2].map(|v| unsafe { slice::from_raw_parts((&raw const *v).cast::<u8>(), len) });
-    slice[0] == slice[1]
+pub trait AsBytes
+where
+    Self: Sized,
+{
+    fn as_bytes(&self) -> &[u8] {
+        let len = mem::size_of::<Self>();
+        unsafe { slice::from_raw_parts((&raw const *self).cast::<u8>(), len) }
+    }
+    fn eql<Other>(&self, other: &Other) -> bool {
+        self.as_bytes() == other.as_bytes()
+    }
 }
+impl<T> AsBytes for T {}
 
 pub fn pause() {
     use io::*;

@@ -100,11 +100,6 @@
       "Next": "div.paging a"
     },
     {
-      "Site": "hotgirlpix.com",
-      "Img": "div.postImageContainer img",
-      "Next": "div#singlePostPagination span"
-    },
-    {
       "Site": "asigirl.com",
       "Img": "div#asigirl-gallery a[href]"
     },
@@ -133,7 +128,7 @@
       "Img": "li figure img"
     },
     {
-      "Site": "z227m.cc,xxx7788.com",
+      "Site": "xxx7788.com",
       "Img": "div#read_tpc img"
     },
     {
@@ -234,7 +229,7 @@
       "Album": "div.title a"
     },
     {
-      "Site": "8se.me,xchina.co,xchina.biz",
+      "Site": "xchina.co",
       "Img": "div.photos > a[href] | div.container > img",
       "Next": "div.pager a",
       "Album": "div.item > a[href] > img"
@@ -671,10 +666,21 @@
       "Album": "div.meta-title"
     },
     {
-      "Site":"youfreex.com",
-      "Img":"div.file-detail img",
-      "Next":"a.page-next",
-      "Album":"div.teaser-file-title"
+      "Site": "youfreex.com",
+      "Img": "div.file-detail img",
+      "Next": "a.page-next",
+      "Album": "div.teaser-file-title"
+    },
+    {
+      "Site": "telegra.ph",
+      "Img": "p > img",
+      "Title": "p"
+    },
+    {
+      "Site": "hotgirlpix.com",
+      "Img": "div.postImageContainer > img",
+      "Next": "div#singlePostPagination > span.paginationPageNumberCurrent",
+      "Album": "a.postTitleLink"
     }
   ],
   "Series": [
@@ -683,6 +689,8 @@
     ["秀人美女", "div.logo > a > img[alt=\"秀人美女\"]", "xrmnw.com"],
     ["爱美女", "h1.logo > a[title=\"爱美女网\"] > img[src]", "imn5.top"],
     ["我为人人", "a[href=\"/2048\"] > img[src]", "hjd2048.com"],
+    ["小黄书 xChina", "div.logo > a > img[alt]", "xchina.co"],
+    ["资讯热线", "div.logo > a > img[alt][title]", "shzx.org"],
     ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],
     [
       "极品性感美女",
@@ -696,7 +704,6 @@
     ],
     ["爱看美女", "div.logo.fl > a[title] > img[alt]", "ligui.org"],
     ["妹妹美", "div.navbar-header a.navbar-brand", "mmm.red"],
-    ["资讯热线", "div.logo > a[href=\"/\"] > img[alt]", "shzx.org"],
     [
       "Sexy Girl Dreamy",
       "h1.elementor-heading-title > a[href]",
