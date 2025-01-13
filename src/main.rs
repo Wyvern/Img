@@ -60,7 +60,7 @@ fn check_host(addr: &str) -> &str {
 }
 
 ///Get `host` info and Generate `img/next/album` selector data
-fn host_info(host: &str) -> [Option<&str>; 3] {
+fn host_info(host: &str) -> [Option<&str>; 4] {
     let site = JSON
         .get_or_init(website)
         .as_object()
@@ -78,13 +78,13 @@ fn host_info(host: &str) -> [Option<&str>; 3] {
             })
         });
 
-    site.map_or([None; 3], |s| {
-        ["Img", "Next", "Album"].map(|key| s[key].as_str().map(|v| v.trim()))
+    site.map_or([None; 4], |s| {
+        ["Img", "Next", "Album", "Title"].map(|key| s[key].as_str().map(|v| v.trim()))
     })
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 3], &str) {
+fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 4], &str) {
     let host = check_host(addr);
     let host_info = host_info(host);
     use sync::mpsc::*;
@@ -115,7 +115,7 @@ fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 3], &str) {
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (bytes, [mut img, mut next_sel, mut album], host) = get_html(addr);
+    let (bytes, [mut img, mut next_sel, mut album, mut title], host) = get_html(addr);
     let html = String::from_utf8_lossy(&bytes);
     let page = crabquery::Document::from(html.as_ref());
 
@@ -133,6 +133,7 @@ fn parse(addr: &str) -> String {
                 .iter()
                 .map(|v| v.as_str().unwrap())
                 .collect::<Vec<_>>();
+
             if !page.select(arr[1]).is_empty() {
                 Some(arr)
             } else {
@@ -140,7 +141,7 @@ fn parse(addr: &str) -> String {
             }
         }) {
             tdbg!(series[0]);
-            [img, next_sel, album] = host_info(series[2]);
+            [img, next_sel, album, title] = host_info(series[2]);
         }
     }
 
@@ -204,38 +205,42 @@ fn parse(addr: &str) -> String {
     } else {
         "title"
     });
-    let title = if !json_img.is_empty() {
-        titles
-            .iter()
-            .find_map(|s| {
-                s.text()
-                    .and_then(|t| t.split_once("metaKeywords").map(|kw| kw.1.to_owned()))
-            })
-            .unwrap()
-            .split('"')
-            .nth(1)
-            .unwrap()
-            .split(',')
-            .max_by_key(|&seg| seg.trim().len())
-            .unwrap()
-            .to_owned()
-    } else {
-        titles
-            .first()
-            .unwrap_or_else(|| {
-                quit!("Not a valid HTML page.");
-            })
-            .text()
-            .expect("NO title text.")
-    };
 
-    let mut t = title.trim();
+    let title = title.map_or_else(
+        || {
+            if !json_img.is_empty() {
+                titles
+                    .iter()
+                    .find_map(|s| {
+                        s.text()
+                            .and_then(|t| t.split_once("metaKeywords").map(|kw| kw.1.to_owned()))
+                    })
+                    .unwrap()
+                    .split('"')
+                    .nth(1)
+                    .unwrap()
+                    .split(',')
+                    .max_by_key(|&seg| seg.trim().len())
+                    .unwrap()
+                    .to_owned()
+            } else {
+                titles
+                    .first()
+                    .unwrap_or_else(|| {
+                        quit!("Not a valid HTML page.");
+                    })
+                    .text()
+                    .expect("NO title text.")
+            }
+        },
+        |t| page.select(t)[0].text().unwrap(),
+    );
 
-    t = t
+    let mut t = title
         .rsplit(['/', '-', '_', '|', '–'])
         .skip(1)
         .max_by_key(|x| x.trim().len())
-        .unwrap_or(t);
+        .unwrap_or(title.as_str());
 
     let albums = album.map(|a| page.select(a));
 
@@ -537,7 +542,7 @@ fn parse(addr: &str) -> String {
             } else {
                 let num = addr
                     .split_terminator('/')
-                    .last()
+                    .next_back()
                     .unwrap_or("")
                     .parse::<u8>()
                     .unwrap_or(1);
