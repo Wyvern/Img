@@ -100,11 +100,6 @@
       "Next": "div.paging a"
     },
     {
-      "Site": "hotgirlpix.com",
-      "Img": "div.postImageContainer img",
-      "Next": "div#singlePostPagination span"
-    },
-    {
       "Site": "asigirl.com",
       "Img": "div#asigirl-gallery a[href]"
     },
@@ -680,6 +675,12 @@
       "Site": "telegra.ph",
       "Img": "p > img",
       "Title": "p"
+    },
+    {
+      "Site": "hotgirlpix.com",
+      "Img": "div.postImageContainer > img",
+      "Next": "div#singlePostPagination > span.paginationPageNumberCurrent",
+      "Album": "a.postTitleLink"
     }
   ],
   "Series": [

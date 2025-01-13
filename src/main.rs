@@ -35,6 +35,7 @@ fn check_args() -> String {
 
 fn main() {
     let arg = check_args();
+    check_host(&arg);
     let mut next_page = parse(&arg);
 
     if cfg!(not(test)) {
@@ -84,9 +85,7 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 4], &str) {
-    let host = check_host(addr);
-    let host_info = host_info(host);
+fn get_html(addr: &str) -> Vec<u8> {
     use sync::mpsc::*;
     let (s, r) = channel();
     _ = io::stdout().lock();
@@ -97,6 +96,8 @@ fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 4], &str) {
         .args(CURL)
         .args([
             addr,
+            "-w",
+            "\n%{url_effective}",
             #[cfg(not(debug_assertions))]
             "-S",
         ])
@@ -106,18 +107,22 @@ fn get_html(addr: &str) -> (Vec<u8>, [Option<&str>; 4], &str) {
             quit!("curl: {}", e);
         });
     _ = s.send(());
-    if out.stdout.is_empty() {
+    if !out.stderr.is_empty() {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
     }
-    (out.stdout, host_info, host)
+    out.stdout
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let (bytes, [mut img, mut next_sel, mut album, mut title], host) = get_html(addr);
+    let bytes = get_html(addr);
     let html = String::from_utf8_lossy(&bytes);
-    let page = crabquery::Document::from(html.as_ref());
+    let ll = html.rfind('\n').unwrap();
+    let url_effective = &html[ll + 1..];
+    let host = check_host(url_effective);
+    let [mut img, mut next_sel, mut album, mut title] = host_info(host);
+    let page = crabquery::Document::from(&html[..ll]);
 
     if img.is_none() {
         let cat = JSON
@@ -743,8 +748,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                             name
                         };
                         curl.args([url, "-o", name_ext]);
-                    } else {
-                        curl.args([url, "-OJ"]);
                     }
                 }
             },
@@ -1099,18 +1102,17 @@ mod img {
 
     #[test]
     fn html() {
-        let (bytes, ..) = get_html(&arg("mmm.red"));
+        let bytes = get_html(&arg("mmm.red"));
         let html = String::from_utf8_lossy(&bytes);
         dbg!(&html);
     }
 
     #[test]
     fn htmlq() {
-        let addr =
-            arg("https://52xiuren.cc/2024/10/30/xiuren-vol-9300-%e8%bd%af%e8%bd%af%e9%85%b1/");
-
-        let (bytes, [img, .., album], _) = get_html(&addr);
-
+        let addr = arg("https://www.hotgirlpix.com/");
+        let host = check_host(&addr);
+        let bytes = get_html(&addr);
+        let [img, _, album, _] = host_info(host);
         use process::*;
 
         let hq = |sel: &str| {
@@ -1188,7 +1190,7 @@ mod img {
     #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let (bytes, ..) = get_html(&addr);
+        let bytes = get_html(&addr);
         let r = css_image(&String::from_utf8_lossy(&bytes), &addr);
         tdbg!(&r, r.len());
     }
