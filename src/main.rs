@@ -754,7 +754,11 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                         };
                         curl.args([url, "-o", name_ext]);
                     } else {
-                        tdbg!(url, content_type);
+                        curl.args([
+                            tdbg!(url),
+                            "-o",
+                            &format!("{}.ext!{content_type}", no_ext[url]),
+                        ]);
                     }
                 }
             },
