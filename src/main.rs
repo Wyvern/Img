@@ -619,10 +619,11 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         "-Z",
         "--parallel-immediate",
         "-sIo",
-        #[cfg(not(target_os = "windows"))]
-        "/dev/null",
-        #[cfg(target_os = "windows")]
-        "NUL",
+        if cfg!(target_os = "windows") {
+            "NUL"
+        } else {
+            "/dev/null"
+        },
         "-w",
         "\n%{url} |-> %{content_type}\n",
     ]);
