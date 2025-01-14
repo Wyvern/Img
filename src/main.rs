@@ -618,7 +618,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
-        "-I",
+        "-sIo",
+        if cfg!(target_os = "windows") {
+            "NUL"
+        } else {
+            "/dev/null"
+        },
         "-w",
         "\n%{url} |-> %{content_type}\n",
     ]);
@@ -748,6 +753,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                             name
                         };
                         curl.args([url, "-o", name_ext]);
+                    } else {
+                        tdbg!(url, content_type);
                     }
                 }
             },
