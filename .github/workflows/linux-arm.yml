@@ -46,8 +46,6 @@ jobs:
           cargo update
 
           set +e -x
-          sudo chown -R $USER:$USER .git
-          sudo chmod -R 755 .git
 
           time cargo s --target powerpc64le-unknown-linux-gnu
           time cargo s --target powerpc64le-unknown-linux-musl
@@ -87,6 +85,7 @@ jobs:
 
       - name: Upload Linux-mips64-gnuabi64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/mips64-unknown-linux-gnuabi64/src/Img
@@ -97,6 +96,7 @@ jobs:
 
       - name: Upload Linux-mips64-muslabi64 to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/mips64-unknown-linux-muslabi64/src/Img
@@ -129,6 +129,7 @@ jobs:
 
       - name: Upload Linux-sparc64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/sparc64-unknown-linux-gnu/src/Img
@@ -139,6 +140,7 @@ jobs:
 
       - name: Upload Linux-powerpc64le-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/powerpc64le-unknown-linux-gnu/src/Img
@@ -149,6 +151,7 @@ jobs:
 
       - name: Upload Linux-powerpc64le-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/powerpc64le-unknown-linux-musl/src/Img
@@ -181,6 +184,7 @@ jobs:
 
       - name: Upload Linux-s390x-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/s390x-unknown-linux-gnu/src/Img
@@ -202,6 +206,7 @@ jobs:
 
       - name: Upload Linux-riscv64gc-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/riscv64gc-unknown-linux-gnu/src/Img
@@ -223,6 +228,7 @@ jobs:
 
       - name: Upload Linux-x86_64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-gnu/src/Img
@@ -233,6 +239,7 @@ jobs:
 
       - name: Upload Linux-x86_64-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64-unknown-linux-musl/src/Img
@@ -243,6 +250,7 @@ jobs:
 
       - name: Upload Linux-aarch64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-unknown-linux-gnu/src/Img
@@ -253,6 +261,7 @@ jobs:
 
       - name: Upload Linux-aarch64-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-unknown-linux-musl/src/Img
@@ -263,6 +272,7 @@ jobs:
 
       - name: Upload Linux-loongarch64-gnu to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/loongarch64-unknown-linux-gnu/src/Img
@@ -273,6 +283,7 @@ jobs:
 
       - name: Upload Linux-loongarch64-musl to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/loongarch64-unknown-linux-musl/src/Img
