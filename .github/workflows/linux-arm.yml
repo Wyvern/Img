@@ -46,6 +46,7 @@ jobs:
           cargo update
 
           set +e -x
+          sudo chown -R $USER:$USER .git
 
           time cargo s --target powerpc64le-unknown-linux-gnu
           time cargo s --target powerpc64le-unknown-linux-musl
