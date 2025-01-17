@@ -47,11 +47,11 @@ jobs:
 
           set +e -x
 
-          sudo time cargo s --target powerpc64le-unknown-linux-gnu
-          sudo time cargo s --target powerpc64le-unknown-linux-musl
+          time cargo s --target powerpc64le-unknown-linux-gnu
+          time cargo s --target powerpc64le-unknown-linux-musl
 
-          # time cargo s --target powerpc64-unknown-linux-gnu
-          # time cargo s --target powerpc64-unknown-linux-musl
+          time cargo s --target powerpc64-unknown-linux-gnu
+          time cargo s --target powerpc64-unknown-linux-musl
 
           time cargo s --target sparc64-unknown-linux-gnu
 
