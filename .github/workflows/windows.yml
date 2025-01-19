@@ -14,7 +14,7 @@ env:
 jobs:
   Windows:
     name: Building on Windows.
-    runs-on: windows-latest
+    runs-on: windows-2025
 
     steps:
       - name: Disable and Stop windows services
