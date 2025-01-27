@@ -204,16 +204,13 @@ rustflags = [
 [target.'cfg(any(target_arch="arm64ec",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = ["-Zlinker-features=-lld"]
 
-[target.'cfg(not(any(target_family="wasm",target_os="none",target_os="windows")))']
+[target.'cfg(not(any(target_family="wasm",target_os="none",target_arch="arm64ec",target_os="windows")))']
 rustflags = [
     "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
 ]
 
 [target.'cfg(target_vendor="apple")']
-rustflags = ["-Clink-arg=-Wl-z,nodefs"]
-
-[target.'cfg(any(target_vendor="apple",target_os="windows"))']
-rustflags = ["-Clink-arg=-fno-async-exceptions"]
+rustflags = ["-Clink-arg=-Wl-z,nodefs", "-Clink-arg=-fno-async-exceptions"]
 
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
