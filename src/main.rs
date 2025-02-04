@@ -1165,8 +1165,8 @@ mod img {
             parse(&arg);
         } else {
             [
-                "https://meitu9.com/",
                 "https://xiutaku.com",
+                "https://meitu9.com/",
                 "https://ugirls.pics/",
                 "https://bisipic.online",
             ]
