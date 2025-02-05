@@ -441,8 +441,8 @@
       "Album": "div.row > a > div > img"
     },
     {
-      "Site": "mntuce.com.mntuce.top",
-      "Img": "figure.size-large img",
+      "Site": "mntuce.com,mntuce.top",
+      "Img": "figure.size-large > img",
       "Next": "p.post-nav-links span.current",
       "Album": "div.item-body > h2 > a"
     },

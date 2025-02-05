@@ -754,7 +754,11 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                         };
                         curl.args([url, "-o", name_ext]);
                     } else {
-                        tdbg!(url, content_type);
+                        curl.args([
+                            tdbg!(url),
+                            "-o",
+                            &format!("{}.ext!{content_type}", no_ext[url]),
+                        ]);
                     }
                 }
             },
@@ -1161,8 +1165,8 @@ mod img {
             parse(&arg);
         } else {
             [
-                "https://meitu9.com/",
                 "https://xiutaku.com",
+                "https://meitu9.com/",
                 "https://ugirls.pics/",
                 "https://bisipic.online",
             ]
