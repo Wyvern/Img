@@ -74,7 +74,11 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
                 s.split_terminator(',').any(|s| {
                     let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
                     parts.reverse();
-                    parts.join(".").eq_ignore_ascii_case(s.trim())
+                    let r = parts.join(".").eq_ignore_ascii_case(s.trim());
+                    if r {
+                        tdbg!(s);
+                    }
+                    r
                 })
             })
         });

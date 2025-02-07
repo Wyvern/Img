@@ -656,7 +656,7 @@
     },
     {
       "Site": "girl-atlas.com",
-      "Img": "div.gallery a",
+      "Img": "div.gallery > a",
       "Album": "h4 > a"
     },
     {
@@ -704,6 +704,11 @@
     ],
     ["爱看美女", "div.logo.fl > a[title] > img[alt]", "ligui.org"],
     ["妹妹美", "div.navbar-header a.navbar-brand", "mmm.red"],
+    [
+      "Girl-Atlas",
+      "div.container-xxl > a.navbar-brand > img",
+      "girl-atlas.com"
+    ],
     [
       "Sexy Girl Dreamy",
       "h1.elementor-heading-title > a[href]",
