@@ -141,9 +141,10 @@
       "Img": "div.container img"
     },
     {
-      "Site": "tuxiuren.com,ikxiuren.com,aixiurentu.com",
+      "Site": "ikxiuren.com",
       "Img": "div.entry-content img",
-      "Next": "div.fenye a"
+      "Next": "div.fenye a",
+      "Album": "h2.entry-title > a"
     },
     {
       "Site": "ligui.org",
@@ -394,7 +395,7 @@
       "Album": "h6 > a"
     },
     {
-      "Site": "v2ph.com,v2ph.ru,v2ph.co",
+      "Site": "v2ph.com",
       "Img": "div.album-photo img",
       "Next": "ul.pagination a",
       "Album": "div.card-body a"
@@ -406,7 +407,7 @@
       "Album": "div.card-body a"
     },
     {
-      "Site": "legbabe.com,honeyleg.com,nlegs.com,ladylap.com,nuyet.com",
+      "Site": "legbabe.com",
       "Img": "div.col-md-2 > a[href] | img.img-res",
       "Next": "ul.pagination a",
       "Album": "div > span.title"
@@ -474,7 +475,7 @@
       "Album": "div.list-content > h2 > a"
     },
     {
-      "Site": "656g.com,MMZZSS.com,mmww.cc",
+      "Site": "656g.com",
       "Img": "div.imgg img",
       "Next": "div.imgg a",
       "Album": "div.img > a > span > img"
@@ -656,7 +657,7 @@
     },
     {
       "Site": "girl-atlas.com",
-      "Img": "div.gallery a",
+      "Img": "div.gallery > a",
       "Album": "h4 > a"
     },
     {
@@ -691,19 +692,27 @@
     ["我为人人", "a[href=\"/2048\"] > img[src]", "hjd2048.com"],
     ["小黄书 xChina", "div.logo > a > img[alt]", "xchina.co"],
     ["资讯热线", "div.logo > a > img[alt][title]", "shzx.org"],
+    ["秀人妹子", "div.nt > a > span", "656g.com"],
     ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],
     [
       "极品性感美女",
       "h1.logo > a[title] > img[alt=\"性感美女网\"]",
       "jpxgmn.com"
     ],
+    ["秀人图 ", "div.logo-wrapper img.tap-logo", "ikxiuren.com"],
     [
       "深度学堂",
       "div.logo-wrapper > a[href] > img[alt=\"深度学堂\"]",
       "sdxt.de"
     ],
     ["爱看美女", "div.logo.fl > a[title] > img[alt]", "ligui.org"],
-    ["妹妹美", "div.navbar-header a.navbar-brand", "mmm.red"],
+    ["V2PH,", "a.logo > img[alt=\"V2PH\"]", "v2ph.com"],
+    ["Leg Baby", "div.navbar-header > a.navbar-brand", "legbabe.com"],
+    [
+      "Girl-Atlas",
+      "div.container-xxl > a.navbar-brand > img",
+      "girl-atlas.com"
+    ],
     [
       "Sexy Girl Dreamy",
       "h1.elementor-heading-title > a[href]",

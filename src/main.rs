@@ -74,7 +74,11 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
                 s.split_terminator(',').any(|s| {
                     let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
                     parts.reverse();
-                    parts.join(".").eq_ignore_ascii_case(s.trim())
+                    let r = parts.join(".").eq_ignore_ascii_case(s.trim());
+                    if r {
+                        tdbg!(s);
+                    }
+                    r
                 })
             })
         });
@@ -89,7 +93,7 @@ fn get_html(addr: &str) -> Vec<u8> {
     use sync::mpsc::*;
     let (s, r) = channel();
     _ = io::stdout().lock();
-    thread::spawn(|| {
+    let h = thread::spawn(|| {
         circle_indicator(r);
     });
     let out = process::Command::new("curl")
@@ -111,6 +115,7 @@ fn get_html(addr: &str) -> Vec<u8> {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
     }
+    _ = h.join();
     out.stdout
 }
 
