@@ -93,7 +93,7 @@ fn get_html(addr: &str) -> Vec<u8> {
     use sync::mpsc::*;
     let (s, r) = channel();
     _ = io::stdout().lock();
-    thread::spawn(|| {
+    let h = thread::spawn(|| {
         circle_indicator(r);
     });
     let out = process::Command::new("curl")
@@ -115,6 +115,7 @@ fn get_html(addr: &str) -> Vec<u8> {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
     }
+    _ = h.join();
     out.stdout
 }
 
