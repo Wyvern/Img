@@ -163,7 +163,7 @@ rustflags = [
     "-Csymbol-mangling-version=hashed",
     "-Coverflow-checks=no",
     "-Cforce-frame-pointers=no",
-    "-Copt-level=s",
+    "-Copt-level=3",
     "-Cno-redzone",
     "-Cdebuginfo=0",
     "-Cstrip=symbols",
