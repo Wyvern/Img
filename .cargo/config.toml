@@ -244,8 +244,6 @@ linker = "sparc64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="loongarch64",target_os="linux"))']
 linker = "loongarch64-linux-gnu-gcc-14"
 
-[target.'cfg(all(target_arch="mips64",target_os="linux"))']
-rustflags = ["-Clink-arg=-zexecstack"]
 [target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "big"))']
 linker = "mips64-linux-gnuabi64-gcc"
 [target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "little"))']
