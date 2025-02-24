@@ -43,7 +43,7 @@ jobs:
 
           function cb() {
             local target="$1"
-            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size --target $target
+            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort,panic_unwind -Zbuild-std-features=panic_immediate_abort,optimize_for_size --target $target
           }
 
           set +e -x
