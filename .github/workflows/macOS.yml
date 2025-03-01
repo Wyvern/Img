@@ -60,6 +60,7 @@ jobs:
 
       - name: Upload macOS x86-64h to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/x86_64h-apple-darwin/src/Img
@@ -70,6 +71,7 @@ jobs:
 
       - name: Upload macOS-arm64e to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/arm64e-apple-darwin/src/Img
@@ -80,6 +82,7 @@ jobs:
 
       - name: Upload macOS-universal to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: Img-Universal
@@ -90,6 +93,7 @@ jobs:
 
       - name: Upload iOS to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/arm64e-apple-ios/src/Img
@@ -100,6 +104,7 @@ jobs:
 
       - name: Upload tvOS to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/arm64e-apple-tvos/src/Img
@@ -121,6 +126,7 @@ jobs:
 
       - name: Upload watchosOS to a GitHub release
         uses: svenstaro/upload-release-action@v2
+        continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/aarch64-apple-watchos/src/Img
