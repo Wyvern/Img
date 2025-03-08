@@ -1,4 +1,4 @@
-#![feature(test)]
+#![feature(test, gen_blocks)]
 
 mod util;
 use {std::*, util::*};
@@ -1160,6 +1160,30 @@ mod img {
         }
     }
 
+    #[test]
+    fn gen_yield() {
+        let start = time::Instant::now();
+
+        let gen_results = gen {
+            for a in 0..=1000 {
+                for b in 0..=1000 {
+                    for c in 0..=1000 {
+                        if a * a + b * b == c * c && a + b + c == 1000 {
+                            yield (a, b, c);
+                        }
+                    }
+                }
+            }
+        };
+
+        for (a, b, c) in gen_results {
+            println!("{{ a: {}, b: {}, c: {} }}", a, b, c,);
+        }
+
+        let duration = start.elapsed();
+        println!("Total: {} seconds", duration.as_secs_f64());
+    }
+
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
 
     #[test]
@@ -1335,7 +1359,13 @@ mod img {
     extern crate test;
 
     #[bench]
-    fn bench_parse(b: &mut test::Bencher) {
-        b.iter(|| thread::sleep);
+    fn demo(b: &mut test::Bencher) {
+        b.iter(|| {
+            let mut sum = 0;
+            for i in 0..1000 {
+                sum += i;
+            }
+            sum
+        });
     }
 }
