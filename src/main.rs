@@ -89,7 +89,7 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> String {
+fn get_html(addr: &str) -> (String, usize) {
     use sync::mpsc::*;
     let (s, r) = channel();
     _ = io::stdout().lock();
@@ -116,14 +116,14 @@ fn get_html(addr: &str) -> String {
         quit!("Fetch {} failed - {err}", addr);
     }
     let s = String::from_utf8_lossy(&out.stdout).into_owned();
+    let ll = s.rfind('\n').unwrap();
     _ = h.join();
-    s
+    (s, ll)
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let html = get_html(addr);
-    let ll = html.rfind('\n').unwrap();
+    let (html, ll) = get_html(addr);
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
     let [mut img, mut next_sel, mut album, mut title] = host_info(host);
@@ -1126,7 +1126,7 @@ mod img {
     fn htmlq() {
         let addr = arg("https://www.hotgirlpix.com/");
         let host = check_host(&addr);
-        let bytes = get_html(&addr);
+        let (html, ll) = get_html(&addr);
         let [img, _, album, _] = host_info(host);
         use process::*;
 
@@ -1140,7 +1140,7 @@ mod img {
             let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
             use io::*;
             stdin
-                .write_all(bytes.as_ref())
+                .write_all(html[..ll].as_ref())
                 .expect("Failed to write stdin.");
             if let Ok(o) = cmd.wait_with_output() {
                 if !o.stdout.is_empty() {
@@ -1229,7 +1229,8 @@ mod img {
     #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let r = css_image(&get_html(&addr), &addr);
+        let (html, ll) = get_html(&addr);
+        let r = css_image(&html[..ll], &addr);
         tdbg!(&r, r.len());
     }
 
