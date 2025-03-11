@@ -89,7 +89,7 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> Vec<u8> {
+fn get_html(addr: &str) -> String {
     use sync::mpsc::*;
     let (s, r) = channel();
     _ = io::stdout().lock();
@@ -115,14 +115,14 @@ fn get_html(addr: &str) -> Vec<u8> {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
     }
+    let s = String::from_utf8_lossy(&out.stdout).into_owned();
     _ = h.join();
-    out.stdout
+    s
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let bytes = get_html(addr);
-    let html = String::from_utf8_lossy(&bytes);
+    let html = get_html(addr);
     let ll = html.rfind('\n').unwrap();
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
@@ -1118,8 +1118,7 @@ mod img {
 
     #[test]
     fn html() {
-        let bytes = get_html(&arg("mmm.red"));
-        let html = String::from_utf8_lossy(&bytes);
+        let html = get_html(&arg("mmm.red"));
         dbg!(&html);
     }
 
@@ -1230,8 +1229,7 @@ mod img {
     #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let bytes = get_html(&addr);
-        let r = css_image(&String::from_utf8_lossy(&bytes), &addr);
+        let r = css_image(&get_html(&addr), &addr);
         tdbg!(&r, r.len());
     }
 
