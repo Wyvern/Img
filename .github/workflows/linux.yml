@@ -73,5 +73,5 @@ jobs:
           for target in ${targets[@]}; do
             read -r arch name <<< $target
             echo "Uploading $name..."
-            gh release upload Nightly target/$arch/src/Img#$name --clobber || true
+            gh release upload Nightly "target/$arch/src/Img#$name" --clobber || true
           done

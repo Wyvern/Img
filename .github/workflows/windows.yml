@@ -57,9 +57,9 @@ jobs:
                       "arm64ec-pc-windows-msvc"
                     )
           foreach ($target in $targets) {
-                      Write-Host "Building: $target"
-                      Measure-Command { cargo s --target $target }
-                    }
+              Write-Host "Building: $target"
+              Measure-Command { cargo s --target $target }
+          }
 
           # cmd /c dir /s target\src\Img.exe
           Get-ChildItem -Path target\*\src\Img.exe -File
@@ -85,5 +85,5 @@ jobs:
               $name = $target[1]
 
               Write-Host "Uploading $name...$arch"
-              gh release upload Nightly "target/$arch/src/Img.exe#$name" --clobber -ErrorAction Continue
+              gh release upload Nightly "target/$arch/src/Img.exe#$name" --clobber; $?
           }
