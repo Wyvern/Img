@@ -15,44 +15,6 @@ jobs:
   macOS:
     name: Building on macOS.
     runs-on: macos-15
-    strategy:
-      matrix:
-        target:
-          - {
-              arch: "x86_64h-apple-darwin",
-              name: "Apple-macOS-x86_64h",
-              desc: "macOS x86-64h",
-            }
-          - {
-              arch: "aarch64-apple-darwin",
-              name: "Apple-macOS-aarch64",
-              desc: "macOS aarch64",
-            }
-          - {
-              arch: "aarch64-apple-ios",
-              name: "iOS-aarch64",
-              desc: "iOS aarch64",
-            }
-          - {
-              arch: "aarch64-apple-tvos",
-              name: "tvOS-aarch64",
-              desc: "tvOS aarch64",
-            }
-          - {
-              arch: "aarch64-apple-visionos",
-              name: "visionos-aarch64",
-              desc: "visionos aarch64",
-            }
-          - {
-              arch: "aarch64-apple-watchos",
-              name: "watchos-aarch64",
-              desc: "watchosaarch64",
-            }
-          - {
-              arch: "wasm32-wasip2",
-              name: "wasm32-wasip2.wasm",
-              desc: "Wasm32-wasip2",
-            }
 
     steps:
       - name: Disable macos spotlight index
@@ -94,7 +56,7 @@ jobs:
             time cargo s --target $target
           done
 
-          lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+          lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
           find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
@@ -104,16 +66,21 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload ${{ matrix.target.name }} to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target.arch }}/src/Img
-          asset_name: ${{ matrix.target.name }}
-          tag: Nightly
-          overwrite: true
-          body: ${{ matrix.target.desc }} binary executable.
+      - name: Upload binaries to a GitHub release
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for arch in "x86_64h-apple-darwin Apple-macOS-x86_64h 'macOS x86-64h'" \
+                      "aarch64-apple-darwin Apple-macOS-aarch64 'macOS aarch64'"\
+                      "aarch64-apple-ios iOS-aarch64 'iOS aarch64'"\
+                      "aarch64-apple-tvos tvOS-aarch64 'tvOS aarch64'"\
+                      "aarch64-apple-watchos watchOS-aarch64 'watchOS aarch64'"\
+                      "aarch64-apple-visionos visionOS-aarch64 'visionOS aarch64'"\
+                      "wasm32-wasip2 wasm32-wasip2.wasm 'wasm32-wasip2'"; do
+            set -- $arch
+            echo "Uploading $2..."
+            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+          done
 
       - name: Upload macOS-universal to a GitHub release
         uses: svenstaro/upload-release-action@v2

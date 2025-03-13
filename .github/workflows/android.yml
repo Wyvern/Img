@@ -14,25 +14,7 @@ env:
 jobs:
   Android:
     name: Building on macOS
-    runs-on: macos-14
-    strategy:
-      matrix:
-        target:
-          - {
-              arch: "x86_64-linux-android",
-              name: "Android-x86_64h",
-              desc: "Android x86-64h",
-            }
-          - {
-              arch: "aarch64-linux-android",
-              name: "Android-aarch64",
-              desc: "Android aarch64",
-            }
-          - {
-              arch: "armv7-linux-androideabi",
-              name: "Android-armv7",
-              desc: "Android armv7",
-            }
+    runs-on: macos-15
 
     steps:
       - name: Disable macos spotlight index
@@ -85,13 +67,14 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload ${{ matrix.target.name }} to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target.arch }}/src/Img
-          asset_name: ${{ matrix.target.name }}
-          tag: Nightly
-          overwrite: true
-          body: ${{ matrix.target.desc }} binary executable.
+      - name: Upload binaries to a GitHub release
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for arch in "x86_64-linux-android Android-x86_64h 'Android x86_64h'" \
+                      "aarch64-linux-android Android-aarch64 'Android aarch64'"\
+                      "armv7-linux-androideabi Android-armv7 'Android-armv7'"; do
+            set -- $arch
+            echo "Uploading $2..."
+            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+          done

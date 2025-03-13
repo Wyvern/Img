@@ -15,94 +15,6 @@ jobs:
   Linux:
     name: Building on Ubuntu.
     runs-on: ubuntu-24.04-arm
-    strategy:
-      matrix:
-        target:
-          - {
-              arch: "powerpc64le-unknown-linux-gnu",
-              name: "Linux-powerpc64le-gnu",
-              desc: "Linux-powerpc64le-gnu",
-            }
-          - {
-              arch: "powerpc64le-unknown-linux-musl",
-              name: "Linux-powerpc64le-musl",
-              desc: "Linux-powerpc64le-musl",
-            }
-          - {
-              arch: "sparc64-unknown-linux-gnu",
-              name: "Linux-sparc64-gnu",
-              desc: "Linux-sparc64-gnu",
-            }
-          - {
-              arch: "mips64-unknown-linux-gnuabi64",
-              name: "Linux-mips64-gnuabi64",
-              desc: "Linux-mips64-gnuabi64",
-            }
-          - {
-              arch: "mips64-unknown-linux-muslabi64",
-              name: "Linux-mips64-muslabi64",
-              desc: "Linux-mips64-muslabi64",
-            }
-          - {
-              arch: "mips64el-unknown-linux-gnuabi64",
-              name: "Linux-mips64el-gnuabi64",
-              desc: "Linux-mips64el-gnuabi64",
-            }
-          - {
-              arch: "mips64el-unknown-linux-muslabi64",
-              name: "Linux-mips64el-muslabi64",
-              desc: "Linux-mips64el-muslabi64",
-            }
-          - {
-              arch: "s390x-unknown-linux-gnu",
-              name: "Linux-s390x-gnu",
-              desc: "Linux-s390x-gnu",
-            }
-          - {
-              arch: "s390x-unknown-linux-musl",
-              name: "Linux-s390x-musl",
-              desc: "Linux-s390x-musl",
-            }
-          - {
-              arch: "riscv64gc-unknown-linux-gnu",
-              name: "Linux-riscv64gc-gnu",
-              desc: "Linux-riscv64gc-gnu",
-            }
-          - {
-              arch: "riscv64gc-unknown-linux-musl",
-              name: "Linux-riscv64gc-musl",
-              desc: "Linux-riscv64gc-musl",
-            }
-          - {
-              arch: "x86_64-unknown-linux-gnu",
-              name: "Linux-x86_64-gnu",
-              desc: "Linux-x86_64-gnu",
-            }
-          - {
-              arch: "x86_64-unknown-linux-musl",
-              name: "Linux-x86_64-musl",
-              desc: "Linux-x86_64-musl",
-            }
-          - {
-              arch: "aarch64-unknown-linux-gnu",
-              name: "Linux-aarch64-gnu",
-              desc: "Linux-aarch64-gnu",
-            }
-          - {
-              arch: "aarch64-unknown-linux-musl",
-              name: "Linux-aarch64-musl",
-              desc: "Linux-aarch64-musl",
-            }
-          - {
-              arch: "loongarch64-unknown-linux-gnu",
-              name: "Linux-loongarch64-gnu",
-              desc: "Linux-loongarch64-gnu",
-            }
-          - {
-              arch: "loongarch64-unknown-linux-musl",
-              name: "Linux-loongarch64-musl",
-              desc: "Linux-loongarch64-musl",
-            }
 
     steps:
       - name: Purge Ubuntu
@@ -167,13 +79,28 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload ${{ matrix.target.name }} to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target.arch }}/src/Img
-          asset_name: ${{ matrix.target.name }}
-          tag: Nightly
-          overwrite: true
-          body: ${{ matrix.target.desc }} binary executable.
+      - name: Upload binaries to a GitHub release
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for arch in "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu 'Linux powerpc64le gnu'" \
+                      "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl 'Linux powerpc64le musl'"\
+                      "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu 'Linux riscv64gc gnu'"\
+                      "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl 'Linux riscv64gc musl'"\
+                      "x86_64-unknown-linux-gnu Linux-x86_64-gnu 'Linux x86_64-gnu'"\
+                      "x86_64-unknown-linux-musl Linux-x86_64-musl 'Linux x86_64 musl'"\
+                      "aarch64-unknown-linux-gnu Linux-aarch64-gnu 'Linux aarch64 gnu'"\
+                      "aarch64-unknown-linux-musl Linux-aarch64-musl 'Linux aarch64 musl'"\
+                      "sparc64-unknown-linux-gnu Linux-sparc64-gnu 'Linux sparc64 gnu'"\
+                      "mips64-unknown-linux-gnuabi64 Linux-mips64-gnuabi64 'Linux mips64 gnuabi64'"\
+                      "mips64-unknown-linux-muslabi64 Linux-mips64-muslabi64 'Linux mips64 muslabi64'"\
+                      "mips64el-unknown-linux-gnuabi64 Linux-mips64el-gnuabi64 'Linux mips64el gnuabi64'"\
+                      "mips64el-unknown-linux-muslabi64 Linux-mips64el-muslabi64 'Linux mips64el muslabi64'"\
+                      "s390x-unknown-linux-gnu Linux-s390x-gnu 'Linux s390x gnu'"\
+                      "s390x-unknown-linux-musl Linux-s390x-musl 'Linux s390x musl'"\
+                      "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu 'Linux loongarch64 gnu'"\
+                      "loongarch64-unknown-linux-musl Linux-loongarch64-musl 'Linux loongarch64 musl'"; do
+            set -- $arch
+            echo "Uploading $2..."
+            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+          done

@@ -15,34 +15,7 @@ jobs:
   Windows:
     name: Building on Windows.
     runs-on: windows-2025
-    strategy:
-      matrix:
-        target:
-          - {
-              arch: "aarch64-pc-windows-msvc",
-              name: "Windows-aarch64",
-              desc: "Windows aarch64",
-            }
-          - {
-              arch: "aarch64-uwp-windows-msvc",
-              name: "Windows-aarch64-uwp",
-              desc: "Windows aarch64 uwp",
-            }
-          - {
-              arch: "x86_64-pc-windows-msvc",
-              name: "Windows-x86_64",
-              desc: "Windows x86_64",
-            }
-          - {
-              arch: "x86_64-uwp-windows-msvc",
-              name: "Windows-x86_64-uwp",
-              desc: "Windows x86_64 uwp",
-            }
-          - {
-              arch: "arm64ec-pc-windows-msvc",
-              name: "Windows-arm64ec",
-              desc: "Windows arm64ec",
-            }
+
     steps:
       - name: Disable and Stop windows services
         continue-on-error: true
@@ -95,13 +68,23 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload ${{ matrix.target.name }} to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target.arch }}/src/Img
-          asset_name: ${{ matrix.target.name }}
-          tag: Nightly
-          overwrite: true
-          body: ${{ matrix.target.desc }} binary executable.
+      - name: Upload binaries to a GitHub release
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $archs = @(
+              @("aarch64-pc-windows-msvc", "Windows-aarch64", "Windows aarch64"),
+              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp", "Windows aarch64 uwp"),
+              @("x86_64-pc-windows-msvc", "Windows-x86_64", "Windows x86_64"),
+              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp", "Windows x86_64 uwp"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec", "Windows arm64ec")
+          )
+
+          foreach ($arch in $archs) {
+              $target = $arch[0]
+              $name = $arch[1]
+              $body = $arch[2]
+
+              Write-Host "Uploading $name..."
+              gh release upload Nightly "target/$target/src/Img" --clobber --name "$name" --body "$body binary executable." || $true
+          }

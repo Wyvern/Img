@@ -15,34 +15,7 @@ jobs:
   Linux:
     name: Building for {Free,Open,Net}BSD and Solaris/Illumos.
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        target:
-          - {
-              arch: "x86_64-unknown-freebsd",
-              name: "Freebsd-x86_64",
-              desc: "Freebsd x86_64",
-            }
-          - {
-              arch: "x86_64-unknown-netbsd",
-              name: "Netbsd-x86_64",
-              desc: "Netbsd x86_64",
-            }
-          - {
-              arch: "x86_64-unknown-illumos",
-              name: "Illumos-x86_64",
-              desc: "Illumos x86_64",
-            }
-          - {
-              arch: "x86_64-pc-solaris",
-              name: "Solaris-x86_64",
-              desc: "Solaris x86_64",
-            }
-          - {
-              arch: "sparcv9-sun-solaris",
-              name: "Solaris-sparcv9",
-              desc: "Solaris sparcv9",
-            }
+
     steps:
       - name: Purge Ubuntu
         run: |
@@ -90,13 +63,16 @@ jobs:
           lscpu
           free -m
 
-      - name: Upload ${{ matrix.target.name }} to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target.arch }}/src/Img
-          asset_name: ${{ matrix.target.name }}
-          tag: Nightly
-          overwrite: true
-          body: ${{ matrix.target.desc }} binary executable.
+      - name: Upload binaries to a GitHub release
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for arch in "x86_64-unknown-freebsd Freebsd-x86_64h 'Freebsd x86_64h'" \
+                      "x86_64-unknown-netbsd Netbsd-x86_64 'Netbsd x86_64'"\
+                      "x86_64-unknown-illumos Illumos-x86_64 'Illumos x86_64'"\
+                      "x86_64-pc-solaris Solaris-x86_64 'Solaris x86_64'"\
+                      "sparcv9-sun-solaris Solaris-sparcv9 'Solaris sparcv9'"; do
+            set -- $arch
+            echo "Uploading $2..."
+            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+          done

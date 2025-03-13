@@ -15,19 +15,6 @@ jobs:
   Linux:
     name: Building on Ubuntu.
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        target:
-          - {
-              arch: "powerpc64-unknown-linux-gnu",
-              name: "Linux-powerpc64-gnu",
-              desc: "Linux-powerpc64-gnu",
-            }
-          - {
-              arch: "powerpc64-unknown-linux-musl",
-              name: "Linux-powerpc64-musl",
-              desc: "Linux-powerpc64-musl",
-            }
 
     steps:
       - name: Purge Ubuntu
@@ -76,13 +63,13 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload ${{ matrix.target.name }} to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.target.arch }}/src/Img
-          asset_name: ${{ matrix.target.name }}
-          tag: Nightly
-          overwrite: true
-          body: ${{ matrix.target.desc }} binary executable.
+      - name: Upload binaries to a GitHub release
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for arch in "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu 'Linux powerpc64 gnu'" \
+                      "powerpc64-unknown-linux-musl Linux-powerpc64-musl 'Linux powerpc64 musl'"; do
+            set -- $arch
+            echo "Uploading $2..."
+            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+          done
