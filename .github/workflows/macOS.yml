@@ -90,5 +90,5 @@ jobs:
           done
           echo "Uploading wasm32-wasip2.wasm..."
           gh release upload Nightly target/wasm32-wasip2/src/Img.wasm#wasm32-wasip2.wasm --clobber || true
-          echo "Uploading Apple-macOS-universal"
+          echo "Uploading Apple-macOS-universal..."
           gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
