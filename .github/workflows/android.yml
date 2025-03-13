@@ -71,7 +71,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for arch in "x86_64-linux-android Android-x86_64h" \
+          for arch in "x86_64-linux-android Android-x86_64" \
                       "aarch64-linux-android Android-aarch64"\
                       "armv7-linux-androideabi Android-armv7"; do
             set -- $arch

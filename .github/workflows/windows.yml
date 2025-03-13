@@ -73,11 +73,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $archs = @(
-              @("aarch64-pc-windows-msvc", "Windows-aarch64"),
-              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp"),
-              @("x86_64-pc-windows-msvc", "Windows-x86_64"),
-              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp"),
-              @("arm64ec-pc-windows-msvc", "Windows-arm64ec")
+              @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
+              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
+              @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
+              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe")
           )
 
           foreach ($arch in $archs) {
@@ -85,5 +85,5 @@ jobs:
               $name = $arch[1]
 
               Write-Host "Uploading $name..."
-              gh release upload Nightly "target/$target/src/Img#$name" --clobber || $true
+              gh release upload Nightly "target/$target/src/Img.exe#$name" --clobber || $true
           }
