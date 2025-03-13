@@ -82,7 +82,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for arch in "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu" \
+          for arch in "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"\
                       "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"\
                       "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"\
                       "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"\

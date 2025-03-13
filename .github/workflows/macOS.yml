@@ -72,7 +72,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for arch in "x86_64h-apple-darwin Apple-macOS-x86_64h" \
+          for arch in "x86_64h-apple-darwin Apple-macOS-x86_64h"\
                       "aarch64-apple-darwin Apple-macOS-aarch64"\
                       "arm64e-apple-darwin Apple-macOS-arm64e"\
                       "aarch64-apple-ios Apple-iOS-aarch64"\
