@@ -80,13 +80,13 @@ jobs:
           set +e -x
 
           targets=(
-            aarch64-apple-ios,
-            aarch64-apple-tvos,
-            aarch64-apple-watchos,
-            aarch64-apple-visionos,
-            aarch64-apple-darwin,
-            x86_64h-apple-darwin,
-            wasm32-wasip2,
+            aarch64-apple-ios
+            aarch64-apple-tvos
+            aarch64-apple-watchos
+            aarch64-apple-visionos
+            aarch64-apple-darwin
+            x86_64h-apple-darwin
+            wasm32-wasip2
           )
 
           for target in "${targets[@]}"; do

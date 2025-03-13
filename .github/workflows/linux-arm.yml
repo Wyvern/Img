@@ -135,23 +135,23 @@ jobs:
           set +e -x
 
           targets=(
-            powerpc64le-unknown-linux-gnu,
-            powerpc64le-unknown-linux-musl,
-            sparc64-unknown-linux-gnu,
-            mips64-unknown-linux-gnuabi64,
-            mips64-unknown-linux-muslabi64,
-            mips64el-unknown-linux-gnuabi64,
-            mips64el-unknown-linux-muslabi64,
-            s390x-unknown-linux-gnu,
-            s390x-unknown-linux-musl,
-            riscv64gc-unknown-linux-gnu,
-            riscv64gc-unknown-linux-musl,
-            x86_64-unknown-linux-gnu,
-            x86_64-unknown-linux-musl,
-            aarch64-unknown-linux-gnu,
-            aarch64-unknown-linux-musl,
-            loongarch64-unknown-linux-gnu,
-            loongarch64-unknown-linux-musl,
+            powerpc64le-unknown-linux-gnu
+            powerpc64le-unknown-linux-musl
+            riscv64gc-unknown-linux-gnu
+            riscv64gc-unknown-linux-musl
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
+            aarch64-unknown-linux-gnu
+            sparc64-unknown-linux-gnu
+            mips64-unknown-linux-gnuabi64
+            mips64-unknown-linux-muslabi64
+            mips64el-unknown-linux-gnuabi64
+            mips64el-unknown-linux-muslabi64
+            s390x-unknown-linux-gnu
+            s390x-unknown-linux-musl
+            aarch64-unknown-linux-musl
+            loongarch64-unknown-linux-gnu
+            loongarch64-unknown-linux-musl
           )
           # powerpc64-unknown-linux-gnu,
           # powerpc64-unknown-linux-musl,

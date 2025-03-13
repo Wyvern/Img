@@ -77,10 +77,10 @@ jobs:
         run: |
           cargo update
           $targets = @(
-                      aarch64-pc-windows-msvc,
-                      aarch64-uwp-windows-msvc,
-                      x86_64-pc-windows-msvc,
-                      x86_64-uwp-windows-msvc,
+                      aarch64-pc-windows-msvc
+                      aarch64-uwp-windows-msvc
+                      x86_64-pc-windows-msvc
+                      x86_64-uwp-windows-msvc
                       arm64ec-pc-windows-msvc
                     )
           foreach ($target in $targets) {
