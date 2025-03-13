@@ -76,13 +76,14 @@ jobs:
               @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
               @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
               @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
-              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe")
+              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe")
           )
 
           foreach ($target in $targets) {
               $arch = $target[0]
               $name = $target[1]
-
               Write-Host "Uploading $name..."
-              gh release upload Nightly "target/$arch/src/Img.exe#$name" --clobber; $?
+              Move-Item target/$arch/src/Img.exe target/$arch/src/$name
+              gh release upload Nightly target/$arch/src/$name --clobber; $?
           }
