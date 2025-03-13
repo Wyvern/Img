@@ -68,7 +68,7 @@ jobs:
 
       - name: Upload binaries to a GitHub release
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           for arch in "x86_64h-apple-darwin Apple-macOS-x86_64h" \
                       "aarch64-apple-darwin Apple-macOS-aarch64"\
@@ -82,13 +82,4 @@ jobs:
             gh release upload Nightly target/$1/src/Img#$2 --clobber || true
           done
 
-      - name: Upload macOS-universal to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: Img-Universal
-          asset_name: Apple-macOS-universal
-          tag: Nightly
-          overwrite: true
-          body: "macOS universal binary executable."
+          gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true

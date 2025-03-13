@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload binaries to a GitHub release
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           for arch in "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu" \
                       "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"\

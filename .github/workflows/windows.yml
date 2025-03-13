@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload binaries to a GitHub release
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           $archs = @(
               @("aarch64-pc-windows-msvc", "Windows-aarch64"),
