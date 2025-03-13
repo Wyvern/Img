@@ -85,5 +85,5 @@ jobs:
               $name = $arch[1]
 
               Write-Host "Uploading $name..."
-              gh release upload Nightly "target/$target/src/Img.exe#$name" --clobber ; $?
+              gh release upload Nightly "target/$target/src/Img.exe#$name" --clobber; $?
           }
