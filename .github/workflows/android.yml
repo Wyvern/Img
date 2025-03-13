@@ -71,10 +71,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for arch in "x86_64-linux-android Android-x86_64"\
-                      "aarch64-linux-android Android-aarch64"\
-                      "armv7-linux-androideabi Android-armv7"; do
-            set -- $arch
-            echo "Uploading $2..."
-            gh release upload Nightly target/$1/src/Img#$2 --clobber || true
+          targets=(
+                  "x86_64-linux-android Android-x86_64"
+                  "aarch64-linux-android Android-aarch64"
+                  "armv7-linux-androideabi Android-armv7"
+          )
+          for target in ${targets[@]}; do
+            read -r arch name <<< $target
+            echo "Uploading $name..."
+            gh release upload Nightly target/$arch/src/Img#$name --clobber || true
           done

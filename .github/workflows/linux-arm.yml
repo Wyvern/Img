@@ -67,7 +67,7 @@ jobs:
           )
           # powerpc64-unknown-linux-gnu,
           # powerpc64-unknown-linux-musl,
-          for target in "${targets[@]}"; do
+          for target in ${targets[@]}; do
             time cargo s --target $target
           done
 
@@ -82,24 +82,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for arch in "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"\
-                      "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"\
-                      "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"\
-                      "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"\
-                      "x86_64-unknown-linux-gnu Linux-x86_64-gnu"\
-                      "x86_64-unknown-linux-musl Linux-x86_64-musl"\
-                      "aarch64-unknown-linux-gnu Linux-aarch64-gnu"\
-                      "aarch64-unknown-linux-musl Linux-aarch64-musl"\
-                      "sparc64-unknown-linux-gnu Linux-sparc64-gnu"\
-                      "mips64-unknown-linux-gnuabi64 Linux-mips64-gnuabi64"\
-                      "mips64-unknown-linux-muslabi64 Linux-mips64-muslabi64"\
-                      "mips64el-unknown-linux-gnuabi64 Linux-mips64el-gnuabi64"\
-                      "mips64el-unknown-linux-muslabi64 Linux-mips64el-muslabi64"\
-                      "s390x-unknown-linux-gnu Linux-s390x-gnu"\
-                      "s390x-unknown-linux-musl Linux-s390x-musl"\
-                      "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"\
-                      "loongarch64-unknown-linux-musl Linux-loongarch64-musl"; do
-            set -- $arch
-            echo "Uploading $2..."
-            gh release upload Nightly target/$1/src/Img#$2 --clobber || true
+          targets=(
+                  "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
+                  "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"
+                  "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
+                  "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
+                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
+                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
+                  "aarch64-unknown-linux-gnu Linux-aarch64-gnu"
+                  "aarch64-unknown-linux-musl Linux-aarch64-musl"
+                  "sparc64-unknown-linux-gnu Linux-sparc64-gnu"
+                  "mips64-unknown-linux-gnuabi64 Linux-mips64-gnuabi64"
+                  "mips64-unknown-linux-muslabi64 Linux-mips64-muslabi64"
+                  "mips64el-unknown-linux-gnuabi64 Linux-mips64el-gnuabi64"
+                  "mips64el-unknown-linux-muslabi64 Linux-mips64el-muslabi64"
+                  "s390x-unknown-linux-gnu Linux-s390x-gnu"
+                  "s390x-unknown-linux-musl Linux-s390x-musl"
+                  "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"
+                  "loongarch64-unknown-linux-musl Linux-loongarch64-musl"
+          )
+          for target in ${targets[@]}; do
+            read -r arch name <<< $target
+            echo "Uploading $name..."
+            gh release upload Nightly target/$arch/src/Img#$name --clobber || true
           done

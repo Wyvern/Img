@@ -54,7 +54,7 @@ jobs:
             wasm32-wasip2
           )
 
-          for target in "${targets[@]}"; do
+          for target in ${targets[@]}; do
             time cargo s --target $target
           done
 
@@ -72,18 +72,21 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for arch in "x86_64h-apple-darwin Apple-macOS-x86_64h"\
-                      "aarch64-apple-darwin Apple-macOS-aarch64"\
-                      "arm64e-apple-darwin Apple-macOS-arm64e"\
-                      "aarch64-apple-ios Apple-iOS-aarch64"\
-                      "arm64e-apple-ios Apple-iOS-arm64e"\
-                      "aarch64-apple-tvos Apple-tvOS-aarch64"\
-                      "arm64e-apple-tvos Apple-tvOS-arm64e"\
-                      "aarch64-apple-watchos Apple-watchOS-aarch64"\
-                      "aarch64-apple-visionos Apple-visionOS-aarch64"; do
-            set -- $arch
-            echo "Uploading $2..."
-            gh release upload Nightly target/$1/src/Img#$2 --clobber || true
+          targets=(
+                  "x86_64h-apple-darwin Apple-macOS-x86_64h"
+                  "aarch64-apple-darwin Apple-macOS-aarch64"
+                  "arm64e-apple-darwin Apple-macOS-arm64e"
+                  "aarch64-apple-ios Apple-iOS-aarch64"
+                  "arm64e-apple-ios Apple-iOS-arm64e"
+                  "aarch64-apple-tvos Apple-tvOS-aarch64"
+                  "arm64e-apple-tvos Apple-tvOS-arm64e"
+                  "aarch64-apple-watchos Apple-watchOS-aarch64"
+                  "aarch64-apple-visionos Apple-visionOS-aarch64"
+          )
+          for target in ${targets[@]}; do
+            read -r arch name <<< $target
+            echo "Uploading $name..."
+            gh release upload Nightly target/$arch/src/Img#$name --clobber || true
           done
           echo "Uploading wasm32-wasip2.wasm..."
           gh release upload Nightly target/wasm32-wasip2/src/Img.wasm#wasm32-wasip2.wasm --clobber || true
