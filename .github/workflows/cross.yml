@@ -55,7 +55,6 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            echo "Building for target: $target"
             time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size --target $target
           done
 

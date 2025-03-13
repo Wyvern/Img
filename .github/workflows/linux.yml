@@ -52,7 +52,6 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            echo "Building for target: $target"
             time cargo s --target $target
           done
 

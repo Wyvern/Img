@@ -68,7 +68,6 @@ jobs:
           # powerpc64-unknown-linux-gnu,
           # powerpc64-unknown-linux-musl,
           for target in "${targets[@]}"; do
-            echo "Building for target: $target"
             time cargo s --target $target
           done
 
