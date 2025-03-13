@@ -15,7 +15,34 @@ jobs:
   Linux:
     name: Building for {Free,Open,Net}BSD and Solaris/Illumos.
     runs-on: ubuntu-24.04
-
+    strategy:
+      matrix:
+        target:
+          - {
+              arch: "x86_64-unknown-freebsd",
+              name: "Freebsd-x86_64",
+              desc: "Freebsd x86_64",
+            }
+          - {
+              arch: "x86_64-unknown-netbsd",
+              name: "Netbsd-x86_64",
+              desc: "Netbsd x86_64",
+            }
+          - {
+              arch: "x86_64-unknown-illumos",
+              name: "Illumos-x86_64",
+              desc: "Illumos x86_64",
+            }
+          - {
+              arch: "x86_64-pc-solaris",
+              name: "Solaris-x86_64",
+              desc: "Solaris x86_64",
+            }
+          - {
+              arch: "sparcv9-sun-solaris",
+              name: "Solaris-sparcv9",
+              desc: "Solaris sparcv9",
+            }
     steps:
       - name: Purge Ubuntu
         run: |
@@ -40,102 +67,36 @@ jobs:
       - name: Build Release
         run: |
           cargo update
-
-          function cb() {
-            local target="$1"
-            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size --target $target
-          }
-
           set +e -x
 
-          cb x86_64-unknown-freebsd
-          cb x86_64-unknown-netbsd
-          # cb x86_64-unknown-dragonfly
-          # cb powerpc64-ibm-aix
+          # x86_64-unknown-dragonfly,
+          # powerpc64-ibm-aix,
+          # aarch64-unknown-illumos,
 
-          cb x86_64-unknown-illumos
-          # cb aarch64-unknown-illumos
+          targets=(
+            x86_64-unknown-freebsd,
+            x86_64-unknown-netbsd,
+            x86_64-unknown-illumos,
+            x86_64-pc-solaris,
+            sparcv9-sun-solaris,
+          )
 
-          cb x86_64-pc-solaris
-          cb sparcv9-sun-solaris
+          for target in "${targets[@]}"; do
+            echo "Building for target: $target"
+            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size --target $target
+          done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
 
-      - name: Upload Solaris-x86_64 to a GitHub release
+      - name: Upload ${{ matrix.target.name }} to a GitHub release
         uses: svenstaro/upload-release-action@v2
         continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-solaris/src/Img
-          asset_name: Solaris-x86_64
+          file: target/${{ matrix.target.arch }}/src/Img
+          asset_name: ${{ matrix.target.name }}
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Solaris-x86_64 binary executable."
-
-      - name: Upload Solaris-sparcv9 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/sparcv9-sun-solaris/src/Img
-          asset_name: Solaris-sparcv9
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Solaris-sparcv9 binary executable."
-
-      - name: Upload Illumos-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-illumos/src/Img
-          asset_name: Illumos-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Illumos-x86_64 binary executable."
-
-      - name: Upload Illumos-aarch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-illumos/src/Img
-          asset_name: Illumos-aarch64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Illumos-aarch64 binary executable."
-
-      - name: Upload Freebsd-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-freebsd/src/Img
-          asset_name: Freebsd-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Freebsd-x86_64 binary executable."
-
-      - name: Upload Netbsd-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-netbsd/src/Img
-          asset_name: Netbsd-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Netbsd-x86_64 binary executable."
-
-      - name: Upload Dragonfly-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-dragonfly/src/Img
-          asset_name: Dragonfly-x86_64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Dragonfly-x86_64 binary executable."
+          body: ${{ matrix.target.desc }} binary executable.

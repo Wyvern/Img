@@ -15,6 +15,19 @@ jobs:
   Linux:
     name: Building on Ubuntu.
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        target:
+          - {
+              arch: "powerpc64-unknown-linux-gnu",
+              name: "Linux-powerpc64-gnu",
+              desc: "Linux-powerpc64-gnu",
+            }
+          - {
+              arch: "powerpc64-unknown-linux-musl",
+              name: "Linux-powerpc64-musl",
+              desc: "Linux-powerpc64-musl",
+            }
 
     steps:
       - name: Purge Ubuntu
@@ -44,37 +57,17 @@ jobs:
           # pipx install cargo-zigbuild
 
           cargo update
-
           set +e -x
 
-          # time cargo s --target powerpc64le-unknown-linux-gnu
-          # time cargo s --target powerpc64le-unknown-linux-musl
+          targets=(
+            powerpc64-unknown-linux-gnu,
+            powerpc64-unknown-linux-musl,
+          )
 
-          time cargo s --target powerpc64-unknown-linux-gnu
-          time cargo s --target powerpc64-unknown-linux-musl
-
-          # time cargo s --target sparc64-unknown-linux-gnu
-
-          # time cargo s --target mips64-unknown-linux-gnuabi64
-          # time cargo s --target mips64-unknown-linux-muslabi64
-
-          # time cargo s --target mips64el-unknown-linux-gnuabi64
-          # time cargo s --target mips64el-unknown-linux-muslabi64
-
-          # time cargo s --target s390x-unknown-linux-gnu
-          # time cargo s --target s390x-unknown-linux-musl
-
-          # time cargo s --target riscv64gc-unknown-linux-gnu
-          # time cargo s --target riscv64gc-unknown-linux-musl
-
-          # time cargo s --target x86_64-unknown-linux-gnu
-          # time cargo s --target x86_64-unknown-linux-musl
-
-          # time cargo s --target aarch64-unknown-linux-gnu
-          # time cargo s --target aarch64-unknown-linux-musl
-
-          # time cargo s --target loongarch64-unknown-linux-gnu
-          # time cargo s --target loongarch64-unknown-linux-musl
+          for target in "${targets[@]}"; do
+            echo "Building for target: $target"
+            time cargo s --target $target
+          done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -83,211 +76,13 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload Linux-mips64-gnuabi64 to a GitHub release
+      - name: Upload ${{ matrix.target.name }} to a GitHub release
         uses: svenstaro/upload-release-action@v2
         continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/mips64-unknown-linux-gnuabi64/src/Img
-          asset_name: Linux-mips64-gnuabi64
+          file: target/${{ matrix.target.arch }}/src/Img
+          asset_name: ${{ matrix.target.name }}
           tag: Nightly
           overwrite: true
-          body: "Ubuntu Linux-mips64-gnuabi64 binary executable."
-
-      - name: Upload Linux-mips64-muslabi64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/mips64-unknown-linux-muslabi64/src/Img
-          asset_name: Linux-mips64-muslabi64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-mips64-muslabi64 binary executable."
-
-      - name: Upload Linux-mips64el-gnuabi64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/mips64el-unknown-linux-gnuabi64/src/Img
-          asset_name: Linux-mips64el-gnuabi64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-mips64el-gnuabi64 binary executable."
-
-      - name: Upload Linux-mips64el-muslabi64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/mips64el-unknown-linux-muslabi64/src/Img
-          asset_name: Linux-mips64el-muslabi64
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-mips64el-muslabi64 binary executable."
-
-      - name: Upload Linux-sparc64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/sparc64-unknown-linux-gnu/src/Img
-          asset_name: Linux-sparc64-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-sparc64-gnu binary executable."
-
-      - name: Upload Linux-powerpc64le-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64le-unknown-linux-gnu/src/Img
-          asset_name: Linux-powerpc64le-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-powerpc64le-gnu binary executable."
-
-      - name: Upload Linux-powerpc64le-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64le-unknown-linux-musl/src/Img
-          asset_name: Linux-powerpc64le-musl
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-powerpc64le-musl binary executable."
-
-      - name: Upload Linux-powerpc64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64-unknown-linux-gnu/src/Img
-          asset_name: Linux-powerpc64-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-powerpc64-gnu binary executable."
-
-      - name: Upload Linux-powerpc64-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64-unknown-linux-musl/src/Img
-          asset_name: Linux-powerpc64-musl
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-powerpc64-musl binary executable."
-
-      - name: Upload Linux-s390x-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/s390x-unknown-linux-gnu/src/Img
-          asset_name: Linux-s390x-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-s390x-gnu binary executable."
-
-      - name: Upload Linux-s390x-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/s390x-unknown-linux-musl/src/Img
-          asset_name: Linux-s390x-musl
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-s390x-musl binary executable."
-
-      - name: Upload Linux-riscv64gc-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/riscv64gc-unknown-linux-gnu/src/Img
-          asset_name: Linux-riscv64gc-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-riscv64gc-gnu binary executable."
-
-      - name: Upload Linux-riscv64gc-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/riscv64gc-unknown-linux-musl/src/Img
-          asset_name: Linux-riscv64gc-musl
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-riscv64gc-musl binary executable."
-
-      - name: Upload Linux-x86_64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-gnu/src/Img
-          asset_name: Linux-x86_64-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-x86_64-gnu binary executable."
-
-      - name: Upload Linux-x86_64-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-musl/src/Img
-          asset_name: Linux-x86_64-musl
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-x86_64-musl binary executable."
-
-      - name: Upload Linux-aarch64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-gnu/src/Img
-          asset_name: Linux-aarch64-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-aarch64-gnu binary executable."
-
-      - name: Upload Linux-aarch64-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-musl/src/Img
-          asset_name: Linux-aarch64-musl
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-aarch64-musl binary executable."
-
-      - name: Upload Linux-loongarch64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/loongarch64-unknown-linux-gnu/src/Img
-          asset_name: Linux-loongarch64-gnu
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-loongarch64-gnu binary executable."
-
-      - name: Upload Linux-loongarch64-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/loongarch64-unknown-linux-musl/src/Img
-          asset_name: Linux-loongarch64-musl
-          tag: Nightly
-          overwrite: true
-          body: "Ubuntu Linux-loongarch64-musl binary executable."
+          body: ${{ matrix.target.desc }} binary executable.

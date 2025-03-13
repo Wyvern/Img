@@ -15,7 +15,34 @@ jobs:
   Windows:
     name: Building on Windows.
     runs-on: windows-2025
-
+    strategy:
+      matrix:
+        target:
+          - {
+              arch: "aarch64-pc-windows-msvc",
+              name: "Windows-aarch64",
+              desc: "Windows aarch64",
+            }
+          - {
+              arch: "aarch64-uwp-windows-msvc",
+              name: "Windows-aarch64-uwp",
+              desc: "Windows aarch64 uwp",
+            }
+          - {
+              arch: "x86_64-pc-windows-msvc",
+              name: "Windows-x86_64",
+              desc: "Windows x86_64",
+            }
+          - {
+              arch: "x86_64-uwp-windows-msvc",
+              name: "Windows-x86_64-uwp",
+              desc: "Windows x86_64 uwp",
+            }
+          - {
+              arch: "arm64ec-pc-windows-msvc",
+              name: "Windows-arm64ec",
+              desc: "Windows arm64ec",
+            }
     steps:
       - name: Disable and Stop windows services
         continue-on-error: true
@@ -49,21 +76,17 @@ jobs:
       - name: Build release
         run: |
           cargo update
-
-          Write-Host "Building: aarch64-pc-windows-msvc"
-          Measure-Command {cargo s --target aarch64-pc-windows-msvc}
-
-          Write-Host "Building: aarch64-uwp-windows-msvc"
-          Measure-Command {cargo s --target aarch64-uwp-windows-msvc}
-
-          Write-Host "Building: x86_64-pc-windows-msvc"
-          Measure-Command {cargo s --target x86_64-pc-windows-msvc}
-
-          Write-Host "Building: x86_64-uwp-windows-msvc"
-          Measure-Command {cargo s --target x86_64-uwp-windows-msvc}
-
-          Write-Host "Building: arm64ec-pc-windows-msvc"
-          Measure-Command {cargo s --target arm64ec-pc-windows-msvc}
+          $targets = @(
+                      aarch64-pc-windows-msvc,
+                      aarch64-uwp-windows-msvc,
+                      x86_64-pc-windows-msvc,
+                      x86_64-uwp-windows-msvc,
+                      arm64ec-pc-windows-msvc
+                    )
+          foreach ($target in $targets) {
+                      Write-Host "Building: $target"
+                      Measure-Command { cargo s --target $target }
+                    }
 
           # cmd /c dir /s target\src\Img.exe
           Get-ChildItem -Path target\*\src\Img.exe -File
@@ -72,53 +95,13 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload Windows-x64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-windows-msvc/src/Img.exe
-          asset_name: Windows-x86_64.exe
-          tag: Nightly
-          overwrite: true
-          body: "Windows x64 binary executable."
-
-      - name: Upload Windows-x64-uwp to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-uwp-windows-msvc/src/Img.exe
-          asset_name: Windows-x86_64-uwp.exe
-          tag: Nightly
-          overwrite: true
-          body: "Windows x64-uwp binary executable."
-
-      - name: Upload Windows-aarch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-pc-windows-msvc/src/Img.exe
-          asset_name: Windows-aarch64.exe
-          tag: Nightly
-          overwrite: true
-          body: "Windows aarch64 binary executable."
-
-      - name: Upload Windows-aarch64-uwp to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-uwp-windows-msvc/src/Img.exe
-          asset_name: Windows-aarch64-uwp.exe
-          tag: Nightly
-          overwrite: true
-          body: "Windows aarch64-uwp binary executable."
-
-      - name: Upload Windows-arm64ec to a GitHub release
+      - name: Upload ${{ matrix.target.name }} to a GitHub release
         uses: svenstaro/upload-release-action@v2
         continue-on-error: true
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/arm64ec-pc-windows-msvc/src/Img.exe
-          asset_name: Windows-arm64ec.exe
+          file: target/${{ matrix.target.arch }}/src/Img
+          asset_name: ${{ matrix.target.name }}
           tag: Nightly
           overwrite: true
-          body: "Windows arm64ec binary executable."
+          body: ${{ matrix.target.desc }} binary executable.
