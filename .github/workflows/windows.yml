@@ -84,6 +84,6 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/Img.exe target/$arch/src/$name
+              Move-Item target/$arch/src/Img.exe target/$arch/src/$name; $?
               gh release upload Nightly target/$arch/src/$name --clobber; $?
           }
