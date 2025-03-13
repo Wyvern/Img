@@ -71,10 +71,10 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for arch in "x86_64-linux-android Android-x86_64h 'Android x86_64h'" \
-                      "aarch64-linux-android Android-aarch64 'Android aarch64'"\
-                      "armv7-linux-androideabi Android-armv7 'Android-armv7'"; do
+          for arch in "x86_64-linux-android Android-x86_64h" \
+                      "aarch64-linux-android Android-aarch64"\
+                      "armv7-linux-androideabi Android-armv7"; do
             set -- $arch
             echo "Uploading $2..."
-            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+            gh release upload Nightly target/$1/src/Img#$2 --clobber || true
           done

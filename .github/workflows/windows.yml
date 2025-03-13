@@ -50,11 +50,11 @@ jobs:
         run: |
           cargo update
           $targets = @(
-                      aarch64-pc-windows-msvc
-                      aarch64-uwp-windows-msvc
-                      x86_64-pc-windows-msvc
-                      x86_64-uwp-windows-msvc
-                      arm64ec-pc-windows-msvc
+                      "aarch64-pc-windows-msvc",
+                      "aarch64-uwp-windows-msvc",
+                      "x86_64-pc-windows-msvc",
+                      "x86_64-uwp-windows-msvc",
+                      "arm64ec-pc-windows-msvc"
                     )
           foreach ($target in $targets) {
                       Write-Host "Building: $target"
@@ -73,18 +73,17 @@ jobs:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $archs = @(
-              @("aarch64-pc-windows-msvc", "Windows-aarch64", "Windows aarch64"),
-              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp", "Windows aarch64 uwp"),
-              @("x86_64-pc-windows-msvc", "Windows-x86_64", "Windows x86_64"),
-              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp", "Windows x86_64 uwp"),
-              @("arm64ec-pc-windows-msvc", "Windows-arm64ec", "Windows arm64ec")
+              @("aarch64-pc-windows-msvc", "Windows-aarch64"),
+              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp"),
+              @("x86_64-pc-windows-msvc", "Windows-x86_64"),
+              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec")
           )
 
           foreach ($arch in $archs) {
               $target = $arch[0]
               $name = $arch[1]
-              $body = $arch[2]
 
               Write-Host "Uploading $name..."
-              gh release upload Nightly "target/$target/src/Img" --clobber --name "$name" --body "$body binary executable." || $true
+              gh release upload Nightly "target/$target/src/Img#$name" --clobber || $true
           }

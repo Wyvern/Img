@@ -70,16 +70,16 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for arch in "x86_64h-apple-darwin Apple-macOS-x86_64h 'macOS x86-64h'" \
-                      "aarch64-apple-darwin Apple-macOS-aarch64 'macOS aarch64'"\
-                      "aarch64-apple-ios iOS-aarch64 'iOS aarch64'"\
-                      "aarch64-apple-tvos tvOS-aarch64 'tvOS aarch64'"\
-                      "aarch64-apple-watchos watchOS-aarch64 'watchOS aarch64'"\
-                      "aarch64-apple-visionos visionOS-aarch64 'visionOS aarch64'"\
-                      "wasm32-wasip2 wasm32-wasip2.wasm 'wasm32-wasip2'"; do
+          for arch in "x86_64h-apple-darwin Apple-macOS-x86_64h" \
+                      "aarch64-apple-darwin Apple-macOS-aarch64"\
+                      "aarch64-apple-ios iOS-aarch64"\
+                      "aarch64-apple-tvos tvOS-aarch64"\
+                      "aarch64-apple-watchos watchOS-aarch64"\
+                      "aarch64-apple-visionos visionOS-aarch64"\
+                      "wasm32-wasip2 wasm32-wasip2.wasm"; do
             set -- $arch
             echo "Uploading $2..."
-            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+            gh release upload Nightly target/$1/src/Img#$2 --clobber || true
           done
 
       - name: Upload macOS-universal to a GitHub release

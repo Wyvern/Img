@@ -67,12 +67,12 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for arch in "x86_64-unknown-freebsd Freebsd-x86_64h 'Freebsd x86_64h'" \
-                      "x86_64-unknown-netbsd Netbsd-x86_64 'Netbsd x86_64'"\
-                      "x86_64-unknown-illumos Illumos-x86_64 'Illumos x86_64'"\
-                      "x86_64-pc-solaris Solaris-x86_64 'Solaris x86_64'"\
-                      "sparcv9-sun-solaris Solaris-sparcv9 'Solaris sparcv9'"; do
+          for arch in "x86_64-unknown-freebsd Freebsd-x86_64h" \
+                      "x86_64-unknown-netbsd Netbsd-x86_64"\
+                      "x86_64-unknown-illumos Illumos-x86_64"\
+                      "x86_64-pc-solaris Solaris-x86_64"\
+                      "sparcv9-sun-solaris Solaris-sparcv9"; do
             set -- $arch
             echo "Uploading $2..."
-            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+            gh release upload Nightly target/$1/src/Img#$2 --clobber|| true
           done

@@ -67,9 +67,9 @@ jobs:
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for arch in "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu 'Linux powerpc64 gnu'" \
-                      "powerpc64-unknown-linux-musl Linux-powerpc64-musl 'Linux powerpc64 musl'"; do
+          for arch in "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu" \
+                      "powerpc64-unknown-linux-musl Linux-powerpc64-musl"; do
             set -- $arch
             echo "Uploading $2..."
-            gh release upload Nightly target/$1/src/Img --clobber --name "$2" --body "$3 binary executable." || true
+            gh release upload Nightly target/$1/src/Img#$2 --clobber || true
           done
