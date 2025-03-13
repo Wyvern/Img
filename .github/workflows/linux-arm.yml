@@ -101,8 +101,8 @@ jobs:
                   "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"
                   "loongarch64-unknown-linux-musl Linux-loongarch64-musl"
           )
-          for target in ${targets[@]}; do
-            read -r arch name <<< $target
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
             echo "Uploading $name..."
             gh release upload Nightly "target/$arch/src/Img#$name" --clobber || true
           done

@@ -70,8 +70,8 @@ jobs:
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
           )
-          for target in ${targets[@]}; do
-            read -r arch name <<< $target
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
             echo "Uploading $name..."
             gh release upload Nightly "target/$arch/src/Img#$name" --clobber || true
           done

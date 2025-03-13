@@ -73,8 +73,8 @@ jobs:
                   "x86_64-pc-solaris Solaris-x86_64"
                   "sparcv9-sun-solaris Solaris-sparcv9"
           )
-          for target in ${targets[@]}; do
-            read -r arch name <<< $target
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
             echo "Uploading $name..."
             gh release upload Nightly "target/$arch/src/Img#$name" --clobber || true
           done
