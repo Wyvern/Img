@@ -83,12 +83,14 @@ jobs:
                   "aarch64-apple-watchos Apple-watchOS-aarch64"
                   "aarch64-apple-visionos Apple-visionOS-aarch64"
           )
+
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
             mv target/$arch/src/Img target/$arch/src/$name || true
             gh release upload Nightly target/$arch/src/$name --clobber || true
           done
+
           echo "Uploading wasm32-wasip2.wasm..."
           gh release upload Nightly target/wasm32-wasip2/src/Img.wasm#wasm32-wasip2.wasm --clobber || true
           echo "Uploading Apple-macOS-universal..."

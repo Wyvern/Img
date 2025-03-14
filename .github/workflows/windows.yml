@@ -71,6 +71,7 @@ jobs:
       - name: Upload binaries to a GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
         run: |
           $targets = @(
               @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
