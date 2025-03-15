@@ -251,7 +251,7 @@ linker = "mips64-linux-gnuabi64-gcc"
 [target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "little"))']
 linker = "mips64el-linux-gnuabi64-gcc"
 [target.'cfg(all(target_arch="mips64",target_os="linux"))']
-rustflags = ["-Clink-arg=-Wl,--execstack"]
+rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
