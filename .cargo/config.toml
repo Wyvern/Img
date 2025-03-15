@@ -233,7 +233,7 @@ linker = "s390x-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little"))']
 linker = "powerpc64le-linux-gnu-gcc"
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big",target_env="gnu"))']
 linker = "powerpc64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big",target_env="musl"))']
 linker = "powerpc64-linux-musl-gcc"
