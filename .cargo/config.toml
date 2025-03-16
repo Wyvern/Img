@@ -209,9 +209,9 @@ rustflags = [
 rustflags = ["-Zlinker-features=-lld"]
 
 [target.'cfg(not(any(target_family="wasm",target_os="none",target_arch="arm64ec",target_os="windows")))']
-# rustflags = [
-#     "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
-# ]
+rustflags = [
+    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
+]
 
 [target.'cfg(target_vendor="apple")']
 rustflags = ["-Clink-arg=-Wl-z,nodefs", "-Clink-arg=-fno-async-exceptions"]
