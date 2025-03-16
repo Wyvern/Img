@@ -259,18 +259,21 @@ rustflags = ["-Zrelax-elf-relocations"]
 rustflags = [
     "-Clink-arg=-Wl,--allow-multiple-definition",
     "-Clink-arg=-Wl,--export-dynamic",
+    "-Clink-arg=-lc",
+    "-Clink-arg=-lgcc_s",
+    "-Clink-arg=-lutil",
+    "-Clink-arg=-lpthread",
+    "-Clink-arg=-lm",
 ]
 [target.x86_64-pc-solaris]
 rustflags = [
     "-Clink-arg=-lposix4",
-    "-Clink-arg=-lxnet",
     "-Clink-arg=-lrt",
     "-Clink-arg=-Wl,-z,nocopyreloc",
 ]
 [target.sparcv9-sun-solaris]
 rustflags = [
     "-Clink-arg=-lposix4",
-    "-Clink-arg=-lxnet",
     "-Clink-arg=-lrt",
     "-Clink-arg=-Wl,-z,nocopyreloc",
 ]
