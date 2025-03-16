@@ -2,8 +2,7 @@
 name = "Img"
 version = "1.0.0"
 edition = "2024"
-# build = "build.rs"
-# default-run = "Img"
+build = "build.rs"
 
 [features]
 default = ["curl"]
