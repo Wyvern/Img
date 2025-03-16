@@ -254,3 +254,29 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
+
+[target.x86_64-unknown-freebsd]
+rustflags = [
+    "-Clink-arg=-Wl,--allow-multiple-definition",
+    "-Clink-arg=-Wl,--export-dynamic",
+    "-Clink-arg=/opt/freebsd/usr/lib/crt1.o",
+    "-Clink-arg=/opt/freebsd/usr/lib/crti.o",
+]
+[target.x86_64-pc-solaris]
+rustflags = [
+    "-Clink-arg=-lposix4",
+    "-Clink-arg=-lxnet",
+    "-Clink-arg=-lrt",
+    "-Clink-arg=/usr/lib/crt1.o",
+    "-Clink-arg=/usr/lib/crti.o",
+    "-Clink-arg=-Wl,-z,nocopyreloc",
+]
+[target.sparcv9-sun-solaris]
+rustflags = [
+    "-Clink-arg=-lposix4",
+    "-Clink-arg=-lxnet",
+    "-Clink-arg=-lrt",
+    "-Clink-arg=/usr/lib/sparcv9/crt1.o",
+    "-Clink-arg=/usr/lib/sparcv9/crti.o",
+    "-Clink-arg=-Wl,-z,nocopyreloc",
+]

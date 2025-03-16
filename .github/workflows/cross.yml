@@ -67,7 +67,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "x86_64-unknown-freebsd Freebsd-x86_64h"
+                  "x86_64-unknown-freebsd Freebsd-x86_64"
                   "x86_64-unknown-netbsd Netbsd-x86_64"
                   "x86_64-unknown-illumos Illumos-x86_64"
                   "x86_64-pc-solaris Solaris-x86_64"
