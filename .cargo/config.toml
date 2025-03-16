@@ -264,14 +264,12 @@ rustflags = [
 [target.x86_64-pc-solaris]
 rustflags = [
     "-Clink-arg=-lc",
-    "-Clink-arg=-lposix4",
-    "-Clink-arg=-lrt",
+    "-Clink-arg=-lc_psr",
     "-Clink-arg=-Wl,-z,nocopyreloc",
 ]
 [target.sparcv9-sun-solaris]
 rustflags = [
     "-Clink-arg=-lc",
-    "-Clink-arg=-lposix4",
-    "-Clink-arg=-lrt",
+    "-Clink-arg=-lc_psr",
     "-Clink-arg=-Wl,-z,nocopyreloc",
 ]
