@@ -261,17 +261,8 @@ rustflags = [
     "-Clink-arg=-Wl,--export-dynamic",
     "-Clink-arg=-lc",
     "-Clink-arg=-lgcc_s",
-    "-Ctarget-feature=+crt-static",
 ]
 [target.x86_64-pc-solaris]
-rustflags = [
-    "-Clink-arg=-lc",
-    "-Clink-arg=-Wl,-z,nocopyreloc",
-    "-Ctarget-feature=+crt-static",
-]
+rustflags = ["-Clink-arg=-lc", "-Clink-arg=-Wl,-z,nocopyreloc"]
 [target.sparcv9-sun-solaris]
-rustflags = [
-    "-Clink-arg=-lc",
-    "-Clink-arg=-Wl,-z,nocopyreloc",
-    "-Ctarget-feature=+crt-static",
-]
+rustflags = ["-Clink-arg=-lc", "-Clink-arg=-Wl,-z,nocopyreloc"]
