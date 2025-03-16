@@ -1,15 +1,19 @@
 use std::*;
 
 fn main() {
-    // let out = env::var("OUT_DIR");
-    let target = env::var("TARGET");
-    if let Ok(t) = target {
-        if t == "arm64ec-pc-windows-msvc" {
-            // println!("cargo::rustc-link-arg=");
-            // println!("cargo::rustc-link-arg-bins=");
-            // println!("cargo::rustc-link-search={}", o);
-            // println!("cargo::rustc-link-lib=msvcrt");
+    let target = env::var("TARGET").expect("TARGET environment variable is not set");
+    let target_os = target.split('-').nth(2).unwrap_or("unknown");
+    // D!(target_os);
+    match target_os {
+        "freebsd" => {
+            println!("cargo::rustc-link-arg=-Wl,--allow-multiple-definition");
+            println!("cargo::rustc-link-arg=-Wl,--export-dynamic");
         }
+        "solaris" | "illumos" => {
+            println!("cargo::rustc-link-arg=-Wl,-z,noexecstack");
+            println!("cargo::rustc-link-arg=-Wl,-z,nocopyreloc");
+        }
+        _ => (),
     }
 
     println!("cargo::rerun-if-changed=build.rs");
