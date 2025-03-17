@@ -161,6 +161,7 @@ rustflags = [
     "-Cstrip=symbols",
     "-Ccollapse-macro-debuginfo=y",
     "-Clink-self-contained=+linker",
+    "-Cpanic=abort",
 
     "-Zunstable-options",
     "-Zexport-executable-symbols",
