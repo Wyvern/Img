@@ -3,6 +3,7 @@ use std::*;
 fn main() {
     let target = env::var("TARGET").expect("TARGET environment variable is not set");
     let target_os = target.split('-').nth(2).unwrap_or("unknown");
+    let abi = target.split('-').nth(3).unwrap_or("unknown");
     // D!(target_os);
     match target_os {
         "freebsd" => {
@@ -15,9 +16,17 @@ fn main() {
         }
         _ => (),
     }
+    match abi {
+        "ohos" => {
+            println!("cargo::rustc-link-arg=-Wl,--no-undefined");
+            println!("cargo::rustc-link-arg=-Wl,--as-needed");
+        }
+        _ => (),
+    }
 
     println!("cargo::rerun-if-changed=build.rs");
-    // println!("cargo::rerun-if-env-changed=TARGET");
+    // println!("cargo::rustc-link-lib=lib");
+    // println!("cargo::rerun-if-env-changed=file");
     // println!("cargo::rustc-flags=-l{}", "");
     // println!("cargo::rustc-check-cfg=cfg(x,y)");
     // println!("cargo::rustc-cfg=x");

@@ -40,20 +40,22 @@ jobs:
 
       - name: Build Release
         run: |
-          # sudo snap install zig --classic --beta
-          # pipx install cargo-zigbuild
+          sudo snap install zig --classic --beta
+          pipx install cargo-zigbuild
 
           cargo update
           set +e -x
 
           targets=(
             powerpc64-unknown-linux-gnu
-            powerpc64-unknown-linux-musl
+            aarch64-unknown-linux-ohos
+            x86_64-unknown-linux-ohos
           )
 
           for target in ${targets[@]}; do
             time cargo s --target $target
           done
+          time cargo z powerpc64-unknown-linux-musl
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -69,6 +71,8 @@ jobs:
           targets=(
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
+                  "aarch64-unknown-linux-ohos Linux-aarch64-ohos"
+                  "x86_64-unknown-linux-ohos Linux-x86_64-ohos"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
