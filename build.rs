@@ -18,8 +18,8 @@ fn main() {
     }
     match abi {
         "ohos" => {
-            println!("cargo::rustc-link-arg=-Wl,--no-undefined");
-            println!("cargo::rustc-link-arg=-Wl,--as-needed");
+            // println!("cargo::rustc-link-arg=-Wl,--no-undefined");
+            // println!("cargo::rustc-link-arg=-Wl,--as-needed");
         }
         _ => (),
     }
