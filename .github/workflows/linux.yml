@@ -46,10 +46,11 @@ jobs:
           cargo update
           set +e -x
 
+          # aarch64-unknown-linux-ohos
+          # x86_64-unknown-linux-ohos
+
           targets=(
             powerpc64-unknown-linux-gnu
-            aarch64-unknown-linux-ohos
-            x86_64-unknown-linux-ohos
           )
 
           for target in ${targets[@]}; do
@@ -71,8 +72,6 @@ jobs:
           targets=(
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
-                  "aarch64-unknown-linux-ohos Linux-aarch64-ohos"
-                  "x86_64-unknown-linux-ohos Linux-x86_64-ohos"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
