@@ -2,10 +2,10 @@ use std::*;
 
 fn main() {
     let target = env::var("TARGET").expect("TARGET environment variable is not set");
-    let target_os = target.split('-').nth(2).unwrap_or("unknown");
+    let os = target.split('-').nth(2).unwrap_or("unknown");
     let abi = target.split('-').nth(3).unwrap_or("unknown");
     // D!(target_os);
-    match target_os {
+    match os {
         "freebsd" => {
             println!("cargo::rustc-link-arg=-Wl,--allow-multiple-definition");
             println!("cargo::rustc-link-arg=-Wl,--export-dynamic");
