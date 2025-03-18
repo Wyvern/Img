@@ -61,7 +61,6 @@ jobs:
             x86_64-linux-android
             aarch64-linux-android
             armv7-linux-androideabi
-            thumbv7neon-linux-androideabi
           )
           for target in ${targets[@]}; do
             time cargo ndk -t $target b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size -q
@@ -83,7 +82,6 @@ jobs:
                   "x86_64-linux-android Android-x86_64"
                   "aarch64-linux-android Android-aarch64"
                   "armv7-linux-androideabi Android-armv7"
-                  "thumbv7neon-linux-androideabi Android-thumbv7"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
