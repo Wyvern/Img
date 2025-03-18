@@ -56,8 +56,15 @@ jobs:
           # time cargo z riscv64-linux-android
 
           set +e -x
-
-          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size -q
+          targets=(
+            x86_64-linux-android
+            aarch64-linux-android
+            armv7-linux-androideabi
+            thumbv7neon-linux-androideabi
+          )
+          for target in ${targets[@]}; do
+            time cargo ndk -t target b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size -q
+          done
 
           find ./target -iname img -type f | xargs ls -hl
           sw_vers
@@ -75,6 +82,7 @@ jobs:
                   "x86_64-linux-android Android-x86_64"
                   "aarch64-linux-android Android-aarch64"
                   "armv7-linux-androideabi Android-armv7"
+                  "thumbv7neon-linux-androideabi Android-thumbv7"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
