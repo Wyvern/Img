@@ -215,7 +215,10 @@ rustflags = [
 ]
 
 [target.'cfg(target_vendor="apple")']
-rustflags = ["-Clink-arg=-Wl-z,nodefs", "-Clink-arg=-fno-async-exceptions"]
+rustflags = ["-Clink-arg=-fno-async-exceptions"]
+
+[target.'cfg(target_os="linux")']
+rustflags = ["-Clink-arg=-Wl-z,nodefs"]
 
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
