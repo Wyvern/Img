@@ -16,12 +16,9 @@ fn main() {
         }
         _ => (),
     }
-    match abi {
-        "ohos" => {
-            // println!("cargo::rustc-link-arg=-Wl,--no-undefined");
-            // println!("cargo::rustc-link-arg=-Wl,--as-needed");
-        }
-        _ => (),
+    if abi == "ohos" {
+        println!("cargo::rustc-link-arg=-Wl,--no-undefined");
+        println!("cargo::rustc-link-arg=-Wl,--as-needed");
     }
 
     println!("cargo::rerun-if-changed=build.rs");
