@@ -215,7 +215,7 @@ rustflags = [
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
 
 [target.'cfg(any(target_abi="ohos",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
-rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-Wl,-z,undefs"]
+rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-Wl,-z,nodefs"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = ["-Zlinker-features=-lld"]
@@ -224,7 +224,7 @@ rustflags = [
     "-Zlinker-features=-lld",
     "-Clink-arg=-Wl,--gc-sections",
     "-Clink-arg=-Wl,-z,norelro",
-    "-Clink-arg=-Wl,-z,undefs",
+    "-Clink-arg=-Wl,-z,nodefs",
 ]
 
 [target.'cfg(target_vendor="apple")']
