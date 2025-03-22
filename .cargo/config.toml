@@ -214,7 +214,7 @@ rustflags = [
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
 
-[target.'cfg(any(target_abi="ohos",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd")']
+[target.'cfg(any(target_abi="ohos",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd"))']
 rustflags = [
     "-Zlinker-features=-lld",
     "-Clink-arg=-Wl,--gc-sections",
