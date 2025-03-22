@@ -211,6 +211,7 @@ rustflags = [
     "-Zlinker-features=-lld",
     "-Clink-args=-Wl,--gc-sections -Wl,-z,norelro -Wl,-z,nodefs",
 ]
+linker = "ld"
 
 [target.'cfg(not(any(target_family="wasm",target_os="none",target_arch="arm64ec",target_os="windows")))']
 rustflags = [
