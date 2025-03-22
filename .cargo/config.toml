@@ -218,7 +218,7 @@ rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
 rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-Wl,-z,undefs"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
-rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-fno-async-exceptions"]
+rustflags = ["-Zlinker-features=-lld"]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
     "-Zlinker-features=-lld",
