@@ -215,8 +215,7 @@ rustflags = [
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
 
 [target.'cfg(any(target_abi="ohos",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris",target_family="windows"))']
-rustflags = ["-Zlinker-features=-lld"]
-linker = "gold"
+rustflags = ["-Zlinker-features=-lld", "-Clinker=gold"]
 
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
