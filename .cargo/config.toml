@@ -227,7 +227,7 @@ rustflags = [
     "-Clink-arg=-Wl,-z,undefs",
 ]
 
-[target.'cfg(target_os="solaris"))']
+[target.'cfg(target_os="solaris")']
 rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-Wl,-z,ignore"]
 
 [target.'cfg(target_vendor="apple")']
