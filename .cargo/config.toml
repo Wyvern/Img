@@ -208,14 +208,14 @@ rustflags = [
 
 [target.'cfg(target_family="unix")']
 rustflags = [
-    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined -Wl,--icf=all",
+    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
 ]
 
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
 
 [target.'cfg(any(target_abi="ohos",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris",target_family="windows"))']
-rustflags = ["-Zlinker-features=-lld", "-Clinker=gold"]
+rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-Wl,-z,nodefs"]
 
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
