@@ -209,16 +209,17 @@ rustflags = [
 [target.'cfg(any(target_abi="ohos",target_arch="arm64ec",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = [
     "-Zlinker-features=-lld",
-    "-Clink-args=-Wl,--gc-sections -Wl,-z,norelro",
+    "-Clink-args=-Wl,--gc-sections -Wl,-z,norelro -Wl,-z,nodefs",
 ]
 
-[target.'cfg(not(any(target_family="wasm",target_os="none",target_arch="arm64ec",target_os="windows")))']
+[target.'cfg(target_family="unix")']
 rustflags = [
-    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined -Wl,--icf=all",
+    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
 ]
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
+    "-Clink-arg=-Wl,--icf=all",
     "-Clink-arg=-Wl,-undefined,dynamic_lookup",
     "-Clink-arg=-fno-async-exceptions",
 ]
