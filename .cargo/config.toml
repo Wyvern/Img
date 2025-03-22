@@ -208,13 +208,13 @@ rustflags = [
 
 [target.'cfg(target_family="unix")']
 rustflags = [
-    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
+    "-Clink-args=-fno-rtti -fno-exceptions -fno-async-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
 ]
 
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
 
-[target.'cfg(any(target_abi="ohos",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd"))']
+[target.'cfg(any(target_abi="ohos",target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-Wl,-z,undefs"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
@@ -226,9 +226,6 @@ rustflags = [
     "-Clink-arg=-Wl,-z,norelro",
     "-Clink-arg=-Wl,-z,undefs",
 ]
-
-[target.'cfg(target_os="solaris")']
-rustflags = ["-Zlinker-features=-lld", "-Clink-arg=-Wl,-z,ignore"]
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
