@@ -217,20 +217,18 @@ rustflags = [
     "-Clink-arg=-Wl,-z,norelro",
     "-Clink-arg=-Wl,--as-needed",
     "-Clink-arg=-Wl,--discard-all",
-    "-Clink-arg=-Wl,--relax",
     "-Clink-arg=-Wl,--build-id=none",
-    "-Clink-arg=-Wl,--defsym",
-    "-Clink-arg=-Wl,-z,common-page-size=512",
 ]
 
 [target.'cfg(any(target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris",target_family="windows"))']
 rustflags = [
     "-Zlinker-features=-lld",
+    "-Clink-arg=-Wl,-z,common-page-size=512",
     # "-Clink-arg=-Wl,-z,nodefs"
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_arch="sparc64",target_arch="powerpc64"))))']
-rustflags = ["-Clink-arg=-Wl,--icf=all"]
+rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
@@ -246,7 +244,14 @@ rustflags = [
     # "-Clink-arg=/NXCOMPAT",
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
-rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
+rustflags = [
+    "-Clink-arg=-Wl,--gc-sections",
+    "-Clink-arg=-Wl,-z,norelro",
+    "-Clink-arg=-Wl,--as-needed",
+    "-Clink-arg=-Wl,--discard-all",
+    "-Clink-arg=-Wl,--relax",
+    "-Clink-arg=-Wl,--build-id=none",
+]
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
