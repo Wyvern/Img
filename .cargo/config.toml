@@ -220,7 +220,7 @@ rustflags = [
     "-Clink-arg=-Wl,--build-id=none",
 ]
 
-[target.'cfg(any(target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris",target_family="windows"))']
+[target.'cfg(any(target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
 rustflags = [
     "-Zlinker-features=-lld",
     "-Clink-arg=-Wl,-z,common-page-size=512",
@@ -232,6 +232,7 @@ rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
+    "-Zlinker-features=-lld",
     "-Clink-arg=/OPT:REF",
     "-Clink-arg=/OPT:ICF",
     "-Clink-arg=/DEBUG:NONE",
@@ -258,6 +259,7 @@ rustflags = [
     "-Clink-arg=-fno-async-exceptions",
     "-Clink-arg=-Wl,--icf=all",
     "-Clink-arg=-Wl,-no_uuid",
+    "-Clink-arg=-Wl,-S",
     "-Clink-arg=-Wl,-dead_strip",
     "-Clink-arg=-Wl,-dead_strip_dylibs",
     "-Clink-arg=-Wl,-undefined,dynamic_lookup",
