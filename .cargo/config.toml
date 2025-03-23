@@ -224,6 +224,7 @@ rustflags = [
 rustflags = [
     "-Zlinker-features=-lld",
     "-Clink-arg=-Wl,-z,common-page-size=512",
+    "-Clink-arg=-Wl,--strip-all",
     # "-Clink-arg=-Wl,-z,nodefs"
 ]
 
