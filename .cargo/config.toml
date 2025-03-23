@@ -253,6 +253,7 @@ rustflags = [
     "-Clink-arg=-Wl,--discard-all",
     "-Clink-arg=-Wl,--relax",
     "-Clink-arg=-Wl,--build-id=none",
+    "-Clink-arg=-Wl,--strip-all",
 ]
 
 [target.'cfg(target_vendor="apple")']
