@@ -212,7 +212,16 @@ rustflags = [
 ]
 
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
-rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
+rustflags = [
+    "-Clink-arg=-Wl,--gc-sections",
+    "-Clink-arg=-Wl,-z,norelro",
+    "-Clink-arg=-Wl,--as-needed",
+    "-Clink-arg=-Wl,--discard-all",
+    "-Clink-arg=-Wl,--relax",
+    "-Clink-arg=-Wl,--build-id=none",
+    "-Clink-arg=-Wl,--defsym",
+    "-Clink-arg=-Wl,-z,common-page-size=512",
+]
 
 [target.'cfg(any(target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris",target_family="windows"))']
 rustflags = [
@@ -227,12 +236,12 @@ rustflags = ["-Clink-arg=-Wl,--icf=all"]
 rustflags = [
     "-Clink-arg=/OPT:REF",
     "-Clink-arg=/OPT:ICF",
-    # "-Clink-arg=/LTCG",
     "-Clink-arg=/DEBUG:NONE",
     "-Clink-arg=/INCREMENTAL:NO",
     "-Clink-arg=/MERGE:.rdata=.text",
     "-Clink-arg=/MERGE:.pdata=.text",
     "-Clink-arg=/FILEALIGN:512",
+    # "-Clink-arg=/LTCG",
     # "-Clink-arg=/DYNAMICBASE",
     # "-Clink-arg=/NXCOMPAT",
 ]
@@ -243,7 +252,9 @@ rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
 rustflags = [
     "-Clink-arg=-fno-async-exceptions",
     "-Clink-arg=-Wl,--icf=all",
+    "-Clink-arg=-Wl,-no_uuid",
     "-Clink-arg=-Wl,-dead_strip",
+    "-Clink-arg=-Wl,-dead_strip_dylibs",
     "-Clink-arg=-Wl,-undefined,dynamic_lookup",
 ]
 
