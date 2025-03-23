@@ -208,7 +208,7 @@ rustflags = [
 
 [target.'cfg(target_family="unix")']
 rustflags = [
-    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined -nostdlib",
+    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
 ]
 
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
@@ -228,8 +228,13 @@ rustflags = [
     "-Clink-arg=/OPT:REF",
     "-Clink-arg=/OPT:ICF",
     "-Clink-arg=/LTCG",
-    "-Clink-arg=/NODEFAULTLIB",
     "-Clink-arg=/DEBUG:NONE",
+    "-Clink-arg=/INCREMENTAL:NO",
+    "-Clink-arg=/MERGE:.rdata=.text",
+    "-Clink-arg=/MERGE:.pdata=.text",
+    "-Clink-arg=/FILEALIGN:512",
+    # "-Clink-arg=/DYNAMICBASE",
+    # "-Clink-arg=/NXCOMPAT",
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = ["-Clink-arg=-Wl,--gc-sections", "-Clink-arg=-Wl,-z,norelro"]
