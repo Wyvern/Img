@@ -20,7 +20,7 @@ jobs:
       - name: Disable and Stop windows services
         continue-on-error: true
         run: |
-          $ErrorActionPreference = 'SilentlyContinue'
+          $ErrorActionPreference = 'Ignore'
 
           $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
           $services = Get-Service|? DisplayName -match $pattern
