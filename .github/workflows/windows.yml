@@ -20,11 +20,13 @@ jobs:
       - name: Disable and Stop windows services
         continue-on-error: true
         run: |
+          $ErrorActionPreference = 'SilentlyContinue'
+
           $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
-          $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
+          $services = Get-Service|? DisplayName -match $pattern
 
           $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
-          $services | Stop-Service -Force -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force
 
           $services | % {$_.DisplayName; $_.Status}
 
