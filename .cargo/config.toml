@@ -195,6 +195,7 @@ rustflags = [
     "-Zchecksum-hash-algorithm=blake3",
     "-Ztrap-unreachable=no",
     "-Zmir-strip-debuginfo=all-locals",
+    "-Zembed-metadata=no",
 
     "-Anonstandard_style",
     "-Adead_code",
