@@ -341,11 +341,13 @@ jobs:
       - name: Disable and Stop windows services
         continue-on-error: true
         run: |
+          $ErrorActionPreference = 'Ignore'
+
           $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
-          $services = Get-Service -ErrorAction SilentlyContinue|? DisplayName -match $pattern
+          $services = Get-Service|? DisplayName -match $pattern
 
           $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
-          $services | Stop-Service -Force -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force
 
           $services | % {$_.DisplayName; $_.Status}
 
@@ -354,7 +356,9 @@ jobs:
           reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
           reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
 
-          schtasks /delete /tn * /f >NUL
+          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
+          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
+
       - name: Checkout
         uses: actions/checkout@v4
 
