@@ -168,7 +168,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "x86_64h-apple-darwin Apple-macOS-x86_64h"
+                  "x86_64-apple-darwin Apple-macOS-x86_64"
                   "aarch64-apple-darwin Apple-macOS-aarch64"
                   "aarch64-apple-ios Apple-iOS-aarch64"
           )
