@@ -29,7 +29,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -42,28 +42,26 @@ jobs:
       - name: Build Release
         run: |
           cargo update
-
           set +e -x
 
-          time cargo l --target sparc64-unknown-linux-gnu
+          targets=(
+            powerpc64-unknown-linux-gnu
+            powerpc64le-unknown-linux-gnu
+            riscv64gc-unknown-linux-gnu
+            riscv64gc-unknown-linux-musl
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
+            aarch64-unknown-linux-gnu
+            aarch64-unknown-linux-musl
+            sparc64-unknown-linux-gnu
+            s390x-unknown-linux-gnu
+            loongarch64-unknown-linux-gnu
+            loongarch64-unknown-linux-musl
+          )
 
-          time cargo l --target powerpc64le-unknown-linux-gnu
-          time cargo l --target powerpc64-unknown-linux-gnu
-
-          time cargo l --target s390x-unknown-linux-gnu
-          # time cargo l --target s390x-unknown-linux-musl
-
-          time cargo l --target riscv64gc-unknown-linux-gnu
-          # time cargo l --target riscv64gc-unknown-linux-musl
-
-          time cargo l --target x86_64-unknown-linux-gnu
-          time cargo l --target x86_64-unknown-linux-musl
-
-          time cargo l --target aarch64-unknown-linux-gnu
-          time cargo l --target aarch64-unknown-linux-musl
-
-          time cargo l --target loongarch64-unknown-linux-gnu
-          time cargo l --target loongarch64-unknown-linux-musl
+          for target in ${targets[@]}; do
+            time cargo l --target $target
+          done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -72,133 +70,34 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload Linux-sparc64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/sparc64-unknown-linux-gnu/lto/Img
-          asset_name: Linux-sparc64-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-sparc64-gnu binary executable."
-
-      - name: Upload Linux-powerpc64le-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64le-unknown-linux-gnu/lto/Img
-          asset_name: Linux-powerpc64le-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-powerpc64le-gnu binary executable."
-
-      - name: Upload Linux-powerpc64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/powerpc64-unknown-linux-gnu/lto/Img
-          asset_name: Linux-powerpc64-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-powerpc64-gnu binary executable."
-
-      - name: Upload Linux-riscv64gc-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/riscv64gc-unknown-linux-gnu/lto/Img
-          asset_name: Linux-riscv64gc-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-riscv64gc-gnu binary executable."
-
-      - name: Upload Linux-riscv64gc-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/riscv64gc-unknown-linux-musl/lto/Img
-          asset_name: Linux-riscv64gc-musl
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-riscv64gc-musl binary executable."
-
-      - name: Upload Linux-s390x-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/s390x-unknown-linux-gnu/lto/Img
-          asset_name: Linux-s390x-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-s390x-gnu binary executable."
-
-      - name: Upload Linux-x86_64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-gnu/lto/Img
-          asset_name: Linux-x86_64-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-x86_64-gnu binary executable."
-
-      - name: Upload Linux-x86_64-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-linux-musl/lto/Img
-          asset_name: Linux-x86_64-musl
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-x86_64-musl binary executable."
-
-      - name: Upload Linux-aarch64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-gnu/lto/Img
-          asset_name: Linux-aarch64-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-aarch64-gnu binary executable."
-
-      - name: Upload Linux-aarch64-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-unknown-linux-musl/lto/Img
-          asset_name: Linux-aarch64-musl
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-aarch64-musl binary executable."
-
-      - name: Upload Linux-loongarch64-gnu to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/loongarch64-unknown-linux-gnu/lto/Img
-          asset_name: Linux-loongarch64-gnu
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-loongarch64-gnu binary executable."
-
-      - name: Upload Linux-loongarch64-musl to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/loongarch64-unknown-linux-musl/lto/Img
-          asset_name: Linux-loongarch64-musl
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Linux-loongarch64-musl binary executable."
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
+                  "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
+                  "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
+                  "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
+                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
+                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
+                  "aarch64-unknown-linux-gnu Linux-aarch64-gnu"
+                  "aarch64-unknown-linux-musl Linux-aarch64-musl"
+                  "sparc64-unknown-linux-gnu Linux-sparc64-gnu"
+                  "s390x-unknown-linux-gnu Linux-s390x-gnu"
+                  "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"
+                  "loongarch64-unknown-linux-musl Linux-loongarch64-musl"
+          )
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            gh release upload Stable target/$arch/lto/$name --clobber || true
+          done
 
   macOS:
     name: Building on macOS.
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Disable macos spotlight index
@@ -227,7 +126,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Install cargo-ndk
-        run: cargo install --git https://github.com/bbqsrc/cargo-ndk --tag v3.5.7
+        run: cargo install --git https://github.com/bbqsrc/cargo-ndk cargo-ndk --branch main
 
       - name: Build Release
         run: |
@@ -235,14 +134,26 @@ jobs:
 
           cargo update
           set +e -x
-          time cargo l --target aarch64-apple-darwin
-          time cargo l --target aarch64-apple-ios
-          time cargo l --target x86_64-apple-darwin
-          time cargo l --target wasm32-wasip2
+          targets=(
+            aarch64-apple-darwin
+            aarch64-apple-ios
+            x86_64-apple-darwin
+            wasm32-wasip2
+          )
+          for target in ${targets[@]}; do
+            time cargo l --target $target
+          done
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
-          time cargo ndk -t x86_64-linux-android -t aarch64-linux-android -t armv7-linux-androideabi b --profile lto -q
+          targets=(
+            x86_64-linux-android
+            aarch64-linux-android
+            armv7-linux-androideabi
+          )
+          for target in ${targets[@]}; do
+            time cargo ndk -t $target b --profile lto -q
+          done
 
           find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
@@ -252,86 +163,39 @@ jobs:
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload macOS x86-64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-apple-darwin/lto/Img
-          asset_name: Apple-macOS-x86_64
-          tag: Stable
-          overwrite: true
-          body: "macOS x86-64 binary executable."
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  "x86_64h-apple-darwin Apple-macOS-x86_64h"
+                  "aarch64-apple-darwin Apple-macOS-aarch64"
+                  "aarch64-apple-ios Apple-iOS-aarch64"
+          )
 
-      - name: Upload macOS-aarch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-apple-darwin/lto/Img
-          asset_name: Apple-macOS-aarch64
-          tag: Stable
-          overwrite: true
-          body: "macOS aarch64 binary executable."
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            gh release upload Stable target/$arch/lto/$name --clobber || true
+          done
 
-      - name: Upload iOS to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-apple-ios/lto/Img
-          asset_name: Apple-iOS
-          tag: Stable
-          overwrite: true
-          body: "iOS binary executable."
+          echo "Uploading wasm32-wasip2.wasm..."
+          gh release upload Stable target/wasm32-wasip2/src/Img.wasm#wasm32-wasip2.wasm --clobber || true
+          echo "Uploading Apple-macOS-universal..."
+          gh release upload Stable Img-Universal#Apple-macOS-universal --clobber || true
 
-      - name: Upload Wasm32-wasip2 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/wasm32-wasip2/lto/Img.wasm
-          asset_name: wasm32-wasip2.wasm
-          tag: Stable
-          overwrite: true
-          body: "Wasm32-wasip2"
-
-      - name: Upload macOS-universal to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: Img-Universal
-          asset_name: Apple-macOS-universal
-          tag: Stable
-          overwrite: true
-          body: "macOS universal binary executable."
-
-      - name: Upload Android-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-linux-android/lto/Img
-          asset_name: Android-x86_64
-          tag: Stable
-          overwrite: true
-          body: "Android-x86_64 binary executable."
-
-      - name: Upload Android-aarch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-linux-android/lto/Img
-          asset_name: Android-aarch64
-          tag: Stable
-          overwrite: true
-          body: "Android-aarch64 binary executable."
-
-      - name: Upload Android-armv7 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/armv7-linux-androideabi/lto/Img
-          asset_name: Android-armv7
-          tag: Stable
-          overwrite: true
-          body: "Android-armv7 binary executable."
+          targets=(
+                  "x86_64-linux-android Android-x86_64"
+                  "aarch64-linux-android Android-aarch64"
+                  "armv7-linux-androideabi Android-armv7"
+          )
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            gh release upload Stable target/$arch/lto/$name --clobber || true
+          done
 
   Windows:
     name: Building on Windows.
@@ -374,48 +238,38 @@ jobs:
       - name: Build release
         run: |
           cargo update
+          $targets = @(
+                      "aarch64-pc-windows-msvc",
+                      "x86_64-pc-windows-msvc",
+                      "arm64ec-pc-windows-msvc"
+                    )
+          foreach ($target in $targets) {
+              Write-Host "Building: $target"
+              Measure-Command { cargo l --target $target }
+          }
 
-          Write-Host "Building: x86_64-pc-windows-msvc"
-          Measure-Command {cargo l --target x86_64-pc-windows-msvc}
-
-          Write-Host "Building: aarch64-pc-windows-msvc"
-          Measure-Command {cargo l --target aarch64-pc-windows-msvc}
-
-          Write-Host "Building: arm64ec-pc-windows-msvc"
-          Measure-Command {cargo l --target arm64ec-pc-windows-msvc}
-
-          cmd /c dir /s target\Img.exe
+          # cmd /c dir /s target\src\Img.exe
+          Get-ChildItem -Path target\*\src\Img.exe -File
           systeminfo
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
 
-      - name: Upload Windows-x64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-windows-msvc/lto/Img.exe
-          asset_name: Windows-x86_64.exe
-          tag: Stable
-          overwrite: true
-          body: "Windows x64 binary executable."
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+        run: |
+          $targets = @(
+              @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
+              @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe")
+          )
 
-      - name: Upload Windows-aarch64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/aarch64-pc-windows-msvc/lto/Img.exe
-          asset_name: Windows-aarch64.exe
-          tag: Stable
-          overwrite: true
-          body: "Windows aarch64 binary executable."
-
-      - name: Upload Windows-arm64ec to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/arm64ec-pc-windows-msvc/lto/Img.exe
-          asset_name: Windows-arm64ec.exe
-          tag: Stable
-          overwrite: true
-          body: "Windows arm64ec binary executable."
+          foreach ($target in $targets) {
+              $arch = $target[0]
+              $name = $target[1]
+              Write-Host "Uploading $name..."
+              Move-Item target/$arch/lto/Img.exe target/$arch/lto/$name; $?
+              gh release upload Stable target/$arch/lto/$name --clobber; $?
+          }
