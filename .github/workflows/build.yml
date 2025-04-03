@@ -181,7 +181,7 @@ jobs:
           done
 
           echo "Uploading wasm32-wasip2.wasm..."
-          gh release upload Stable target/wasm32-wasip2/src/Img.wasm#wasm32-wasip2.wasm --clobber || true
+          gh release upload Stable target/wasm32-wasip2/lto/Img.wasm#wasm32-wasip2.wasm --clobber || true
           echo "Uploading Apple-macOS-universal..."
           gh release upload Stable Img-Universal#Apple-macOS-universal --clobber || true
 
@@ -248,8 +248,7 @@ jobs:
               Measure-Command { cargo l --target $target }
           }
 
-          # cmd /c dir /s target\src\Img.exe
-          Get-ChildItem -Path target\*\src\Img.exe -File
+          Get-ChildItem -Path target\*\lto\Img.exe -File
           systeminfo
 
       - name: Rust Versions

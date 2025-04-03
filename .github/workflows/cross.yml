@@ -26,12 +26,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Enable KVM group perms
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
@@ -62,57 +56,20 @@ jobs:
           lscpu
           free -m
 
-      - name: Upload Freebsd-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-freebsd/lto/Img
-          asset_name: Freebsd-x86_64
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Freebsd-x86_64 binary executable."
-
-      - name: Upload Netbsd-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-netbsd/lto/Img
-          asset_name: Netbsd-x86_64
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Netbsd-x86_64 binary executable."
-
-      - name: Upload Illumos-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-unknown-illumos/lto/Img
-          asset_name: Illumos-x86_64
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Illumos-x86_64 binary executable."
-
-      - name: Upload Solaris-x86_64 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/x86_64-pc-solaris/lto/Img
-          asset_name: Solaris-x86_64
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Solaris-x86_64 binary executable."
-
-      - name: Upload Solaris-sparcv9 to a GitHub release
-        uses: svenstaro/upload-release-action@v2
-        continue-on-error: true
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/sparcv9-sun-solaris/lto/Img
-          asset_name: Solaris-sparcv9
-          tag: Stable
-          overwrite: true
-          body: "Ubuntu Solaris-sparcv9 binary executable."
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  "x86_64-unknown-freebsd Freebsd-x86_64"
+                  "x86_64-unknown-netbsd Netbsd-x86_64"
+                  "x86_64-unknown-illumos Illumos-x86_64"
+                  "x86_64-pc-solaris Solaris-x86_64"
+                  "sparcv9-sun-solaris Solaris-sparcv9"
+          )
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            gh release upload Stable target/$arch/lto/$name --clobber || true
+          done
