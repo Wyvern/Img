@@ -565,7 +565,7 @@ fn parse(addr: &str) -> String {
                 tdbg!(next_page)
             }
         } else {
-            check_next(page.select(n), addr)
+            check_next(n, addr, page)
         }
     })
 }
@@ -801,13 +801,22 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
+fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     let mut next_link: String;
     let splitter = |e: &crabquery::Element| {
         e.attr("class")
             .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
             || e.attr("aria-current").is_some()
     };
+    let ns = next.split_once(SEP);
+    let nxt = ns.map_or(next, |(l, _)| l);
+    let attr = nxt
+        .split_whitespace()
+        .next_back()
+        .unwrap()
+        .rsplit(['[', ']'])
+        .nth(1)
+        .unwrap_or("href");
     let set_next = |tags: &[crabquery::Element]| -> String {
         let tag = tags.iter().find(|e| {
             e.tag().unwrap() == "a"
@@ -819,26 +828,26 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
                 <_>::default()
             } else {
-                e.attr("href")
-                    .or_else(|| e.children().first().and_then(|x| x.attr("href")))
+                e.attr(attr)
+                    .or_else(|| e.children().first().and_then(|x| x.attr(attr)))
                     .unwrap()
             }
         })
     };
-
+    let nexts = page.select(nxt);
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
     } else if nexts.len() == 1 {
         let element = &nexts[0];
-        if element.tag().unwrap() == "span" || element.attr("href").is_none() {
+        if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
             let tags = items.split(|e| element.eql(e)).next_back().unwrap();
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
-            next_link = element.parent().unwrap().attr("href").unwrap();
+            next_link = element.parent().unwrap().attr(attr).unwrap();
         } else {
-            next_link = element.attr("href").unwrap();
+            next_link = element.attr(attr).unwrap();
         }
     } else {
         let element = &nexts[0];
@@ -885,13 +894,13 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 }
             });
             next_link = match last2 {
-                Some(v) => v.attr("href").unwrap_or(String::default()),
+                Some(v) => v.attr(attr).unwrap_or(String::default()),
                 None => {
                     let pos = nexts.iter().rposition(|e| {
-                        e.attr("href").is_some_and(|h| {
+                        e.attr(attr).is_some_and(|h| {
                             cur.trim().ends_with(h.trim())
                                 || h.trim() == "#"
-                                || ["/1", "?page=1"].iter().any(|suffix| {
+                                || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
                                     format!("{}{suffix}", cur.trim_end_matches('/'))
                                         .ends_with(h.trim())
                                 })
@@ -900,7 +909,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     match pos {
                         Some(p) => {
                             if p < nexts.len() - 1 {
-                                nexts[p + 1].attr("href").unwrap()
+                                nexts[p + 1].attr(attr).unwrap()
                             } else {
                                 String::default()
                             }
@@ -919,7 +928,24 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         next_link = String::default();
     }
 
-    next_link = canonicalize(&next_link, cur);
+    next_link = ns.map_or_else(
+        || canonicalize(&next_link, cur),
+        |(_, r)| {
+            let count = r.matches('/').count();
+            format!(
+                "{}{r}",
+                if cur.contains(r.split("{}").next().unwrap()) {
+                    cur.trim_end_matches('/')
+                        .rsplitn(count, '/')
+                        .last()
+                        .unwrap()
+                } else {
+                    cur.trim_end_matches('/')
+                }
+            )
+            .replace("{}", &next_link)
+        },
+    );
 
     tdbg!(next_link)
 }

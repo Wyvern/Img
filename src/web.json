@@ -682,6 +682,12 @@
       "Img": "div.postImageContainer > img",
       "Next": "div#singlePostPagination > span.paginationPageNumberCurrent",
       "Album": "a.postTitleLink"
+    },
+    {
+      "Site": "knit.bid",
+      "Img": "p.item-image > img",
+      "Next": "li.next-page > a[data-page] | /page/{}/",
+      "Album": "article.excerpt > h2 > a"
     }
   ],
   "Series": [
