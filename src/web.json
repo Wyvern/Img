@@ -108,7 +108,7 @@
       "Img": "div#rl-gallery-1 a[href]"
     },
     {
-      "Site": "mmm.red",
+      "Site": "mmm.red,mmm999.red",
       "Img": "div[data-fancybox=\"gallery\"] img[data-original]",
       "Album": "a.item-link div"
     },
@@ -564,7 +564,7 @@
       "Album": "h1.entry-title > a"
     },
     {
-      "Site": "inewgirl.com,nshens.com",
+      "Site": "inewgirl.com,nshens.com,lovestatic.com",
       "Img": "json: key | photourl",
       "Next": "<script>"
     },
@@ -682,6 +682,12 @@
       "Img": "div.postImageContainer > img",
       "Next": "div#singlePostPagination > span.paginationPageNumberCurrent",
       "Album": "a.postTitleLink"
+    },
+    {
+      "Site": "knit.bid",
+      "Img": "p.item-image > img",
+      "Next": "li.next-page > a[data-page] | /page/{}/",
+      "Album": "article.excerpt > h2 > a"
     }
   ],
   "Series": [

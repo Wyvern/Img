@@ -1,4 +1,4 @@
-#![feature(test)]
+#![feature(test, gen_blocks)]
 
 mod util;
 use {std::*, util::*};
@@ -89,7 +89,7 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
 }
 
 ///Fetch web page generate html content
-fn get_html(addr: &str) -> Vec<u8> {
+fn get_html(addr: &str) -> (String, usize) {
     use sync::mpsc::*;
     let (s, r) = channel();
     _ = io::stdout().lock();
@@ -115,15 +115,15 @@ fn get_html(addr: &str) -> Vec<u8> {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
         quit!("Fetch {} failed - {err}", addr);
     }
+    let s = String::from_utf8_lossy(&out.stdout).into_owned();
+    let ll = s.rfind('\n').unwrap();
     _ = h.join();
-    out.stdout
+    (s, ll)
 }
 
 ///Parse photos in web url
 fn parse(addr: &str) -> String {
-    let bytes = get_html(addr);
-    let html = String::from_utf8_lossy(&bytes);
-    let ll = html.rfind('\n').unwrap();
+    let (html, ll) = get_html(addr);
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
     let [mut img, mut next_sel, mut album, mut title] = host_info(host);
@@ -565,7 +565,7 @@ fn parse(addr: &str) -> String {
                 tdbg!(next_page)
             }
         } else {
-            check_next(page.select(n), addr)
+            check_next(n, addr, page)
         }
     })
 }
@@ -801,13 +801,22 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
+fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     let mut next_link: String;
     let splitter = |e: &crabquery::Element| {
         e.attr("class")
             .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
             || e.attr("aria-current").is_some()
     };
+    let ns = next.split_once(SEP);
+    let nxt = ns.map_or(next, |(l, _)| l);
+    let attr = nxt
+        .split_whitespace()
+        .next_back()
+        .unwrap()
+        .rsplit(['[', ']'])
+        .nth(1)
+        .unwrap_or("href");
     let set_next = |tags: &[crabquery::Element]| -> String {
         let tag = tags.iter().find(|e| {
             e.tag().unwrap() == "a"
@@ -819,26 +828,26 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
             if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
                 <_>::default()
             } else {
-                e.attr("href")
-                    .or_else(|| e.children().first().and_then(|x| x.attr("href")))
+                e.attr(attr)
+                    .or_else(|| e.children().first().and_then(|x| x.attr(attr)))
                     .unwrap()
             }
         })
     };
-
+    let nexts = page.select(nxt);
     if nexts.is_empty() {
         next_link = String::default();
         //println!("NO next page <element> found.")
     } else if nexts.len() == 1 {
         let element = &nexts[0];
-        if element.tag().unwrap() == "span" || element.attr("href").is_none() {
+        if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
             let tags = items.split(|e| element.eql(e)).next_back().unwrap();
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
-            next_link = element.parent().unwrap().attr("href").unwrap();
+            next_link = element.parent().unwrap().attr(attr).unwrap();
         } else {
-            next_link = element.attr("href").unwrap();
+            next_link = element.attr(attr).unwrap();
         }
     } else {
         let element = &nexts[0];
@@ -885,13 +894,13 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                 }
             });
             next_link = match last2 {
-                Some(v) => v.attr("href").unwrap_or(String::default()),
+                Some(v) => v.attr(attr).unwrap_or(String::default()),
                 None => {
                     let pos = nexts.iter().rposition(|e| {
-                        e.attr("href").is_some_and(|h| {
+                        e.attr(attr).is_some_and(|h| {
                             cur.trim().ends_with(h.trim())
                                 || h.trim() == "#"
-                                || ["/1", "?page=1"].iter().any(|suffix| {
+                                || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
                                     format!("{}{suffix}", cur.trim_end_matches('/'))
                                         .ends_with(h.trim())
                                 })
@@ -900,7 +909,7 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
                     match pos {
                         Some(p) => {
                             if p < nexts.len() - 1 {
-                                nexts[p + 1].attr("href").unwrap()
+                                nexts[p + 1].attr(attr).unwrap()
                             } else {
                                 String::default()
                             }
@@ -919,7 +928,28 @@ fn check_next(nexts: Vec<crabquery::Element>, cur: &str) -> String {
         next_link = String::default();
     }
 
-    next_link = canonicalize(&next_link, cur);
+    next_link = ns.map_or_else(
+        || canonicalize(&next_link, cur),
+        |(_, r)| {
+            if next_link.is_empty() {
+                String::default()
+            } else {
+                let count = r.matches('/').count();
+                format!(
+                    "{}{r}",
+                    if cur.contains(r.split("{}").next().unwrap()) {
+                        cur.trim_end_matches('/')
+                            .rsplitn(count, '/')
+                            .last()
+                            .unwrap()
+                    } else {
+                        cur.trim_end_matches('/')
+                    }
+                )
+                .replace("{}", &next_link)
+            }
+        },
+    );
 
     tdbg!(next_link)
 }
@@ -1118,8 +1148,7 @@ mod img {
 
     #[test]
     fn html() {
-        let bytes = get_html(&arg("mmm.red"));
-        let html = String::from_utf8_lossy(&bytes);
+        let html = get_html(&arg("mmm.red"));
         dbg!(&html);
     }
 
@@ -1127,7 +1156,7 @@ mod img {
     fn htmlq() {
         let addr = arg("https://www.hotgirlpix.com/");
         let host = check_host(&addr);
-        let bytes = get_html(&addr);
+        let (html, ll) = get_html(&addr);
         let [img, _, album, _] = host_info(host);
         use process::*;
 
@@ -1141,7 +1170,7 @@ mod img {
             let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
             use io::*;
             stdin
-                .write_all(bytes.as_ref())
+                .write_all(html[..ll].as_ref())
                 .expect("Failed to write stdin.");
             if let Ok(o) = cmd.wait_with_output() {
                 if !o.stdout.is_empty() {
@@ -1158,6 +1187,30 @@ mod img {
             pl!("{MARK} Album Selector: {HL} {a} ");
             hq(a)
         }
+    }
+
+    #[test]
+    fn gen_yield() {
+        let start = time::Instant::now();
+
+        let gen_results = gen {
+            for a in 0..=1000 {
+                for b in 0..=1000 {
+                    for c in 0..=1000 {
+                        if a * a + b * b == c * c && a + b + c == 1000 {
+                            yield (a, b, c);
+                        }
+                    }
+                }
+            }
+        };
+
+        for (a, b, c) in gen_results {
+            println!("{{ a: {}, b: {}, c: {} }}", a, b, c,);
+        }
+
+        let duration = start.elapsed();
+        println!("Total: {} seconds", duration.as_secs_f64());
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
@@ -1206,8 +1259,8 @@ mod img {
     #[test]
     fn css_img() {
         let addr = arg("autodesk.com");
-        let bytes = get_html(&addr);
-        let r = css_image(&String::from_utf8_lossy(&bytes), &addr);
+        let (html, ll) = get_html(&addr);
+        let r = css_image(&html[..ll], &addr);
         tdbg!(&r, r.len());
     }
 
@@ -1335,7 +1388,13 @@ mod img {
     extern crate test;
 
     #[bench]
-    fn bench_parse(b: &mut test::Bencher) {
-        b.iter(|| thread::sleep);
+    fn demo(b: &mut test::Bencher) {
+        b.iter(|| {
+            let mut sum = 0;
+            for i in 0..1000 {
+                sum += i;
+            }
+            sum
+        });
     }
 }
