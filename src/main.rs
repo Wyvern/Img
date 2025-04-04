@@ -931,19 +931,23 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     next_link = ns.map_or_else(
         || canonicalize(&next_link, cur),
         |(_, r)| {
-            let count = r.matches('/').count();
-            format!(
-                "{}{r}",
-                if cur.contains(r.split("{}").next().unwrap()) {
-                    cur.trim_end_matches('/')
-                        .rsplitn(count, '/')
-                        .last()
-                        .unwrap()
-                } else {
-                    cur.trim_end_matches('/')
-                }
-            )
-            .replace("{}", &next_link)
+            if next_link.is_empty() {
+                String::default()
+            } else {
+                let count = r.matches('/').count();
+                format!(
+                    "{}{r}",
+                    if cur.contains(r.split("{}").next().unwrap()) {
+                        cur.trim_end_matches('/')
+                            .rsplitn(count, '/')
+                            .last()
+                            .unwrap()
+                    } else {
+                        cur.trim_end_matches('/')
+                    }
+                )
+                .replace("{}", &next_link)
+            }
         },
     );
 
