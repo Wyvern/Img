@@ -927,13 +927,12 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
         next_link = String::default();
     }
-
-    next_link = ns.map_or_else(
-        || canonicalize(&next_link, cur),
-        |(_, r)| {
-            if next_link.is_empty() {
-                String::default()
-            } else {
+    next_link = if next_link.is_empty() {
+        next_link
+    } else {
+        ns.map_or_else(
+            || canonicalize(&next_link, cur),
+            |(_, r)| {
                 let count = r.matches('/').count();
                 format!(
                     "{}{r}",
@@ -947,9 +946,9 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
                     }
                 )
                 .replace("{}", &next_link)
-            }
-        },
-    );
+            },
+        )
+    };
 
     tdbg!(next_link)
 }
