@@ -238,6 +238,7 @@ rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
+    "-Cforce-unwind-tables=yes",
     "-Zlinker-features=-lld",
     "-Clink-arg=/OPT:REF",
     "-Clink-arg=/OPT:ICF",
@@ -259,6 +260,7 @@ rustflags = [
     "-Clink-arg=-Wl,--relax",
     "-Clink-arg=-Wl,--build-id=none",
     "-Clink-arg=-Wl,--strip-all",
+    "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
 
 [target.'cfg(target_vendor="apple")']
