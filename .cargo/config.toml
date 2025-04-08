@@ -222,11 +222,9 @@ rustflags = [
     "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
 [target.'cfg(all(target_family="unix",not(target_vendor="apple"),target_os="linux"))']
-rustflags = ["-Clink-arg=-Wl,--icf=all"]
-[target.'cfg(all(target_family="unix",not(target_vendor="apple"),target_os="linux",not(any(target_arch="sparc64", target_arch="powerpc64"))))']
-rustflags = ["-Clink-arg=-Wl,--relax"]
+rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 
-[target.'cfg(all(target_family="unix",not(target_vendor="apple"),not(target_os="linux")))']
+[target.'cfg(all(target_family="unix",not(target_vendor="apple"),not(target_os="linux"),any(target_arch="sparc64", target_arch="powerpc64")))']
 rustflags = [
     "-Zlinker-features=-lld",
     "-Clink-arg=-Wl,-z,common-page-size=512",
