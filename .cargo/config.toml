@@ -211,9 +211,7 @@ rustflags = [
 ]
 
 [target.'cfg(target_family="unix")']
-rustflags = [
-    "-Clink-args=-fno-rtti -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-sanitize=undefined",
-]
+rustflags = ["-Clink-self-contained=+linker", "-Zlinker-features=+lld"]
 
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
 rustflags = [
@@ -239,7 +237,6 @@ rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
     "-Cforce-unwind-tables=yes",
-    "-Zlinker-features=-lld",
     "-Clink-arg=/OPT:REF",
     "-Clink-arg=/OPT:ICF",
     "-Clink-arg=/DEBUG:NONE",
@@ -253,6 +250,8 @@ rustflags = [
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
+    "-Clink-self-contained=+linker",
+    "-Zlinker-features=+lld",
     "-Clink-arg=-Wl,--gc-sections",
     "-Clink-arg=-Wl,-z,norelro",
     "-Clink-arg=-Wl,--as-needed",
@@ -265,7 +264,6 @@ rustflags = [
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
-    "-Clink-arg=-fno-async-exceptions",
     "-Clink-arg=-Wl,--icf=all",
     "-Clink-arg=-Wl,-no_uuid",
     "-Clink-arg=-Wl,-S",
