@@ -213,6 +213,8 @@ rustflags = ["-Clink-self-contained=+linker", "-Zlinker-features=+lld"]
 
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
 rustflags = [
+    "-Clink-arg=-Wl,--icf=all",
+    "-Clink-arg=-Wl,--relax",
     "-Clink-arg=-Wl,--gc-sections",
     "-Clink-arg=-Wl,-z,norelro",
     "-Clink-arg=-Wl,--as-needed",
@@ -228,9 +230,6 @@ rustflags = [
     "-Clink-arg=-Wl,-z,common-page-size=512",
     # "-Clink-arg=-Wl,-z,nodefs"
 ]
-
-[target.'cfg(target_os="linux")']
-rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
