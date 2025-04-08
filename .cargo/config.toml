@@ -220,6 +220,9 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
+[target.'cfg(target_family="unix")']
+rustflags = ["-Clink-self-contained=+linker", "-Zlinker-features=+lld"]
+
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
 rustflags = [
     "-Clink-arg=-Wl,--gc-sections",
@@ -230,20 +233,18 @@ rustflags = [
     "-Clink-arg=-Wl,--strip-all",
     "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
+[target.'cfg(all(target_family="unix",not(target_vendor="apple"),target_os="linux"))']
+rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 
-[target.'cfg(any(target_arch="sparc64",target_arch="powerpc64",target_os="freebsd",target_os="openbsd",target_os="netbsd",target_os="solaris"))']
+[target.'cfg(all(any(target_arch="sparc64",target_arch="powerpc64"),not(target_os="linux")))']
 rustflags = [
     "-Zlinker-features=-lld",
     "-Clink-arg=-Wl,-z,common-page-size=512",
     # "-Clink-arg=-Wl,-z,nodefs"
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_arch="sparc64",target_arch="powerpc64"))))']
-rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
-
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
-    "-Zlinker-features=-lld",
     "-Cforce-unwind-tables=yes",
     "-Clink-arg=/OPT:REF",
     "-Clink-arg=/OPT:ICF",
@@ -258,11 +259,14 @@ rustflags = [
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
+    "-Clink-self-contained=+linker",
+    "-Zlinker-features=+lld",
+    "-Clink-arg=-Wl,--icf=all",
+    "-Clink-arg=-Wl,--relax",
     "-Clink-arg=-Wl,--gc-sections",
     "-Clink-arg=-Wl,-z,norelro",
     "-Clink-arg=-Wl,--as-needed",
     "-Clink-arg=-Wl,--discard-all",
-    "-Clink-arg=-Wl,--relax",
     "-Clink-arg=-Wl,--build-id=none",
     "-Clink-arg=-Wl,--strip-all",
     "-Clink-arg=-Wl,--no-eh-frame-hdr",
