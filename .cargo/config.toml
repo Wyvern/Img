@@ -230,7 +230,7 @@ rustflags = [
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_arch="sparc64",target_arch="powerpc64"))))']
-rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
+rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=--relax"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
