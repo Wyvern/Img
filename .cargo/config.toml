@@ -173,8 +173,6 @@ rustflags = [
     "-Cdebuginfo=0",
     "-Cstrip=symbols",
     "-Ccollapse-macro-debuginfo=y",
-    "-Clink-self-contained=+linker",
-    "-Zlinker-features=+lld",
 
     "-Zunstable-options",
     "-Zexport-executable-symbols",
@@ -220,8 +218,14 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(target_family="unix")']
-rustflags = ["-Clink-self-contained=+linker", "-Zlinker-features=+lld"]
+[target.'cfg(any(target_vendor="apple",all(target_os="linux",not(any(target_arch="sparc64", target_arch="powerpc64")))))']
+rustflags = [
+    "-Clink-self-contained=+linker",
+    "-Zlinker-features=+lld",
+    "-Clink-arg=-Wl,--icf=all",
+]
+[target.'cfg(all(target_os="linux",not(any(target_arch="sparc64", target_arch="powerpc64"))))']
+rustflags = ["-Clink-arg=-Wl,--relax"]
 
 [target.'cfg(all(target_family="unix",not(target_vendor="apple")))']
 rustflags = [
@@ -233,15 +237,9 @@ rustflags = [
     "-Clink-arg=-Wl,--strip-all",
     "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
-[target.'cfg(all(target_family="unix",not(target_vendor="apple"),target_os="linux"))']
-rustflags = ["-Clink-arg=-Wl,--icf=all", "-Clink-arg=-Wl,--relax"]
 
-[target.'cfg(all(any(target_arch="sparc64",target_arch="powerpc64"),not(target_os="linux")))']
-rustflags = [
-    "-Zlinker-features=-lld",
-    "-Clink-arg=-Wl,-z,common-page-size=512",
-    # "-Clink-arg=-Wl,-z,nodefs"
-]
+[target.'cfg(all(target_family="unix",not(target_vendor="apple"),not(target_os="linux")))']
+rustflags = ["-Clink-arg=-Wl,-z,common-page-size=512"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
@@ -274,7 +272,6 @@ rustflags = [
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
-    "-Clink-arg=-Wl,--icf=all",
     "-Clink-arg=-Wl,-no_uuid",
     "-Clink-arg=-Wl,-S",
     "-Clink-arg=-Wl,-dead_strip",
