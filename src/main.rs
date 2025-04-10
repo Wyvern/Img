@@ -1210,6 +1210,14 @@ mod img {
         println!("Total: {} seconds", duration.as_secs_f64());
     }
 
+    #[test]
+    fn mut_val() {
+        let x = 123;
+        let c = cell::Cell::new((&raw const x).cast_mut());
+        unsafe { **c.as_ptr() = 456 }
+        tdbg!(x;);
+    }
+
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
 
     #[test]
