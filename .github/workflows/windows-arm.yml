@@ -1,4 +1,4 @@
-name: Windows
+name: Windows-11-Arm
 
 on:
   push:
@@ -42,16 +42,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
+      # - name: Rust Toolchain
+      #   uses: dtolnay/rust-toolchain@nightly
+      #   with:
+      #     components: rust-src
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Build release
         run: |
+          Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
+          .\rustup-init.exe
+
+          rustup install nightly
+          rustup default nightly
+          rustup component add rust-src
+
           cargo update
           $targets = @(
                       "aarch64-pc-windows-msvc",
