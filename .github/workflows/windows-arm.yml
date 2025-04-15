@@ -54,6 +54,7 @@ jobs:
         run: |
           Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
           .\rustup-init.exe --default-toolchain nightly --profile minimal --component rust-src -y
+          $env:PATH += ";$env:USERPROFILE\.cargo\bin"
 
       - name: Build release
         run: |
