@@ -1,0 +1,94 @@
+name: Windows
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Windows:
+    name: Building on Windows.
+    runs-on: windows-11-arm
+
+    steps:
+      - name: Disable and Stop windows services
+        continue-on-error: true
+        run: |
+          $ErrorActionPreference = 'Ignore'
+
+          $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
+          $services = Get-Service|? DisplayName -match $pattern
+
+          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force
+
+          $services | % {$_.DisplayName; $_.Status}
+
+          reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
+
+          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
+          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
+          # schtasks /delete /tn * /f >NUL
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Build release
+        run: |
+          cargo update
+          $targets = @(
+                      "aarch64-pc-windows-msvc",
+                      "aarch64-uwp-windows-msvc",
+                      "x86_64-pc-windows-msvc",
+                      "x86_64-uwp-windows-msvc",
+                      "arm64ec-pc-windows-msvc"
+                    )
+          foreach ($target in $targets) {
+              Write-Host "Building: $target"
+              Measure-Command { cargo s --target $target }
+          }
+
+          # cmd /c dir /s target\src\Img.exe
+          Get-ChildItem -Path target\*\src\Img.exe -File
+          systeminfo
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+        run: |
+          $targets = @(
+              @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
+              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
+              @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
+              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe")
+          )
+
+          foreach ($target in $targets) {
+              $arch = $target[0]
+              $name = $target[1]
+              Write-Host "Uploading $name..."
+              Move-Item target/$arch/src/Img.exe target/$arch/src/$name; $?
+              gh release upload Nightly target/$arch/src/$name --clobber; $?
+          }
