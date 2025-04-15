@@ -76,7 +76,7 @@ jobs:
 
           # cmd /c dir /s target\src\Img.exe
           Get-ChildItem -Path target\*\src\Img.exe -File
-          systeminfo
+          # systeminfo
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
