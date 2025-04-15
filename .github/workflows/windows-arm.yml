@@ -53,7 +53,7 @@ jobs:
       - name: Build release
         run: |
           Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
-          .\rustup-init.exe
+          .\rustup-init.exe -y
 
           rustup install nightly
           rustup default nightly
