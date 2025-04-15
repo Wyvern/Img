@@ -53,14 +53,10 @@ jobs:
       - name: Install Rust
         run: |
           Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
-          .\rustup-init.exe -y
+          .\rustup-init.exe --default-toolchain nightly --profile minimal --component rust-src -y
 
       - name: Build release
         run: |
-          rustup install nightly
-          rustup default nightly
-          rustup component add rust-src
-
           cargo update
           $targets = @(
                       "aarch64-pc-windows-msvc",
