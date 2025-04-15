@@ -59,7 +59,7 @@ jobs:
         env:
           PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
         run: |
-          $env:PATH += ";$env:USERPROFILE\.cargo\bin"
+          # $env:PATH += ";$env:USERPROFILE\.cargo\bin"
 
           cargo update
           $targets = @(
