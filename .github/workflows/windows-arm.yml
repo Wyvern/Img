@@ -58,9 +58,8 @@ jobs:
       - name: Build release
         env:
           PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
+        continue-on-error: true
         run: |
-          # $env:PATH += ";$env:USERPROFILE\.cargo\bin"
-
           cargo update
           $targets = @(
                       "aarch64-pc-windows-msvc",
