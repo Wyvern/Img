@@ -78,6 +78,9 @@ jobs:
           # systeminfo
 
       - name: Rust Versions
+        env:
+          PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
+        continue-on-error: true
         run: rustup -V; cargo -Vv; rustc -Vv
 
       - name: Upload binaries to a GitHub release
