@@ -1203,7 +1203,7 @@ mod img {
         };
 
         for (a, b, c) in gen_results {
-            println!("{{ a: {}, b: {}, c: {} }}", a, b, c,);
+            println!("{{ a: {a}, b: {b}, c: {c} }}",);
         }
 
         let duration = start.elapsed();
