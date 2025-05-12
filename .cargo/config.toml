@@ -125,6 +125,7 @@ checksum-freshness = true
 feature-unification = true
 build-dir = true
 rustdoc-depinfo = true
+no-embed-metadata = true
 
 # build-std = [
 #     "core",
@@ -197,6 +198,7 @@ rustflags = [
     "-Zmir-strip-debuginfo=all-locals",
     "-Ztyping-mode-borrowck=y",
     "-Zexperimental-default-bounds=y",
+    # "-Zbuild-sdylib-interface",
 
     "-Anonstandard_style",
     "-Adead_code",
