@@ -42,22 +42,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Rust Toolchain
-      #   uses: dtolnay/rust-toolchain@nightly
-      #   with:
-      #     components: rust-src
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
 
       # - name: Run sccache-cache
       #   uses: mozilla-actions/sccache-action@main
 
-      - name: Install Rust
-        run: |
-          Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
-          .\rustup-init.exe --default-toolchain nightly --profile minimal --component rust-src -y
+      # - name: Install Rust
+      #   run: |
+      #     Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
+      #     .\rustup-init.exe --default-toolchain nightly --profile minimal --component rust-src -y
 
       - name: Build release
-        env:
-          PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
+        # env:
+        #   PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
         continue-on-error: true
         run: |
           cargo update
@@ -78,8 +78,8 @@ jobs:
           # systeminfo
 
       - name: Rust Versions
-        env:
-          PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
+        # env:
+        #   PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
         continue-on-error: true
         run: rustup -V; cargo -Vv; rustc -Vv
 
