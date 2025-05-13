@@ -12,7 +12,7 @@ env:
   # RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Windows:
+  Windows-arm:
     name: Building on Windows.
     runs-on: windows-11-arm
 
@@ -50,14 +50,7 @@ jobs:
       # - name: Run sccache-cache
       #   uses: mozilla-actions/sccache-action@main
 
-      # - name: Install Rust
-      #   run: |
-      #     Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
-      #     .\rustup-init.exe --default-toolchain nightly --profile minimal --component rust-src -y
-
       - name: Build release
-        # env:
-        #   PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
         continue-on-error: true
         run: |
           cargo update
@@ -78,8 +71,6 @@ jobs:
           # systeminfo
 
       - name: Rust Versions
-        # env:
-        #   PATH: C:\Users\runneradmin\.cargo\bin;${{ github.env.PATH }}
         continue-on-error: true
         run: rustup -V; cargo -Vv; rustc -Vv
 
