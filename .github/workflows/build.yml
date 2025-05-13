@@ -305,19 +305,17 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc
+          targets: x86_64-pc-windows-msvc,arm64ec-pc-windows-msvc
           # components: rust-src
 
-      # - name: Install Rust
-      #   run: |
-      #     Invoke-WebRequest -Uri https://win.rustup.rs/aarch64 -OutFile rustup-init.exe
-      #     .\rustup-init.exe --default-toolchain stable --profile minimal --component -y
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+      # - name: Run sccache-cache
+      #   uses: mozilla-actions/sccache-action@main
 
       - name: Build release
         run: |
+          Remove-Item Env:SCCACHE_GHA_ENABLED
+          Remove-Item Env:RUSTC_WRAPPER
+
           cargo update
           $targets = @(
                       "aarch64-pc-windows-msvc",
