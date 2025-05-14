@@ -205,8 +205,8 @@ rustflags = [
     "-Zchecksum-hash-algorithm=blake3",
     "-Ztrap-unreachable=no",
     "-Zmir-strip-debuginfo=all-locals",
-    # "-Ztyping-mode-borrowck",
-    # "-Zexperimental-default-bounds",
+    "-Ztyping-mode-borrowck",
+    "-Zexperimental-default-bounds",
 
     "-Anonstandard_style",
     "-Adead_code",
