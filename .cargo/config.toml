@@ -136,6 +136,7 @@ checksum-freshness = true
 feature-unification = true
 build-dir = true
 rustdoc-depinfo = true
+no-embed-metadata = true
 
 # build-std = [
 #     "core",
