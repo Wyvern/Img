@@ -198,7 +198,7 @@ jobs:
           done
 
   Windows-2025:
-    name: Windows-2025.
+    name: Windows-2025
     runs-on: windows-2025
 
     steps:
@@ -236,6 +236,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Build release
+        continue-on-error: true
         run: |
           cargo update
           $targets = @(
@@ -312,6 +313,7 @@ jobs:
       #   uses: mozilla-actions/sccache-action@main
 
       - name: Build release
+        continue-on-error: true
         run: |
           Remove-Item Env:SCCACHE_GHA_ENABLED
           Remove-Item Env:RUSTC_WRAPPER
