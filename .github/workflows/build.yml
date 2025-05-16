@@ -96,7 +96,7 @@ jobs:
           done
 
   macOS:
-    name: macOS-15.
+    name: macOS-15
     runs-on: macos-15
 
     steps:
@@ -275,7 +275,7 @@ jobs:
           }
 
   Windows-11-Arm:
-    name: Windows-11-arm.
+    name: Windows-11-arm
     runs-on: windows-11-arm
 
     steps:
