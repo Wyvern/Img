@@ -13,7 +13,7 @@ env:
 
 jobs:
   macOS:
-    name: Building on macOS.
+    name: macOS-15
     runs-on: macos-15
 
     steps:

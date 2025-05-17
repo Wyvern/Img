@@ -13,7 +13,7 @@ env:
 
 jobs:
   Windows:
-    name: Building on Windows.
+    name: Windows-2025
     runs-on: windows-2025
 
     steps:
