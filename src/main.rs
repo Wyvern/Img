@@ -1062,9 +1062,9 @@ fn url_redirect_and_query_cleanup(url: &str) -> String {
 fn url_image(content: &str) -> Option<String> {
     if let Some(rp) = content.find(')') {
         let mut url = &content[..rp];
-        ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
+        _ = ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
         url = url.trim_matches(['\'', '"']).trim();
-        ["&#39;", "&apos;", "&#34;", "&quot;"]
+        _ = ["&#39;", "&apos;", "&#34;", "&quot;"]
             .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
         if url.starts_with("data:image/") {
             return Some(url.into());
@@ -1094,7 +1094,7 @@ fn url_image(content: &str) -> Option<String> {
 ///Get `page` css style `url(),image(),image-set()`
 fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
-    CSS.map(|s| {
+    _ = CSS.map(|s| {
         let segments = html.split(s);
         if s == "image-set(" {
             for seg in segments.skip(1) {
