@@ -1,4 +1,4 @@
-#![feature(test, gen_blocks)]
+#![feature(gen_blocks)]
 
 mod util;
 use {std::*, util::*};
@@ -1135,6 +1135,7 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
+
     use super::*;
 
     #[inline]
@@ -1226,7 +1227,7 @@ mod img {
 
     #[test]
     fn run() {
-        // https://bisipic.online/portal.php?page=9 https://xiutaku.com/?start=20
+        // https://bisipic.online/portal.php?page=2
 
         if let Some(arg) = env::args().nth(4) {
             parse(&arg);
@@ -1391,19 +1392,6 @@ mod img {
             while !idx.is_empty() {
                 idx = parse(&idx);
             }
-        });
-    }
-
-    extern crate test;
-
-    #[bench]
-    fn demo(b: &mut test::Bencher) {
-        b.iter(|| {
-            let mut sum = 0;
-            for i in 0..1000 {
-                sum += i;
-            }
-            sum
         });
     }
 }
