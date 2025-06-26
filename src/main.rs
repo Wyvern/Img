@@ -49,7 +49,10 @@ fn main() {
 fn check_host(addr: &str) -> &str {
     let (scheme, rest) = addr.split_once("://").unwrap_or(("http", addr));
 
-    if !(scheme.eq_ignore_ascii_case("http") || scheme.eq_ignore_ascii_case("https")) {
+    if ["http", "https"]
+        .iter()
+        .all(|x| !scheme.trim().eq_ignore_ascii_case(x))
+    {
         quit!("Scheme {} is NOT valid {} protocol.", scheme, "http(s)");
     }
 
@@ -1135,7 +1138,6 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
-
     use super::*;
 
     #[inline]
