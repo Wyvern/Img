@@ -101,7 +101,7 @@ mod macros {
                 dbg!(($($e),*))
             } else {($($e),*)}
         };
-        ($($e:expr),* ;) => {
+        ($($e:expr),*;) => {
             if cfg!(test) || cfg!(debug_assertions) {
                 let _l = io::stdout().lock();
                 let r = dbg!(($($e),*));
