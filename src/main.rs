@@ -1,4 +1,4 @@
-#![feature(gen_blocks)]
+#![feature(gen_blocks, super_let)]
 
 mod util;
 use {std::*, util::*};
