@@ -229,9 +229,6 @@ rustflags = [
     "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
 
-[target.'cfg(all(target_family="unix",not(target_vendor="apple"),not(target_os="linux")))']
-rustflags = ["-Clink-arg=-Wl,-z,common-page-size=512"]
-
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
     "-Cforce-unwind-tables=yes",
@@ -267,7 +264,6 @@ rustflags = [
     "-Clink-arg=-Wl,-S",
     "-Clink-arg=-Wl,-dead_strip",
     "-Clink-arg=-Wl,-dead_strip_dylibs",
-    "-Clink-arg=-Wl,-undefined,dynamic_lookup",
 ]
 
 [target.'cfg(target_arch="x86_64")']
