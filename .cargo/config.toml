@@ -60,23 +60,15 @@ inherits = "dev"
 [profile.test.build-override]
 inherits = "dev"
 
-#bench
-[profile.bench.package."*"]
-inherits = "dev"
-[profile.bench.build-override]
-inherits = "dev"
-[profile.bench]
-inherits = "dev"
-
 #release
 [profile.release.build-override]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 rpath = true
 trim-paths = true
 
@@ -86,22 +78,55 @@ inherits = "release"
 lto = true
 panic = "abort"
 codegen-units = 1
+rustflags = [
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+    "-Crelocation-model=static",
+    "-Clink-arg=-fno-pie",
+    "-Clink-arg=-fno-pic",
+    # "-Zvirtual-function-elimination",
+]
 [profile.lto.build-override]
 inherits = "lto"
+rustflags = [
+    "-Cprefer-dynamic",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+]
 [profile.lto.package."*"]
 inherits = "lto"
+rustflags = [
+    "-Cprefer-dynamic",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+]
 
 #src
 [profile.src]
 inherits = "lto"
 rustflags = [
     "-Zforce-unstable-if-unmarked",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
     "-Zcross-crate-inline-threshold=yes",
+    "-Crelocation-model=static",
+    "-Clink-arg=-fno-pie",
+    "-Clink-arg=-fno-pic",
 ]
 [profile.src.build-override]
 inherits = "src"
+rustflags = [
+    "-Cprefer-dynamic",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+]
 [profile.src.package."*"]
 inherits = "src"
+rustflags = [
+    "-Cprefer-dynamic",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+]
 
 [unstable]
 unstable-options = true
