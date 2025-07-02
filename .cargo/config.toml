@@ -229,6 +229,9 @@ rustflags = [
 
 [target.'cfg(target_os="linux")']
 rustflags = [
+    "-Crelocation-model=static",
+    "-Clink-arg=-fno-pic",
+    "-Clink-arg=-fno-pie",
     "-Clink-arg=-Wl,--gc-sections",
     "-Clink-arg=-Wl,-z,norelro",
     "-Clink-arg=-Wl,--as-needed",
