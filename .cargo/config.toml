@@ -82,21 +82,20 @@ rustflags = [
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
     "-Crelocation-model=static",
-    "-Clink-arg=-fno-pie",
     "-Clink-arg=-fno-pic",
     # "-Zvirtual-function-elimination",
 ]
 [profile.lto.build-override]
 inherits = "lto"
 rustflags = [
-    "-Cprefer-dynamic",
+    # "-Cprefer-dynamic",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
 ]
 [profile.lto.package."*"]
 inherits = "lto"
 rustflags = [
-    "-Cprefer-dynamic",
+    # "-Cprefer-dynamic",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
 ]
@@ -110,7 +109,6 @@ rustflags = [
     "-Ztrap-unreachable=no",
     "-Zcross-crate-inline-threshold=yes",
     "-Crelocation-model=static",
-    "-Clink-arg=-fno-pie",
     "-Clink-arg=-fno-pic",
 ]
 [profile.src.build-override]
