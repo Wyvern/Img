@@ -81,21 +81,19 @@ codegen-units = 1
 rustflags = [
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
-    "-Crelocation-model=static",
-    "-Clink-arg=-fno-pic",
     # "-Zvirtual-function-elimination",
 ]
 [profile.lto.build-override]
 inherits = "lto"
 rustflags = [
-    # "-Cprefer-dynamic",
+    "-Cprefer-dynamic",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
 ]
 [profile.lto.package."*"]
 inherits = "lto"
 rustflags = [
-    # "-Cprefer-dynamic",
+    "-Cprefer-dynamic",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
 ]
@@ -108,20 +106,18 @@ rustflags = [
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
     "-Zcross-crate-inline-threshold=yes",
-    "-Crelocation-model=static",
-    "-Clink-arg=-fno-pic",
 ]
 [profile.src.build-override]
 inherits = "src"
 rustflags = [
-    "-Cprefer-dynamic",
+    # "-Cprefer-dynamic",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
 ]
 [profile.src.package."*"]
 inherits = "src"
 rustflags = [
-    "-Cprefer-dynamic",
+    # "-Cprefer-dynamic",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
 ]
@@ -243,6 +239,9 @@ rustflags = [
 
 [target.'cfg(target_os="linux")']
 rustflags = [
+    "-Crelocation-model=static",
+    "-Clink-arg=-fno-pic",
+    "-Clink-arg=-fno-pie",
     "-Clink-arg=-Wl,--gc-sections",
     "-Clink-arg=-Wl,-z,norelro",
     "-Clink-arg=-Wl,--as-needed",
