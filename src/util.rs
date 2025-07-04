@@ -150,37 +150,7 @@ impl<T> AsBytes for T {}
 pub fn pause() {
     use io::*;
 
-    #[cfg(not(windows))]
-    {
-        use termion::input::TermRead;
-        use termion::raw::IntoRawMode;
-
-        let mut o = stdout().into_raw_mode().unwrap();
-        write!(
-            o,
-            "Press any key to continue, or [Q{}]uit:",
-            char::from_u32(0x332).unwrap()
-        )
-        .unwrap();
-        o.flush().unwrap();
-
-        let i = stdin();
-        if let Some(Ok(key)) = i.keys().next() {
-            match key {
-                termion::event::Key::Char('q') | termion::event::Key::Char('Q') => {
-                    write!(o, " Done!",).unwrap();
-                    o.flush().unwrap();
-                    process::exit(0);
-                }
-                _ => {
-                    write!(o, "{CL}{BEG}",).unwrap();
-                    o.flush().unwrap();
-                }
-            }
-        }
-    }
-
-    #[cfg(windows)]
+    #[cfg(not(unix))]
     {
         use io::*;
         let mut o = stdout().lock();
@@ -196,6 +166,31 @@ pub fn pause() {
         if s.trim() == "q" {
             process::exit(0);
         }
+    }
+    #[cfg(unix)]
+    {
+        use termion::input::TermRead;
+        use termion::raw::IntoRawMode;
+
+        let mut o = stdout().into_raw_mode().unwrap();
+        write!(
+            o,
+            "Press any key to continue, or [Q{}]uit:",
+            char::from_u32(0x332).unwrap()
+        )
+        .unwrap();
+        o.flush().unwrap();
+
+        let i = stdin();
+        if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
+            i.keys().next()
+        {
+            write!(o, " Done!",).unwrap();
+            o.flush().unwrap();
+            process::exit(0);
+        }
+        write!(o, "{CL}{BEG}",).unwrap();
+        o.flush().unwrap();
     }
 }
 
