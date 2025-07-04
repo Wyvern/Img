@@ -150,24 +150,7 @@ impl<T> AsBytes for T {}
 pub fn pause() {
     use io::*;
 
-    #[cfg(any(target_family = "windows", target_family = "wasm"))]
-    {
-        let mut o = stdout().lock();
-        _ = write!(
-            o,
-            "Press any key to continue, or [Q{}]uit:",
-            char::from_u32(0x332).unwrap()
-        );
-        _ = o.flush();
-        let mut s = String::default();
-        _ = stdin().lock().read_line(&mut s);
-        s.make_ascii_lowercase();
-        if s.trim() == "q" {
-            process::exit(0);
-        }
-    }
-    #[cfg(unix)]
-    {
+    if cfg!(unix) {
         use termion::input::TermRead;
         use termion::raw::IntoRawMode;
 
@@ -190,6 +173,20 @@ pub fn pause() {
         }
         write!(o, "{CL}{BEG}",).unwrap();
         o.flush().unwrap();
+    } else {
+        let mut o = stdout().lock();
+        _ = write!(
+            o,
+            "Press any key to continue, or [Q{}]uit:",
+            char::from_u32(0x332).unwrap()
+        );
+        _ = o.flush();
+        let mut s = String::default();
+        _ = stdin().lock().read_line(&mut s);
+        s.make_ascii_lowercase();
+        if s.trim() == "q" {
+            process::exit(0);
+        }
     }
 }
 
