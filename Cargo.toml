@@ -16,9 +16,10 @@ name = "color"
 path = "src/color.rs"
 
 [dependencies]
-crabquery = { version = "*", default-features = false }
+crabquery = { version = "*" }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
 percent-encoding = "*"
+termion = "*"
 
 base64 = { version = "*", default-features = false, optional = true }
 infer = { version = "*", default-features = false, optional = true }

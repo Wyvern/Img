@@ -1237,7 +1237,6 @@ mod img {
             [
                 "https://xiutaku.com",
                 "https://meitu9.com/",
-                "https://ugirls.pics/",
                 "https://bisipic.online",
             ]
             .into_iter()
