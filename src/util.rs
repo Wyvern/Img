@@ -150,9 +150,8 @@ impl<T> AsBytes for T {}
 pub fn pause() {
     use io::*;
 
-    #[cfg(not(unix))]
+    #[cfg(any(target_family = "windows", target_family = "wasm"))]
     {
-        use io::*;
         let mut o = stdout().lock();
         _ = write!(
             o,
