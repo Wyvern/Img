@@ -150,7 +150,8 @@ impl<T> AsBytes for T {}
 pub fn pause() {
     use io::*;
 
-    if cfg!(unix) {
+    #[cfg(target_family = "unix")]
+    {
         use termion::input::TermRead;
         use termion::raw::IntoRawMode;
 
@@ -173,7 +174,9 @@ pub fn pause() {
         }
         write!(o, "{CL}{BEG}",).unwrap();
         o.flush().unwrap();
-    } else {
+    }
+    #[cfg(any(target_family = "windows", target_family = "wasm"))]
+    {
         let mut o = stdout().lock();
         _ = write!(
             o,
