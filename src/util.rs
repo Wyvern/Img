@@ -168,7 +168,7 @@ pub fn pause() {
         if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
             i.keys().next()
         {
-            write!(o, " Done!",).unwrap();
+            write!(o, " Quit!",).unwrap();
             o.flush().unwrap();
             process::exit(0);
         }
@@ -188,6 +188,8 @@ pub fn pause() {
         _ = stdin().lock().read_line(&mut s);
         s.make_ascii_lowercase();
         if s.trim() == "q" {
+            write!(o, " Quit!",).unwrap();
+            o.flush().unwrap();
             process::exit(0);
         }
     }
