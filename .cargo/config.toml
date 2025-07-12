@@ -222,7 +222,7 @@ rustflags = [
 [target.'cfg(all(target_os="linux",not(any(target_arch="sparc64", target_arch="powerpc64"))))']
 rustflags = [
     "-Clink-self-contained=+linker",
-    "-Zlinker-features=+lld",
+    "-Clinker-features=+lld",
     "-Clink-arg=-Wl,--icf=all",
     "-Clink-arg=-Wl,--relax",
 ]
@@ -260,7 +260,7 @@ rustflags = [
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
     "-Clink-self-contained=+linker",
-    "-Zlinker-features=+lld",
+    "-Clinker-features=+lld",
     "-Clink-arg=-Wl,--icf=all",
     "-Clink-arg=-Wl,--relax",
     "-Clink-arg=-Wl,--gc-sections",
