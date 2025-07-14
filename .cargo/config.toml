@@ -328,6 +328,3 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
-
-[target.powerpc64-unknown-linux-musl]
-rustflags = ["-Clink-arg=-Wl,--no-dynamic-list", "-Clink-arg=-static"]
