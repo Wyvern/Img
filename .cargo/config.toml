@@ -309,6 +309,8 @@ linker = "s390x-linux-gnu-gcc"
 linker = "powerpc64le-linux-gnu-gcc"
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
 linker = "powerpc64-linux-gnu-gcc"
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big",target_env = "musl"))']
+rustflags = ["-Ctarget-feature=+elfv1"]
 
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
