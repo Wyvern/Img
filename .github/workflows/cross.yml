@@ -41,7 +41,9 @@ jobs:
         run: |
           cargo update
           set +e -x
-          export DOCKER_DEFAULT_PLATFORM=linux/arm64
+
+          sudo apt install -q binfmt qemu-user-static
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
           # x86_64-unknown-dragonfly,
           # powerpc64-ibm-aix,
