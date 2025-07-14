@@ -36,6 +36,10 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
+          sudo sync
+          echo 3 | sudo tee /proc/sys/vm/drop_caches
+          sudo swapoff -a && sudo swapon -a
+
           # gcc-aarch64-linux-gnu
           sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools -y
 
