@@ -48,7 +48,6 @@ use std::sync::{Arc, Weak};
 use tendril::StrTendril;
 
 use markup5ever::Attribute;
-use markup5ever::ExpandedName;
 use markup5ever::QualName;
 use markup5ever::interface::tree_builder;
 use markup5ever::interface::tree_builder::{ElementFlags, NodeOrText, QuirksMode, TreeSink};
@@ -207,21 +206,35 @@ pub struct ArcDom {
 
 impl TreeSink for ArcDom {
     type Output = Self;
+    type Handle = Handle;
+    type ElemName<'a> = &'a QualName;
+
+    fn elem_name<'a>(&'a self, target: &'a Handle) -> &'a QualName {
+        match target.data {
+            NodeData::Element { ref name, .. } => name,
+            _ => panic!("not an element!"),
+        }
+    }
+
     fn finish(self) -> Self {
         self
     }
 
-    type Handle = Handle;
-
-    fn parse_error(&mut self, msg: Cow<'static, str>) {
-        self.errors.push(msg);
+    fn parse_error(&self, msg: Cow<'static, str>) {
+        // Need to use interior mutability since the trait expects &self
+        use std::cell::UnsafeCell;
+        let errors = unsafe {
+            let ptr = &self.errors as *const Vec<_> as *const UnsafeCell<Vec<_>>;
+            &mut *(*ptr).get()
+        };
+        errors.push(msg);
     }
 
-    fn get_document(&mut self) -> Handle {
+    fn get_document(&self) -> Handle {
         self.document.clone()
     }
 
-    fn get_template_contents(&mut self, target: &Handle) -> Handle {
+    fn get_template_contents(&self, target: &Handle) -> Handle {
         if let NodeData::Element {
             template_contents: Some(ref contents),
             ..
@@ -233,29 +246,23 @@ impl TreeSink for ArcDom {
         }
     }
 
-    fn set_quirks_mode(&mut self, mode: QuirksMode) {
-        self.quirks_mode = mode;
+    fn set_quirks_mode(&self, mode: QuirksMode) {
+        // We need to use interior mutability here because the trait signature requires &self
+        use std::cell::UnsafeCell;
+        let quirks_mode = unsafe {
+            let ptr = &self.quirks_mode as *const QuirksMode as *const UnsafeCell<QuirksMode>;
+            &mut *(*ptr).get()
+        };
+        *quirks_mode = mode;
     }
 
     fn same_node(&self, x: &Handle, y: &Handle) -> bool {
         Arc::ptr_eq(x, y)
     }
 
-    fn elem_name<'a>(&self, target: &'a Handle) -> ExpandedName<'a> {
-        return match target.data {
-            NodeData::Element { ref name, .. } => name.expanded(),
-            _ => panic!("not an element!"),
-        };
-    }
-
-    fn create_element(
-        &mut self,
-        name: QualName,
-        attrs: Vec<Attribute>,
-        flags: ElementFlags,
-    ) -> Handle {
+    fn create_element(&self, name: QualName, attrs: Vec<Attribute>, flags: ElementFlags) -> Handle {
         Node::new(NodeData::Element {
-            name: name,
+            name,
             attrs: RefCell::new(attrs),
             template_contents: if flags.template {
                 Some(Node::new(NodeData::Document))
@@ -266,18 +273,18 @@ impl TreeSink for ArcDom {
         })
     }
 
-    fn create_comment(&mut self, text: StrTendril) -> Handle {
+    fn create_comment(&self, text: StrTendril) -> Handle {
         Node::new(NodeData::Comment { contents: text })
     }
 
-    fn create_pi(&mut self, target: StrTendril, data: StrTendril) -> Handle {
+    fn create_pi(&self, target: StrTendril, data: StrTendril) -> Handle {
         Node::new(NodeData::ProcessingInstruction {
-            target: target,
+            target,
             contents: data,
         })
     }
 
-    fn append(&mut self, parent: &Handle, child: NodeOrText<Handle>) {
+    fn append(&self, parent: &Handle, child: NodeOrText<Handle>) {
         // Append to an existing Text node if we have one.
         match child {
             NodeOrText::AppendText(ref text) => match parent.children.borrow().last() {
@@ -302,7 +309,7 @@ impl TreeSink for ArcDom {
         );
     }
 
-    fn append_before_sibling(&mut self, sibling: &Handle, child: NodeOrText<Handle>) {
+    fn append_before_sibling(&self, sibling: &Handle, child: NodeOrText<Handle>) {
         let (parent, i) = get_parent_and_index(&sibling)
             .expect("append_before_sibling called on node without parent");
 
@@ -338,7 +345,7 @@ impl TreeSink for ArcDom {
     }
 
     fn append_based_on_parent_node(
-        &mut self,
+        &self,
         element: &Self::Handle,
         prev_element: &Self::Handle,
         child: NodeOrText<Self::Handle>,
@@ -355,7 +362,7 @@ impl TreeSink for ArcDom {
     }
 
     fn append_doctype_to_document(
-        &mut self,
+        &self,
         name: StrTendril,
         public_id: StrTendril,
         system_id: StrTendril,
@@ -363,14 +370,14 @@ impl TreeSink for ArcDom {
         append(
             &self.document,
             Node::new(NodeData::Doctype {
-                name: name,
-                public_id: public_id,
-                system_id: system_id,
+                name,
+                public_id,
+                system_id,
             }),
         );
     }
 
-    fn add_attrs_if_missing(&mut self, target: &Handle, attrs: Vec<Attribute>) {
+    fn add_attrs_if_missing(&self, target: &Handle, attrs: Vec<Attribute>) {
         let mut existing = if let NodeData::Element { ref attrs, .. } = target.data {
             attrs.borrow_mut()
         } else {
@@ -388,11 +395,11 @@ impl TreeSink for ArcDom {
         );
     }
 
-    fn remove_from_parent(&mut self, target: &Handle) {
+    fn remove_from_parent(&self, target: &Handle) {
         remove_from_parent(&target);
     }
 
-    fn reparent_children(&mut self, node: &Handle, new_parent: &Handle) {
+    fn reparent_children(&self, node: &Handle, new_parent: &Handle) {
         let mut children = node.children.borrow_mut();
         let mut new_children = new_parent.children.borrow_mut();
         for child in children.iter() {

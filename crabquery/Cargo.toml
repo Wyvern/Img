@@ -4,4 +4,5 @@ version = "1.0.0"
 edition = "2024"
 
 [dependencies]
+html5ever = { version = "*" }
 markup5ever_arcdom = { version = "*", path = "../markup5ever_arcdom" }

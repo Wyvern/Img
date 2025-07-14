@@ -7,8 +7,7 @@ edition = "2024"
 path = "lib.rs"
 
 [dependencies]
-tendril = { version = "*" }
-html5ever = { version = "*", public = true }
+tendril = { version = "*", public = true }
 markup5ever = { version = "*", public = true }
 xml5ever = { version = "*" }
 
