@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo snap install zig --classic --beta
+          sudo snap install zig --classic --edge
           pipx install cargo-zigbuild
 
           cargo update
