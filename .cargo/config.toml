@@ -330,4 +330,4 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.powerpc64-unknown-linux-musl]
-rustflags = ["-Clink-arg=-Wl,--no-dynamic-list"]
+rustflags = ["-Clink-arg=-Wl,--no-dynamic-list", "-Clink-arg=-static"]
