@@ -36,7 +36,8 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q pipx gcc-x86_64-linux-gnu gcc-powerpc64-linux-gnu musl-tools -y
+          # gcc-aarch64-linux-gnu
+          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
