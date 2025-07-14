@@ -10,7 +10,6 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
-  DOCKER_DEFAULT_PLATFORM: "linux/arm64"
 
 jobs:
   Linux:
@@ -42,6 +41,7 @@ jobs:
         run: |
           cargo update
           set +e -x
+          export DOCKER_DEFAULT_PLATFORM=linux/arm64
 
           # x86_64-unknown-dragonfly,
           # powerpc64-ibm-aix,
