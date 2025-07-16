@@ -2,7 +2,7 @@
 name = "Img"
 version = "1.0.0"
 edition = "2024"
-# default-run = "Img"
+build = "build.rs"
 
 [features]
 default = ["curl"]
@@ -11,19 +11,20 @@ download = []
 infer = ["dep:infer"]
 embed = ["dep:base64"]
 
-
 [[example]]
 name = "color"
 path = "src/color.rs"
-test = true
 
 [dependencies]
-crabquery = { version = "*", default-features = false }
+crabquery = { version = "*", path = "./crabquery" }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
 percent-encoding = "*"
 
 base64 = { version = "*", default-features = false, optional = true }
 infer = { version = "*", default-features = false, optional = true }
+
+[target.'cfg(unix)'.dependencies]
+termion = "*"
 
 [dev-dependencies]
 # file-format = { version = "*", features = ["reader-xml"] }
