@@ -13,8 +13,8 @@ env:
 
 jobs:
   Linux:
-    name: Ubuntu-24.04
-    runs-on: ubuntu-24.04
+    name: Ubuntu-22.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Purge Ubuntu
@@ -36,10 +36,6 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo sync
-          echo 3 | sudo tee /proc/sys/vm/drop_caches
-          sudo swapoff -a && sudo swapon -a
-
           # gcc-aarch64-linux-gnu
           sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools -y
 

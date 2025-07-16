@@ -14,7 +14,7 @@ env:
 jobs:
   Linux:
     name: Building for {Free,Open,Net}BSD and Solaris/Illumos.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Purge Ubuntu
@@ -39,10 +39,6 @@ jobs:
           wget https://github.com/cross-rs/cross/releases/download/v0.2.5/cross-x86_64-unknown-linux-gnu.tar.gz
           tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
           sudo mv cross /usr/local/bin/
-
-          sudo sync
-          echo 3 | sudo tee /proc/sys/vm/drop_caches
-          sudo swapoff -a && sudo swapon -a
 
           # cargo install cross --git https://github.com/cross-rs/cross --branch main
 
