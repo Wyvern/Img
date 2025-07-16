@@ -125,7 +125,6 @@ rustflags = [
 [unstable]
 unstable-options = true
 avoid-dev-deps = true
-dual-proc-macros = true
 panic-abort-tests = true
 config-include = true
 bindeps = true
