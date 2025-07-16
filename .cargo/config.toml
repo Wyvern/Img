@@ -117,7 +117,6 @@ inherits = "src"
 [unstable]
 unstable-options = true
 avoid-dev-deps = true
-dual-proc-macros = true
 panic-abort-tests = true
 config-include = true
 bindeps = true
@@ -150,7 +149,7 @@ no-embed-metadata = true
 # build-std-features = ["panic_immediate_abort", "compiler-builtins-mem"]
 
 [host]
-rustflags = ["-Ctarget-cpu=native", "-Ztune-cpu=native"]
+rustflags = ["-Ctarget-cpu=native", "-Ztune-cpu=native", "-Cprefer-dynamic"]
 
 [build]
 rustflags = ["-Zpanic-in-drop=abort"]
@@ -206,8 +205,8 @@ rustflags = [
     "-Zchecksum-hash-algorithm=blake3",
     "-Ztrap-unreachable=no",
     "-Zmir-strip-debuginfo=all-locals",
-    # "-Ztyping-mode-borrowck",
-    # "-Zexperimental-default-bounds",
+    "-Ztyping-mode-borrowck",
+    "-Zexperimental-default-bounds",
 
     "-Anonstandard_style",
     "-Adead_code",
