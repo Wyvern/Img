@@ -840,7 +840,7 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     let nexts = page.select(nxt);
     if nexts.is_empty() {
         next_link = String::default();
-        //println!("NO next page <element> found.")
+        tdbg!("NO next page <element> found.");
     } else if nexts.len() == 1 {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
@@ -1138,6 +1138,8 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
+    use std::cmp::Reverse;
+
     use super::*;
 
     #[inline]
@@ -1324,7 +1326,7 @@ mod img {
         }
         assert!(dup_site.is_empty());
 
-        let dup_sel = img_sel
+        let mut dup_sel = img_sel
             .keys()
             .filter_map(|k| {
                 if img_sel[*k].len() > 1 {
@@ -1341,6 +1343,7 @@ mod img {
         );
 
         if !dup_sel.is_empty() {
+            dup_sel.sort_unstable_by_key(|x| Reverse(x.1));
             for (sel, count) in dup_sel {
                 pl!("({},{})", sel, count);
             }
