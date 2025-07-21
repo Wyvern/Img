@@ -688,6 +688,11 @@
       "Img": "p.item-image > img",
       "Next": "li.next-page > a[data-page] | /page/{}/",
       "Album": "article.excerpt > h2 > a"
+    },
+    {
+      "Site": "taotuhome.com",
+      "Img": "div.single-content img",
+      "Album": "h2.grid-title a"
     }
   ],
   "Series": [
