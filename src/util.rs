@@ -165,10 +165,12 @@ pub fn pause() {
         {
             write!(o, " Quit!",).unwrap();
             o.flush().unwrap();
+            drop(o);
             process::exit(0);
+        } else {
+            write!(o, "{CL}{BEG}",).unwrap();
+            o.flush().unwrap();
         }
-        write!(o, "{CL}{BEG}",).unwrap();
-        o.flush().unwrap();
     }
     #[cfg(any(target_family = "windows", target_family = "wasm"))]
     {

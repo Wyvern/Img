@@ -219,6 +219,7 @@ rustflags = [
     "-Zexperimental-default-bounds=y",
     "-Zhint-mostly-unused",
     "-Zhigher-ranked-assumptions",
+    "-Zoffload=Enable",
     # "-Zbuild-sdylib-interface",
 
     "-Anonstandard_style",
