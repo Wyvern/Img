@@ -88,6 +88,15 @@ mod macros {
     }
 
     #[macro_export]
+    macro_rules! mutv {
+        ($var:ident, $val:expr) => {
+            unsafe {
+                *(&raw const $var).cast_mut() = $val;
+            }
+        };
+    }
+
+    #[macro_export]
     macro_rules! p {
         ($l:literal $(,$e:expr)*) => {
             print!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*))

@@ -1218,10 +1218,8 @@ mod img {
     #[test]
     fn mut_val() {
         let var = 123;
-        unsafe {
-            *(&raw const var).cast_mut() = 222;
-        }
-        tdbg!(var);
+        mutv!(var, 100 * 2 + 22);
+        tdbg!(var, s);
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
