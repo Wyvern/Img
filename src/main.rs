@@ -1219,7 +1219,7 @@ mod img {
     fn mut_val() {
         let var = 123;
         mutv!(var, 100 * 2 + 22);
-        tdbg!(var, s);
+        tdbg!(var);
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
