@@ -207,8 +207,7 @@ rustflags = [
     "-Zmir-strip-debuginfo=all-locals",
     "-Ztyping-mode-borrowck",
     "-Zexperimental-default-bounds",
-    # "-Zhint-mostly-unused",
-    # "-Zhigher-ranked-assumptions",
+    "-Zhigher-ranked-assumptions",
 
     "-Anonstandard_style",
     "-Adead_code",
