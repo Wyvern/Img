@@ -1217,14 +1217,11 @@ mod img {
 
     #[test]
     fn mut_val() {
-        let x = 123;
-        let mut b = unsafe { Box::from_raw((&raw const x).cast_mut()) };
-        *b.as_mut() = 789;
-        tdbg!(x);
-
-        let c = cell::Cell::new((&raw const x).cast_mut());
-        unsafe { **c.as_ptr() = 456 }
-        tdbg!(x;);
+        let var = 123;
+        unsafe {
+            *(&raw const var).cast_mut() = 222;
+        }
+        tdbg!(var);
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
