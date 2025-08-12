@@ -335,7 +335,6 @@ linker = "clang"
 rustflags = [
     "-Zunstable-options",
     "--sysroot=/opt/freebsd-x86_64",
-    "-Clink-arg=-fuse-ld=lld",
     # "-Clink-self-contained=+linker",
     # "-Clinker-features=+lld",
 ]
@@ -346,7 +345,6 @@ linker = "clang"
 rustflags = [
     "-Zunstable-options",
     "--sysroot=/opt/freebsd-arm64",
-    "-Clink-arg=-fuse-ld=lld",
     # "-Clink-self-contained=+linker",
     # "-Clinker-features=+lld",
 ]
