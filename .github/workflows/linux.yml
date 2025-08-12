@@ -24,7 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: aarch64-unknown-freebsd,riscv64gc-unknown-freebsd
+          targets: aarch64-unknown-freebsd
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
