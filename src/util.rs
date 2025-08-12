@@ -88,6 +88,15 @@ mod macros {
     }
 
     #[macro_export]
+    macro_rules! mutv {
+        ($var:ident, $val:expr) => {
+            unsafe {
+                *(&raw const $var).cast_mut() = $val;
+            }
+        };
+    }
+
+    #[macro_export]
     macro_rules! p {
         ($l:literal $(,$e:expr)*) => {
             print!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*))
@@ -139,7 +148,7 @@ where
 {
     fn as_bytes(&self) -> &[u8] {
         let len = mem::size_of::<Self>();
-        unsafe { slice::from_raw_parts((&raw const *self).cast::<u8>(), len) }
+        unsafe { slice::from_raw_parts((self as *const Self).cast::<u8>(), len) }
     }
     fn eql<Other>(&self, other: &Other) -> bool {
         self.as_bytes() == other.as_bytes()
@@ -149,18 +158,42 @@ impl<T> AsBytes for T {}
 
 pub fn pause() {
     use io::*;
-    let mut o = stdout().lock();
-    _ = write!(
-        o,
-        "Press any key to continue, or [Q{}]uit:",
-        char::from_u32(0x332).unwrap()
-    );
-    _ = o.flush();
-    let mut s = String::default();
-    _ = stdin().lock().read_line(&mut s);
-    s.make_ascii_lowercase();
-    if s.trim() == "q" {
-        process::exit(0);
+
+    #[cfg(target_family = "unix")]
+    {
+        use termion::input::TermRead;
+        use termion::raw::IntoRawMode;
+
+        let mut o = stdout().into_raw_mode().unwrap();
+        write!(o, "Press any key to continue, or [Q\u{332}]uit:").unwrap();
+        o.flush().unwrap();
+
+        let i = stdin();
+        if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
+            i.keys().next()
+        {
+            write!(o, " Quit!",).unwrap();
+            o.flush().unwrap();
+            drop(o);
+            process::exit(0);
+        } else {
+            write!(o, "{CL}{BEG}",).unwrap();
+            o.flush().unwrap();
+        }
+    }
+    #[cfg(any(target_family = "windows", target_family = "wasm"))]
+    {
+        let mut o = stdout().lock();
+        _ = write!(o, "Press any key to continue, or [Q\u{332}]uit:");
+        _ = o.flush();
+        let mut s = String::default();
+        _ = stdin().lock().read_line(&mut s);
+        s.make_ascii_lowercase();
+        if s.trim() == "q" {
+            write!(o, " Quit!",).unwrap();
+            o.flush().unwrap();
+            process::exit(0);
+        }
     }
 }
 

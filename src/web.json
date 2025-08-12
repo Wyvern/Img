@@ -128,10 +128,6 @@
       "Img": "li figure img"
     },
     {
-      "Site": "xxx7788.com",
-      "Img": "div#read_tpc img"
-    },
-    {
       "Site": "baobua.net",
       "Img": "img.wp-image",
       "Next": "span.page-numbers.current"
@@ -464,11 +460,6 @@
       "Album": "h2.entry-title > a"
     },
     {
-      "Site": "06se.com",
-      "Img": "div.article-content img",
-      "Album": "h2.item-heading a"
-    },
-    {
       "Site": "meitu8.cc",
       "Img": "article#lightgallery img",
       "Next": "div.pagelist a.next",
@@ -486,7 +477,7 @@
       "Next": "div.fed-page-info a"
     },
     {
-      "Site": "emonl.com",
+      "Site": "emonl.com,taotuhome.com",
       "Img": "div.single-content img",
       "Next": "div.page-links > span",
       "Album": "h2.grid-title > a"
@@ -532,7 +523,7 @@
       "Album": "div.thcovering-video a"
     },
     {
-      "Site": "hjd2048.com",
+      "Site": "hjd2048.com,xxx7788.com",
       "Img": "div#read_tpc img"
     },
     {
@@ -641,7 +632,7 @@
       "Album": "div.case_info a.meta-title"
     },
     {
-      "Site": "xiuren7.com",
+      "Site": "xiuren7.com,06se.com",
       "Img": "div.article-content img",
       "Album": "h2.item-heading a"
     },
