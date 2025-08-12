@@ -30,7 +30,12 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools qemu-user-static llvm-y
+          wget https://apt.llvm.org/llvm-snapshot.gpg.key
+          sudo apt-key add llvm-snapshot.gpg.key
+
+          sudo apt-add-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main"
+
+          sudo apt update -q && sudo apt install pipx gcc-powerpc64-linux-gnu musl-tools qemu-user-static clang-21 lld-21 -qy
 
       - name: Build Release
         run: |
