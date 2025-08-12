@@ -1,4 +1,4 @@
-name: Linux
+name: FreeBSD
 
 on:
   push:
@@ -13,8 +13,8 @@ env:
 
 jobs:
   Linux:
-    name: Ubuntu-24.04
-    runs-on: ubuntu-24.04
+    name: FreeBSD
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Purge Ubuntu
@@ -37,33 +37,30 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           # gcc-aarch64-linux-gnu
-          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools qemu-user-static -y
+          sudo apt update -q && sudo apt install qemu-user-static -qy
 
       - name: Build Release
         run: |
-          sudo snap install zig --classic --beta
-          pipx install cargo-zigbuild
-
           cargo update
           set +e -x
 
-          targets=(
-            powerpc64-unknown-linux-gnu
-            powerpc64-unknown-linux-musl
-          )
+          export CFLAGS_x86_64_unknown_freebsd="-isystem /opt/freebsd-x86_64/usr/include"
+          curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
+          sudo mkdir -p /opt/freebsd-x86_64
+          sudo tar -xJf base.txz -C /opt/freebsd-x86_64
 
-          zigs=(
-            powerpc64-unknown-linux-musl
+          export CFLAGS_aarch64_unknown_freebsd="-isystem /opt/freebsd-arm64/usr/include"
+          curl -O https://download.freebsd.org/ftp/releases/arm64/14.3-RELEASE/base.txz
+          sudo mkdir -p /opt/freebsd-arm64
+          sudo tar -xJf base.txz -C /opt/freebsd-arm64
+
+          targets=(
             x86_64-unknown-freebsd
-            x86_64-unknown-dragonfly
+            aarch64-unknown-freebsd
           )
 
           for target in ${targets[@]}; do
             time cargo s --target $target
-          done
-
-          for zig in ${zigs[@]}; do
-            time cargo z $zig
           done
 
           find ./target -iname img -type f | xargs ls -hl
@@ -78,8 +75,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
-                  "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
+                  "x86_64-unknown-freebsd FreeBSD-x86_64"
+                  "aarch64-unknown-freebsd FreeBSD-aarch64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
