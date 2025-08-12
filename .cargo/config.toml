@@ -333,15 +333,23 @@ rustflags = ["-Zrelax-elf-relocations"]
 [target.x86_64-unknown-freebsd]
 linker = "clang"
 rustflags = [
-    "-Clink-arg=--sysroot=/opt/freebsd-amd64",
+    "-Clink-arg=--sysroot=/opt/freebsd/amd64",
     "-Clink-arg=-fuse-ld=lld",
 ]
-runner = "qemu-x86_64 -L /opt/freebsd-amd64"
+runner = "qemu-x86_64 -L /opt/freebsd/amd64"
 
 [target.aarch64-unknown-freebsd]
 linker = "clang"
 rustflags = [
-    "-Clink-arg=--sysroot=/opt/freebsd-arm64",
+    "-Clink-arg=--sysroot=/opt/freebsd/arm64",
     "-Clink-arg=-fuse-ld=lld",
 ]
-runner = "qemu-aarch64 -L /opt/freebsd-arm64"
+runner = "qemu-aarch64 -L /opt/freebsd/arm64"
+
+[target.riscv64gc-unknown-freebsd]
+linker = "clang"
+rustflags = [
+    "-Clink-arg=--sysroot=/opt/freebsd/riscv",
+    "-Clink-arg=-fuse-ld=lld",
+]
+runner = "qemu-riscv -L /opt/freebsd/riscv"

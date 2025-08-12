@@ -38,16 +38,21 @@ jobs:
           set +e -x
 
           curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
-          sudo mkdir -p /opt/freebsd-amd64
-          sudo tar -xJf base.txz -C /opt/freebsd-amd64
+          sudo mkdir -p /opt/freebsd/amd64
+          sudo tar -xJf base.txz -C /opt/freebsd/amd64
 
           curl -O https://download.freebsd.org/ftp/releases/arm64/14.3-RELEASE/base.txz
-          sudo mkdir -p /opt/freebsd-arm64
-          sudo tar -xJf base.txz -C /opt/freebsd-arm64
+          sudo mkdir -p /opt/freebsd/arm64
+          sudo tar -xJf base.txz -C /opt/freebsd/arm64
+
+          curl -O https://download.freebsd.org/ftp/releases/riscv/14.3-RELEASE/base.txz
+          sudo mkdir -p /opt/freebsd/riscv
+          sudo tar -xJf base.txz -C /opt/freebsd/riscv
 
           targets=(
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
+            riscv64gc-unknown-freebsd
           )
 
           for target in ${targets[@]}; do
@@ -68,6 +73,7 @@ jobs:
           targets=(
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
+                  "riscv64gc-unknown-freebsd FreeBSD-riscv64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
