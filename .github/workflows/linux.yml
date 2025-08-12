@@ -41,16 +41,14 @@ jobs:
 
       - name: Build Release
         run: |
-          # sudo snap install zig --classic --beta
-          # pipx install cargo-zigbuild
+          sudo snap install zig --classic --beta
+          pipx install cargo-zigbuild
 
           cargo update
           set +e -x
 
           # aarch64-unknown-linux-ohos
           # x86_64-unknown-linux-ohos
-
-          powerpc64-linux-gnu-gcc -v 2>&1 | grep 'Configured with'
 
           targets=(
             powerpc64-unknown-linux-gnu
