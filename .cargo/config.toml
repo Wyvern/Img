@@ -331,21 +331,21 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.x86_64-unknown-freebsd]
-# linker = "clang"
+linker = "clang"
 rustflags = [
     "-Zunstable-options",
     "--sysroot=/opt/freebsd-amd64",
-    "-Clink-self-contained=+linker",
-    "-Clinker-features=+lld",
+    # "-Clink-self-contained=+linker",
+    # "-Clinker-features=+lld",
 ]
-runner = "qemu-x86_64 -L /opt/freebsd-x86_64"
+runner = "qemu-x86_64 -L /opt/freebsd-amd64"
 
 [target.aarch64-unknown-freebsd]
-# linker = "clang"
+linker = "clang"
 rustflags = [
     "-Zunstable-options",
     "--sysroot=/opt/freebsd-arm64",
-    "-Clink-self-contained=+linker",
-    "-Clinker-features=+lld",
+    # "-Clink-self-contained=+linker",
+    # "-Clinker-features=+lld",
 ]
 runner = "qemu-x86_64 -L /opt/freebsd-arm64"
