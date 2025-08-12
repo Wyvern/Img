@@ -43,24 +43,33 @@ jobs:
           cargo update
           set +e -x
 
-          export CFLAGS_x86_64_unknown_freebsd="-isystem /opt/freebsd-x86_64/usr/include"
+
+          export CFLAGS_x86_64_unknown_freebsd="-isystem /opt/freebsd-amd64/usr/include"
           curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
-          sudo mkdir -p /opt/freebsd-x86_64
-          sudo tar -xJf base.txz -C /opt/freebsd-x86_64
+          sudo mkdir -p /opt/freebsd-amd64
+          sudo tar -xJf base.txz -C /opt/freebsd-amd64
 
           export CFLAGS_aarch64_unknown_freebsd="-isystem /opt/freebsd-arm64/usr/include"
           curl -O https://download.freebsd.org/ftp/releases/arm64/14.3-RELEASE/base.txz
           sudo mkdir -p /opt/freebsd-arm64
           sudo tar -xJf base.txz -C /opt/freebsd-arm64
 
-          targets=(
-            x86_64-unknown-freebsd
-            aarch64-unknown-freebsd
-          )
+          export LIBRARY_PATH="/opt/freebsd-arm64/lib:/opt/freebsd-amd64/usr/lib"
+          export CPATH="/opt/freebsd-amd64/usr/include"
+          time cargo s --target x86_64-unknown-freebsd
 
-          for target in ${targets[@]}; do
-            time cargo s --target $target
-          done
+          export LIBRARY_PATH="/opt/freebsd-arm64/lib:/opt/freebsd-arm64/usr/lib"
+          export CPATH="/opt/freebsd-arm64/usr/include"
+          time cargo s --target aarch64-unknown-freebsd
+
+          # targets=(
+          #   x86_64-unknown-freebsd
+          #   aarch64-unknown-freebsd
+          # )
+
+          # for target in ${targets[@]}; do
+          #   time cargo s --target $target
+          # done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu

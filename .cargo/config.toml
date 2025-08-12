@@ -334,7 +334,7 @@ rustflags = ["-Zrelax-elf-relocations"]
 # linker = "clang"
 rustflags = [
     "-Zunstable-options",
-    "--sysroot=/opt/freebsd-x86_64",
+    "--sysroot=/opt/freebsd-amd64",
     "-Clink-self-contained=+linker",
     "-Clinker-features=+lld",
 ]
