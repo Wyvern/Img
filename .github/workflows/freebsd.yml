@@ -37,16 +37,16 @@ jobs:
           cargo update
           set +e -x
 
-          # export LIBRARY_PATH_x86_64_unknown_freebsd="/opt/freebsd-amd64/lib:/opt/freebsd-amd64/usr/lib"
-          # export CPATH_x86_64_unknown_freebsd="/opt/freebsd-amd64/usr/include"
-          # export CFLAGS_x86_64_unknown_freebsd="-isystem /opt/freebsd-amd64/usr/include"
-          # curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
-          # sudo mkdir -p /opt/freebsd-amd64
-          # sudo tar -xJf base.txz -C /opt/freebsd-amd64
+          export LIBRARY_PATH_x86_64_unknown_freebsd="/opt/freebsd-amd64/lib:/opt/freebsd-amd64/usr/lib"
+          export CPATH_x86_64_unknown_freebsd="/opt/freebsd-amd64/usr/include"
+          export CFLAGS_x86_64_unknown_freebsd="-isystem /opt/freebsd-amd64/usr/include"
+          curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
+          sudo mkdir -p /opt/freebsd-amd64
+          sudo tar -xJf base.txz -C /opt/freebsd-amd64
 
-          export LIBRARY_PATH_aarch64_unknown_freebsd="/opt/freebsd-arm64/lib:/opt/freebsd-arm64/usr/lib"
-          export CPATH_aarch64_unknown_freebsd="/opt/freebsd-arm64/usr/include"
-          export CFLAGS_aarch64_unknown_freebsd="-isystem /opt/freebsd-arm64/usr/include"
+          # export LIBRARY_PATH_aarch64_unknown_freebsd="/opt/freebsd-arm64/lib:/opt/freebsd-arm64/usr/lib"
+          # export CPATH_aarch64_unknown_freebsd="/opt/freebsd-arm64/usr/include"
+          # export CFLAGS_aarch64_unknown_freebsd="-isystem /opt/freebsd-arm64/usr/include"
           curl -O https://download.freebsd.org/ftp/releases/arm64/14.3-RELEASE/base.txz
           sudo mkdir -p /opt/freebsd-arm64
           sudo tar -xJf base.txz -C /opt/freebsd-arm64
