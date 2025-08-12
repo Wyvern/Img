@@ -346,4 +346,4 @@ rustflags = [
     # "-Clink-self-contained=+linker",
     # "-Clinker-features=+lld",
 ]
-runner = "qemu-x86_64 -L /opt/freebsd-arm64"
+runner = "qemu-aarch64 -L /opt/freebsd-arm64"
