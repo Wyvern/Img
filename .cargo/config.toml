@@ -333,6 +333,7 @@ rustflags = ["-Zrelax-elf-relocations"]
 [target.x86_64-unknown-freebsd]
 linker = "clang"
 rustflags = [
+    "-Zunstable-options",
     "--sysroot=/opt/freebsd-x86_64",
     # "-fuse-ld=lld",
     "-Clink-self-contained=+linker",
@@ -343,6 +344,7 @@ runner = "qemu-x86_64 -L /opt/freebsd-x86_64"
 [target.aarch64-unknown-freebsd]
 linker = "clang"
 rustflags = [
+    "-Zunstable-options",
     "--sysroot=/opt/freebsd-arm64",
     # "-fuse-ld=lld",
     "-Clink-self-contained=+linker",
