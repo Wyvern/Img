@@ -329,3 +329,13 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
+
+[target.x86_64-unknown-freebsd]
+linker = "clang"
+rustflags = [
+    "--sysroot=/opt/freebsd-x86_64",
+    "-fuse-ld=lld",
+    # "-Clink-self-contained=+linker",
+    # "-Clinker-features=+lld",
+]
+runner = "qemu-x86_64 -L /opt/freebsd-x86_64"

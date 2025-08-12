@@ -37,18 +37,19 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           # gcc-aarch64-linux-gnu
-          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools clang lld qemu-user-static -y
 
       - name: Build Release
         run: |
-          sudo snap install zig --classic --beta
-          pipx install cargo-zigbuild
+          # sudo snap install zig --classic --beta
+          # pipx install cargo-zigbuild
 
           cargo update
           set +e -x
 
-          # aarch64-unknown-linux-ohos
-          # x86_64-unknown-linux-ohos
+          export CFLAGS_x86_64_unknown_freebsd="-isystem /opt/freebsd-x86_64/usr/include"
+          curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
+          sudo tar -xJf base.txz -C /opt/freebsd-x86_64
 
           targets=(
             powerpc64-unknown-linux-gnu
