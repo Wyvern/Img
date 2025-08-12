@@ -49,11 +49,14 @@ jobs:
 
           export CFLAGS_x86_64_unknown_freebsd="-isystem /opt/freebsd-x86_64/usr/include"
           curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
+          sudo mkdir -p /opt/freebsd-x86_64
           sudo tar -xJf base.txz -C /opt/freebsd-x86_64
 
           targets=(
             powerpc64-unknown-linux-gnu
             powerpc64-unknown-linux-musl
+            x86_64-unknown-freebsd
+            aarch64-unknown-freebsd
           )
 
           zigs=(
@@ -66,9 +69,9 @@ jobs:
             time cargo s --target $target
           done
 
-          for zig in ${zigs[@]}; do
-            time cargo z $zig
-          done
+          # for zig in ${zigs[@]}; do
+          #   time cargo z $zig
+          # done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
