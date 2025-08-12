@@ -17,12 +17,6 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      # - name: Purge Ubuntu
-      #   run: |
-      #     sudo apt purge -y ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-      #     sudo apt autoremove -y && sudo apt clean
-      #     sudo systemctl disable --now systemd-journald
-
       - name: Checkout
         uses: actions/checkout@v4
 

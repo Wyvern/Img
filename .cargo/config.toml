@@ -334,6 +334,8 @@ rustflags = ["-Zrelax-elf-relocations"]
 linker = "clang"
 rustflags = [
     "--sysroot=/opt/freebsd-amd64",
+    "-Clink-arg=-L/opt/freebsd-amd64/usr/lib",
+    "-Clink-arg=-L/opt/freebsd-amd64/lib",
     # "-Clink-self-contained=+linker",
     # "-Clinker-features=+lld",
 ]
@@ -343,6 +345,8 @@ runner = "qemu-x86_64 -L /opt/freebsd-amd64"
 linker = "clang"
 rustflags = [
     "--sysroot=/opt/freebsd-arm64",
+    "-Clink-arg=-L/opt/freebsd-arm64/usr/lib",
+    "-Clink-arg=-L/opt/freebsd-arm64/lib",
     # "-Clink-self-contained=+linker",
     # "-Clinker-features=+lld",
 ]
