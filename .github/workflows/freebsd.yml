@@ -30,7 +30,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install clang lld qemu-user-static -qy
+          sudo apt update -q && sudo apt install qemu-user-static -qy
 
       - name: Build Release
         run: |

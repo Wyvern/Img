@@ -30,7 +30,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu musl-tools qemu-user-static -y
+          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools qemu-user-static -y
 
       - name: Build Release
         run: |

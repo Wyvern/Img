@@ -330,26 +330,24 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
 
-[target.x86_64-unknown-freebsd]
-linker = "clang"
+
+[target.'cfg(target_os="freebsd")']
+# linker = "clang"
 rustflags = [
-    "-Clink-arg=--sysroot=/opt/freebsd/amd64",
-    "-Clink-arg=-fuse-ld=lld",
+    "-Zunstable-options",
+    "-Clink-self-contained=+linker",
+    "-Clinker-features=+lld",
+    # "-Clink-arg=-fuse-ld=lld",
 ]
+
+[target.x86_64-unknown-freebsd]
+rustflags = ["-Clink-arg=--sysroot=/opt/freebsd/amd64"]
 runner = "qemu-x86_64 -L /opt/freebsd/amd64"
 
 [target.aarch64-unknown-freebsd]
-linker = "clang"
-rustflags = [
-    "-Clink-arg=--sysroot=/opt/freebsd/arm64",
-    "-Clink-arg=-fuse-ld=lld",
-]
+rustflags = ["-Clink-arg=--sysroot=/opt/freebsd/arm64"]
 runner = "qemu-aarch64 -L /opt/freebsd/arm64"
 
 [target.riscv64gc-unknown-freebsd]
-linker = "clang"
-rustflags = [
-    "-Clink-arg=--sysroot=/opt/freebsd/riscv",
-    "-Clink-arg=-fuse-ld=lld",
-]
+rustflags = ["-Clink-arg=--sysroot=/opt/freebsd/riscv"]
 runner = "qemu-riscv -L /opt/freebsd/riscv"
