@@ -1,5 +1,3 @@
-#![feature(gen_blocks, super_let)]
-
 mod util;
 use {std::*, util::*};
 
@@ -339,7 +337,9 @@ fn parse(addr: &str) -> String {
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
                                         handle_embed(u);
-                                    } else if u.is_empty() || !urls.insert(canonicalize(&u, addr)) {
+                                    } else if u.is_empty()
+                                        || !urls.insert(canonicalize(&u, addr).into_owned())
+                                    {
                                         if !u.is_empty() {
                                             dup += 1;
                                         } else {
@@ -357,7 +357,8 @@ fn parse(addr: &str) -> String {
                                 val
                             };
                             // tdbg!(&url;);
-                            if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
+                            if url.is_empty() || !urls.insert(canonicalize(&url, addr).into_owned())
+                            {
                                 if !url.is_empty() {
                                     dup += 1;
                                 } else {
@@ -428,11 +429,10 @@ fn parse(addr: &str) -> String {
                                     }
                                 })
                             });
-                            let url = canonicalize(&src, addr);
-                            urls.insert(
-                                title_alt
-                                    .map_or_else(|| url.to_owned(), |x| format!("{url}{SEP}{x}")),
-                            );
+                            urls.insert(title_alt.map_or_else(
+                                || canonicalize(&src, addr).into_owned(),
+                                |x| format!("{}{SEP}{x}", canonicalize(&src, addr).into_owned()),
+                            ));
                         }
                     }
                     _ => (),
@@ -574,27 +574,28 @@ fn parse(addr: &str) -> String {
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: &str, addr: &str) -> String {
+fn canonicalize<'a>(url: &'a str, addr: &'a str) -> borrow::Cow<'a, str> {
+    use borrow::*;
     if url.is_empty() {
-        return String::default();
+        return Cow::Borrowed("");
     }
     let (scheme, path) = addr.split_once("://").unwrap_or(("http", addr));
     if !url.starts_with("http") {
         if url.starts_with("//") {
-            format!("{scheme}:{url}")
+            Cow::Owned(format!("{scheme}:{url}"))
         } else if url.starts_with('/') {
-            format!(
+            Cow::Owned(format!(
                 "{scheme}://{}{url}",
                 &path[..path.find('/').unwrap_or(path.len())]
-            )
+            ))
         } else {
-            format!(
+            Cow::Owned(format!(
                 "{scheme}://{}/{url}",
                 &path[..path.rfind('/').unwrap_or(path.len())]
-            )
+            ))
         }
     } else {
-        url.to_owned()
+        Cow::Borrowed(url)
     }
 }
 
@@ -932,7 +933,7 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     }
     if !next_link.is_empty() {
         next_link = ns.map_or_else(
-            || canonicalize(&next_link, cur),
+            || canonicalize(&next_link, cur).into_owned(),
             |(_, r)| {
                 let count = r.matches('/').count();
                 format!(
@@ -1114,7 +1115,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(&u, addr));
+                        images.insert(canonicalize(&u, addr).into_owned());
                     }
                 }
             }
@@ -1189,30 +1190,6 @@ mod img {
             pl!("{MARK} Album Selector: {HL} {a} ");
             hq(a)
         }
-    }
-
-    #[test]
-    fn gen_yield() {
-        let start = time::Instant::now();
-
-        let gen_results = gen {
-            for a in 0..=1000 {
-                for b in 0..=1000 {
-                    for c in 0..=1000 {
-                        if a * a + b * b == c * c && a + b + c == 1000 {
-                            yield (a, b, c);
-                        }
-                    }
-                }
-            }
-        };
-
-        for (a, b, c) in gen_results {
-            println!("{{ a: {a}, b: {b}, c: {c} }}",);
-        }
-
-        let duration = start.elapsed();
-        println!("Total: {} seconds", duration.as_secs_f64());
     }
 
     #[test]

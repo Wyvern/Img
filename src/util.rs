@@ -148,7 +148,7 @@ where
 {
     fn as_bytes(&self) -> &[u8] {
         let len = mem::size_of::<Self>();
-        unsafe { slice::from_raw_parts((&raw const *self).cast::<u8>(), len) }
+        unsafe { slice::from_raw_parts((self as *const Self).cast::<u8>(), len) }
     }
     fn eql<Other>(&self, other: &Other) -> bool {
         self.as_bytes() == other.as_bytes()
