@@ -24,18 +24,19 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
+          targets: x86_64-unknown-freebsd,riscv64gc-unknown-freebsd
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
       - name: Ubuntu apt update and install
         run: |
-          wget https://apt.llvm.org/llvm-snapshot.gpg.key
-          sudo apt-key add llvm-snapshot.gpg.key
+          # wget https://apt.llvm.org/llvm-snapshot.gpg.key
+          # sudo apt-key add llvm-snapshot.gpg.key
 
-          sudo apt-add-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main"
+          # sudo apt-add-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main"
 
-          sudo apt update -q && sudo apt install clang-21 lld-21 qemu-user-static -qy
+          sudo apt update -q && sudo apt install qemu-user-static -qy
 
       - name: Build Release
         run: |
