@@ -337,9 +337,7 @@ fn parse(addr: &str) -> String {
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
                                         handle_embed(u);
-                                    } else if u.is_empty()
-                                        || !urls.insert(canonicalize(&u, addr).into_owned())
-                                    {
+                                    } else if u.is_empty() || !urls.insert(canonicalize(&u, addr)) {
                                         if !u.is_empty() {
                                             dup += 1;
                                         } else {
@@ -357,8 +355,7 @@ fn parse(addr: &str) -> String {
                                 val
                             };
                             // tdbg!(&url;);
-                            if url.is_empty() || !urls.insert(canonicalize(&url, addr).into_owned())
-                            {
+                            if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
                                 if !url.is_empty() {
                                     dup += 1;
                                 } else {
@@ -430,8 +427,8 @@ fn parse(addr: &str) -> String {
                                 })
                             });
                             urls.insert(title_alt.map_or_else(
-                                || canonicalize(&src, addr).into_owned(),
-                                |x| format!("{}{SEP}{x}", canonicalize(&src, addr).into_owned()),
+                                || canonicalize(&src, addr),
+                                |x| format!("{}{SEP}{x}", canonicalize(&src, addr)),
                             ));
                         }
                     }
@@ -574,28 +571,27 @@ fn parse(addr: &str) -> String {
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize<'a>(url: &'a str, addr: &'a str) -> borrow::Cow<'a, str> {
-    use borrow::*;
+fn canonicalize(url: &str, addr: &str) -> String {
     if url.is_empty() {
-        return Cow::Borrowed("");
+        return String::default();
     }
     let (scheme, path) = addr.split_once("://").unwrap_or(("http", addr));
     if !url.starts_with("http") {
         if url.starts_with("//") {
-            Cow::Owned(format!("{scheme}:{url}"))
+            format!("{scheme}:{url}")
         } else if url.starts_with('/') {
-            Cow::Owned(format!(
+            format!(
                 "{scheme}://{}{url}",
                 &path[..path.find('/').unwrap_or(path.len())]
-            ))
+            )
         } else {
-            Cow::Owned(format!(
+            format!(
                 "{scheme}://{}/{url}",
                 &path[..path.rfind('/').unwrap_or(path.len())]
-            ))
+            )
         }
     } else {
-        Cow::Borrowed(url)
+        url.to_owned()
     }
 }
 
@@ -933,7 +929,7 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     }
     if !next_link.is_empty() {
         next_link = ns.map_or_else(
-            || canonicalize(&next_link, cur).into_owned(),
+            || canonicalize(&next_link, cur),
             |(_, r)| {
                 let count = r.matches('/').count();
                 format!(
@@ -1115,7 +1111,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(&u, addr).into_owned());
+                        images.insert(canonicalize(&u, addr));
                     }
                 }
             }
