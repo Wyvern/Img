@@ -86,6 +86,7 @@ jobs:
           targets=(
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
+                  "x86_64-unknown-freebsd FreeBSD-x86_64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"

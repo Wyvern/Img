@@ -332,13 +332,8 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 
 [target.'cfg(target_os="freebsd")']
-# linker = "clang"
-rustflags = [
-    "-Zunstable-options",
-    "-Clink-self-contained=+linker",
-    "-Clinker-features=+lld",
-    # "-Clink-arg=-fuse-ld=lld",
-]
+linker = "clang"
+rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 [target.x86_64-unknown-freebsd]
 rustflags = ["-Clink-arg=--sysroot=/opt/freebsd/amd64"]
