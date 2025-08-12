@@ -37,7 +37,7 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           # gcc-aarch64-linux-gnu
-          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools clang lld qemu-user-static -y
+          sudo apt update -q && sudo apt install -q pipx gcc-powerpc64-linux-gnu musl-tools qemu-user-static -y
 
       - name: Build Release
         run: |
