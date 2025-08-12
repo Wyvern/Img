@@ -24,7 +24,6 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: aarch64-unknown-freebsd
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -54,14 +53,15 @@ jobs:
           sudo mkdir -p /opt/freebsd/arm64
           sudo tar -xJf base.txz -C /opt/freebsd/arm64
 
-          curl -O https://download.freebsd.org/ftp/releases/riscv/14.3-RELEASE/base.txz
-          sudo mkdir -p /opt/freebsd/riscv
-          sudo tar -xJf base.txz -C /opt/freebsd/riscv
+          curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/base.tar.xz
+          curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/comp.tar.xz
+          sudo mkdir -p /opt/netbsd/amd64
+          tar -C /opt/netbsd/amd64 -xvf base.tar.xz
+          tar -C /opt/netbsd/amd64 -xvf comp.tar.xz
 
           targets=(
             x86_64-unknown-freebsd
-            aarch64-unknown-freebsd
-            riscv64gc-unknown-freebsd
+            x86_64-unknown-netbsd
             powerpc64-unknown-linux-gnu
             powerpc64-unknown-linux-musl
           )
