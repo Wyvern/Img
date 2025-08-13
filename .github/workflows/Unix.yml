@@ -71,9 +71,10 @@ jobs:
           sudo mkdir -p /opt/illumos/
           unxz omnios-iso/image/kayak_r151054.zfs.xz
           sudo modprobe zfs
-          sudo zpool import -d . -o readonly=on kayak_r151054.zfs /opt/illumos
-          ls -ahl /opt/illumos
-          # sudo zpool export ./kayak
+          sudo zpool import -d . -o readonly=on kayak_r151054 kayak
+          ls -ahl /kayak
+          sudo cp -a /kayak /opt/illumos
+          sudo zpool export ./kayak
           sudo umount omnios-iso
           rmdir omnios-iso
 
