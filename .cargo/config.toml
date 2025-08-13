@@ -351,6 +351,13 @@ rustflags = [
 ]
 runner = "qemu-aarch64 -L /opt/freebsd/arm64"
 
+[target.riscv64gc-unknown-freebsd]
+rustflags = [
+    "-Clink-arg=--sysroot=/opt/freebsd/riscv",
+    "-Clink-arg=-target",
+    "-Clink-arg=riscv64gc--freebsd",
+]
+
 [target.x86_64-unknown-netbsd]
 rustflags = [
     "-Clink-arg=--sysroot=/opt/netbsd/amd64",

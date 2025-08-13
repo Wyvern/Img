@@ -50,6 +50,10 @@ jobs:
           sudo mkdir -p /opt/freebsd/arm64
           sudo tar -xJf base.txz -C /opt/freebsd/arm64
 
+          curl -O https://download.freebsd.org/ftp/releases/riscv/14.3-RELEASE/base.txz
+          sudo mkdir -p /opt/freebsd/riscv
+          sudo tar -xJf base.txz -C /opt/freebsd/riscv
+
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/base.tar.xz
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/comp.tar.xz
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/etc.tar.xz
@@ -69,6 +73,7 @@ jobs:
           targets=(
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
+            riscv64gc-unknown-freebsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
           )
@@ -91,6 +96,7 @@ jobs:
           targets=(
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
+                  "riscv64gc-unknown-freebsd FreeBSD-riscv64"
                   "x86_64-unknown-netbsd NetBSD-x86_64"
                   "aarch64-unknown-netbsd NetBSD-aarch64"
           )
