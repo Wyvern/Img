@@ -46,14 +46,14 @@ jobs:
           for arch in ${freebsd[@]}; do
             curl -fsSO https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz
             sudo mkdir -p /opt/freebsd/$arch
-            sudo tar -xJf base.txz -C /opt/freebsd/$arch
+            sudo tar -xJf base.txz -C /opt/freebsd/$arch 2>/dev/null
           done
 
           ppc=(powerpc64 powerpc64le)
           for arch in ${ppc[@]}; do
             curl -fsSO https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz
             sudo mkdir -p /opt/freebsd/$arch
-            sudo tar -xJf base.txz -C /opt/freebsd/$arch
+            sudo tar -xJf base.txz -C /opt/freebsd/$arch 2>/dev/null
           done
 
           curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
@@ -69,7 +69,7 @@ jobs:
           mkdir omnios-iso
           sudo mount -o loop omnios-r151054.iso omnios-iso
           sudo mkdir -p /opt/illumos/
-          PKG=$(find omnios-iso -name 'SUNWcsd.pkg' | head -n1)
+          PKG=$(sudo find omnios-iso -name 'SUNWcsd.pkg' | head -n1)
           cpio -idm --no-absolute-filenames < "$PKG/archive"
           sudo cp -a root/usr /opt/illumos
           sudo umount omnios-iso
@@ -81,7 +81,7 @@ jobs:
             sudo mkdir -p /opt/netbsd/$arch
             for file in ${files[@]}; do
               curl -fsSO https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz
-              sudo tar -C /opt/netbsd/$arch -xJf $file.tar.xz
+              sudo tar -C /opt/netbsd/$arch -xJf $file.tar.xz 2>/dev/null
             done
           done
 
