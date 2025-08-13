@@ -70,11 +70,10 @@ jobs:
           sudo mount -o loop omnios-r151054.iso omnios-iso
           sudo mkdir -p /opt/illumos/
           sudo xz -dc omnios-iso/image/kayak_r151054.zfs.xz > kayak_r151054.zfs
-          sudo kpartx -av kayak_r151054.zfs
-          sudo ls /dev/mapper/
-          sudo zpool import -o readonly=on -o altroot=/opt/illumos kayak_pool
+          LOOP=$(sudo losetup --show -f kayak_r151054.zfs)
+          sudo zpool import -o readonly=on -o altroot=/opt/illumos kayak_pool $LOOP
           sudo zpool export kayak_pool
-          sudo kpartx -dv kayak_r151054.zfs
+          sudo losetup -d $LOOP
           sudo umount omnios-iso
           rmdir omnios-iso
 
