@@ -65,6 +65,14 @@ jobs:
           sudo umount dfly
           rmdir dfly
 
+          curl -fsSO https://downloads.omnios.org/media/stable/omnios-r151054.iso
+          mkdir omnios-iso
+          sudo mount -o loop omnios-r151054.iso omnios-iso
+          sudo mkdir -p /opt/illumos/
+          sudo cp -a omnios-iso/usr /opt/illumos
+          sudo umount omnios-iso
+          rmdir omnios-iso
+
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in ${netbsd[@]}; do
@@ -77,6 +85,8 @@ jobs:
 
           targets=(
             x86_64-unknown-dragonfly
+            x86_64-unknown-illumos
+            x86_64-pc-solaris
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             riscv64gc-unknown-freebsd
@@ -103,6 +113,8 @@ jobs:
         run: |
           targets=(
                   "x86_64-unknown-dragonfly DragonFly-x86_64"
+                  "x86_64-unknown-illumos Illumos-x86_64"
+                  "x86_64-pc-solaris Solaris-x86_64"
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"
