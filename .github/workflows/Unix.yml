@@ -67,7 +67,6 @@ jobs:
 
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
-          #  xbase77
           for arch in ${openbsd[@]}; do
             sudo mkdir -p /opt/openbsd/$arch
             for file in ${files[@]}; do
