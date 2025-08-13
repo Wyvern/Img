@@ -69,9 +69,7 @@ jobs:
           mkdir omnios-iso
           sudo mount -o loop omnios-r151054.iso omnios-iso
           sudo mkdir -p /opt/illumos/
-          sudo ls -R omnios-iso | grep -i sunwcsd
-          ls -lah omnios-iso/packages
-          cpio -idm --no-absolute-filenames < "$PKG/archive"
+          cpio -idm --no-absolute-filenames < "omnios-iso/var/sadm/pkg/SUNWcsd/archive"
           sudo cp -a root/usr /opt/illumos
           sudo umount omnios-iso
           rmdir omnios-iso
