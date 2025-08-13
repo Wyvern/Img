@@ -69,8 +69,8 @@ jobs:
           mkdir omnios-iso
           sudo mount -o loop omnios-r151054.iso omnios-iso
           sudo mkdir -p /opt/illumos/
-          find omnios-iso -name '*.img' -o -name '*.pkg'
-          ls -ahl
+          sudo find omnios-iso -name '*.img' -o -name '*.pkg'
+          ls -ahl omnios-iso
           sudo cp -a omnios-iso/usr /opt/illumos
           sudo umount omnios-iso
           rmdir omnios-iso
