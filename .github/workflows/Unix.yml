@@ -69,9 +69,10 @@ jobs:
           mkdir omnios-iso
           sudo mount -o loop omnios-r151054.iso omnios-iso
           sudo mkdir -p /opt/illumos/
-          xz -dc omnios-iso/image/kayak_r151054.zfs.xz > kayak_r151054.zfs
-          LOOP=$(sudo losetup --show -fP kayak_r151054.zfs)
-          sudo zpool import -o readonly=on -o altroot=/opt/illumos -N kayak_pool "$LOOP"
+          sudo xz -dc omnios-iso/image/kayak_r151054.zfs.xz > kayak_r151054.zfs
+          LOOP=$(sudo losetup --show -f kayak_r151054.zfs)
+          sudo zpool import
+          sudo zpool import -o readonly=on -o altroot=/opt/illumos kayak_pool
           sudo zpool export kayak_pool
           sudo losetup -d "$LOOP"
           sudo umount omnios-iso
