@@ -1,0 +1,133 @@
+name: Unix
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Unix
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Ubuntu apt update and install
+        run: |
+          # wget https://apt.llvm.org/llvm-snapshot.gpg.key
+          # sudo apt-key add llvm-snapshot.gpg.key
+
+          # sudo apt-add-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main"
+
+          sudo apt update -q && sudo apt install qemu-user-static -qy
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          freebsd=(amd64 arm64 riscv)
+          for arch in ${freebsd[@]}; do
+            curl -fsSO https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz
+            sudo mkdir -p /opt/freebsd/$arch
+            sudo tar -xJf base.txz -C /opt/freebsd/$arch
+          done
+
+          ppc=(powerpc64 powerpc64le)
+          for arch in ${ppc[@]}; do
+            curl -fsSO https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz
+            sudo mkdir -p /opt/freebsd/$arch
+            sudo tar -xJf base.txz -C /opt/freebsd/$arch
+          done
+
+          curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
+          bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
+          mkdir dfly
+          sudo mount -o loop dfly-x86_64-6.4.2_REL.iso dfly
+          sudo mkdir -p /opt/dragonfly/
+          sudo cp -a dfly/usr /opt/dragonfly
+          sudo umount dfly
+          rmdir dfly
+
+          curl -fsSO https://downloads.omnios.org/media/stable/omnios-r151054.iso
+          mkdir omnios-iso
+          sudo mount -o loop omnios-r151054.iso omnios-iso
+          sudo mkdir -p /opt/illumos/
+          find omnios-iso -name '*.img' -o -name '*.pkg'
+          ls -ahl
+          sudo cp -a omnios-iso/usr /opt/illumos
+          sudo umount omnios-iso
+          rmdir omnios-iso
+
+          netbsd=(amd64 evbarm-aarch64)
+          files=(base comp etc)
+          for arch in ${netbsd[@]}; do
+            sudo mkdir -p /opt/netbsd/$arch
+            for file in ${files[@]}; do
+              curl -fsSO https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz
+              sudo tar -C /opt/netbsd/$arch -xJf $file.tar.xz
+            done
+          done
+
+          targets=(
+            x86_64-unknown-dragonfly
+            x86_64-unknown-illumos
+            x86_64-pc-solaris
+            x86_64-unknown-freebsd
+            aarch64-unknown-freebsd
+            riscv64gc-unknown-freebsd
+            powerpc64-unknown-freebsd
+            powerpc64le-unknown-freebsd
+            x86_64-unknown-netbsd
+            aarch64-unknown-netbsd
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s --target $target
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  "x86_64-unknown-dragonfly DragonFly-x86_64"
+                  "x86_64-unknown-illumos Illumos-x86_64"
+                  "x86_64-pc-solaris Solaris-x86_64"
+                  "x86_64-unknown-freebsd FreeBSD-x86_64"
+                  "aarch64-unknown-freebsd FreeBSD-aarch64"
+                  "riscv64gc-unknown-freebsd FreeBSD-riscv64"
+                  "powerpc64-unknown-freebsd FreeBSD-ppc64"
+                  "powerpc64le-unknown-freebsd FreeBSD-ppc64le"
+                  "x86_64-unknown-netbsd NetBSD-x86_64"
+                  "aarch64-unknown-netbsd NetBSD-aarch64"
+          )
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/src/Img target/$arch/src/$name || true
+            gh release upload Nightly target/$arch/src/$name --clobber || true
+          done
