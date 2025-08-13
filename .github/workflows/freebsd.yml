@@ -56,6 +56,15 @@ jobs:
             sudo tar -xJf base.txz -C /opt/freebsd/$arch
           done
 
+          curl -O https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
+          bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
+          mkdir dfly
+          sudo mount -o loop dfly-x86_64-6.4.2_REL.iso dfly
+          sudo mkdir -p /opt/dragonfly/
+          sudo tar -xJf dfly/base.txz -C /opt/dragonfly
+          sudo umount dfly
+          rmdir dfly
+
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in ${netbsd[@]}; do
@@ -67,6 +76,7 @@ jobs:
           done
 
           targets=(
+            x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             riscv64gc-unknown-freebsd
@@ -92,6 +102,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  "x86_64-unknown-dragonfly DragonFly-x86_64"
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"
