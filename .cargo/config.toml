@@ -331,7 +331,7 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 rustflags = ["-Zrelax-elf-relocations"]
 
 
-[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="illumos"))']
+[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
@@ -390,4 +390,25 @@ rustflags = [
     "-Clink-arg=--sysroot=/opt/netbsd/evbarm-aarch64",
     "-Clink-arg=-target",
     "-Clink-arg=aarch64--netbsd",
+]
+
+[target.x86_64-unknown-openbsd]
+rustflags = [
+    "-Clink-arg=--sysroot=/opt/openbsd/amd64",
+    "-Clink-arg=-target",
+    "-Clink-arg=x86_64--openbsd",
+]
+
+[target.aarch64-unknown-openbsd]
+rustflags = [
+    "-Clink-arg=--sysroot=/opt/openbsd/arm64",
+    "-Clink-arg=-target",
+    "-Clink-arg=aarch64--openbsd",
+]
+
+[target.riscv64gc-unknown-openbsd]
+rustflags = [
+    "-Clink-arg=--sysroot=/opt/openbsd/riscv64",
+    "-Clink-arg=-target",
+    "-Clink-arg=riscv64gc--openbsd",
 ]

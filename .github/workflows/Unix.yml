@@ -65,6 +65,13 @@ jobs:
           sudo umount dfly
           rmdir dfly
 
+          openbsd=(amd64 arm64 riscv64)
+          for arch in ${openbsd[@]}; do
+            curl -fsSO https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/base77.tgz
+            sudo mkdir -p /opt/openbsd/$arch
+            sudo tar -xzf base77.tgz -C /opt/openbsd/$arch 2>/dev/null
+          done
+
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in ${netbsd[@]}; do
@@ -82,6 +89,9 @@ jobs:
             riscv64gc-unknown-freebsd
             powerpc64-unknown-freebsd
             powerpc64le-unknown-freebsd
+            x86_64-unknown-openbsd
+            aarch64-unknown-openbsd
+            riscv64gc-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
           )
@@ -108,6 +118,9 @@ jobs:
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"
                   "powerpc64-unknown-freebsd FreeBSD-ppc64"
                   "powerpc64le-unknown-freebsd FreeBSD-ppc64le"
+                  "x86_64-unknown-openbsd OpenBSD-x86_64"
+                  "aarch64-unknown-openbsd OpenBSD-aarch64"
+                  "riscv64gc-unknown-openbsd OpenBSD-riscv64"
                   "x86_64-unknown-netbsd NetBSD-x86_64"
                   "aarch64-unknown-netbsd NetBSD-aarch64"
           )
