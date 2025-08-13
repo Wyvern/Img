@@ -374,8 +374,7 @@ rustflags = [
 
 [target.sparc64-unknown-netbsd]
 rustflags = [
-    "-Ccode-model=pic",
-    "-Crelocation-model=pic",
+    "-Crelocation-model=static",
     "-Clink-arg=--sysroot=/opt/netbsd/sparc64",
     "-Clink-arg=-target",
     "-Clink-arg=sparc64--netbsd",
