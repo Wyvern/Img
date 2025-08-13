@@ -65,19 +65,6 @@ jobs:
           sudo umount dfly
           rmdir dfly
 
-          curl -fsSO https://downloads.omnios.org/media/stable/omnios-r151054.iso
-          mkdir omnios-iso
-          sudo mount -o loop omnios-r151054.iso omnios-iso
-          sudo mkdir -p /opt/illumos/
-          sudo xz -dc omnios-iso/image/kayak_r151054.zfs.xz > kayak_r151054.zfs
-          sudo dd if=/dev/zero of=/opt/illumos/temp_pool.img bs=1G count=1
-          LOOP=$(sudo losetup --show -f /opt/illumos/temp_pool.img)
-          sudo zpool create temp_pool $LOOP
-          sudo zfs receive -F temp_pool < kayak_r151054.zfs
-          ROOT_DS=$(sudo zfs list -H -o name -r temp_pool | grep -E 'ROOT|/ROOT' | head -n1)
-          sudo zfs set mountpoint=/opt/illumos $ROOT_DS
-          sudo zfs mount $ROOT_DS
-
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in ${netbsd[@]}; do
@@ -90,8 +77,6 @@ jobs:
 
           targets=(
             x86_64-unknown-dragonfly
-            x86_64-unknown-illumos
-            x86_64-pc-solaris
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             riscv64gc-unknown-freebsd
@@ -118,8 +103,6 @@ jobs:
         run: |
           targets=(
                   "x86_64-unknown-dragonfly DragonFly-x86_64"
-                  "x86_64-unknown-illumos Illumos-x86_64"
-                  "x86_64-pc-solaris Solaris-x86_64"
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"

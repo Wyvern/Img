@@ -42,6 +42,7 @@ jobs:
           set +e -x
 
           targets=(
+            x86_64-unknown-illumos
             x86_64-pc-solaris
             sparcv9-sun-solaris
           )
@@ -59,8 +60,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "x86_64-pc-solaris Solaris-x86_64"
-                  "sparcv9-sun-solaris Solaris-sparcv9"
+            "x86_64-unknown-illumos Illumos-x86_64"
+            "x86_64-pc-solaris Solaris-x86_64"
+            "sparcv9-sun-solaris Solaris-sparcv9"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
