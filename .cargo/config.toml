@@ -371,3 +371,10 @@ rustflags = [
     "-Clink-arg=-target",
     "-Clink-arg=aarch64--netbsd",
 ]
+
+[target.sparc64-unknown-netbsd]
+rustflags = [
+    "-Clink-arg=--sysroot=/opt/netbsd/sparc64",
+    "-Clink-arg=-target",
+    "-Clink-arg=sparc64--netbsd",
+]
