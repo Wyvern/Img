@@ -367,7 +367,7 @@ rustflags = [
 
 [target.aarch64-unknown-netbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=/opt/netbsd/arm64",
+    "-Clink-arg=--sysroot=/opt/netbsd/evbarm-aarch64",
     "-Clink-arg=-target",
     "-Clink-arg=aarch64--netbsd",
 ]
