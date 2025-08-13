@@ -49,7 +49,14 @@ jobs:
             sudo tar -xJf base.txz -C /opt/freebsd/$arch
           done
 
-          netbsd=(amd64 evbarm-aarch64 sparc64)
+          ppc=(powerpc64 powerpc64le)
+          for arch in ${ppc[@]}; do
+            curl -O https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz
+            sudo mkdir -p /opt/freebsd/$arch
+            sudo tar -xJf base.txz -C /opt/freebsd/$arch
+          done
+
+          netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in ${netbsd[@]}; do
             sudo mkdir -p /opt/netbsd/$arch
@@ -63,9 +70,10 @@ jobs:
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             riscv64gc-unknown-freebsd
+            powerpc64-unknown-freebsd
+            powerpc64le-unknown-freebsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
-            sparc64-unknown-netbsd
           )
 
           for target in ${targets[@]}; do
@@ -87,9 +95,10 @@ jobs:
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"
+                  "powerpc64-unknown-freebsd FreeBSD-ppc64"
+                  "powerpc64le-unknown-freebsd FreeBSD-ppc64le"
                   "x86_64-unknown-netbsd NetBSD-x86_64"
                   "aarch64-unknown-netbsd NetBSD-aarch64"
-                  "sparc64-unknown-netbsd NetBSD-sparc64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
