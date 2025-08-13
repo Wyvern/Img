@@ -66,10 +66,13 @@ jobs:
           rmdir dfly
 
           openbsd=(amd64 arm64 riscv64)
+          files=(base77 comp77 xbase77)
           for arch in ${openbsd[@]}; do
-            curl -fsSO https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/base77.tgz
             sudo mkdir -p /opt/openbsd/$arch
-            sudo tar -xzf base77.tgz -C /opt/openbsd/$arch 2>/dev/null
+            for file in ${files[@]}; do
+              curl -fsSO https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz
+              sudo tar -xzf $file.tgz -C /opt/openbsd/$arch 2>/dev/null
+            done
           done
 
           netbsd=(amd64 evbarm-aarch64)
@@ -78,7 +81,7 @@ jobs:
             sudo mkdir -p /opt/netbsd/$arch
             for file in ${files[@]}; do
               curl -fsSO https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz
-              sudo tar -C /opt/netbsd/$arch -xJf $file.tar.xz 2>/dev/null
+              sudo tar -xJf $file.tar.xz -C /opt/netbsd/$arch 2>/dev/null
             done
           done
 
