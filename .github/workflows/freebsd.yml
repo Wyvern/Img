@@ -42,17 +42,24 @@ jobs:
           cargo update
           set +e -x
 
+          curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
+          sudo mkdir -p /opt/freebsd/amd64
+          sudo tar -xJf base.txz -C /opt/freebsd/amd64
+
           curl -O https://download.freebsd.org/ftp/releases/arm64/14.3-RELEASE/base.txz
           sudo mkdir -p /opt/freebsd/arm64
           sudo tar -xJf base.txz -C /opt/freebsd/arm64
 
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/base.tar.xz
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/comp.tar.xz
+          curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/etc.tar.xz
           sudo mkdir -p /opt/netbsd/arm64
           sudo tar -C /opt/netbsd/arm64 -xJf base.tar.xz
           sudo tar -C /opt/netbsd/arm64 -xJf comp.tar.xz
+          sudo tar -C /opt/netbsd/arm64 -xJf etc.tar.xz
 
           targets=(
+            x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             aarch64-unknown-netbsd
           )
