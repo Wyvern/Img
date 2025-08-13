@@ -333,7 +333,7 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
 linker = "clang"
-rustflags = ["-Clink-arg=-fuse-ld=lld"]
+# rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 [target.x86_64-unknown-freebsd]
 rustflags = ["-Clink-arg=--sysroot=/opt/freebsd/amd64"]
