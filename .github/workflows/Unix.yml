@@ -75,7 +75,7 @@ jobs:
             done
           done
 
-          netbsd=(amd64 evbarm-aarch64 sparc64)
+          netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in ${netbsd[@]}; do
             sudo mkdir -p /opt/netbsd/$arch
@@ -95,7 +95,6 @@ jobs:
             riscv64gc-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
-            sparc64-unknown-netbsd
           )
 
           for target in ${targets[@]}; do
@@ -123,7 +122,6 @@ jobs:
                   "riscv64gc-unknown-openbsd OpenBSD-riscv64"
                   "x86_64-unknown-netbsd NetBSD-x86_64"
                   "aarch64-unknown-netbsd NetBSD-aarch64"
-                  "sparc64-unknown-netbsd NetBSD-sparc64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
