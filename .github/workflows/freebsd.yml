@@ -49,8 +49,8 @@ jobs:
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/base.tar.xz
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/evbarm-aarch64/binary/sets/comp.tar.xz
           sudo mkdir -p /opt/netbsd/arm64
-          sudo tar -C /opt/netbsd/arm64 -xvf base.tar.xz
-          sudo tar -C /opt/netbsd/arm64 -xvf comp.tar.xz
+          sudo tar -C /opt/netbsd/arm64 -xJf base.tar.xz
+          sudo tar -C /opt/netbsd/arm64 -xJf comp.tar.xz
 
           targets=(
             aarch64-unknown-freebsd

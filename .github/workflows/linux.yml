@@ -52,8 +52,8 @@ jobs:
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/base.tar.xz
           curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/comp.tar.xz
           sudo mkdir -p /opt/netbsd/amd64
-          sudo tar -C /opt/netbsd/amd64 -xvf base.tar.xz
-          sudo tar -C /opt/netbsd/amd64 -xvf comp.tar.xz
+          sudo tar -C /opt/netbsd/amd64 -xJf base.tar.xz
+          sudo tar -C /opt/netbsd/amd64 -xJf comp.tar.xz
 
           targets=(
             x86_64-unknown-freebsd
