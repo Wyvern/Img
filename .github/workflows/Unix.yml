@@ -35,7 +35,7 @@ jobs:
 
           # sudo apt-add-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main"
 
-          sudo apt update -q && sudo apt install multipath-tools xz-utils zfsutils-linux qemu-user-static -qy
+          sudo apt update -q && sudo apt install xz-utils -qy
 
       - name: Build Release
         run: |
