@@ -71,6 +71,7 @@ jobs:
           sudo mkdir -p /opt/illumos/
           sudo xz -dc omnios-iso/image/kayak_r151054.zfs.xz > kayak_r151054.zfs
           sudo kpartx -av kayak_r151054.zfs
+          sudo zpool import
           sudo zpool import -o readonly=on -o altroot=/opt/illumos kayak_pool
           sudo zpool export kayak_pool
           sudo kpartx -dv kayak_r151054.zfs
