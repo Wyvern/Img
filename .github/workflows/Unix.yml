@@ -69,7 +69,7 @@ jobs:
           mkdir omnios-iso
           sudo mount -o loop omnios-r151054.iso omnios-iso
           sudo mkdir -p /opt/illumos/
-          unxz omnios-iso/kayak/kayak_r151054.zfs.xz
+          unxz omnios-iso/image/kayak_r151054.zfs.xz
           sudo modprobe zfs
           sudo zpool import -d . -o readonly=on kayak_r151054 /opt/illumos
           ls -ahl /opt/illumos
