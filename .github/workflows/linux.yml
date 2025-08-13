@@ -45,21 +45,7 @@ jobs:
           cargo update
           set +e -x
 
-          curl -O https://download.freebsd.org/ftp/releases/amd64/14.3-RELEASE/base.txz
-          sudo mkdir -p /opt/freebsd/amd64
-          sudo tar -xJf base.txz -C /opt/freebsd/amd64
-
-          curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/base.tar.xz
-          curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/comp.tar.xz
-          curl -O https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/amd64/binary/sets/etc.tar.xz
-          sudo mkdir -p /opt/netbsd/amd64
-          sudo tar -C /opt/netbsd/amd64 -xJf base.tar.xz
-          sudo tar -C /opt/netbsd/amd64 -xJf comp.tar.xz
-          sudo tar -C /opt/netbsd/arm64 -xJf etc.tar.xz
-
           targets=(
-            x86_64-unknown-freebsd
-            x86_64-unknown-netbsd
             powerpc64-unknown-linux-gnu
             powerpc64-unknown-linux-musl
           )
@@ -90,7 +76,6 @@ jobs:
           targets=(
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
-                  "x86_64-unknown-freebsd FreeBSD-x86_64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
