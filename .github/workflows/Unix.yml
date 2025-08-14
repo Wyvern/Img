@@ -44,9 +44,12 @@ jobs:
 
           freebsd=(amd64 arm64 riscv)
           for arch in ${freebsd[@]}; do
-            curl -fsSO https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz
+            curl -fsSO https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz &
+          done
+          wait
+          for arch in ${freebsd[@]}; do
             sudo mkdir -p /opt/freebsd/$arch
-            sudo tar -xJf base.txz -C /opt/freebsd/$arch 2>/dev/null
+            sudo tar -xJf base.txz -C /opt/freebsd/$arch 2>/dev/null &
           done
 
           # ppc=(powerpc64 powerpc64le)
