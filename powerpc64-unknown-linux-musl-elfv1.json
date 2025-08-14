@@ -1,0 +1,22 @@
+{
+  "llvm-target": "powerpc64-unknown-linux-gnu",
+  "target-endian": "big",
+  "target-pointer-width": "64",
+  "target-c-int-width": "32",
+  "arch": "powerpc64",
+  "os": "linux",
+  "env": "musl",
+  "vendor": "unknown",
+  "linker": "powerpc64-linux-gnu-gcc",
+  "linker-flavor": "gcc",
+  "executables": true,
+  "has-rpath": false,
+  "panic-strategy": "abort",
+  "disable-redzone": true,
+  "features": "-vsx,-altivec",
+  "crt-static-default": true,
+  "crt-static-respected": true,
+  "relocation-model": "static",
+  "code-model": "large",
+  "link-args": ["-mabi=elfv1"]
+}
