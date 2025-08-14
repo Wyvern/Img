@@ -28,16 +28,16 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Ensure /opt dirs exist
-        run: |
-          sudo mkdir -p /opt/freebsd /opt/openbsd /opt/netbsd
-          sudo chown -R $USER:$USER /opt/freebsd /opt/openbsd /opt/netbsd
+      # - name: Ensure /opt dirs exist
+      #   run: |
+      #     sudo mkdir -p /opt/freebsd /opt/openbsd /opt/netbsd
+      #     sudo chown -R $USER:$USER /opt/freebsd /opt/openbsd /opt/netbsd
 
       - name: Cache /opt
         uses: actions/cache@v4
         id: opt-cache
         with:
-          path: /opt/freebsd /opt/openbsd /opt/netbsd
+          path: /opt
           key: opt-${{ runner.os }}-${{ hashFiles('scripts/opt-files.txt') }}
           restore-keys: |
             opt-${{ runner.os }}-
