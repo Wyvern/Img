@@ -417,4 +417,4 @@ rustflags = [
 ]
 
 [target.powerpc64-unknown-linux-musl]
-rustflags = ["-Ctarget-feature=-elfv2"]
+rustflags = ["-Clink-arg=-mabi=elfv1"]
