@@ -44,13 +44,12 @@ jobs:
 
           cargo update
           set +e -x
-          abi=$(powerpc64-linux-gnu-gcc -v 2>&1 | grep ABI)
-          echo $abi
+
           targets=(
             powerpc64-unknown-linux-gnu
             powerpc64-unknown-linux-musl
           )
-
+          time cargo s --target ./powerpc64-unknown-linux-musl-elfv1.json
           zigs=(
             powerpc64-unknown-linux-musl
           )
