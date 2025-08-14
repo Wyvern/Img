@@ -39,8 +39,8 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo snap install zig --classic --beta
-          pipx install cargo-zigbuild
+          # sudo snap install zig --classic --beta
+          # pipx install cargo-zigbuild
 
           cargo update
           set +e -x
@@ -50,17 +50,17 @@ jobs:
             powerpc64-unknown-linux-musl
           )
           time cargo s --target ./powerpc64-unknown-linux-musl-elfv1.json
-          zigs=(
-            powerpc64-unknown-linux-musl
-          )
+          # zigs=(
+          #   powerpc64-unknown-linux-musl
+          # )
 
           for target in ${targets[@]}; do
             time cargo s --target $target
           done
 
-          for zig in ${zigs[@]}; do
-            time cargo z $zig
-          done
+          # for zig in ${zigs[@]}; do
+          #   time cargo z $zig
+          # done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
