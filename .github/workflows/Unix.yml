@@ -75,12 +75,8 @@ jobs:
 
           # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
           # bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
-          # mkdir dfly
-          # sudo mount -o loop dfly-x86_64-6.4.2_REL.iso dfly
-          # sudo mkdir -p /opt/dragonfly/
-          # sudo cp -a dfly/usr /opt/dragonfly
-          # sudo umount dfly
-          # rmdir dfly
+          # mkdir /tmp/dfly
+          # sudo mount -o loop dfly-x86_64-6.4.2_REL.iso /tmp/dfly
 
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
