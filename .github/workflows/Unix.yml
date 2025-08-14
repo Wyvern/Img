@@ -49,7 +49,7 @@ jobs:
           wait
           for arch in ${freebsd[@]}; do
             sudo mkdir -p /opt/freebsd/$arch
-            sudo tar -xJf base.txz -C /opt/freebsd/$arch 2>/dev/null &
+            sudo tar -xJf base.txz -C /opt/freebsd/$arch 2>/dev/null
           done
 
           # ppc=(powerpc64 powerpc64le)
@@ -71,9 +71,14 @@ jobs:
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
           for arch in ${openbsd[@]}; do
+            for file in ${files[@]}; do
+              curl -fsSO https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz &
+            done
+          done
+          wait
+          for arch in ${openbsd[@]}; do
             sudo mkdir -p /opt/openbsd/$arch
             for file in ${files[@]}; do
-              curl -fsSO https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz
               sudo tar -xzf $file.tgz -C /opt/openbsd/$arch 2>/dev/null
             done
           done
@@ -81,9 +86,14 @@ jobs:
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in ${netbsd[@]}; do
+            for file in ${files[@]}; do
+              curl -fsSO https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz &
+            done
+          done
+          wait
+          for arch in ${netbsd[@]}; do
             sudo mkdir -p /opt/netbsd/$arch
             for file in ${files[@]}; do
-              curl -fsSO https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz
               sudo tar -xJf $file.tar.xz -C /opt/netbsd/$arch 2>/dev/null
             done
           done
