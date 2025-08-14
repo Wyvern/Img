@@ -70,7 +70,7 @@ jobs:
           for arch in "${openbsd[@]}"; do
             sudo mkdir -p /opt/openbsd/$arch
             for file in "${files[@]}"; do
-            sudo sh -c "curl -fsSL 'https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz' | tar -xzf - -C /opt/openbsd/$arch 2>/dev/null" &
+            sudo sh -c "curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C /opt/openbsd/$arch 2>/dev/null" &
             done
           done
 
@@ -79,7 +79,7 @@ jobs:
           for arch in "${netbsd[@]}"; do
             sudo mkdir -p /opt/netbsd/$arch
             for file in "${files[@]}"; do
-              sudo sh -c "curl -fsSL 'https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz' | tar -xJf - -C /opt/netbsd/$arch 2>/dev/null" &
+              sudo sh -c "curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C /opt/netbsd/$arch 2>/dev/null" &
             done
           done
 
