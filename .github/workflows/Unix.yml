@@ -43,23 +43,15 @@ jobs:
           set +e -x
 
           freebsd=(amd64 arm64 riscv)
-          for arch in ${freebsd[@]}; do
-            curl -fsSo "${arch}-base.txz" https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz &
-          done
-          wait
-          for arch in ${freebsd[@]}; do
+          for arch in "${freebsd[@]}"; do
             sudo mkdir -p /opt/freebsd/$arch
-            sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null &
+            curl -fsSL "https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz" \
+              | sudo tar -xJf - -C /opt/freebsd/$arch 2>/dev/null &
           done
 
           ppc=(powerpc64 powerpc64le)
-          for arch in ${ppc[@]}; do
-            curl -fsSo "${arch}-base.txz" https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz &
-          done
-          wait
-          for arch in ${ppc[@]}; do
-            sudo mkdir -p /opt/freebsd/$arch
-            sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null &
+          for arch in "${ppc[@]}"; do
+            curl -fsSL "https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz" | sudo tar -xJf - -C /opt/freebsd/$arch 2>/dev/null &
           done
 
           # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
@@ -73,33 +65,21 @@ jobs:
 
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
-          for arch in ${openbsd[@]}; do
-            for file in ${files[@]}; do
-              curl -fsSo "${arch}-${file}.tgz" https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz &
-            done
-          done
-          wait
-          for arch in ${openbsd[@]}; do
-            sudo mkdir -p /opt/openbsd/$arch
-            for file in ${files[@]}; do
-              sudo tar -xzf "${arch}-${file}.tgz" -C /opt/openbsd/$arch 2>/dev/null &
+          for arch in "${openbsd[@]}"; do
+            for file in "${files[@]}"; do
+              curl -fsSL "https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz" | sudo tar -xJf - -C /opt/openbsd/$arch 2>/dev/null &
             done
           done
 
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
-          for arch in ${netbsd[@]}; do
-            for file in ${files[@]}; do
-              curl -fsSo "${arch}-${file}.tar.xz" https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz &
+          for arch in "${netbsd[@]}"; do
+            for file in "${files[@]}"; do
+              curl -fsSL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz" | sudo tar -xJf - -C /opt/netbsd/$arch 2>/dev/null &
             done
           done
+
           wait
-          for arch in ${netbsd[@]}; do
-            sudo mkdir -p /opt/netbsd/$arch
-            for file in ${files[@]}; do
-              sudo tar -xJf "${arch}-${file}.tar.xz" -C /opt/netbsd/$arch 2>/dev/null &
-            done
-          done
 
           targets=(
             x86_64-unknown-freebsd
