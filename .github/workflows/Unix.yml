@@ -54,19 +54,22 @@ jobs:
 
           # ppc=(powerpc64 powerpc64le)
           # for arch in ${ppc[@]}; do
-          #   curl -fsSO https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz
+          #   curl -fsSO https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz &
+          # done
+          # wait
+          # for arch in ${ppc[@]}; do
           #   sudo mkdir -p /opt/freebsd/$arch
           #   sudo tar -xJf base.txz -C /opt/freebsd/$arch 2>/dev/null
           # done
 
-          curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
-          bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
-          mkdir dfly
-          sudo mount -o loop dfly-x86_64-6.4.2_REL.iso dfly
-          sudo mkdir -p /opt/dragonfly/
-          sudo cp -a dfly/usr /opt/dragonfly
-          sudo umount dfly
-          rmdir dfly
+          # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
+          # bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
+          # mkdir dfly
+          # sudo mount -o loop dfly-x86_64-6.4.2_REL.iso dfly
+          # sudo mkdir -p /opt/dragonfly/
+          # sudo cp -a dfly/usr /opt/dragonfly
+          # sudo umount dfly
+          # rmdir dfly
 
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
@@ -99,7 +102,6 @@ jobs:
           done
 
           targets=(
-            x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             riscv64gc-unknown-freebsd
@@ -126,7 +128,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "x86_64-unknown-dragonfly DragonFly-x86_64"
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"
