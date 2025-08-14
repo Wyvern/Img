@@ -8,6 +8,7 @@
   "os": "linux",
   "env": "musl",
   "vendor": "unknown",
+  "abi": "elfv1",
 
   "linker": "powerpc64-linux-gnu-gcc",
   "linker-flavor": "gcc",
