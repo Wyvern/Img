@@ -9,7 +9,7 @@
   "env": "musl",
   "vendor": "unknown",
   "abi": "elfv1",
-
+  "llvm-abiname": "elfv1",
   "linker": "powerpc64-linux-gnu-gcc",
   "linker-flavor": "gcc",
   "linker-is-gnu": true,
