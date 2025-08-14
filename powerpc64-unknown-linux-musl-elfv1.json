@@ -18,5 +18,7 @@
   "crt-static-respected": true,
   "relocation-model": "static",
   "code-model": "large",
-  "link-args": ["-mabi=elfv1"]
+  "pre-link-args": {
+    "gcc": ["-mabi=elfv1"]
+  }
 }
