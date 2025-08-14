@@ -28,16 +28,14 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Set up cache directory
-        run: mkdir -p $GITHUB_WORKSPACE/.cache/sysroots/freebsd \
-          $GITHUB_WORKSPACE/.cache/sysroots/openbsd \
-          $GITHUB_WORKSPACE/.cache/sysroots/netbsd
+      - name: Prepare sysroot dir
+        run: mkdir -p /home/runner/sysroots
 
       - name: Cache sysroot
         uses: actions/cache@v4
         id: sysroot-cache
         with:
-          path: $GITHUB_WORKSPACE/.cache/sysroots
+          path: /home/runner/sysroots
           key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: |
             sysroot-${{ runner.os }}-
@@ -47,8 +45,8 @@ jobs:
           cargo update
           set +e -x
 
-          SYSROOT="$GITHUB_WORKSPACE/.cache/sysroots"
-          ln -s $SYSROOT sysroot
+          SYSROOT="/home/runner/sysroots"
+          ln -sfn "$SYSROOT" sysroot
 
           freebsd=(amd64 arm64 riscv)
           for arch in "${freebsd[@]}"; do
