@@ -42,72 +42,64 @@ jobs:
           restore-keys: |
             sysroot-${{ runner.os }}-
 
-      # - name: Ubuntu apt update and install
-      #   run: |
-      #     # wget https://apt.llvm.org/llvm-snapshot.gpg.key
-      #     # sudo apt-key add llvm-snapshot.gpg.key
-
-      #     # sudo apt-add-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main"
-
-      #     sudo apt update -q && sudo apt install xz-utils -qy
-
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          sysroots="$GITHUB_WORKSPACE/.cache/sysroots"
+          SYSROOT="$GITHUB_WORKSPACE/.cache/sysroots"
+          ln -s $SYSROOT sysroot
 
           freebsd=(amd64 arm64 riscv)
           for arch in "${freebsd[@]}"; do
-            if [ ! -d $sysroots/freebsd/$arch ]; then
-                mkdir -p $sysroots/freebsd/$arch
+            if [ ! -d $SYSROOT/freebsd/$arch ]; then
+                mkdir -p $SYSROOT/freebsd/$arch
                 curl -fsSL https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz \
-            | tar -xJf - -C $sysroots/freebsd/$arch 2>/dev/null &
+            | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
             else
-              echo "FreeBSD $arch already exists in $sysroots/freebsd, skipping download."
+              echo "FreeBSD $arch already exists in $SYSROOT/freebsd, skipping download."
             fi
           done
 
           ppc=(powerpc64 powerpc64le)
           for arch in "${ppc[@]}"; do
-            if [ ! -d $sysroots/freebsd/$arch ]; then
-              mkdir -p $sysroots/freebsd/$arch
+            if [ ! -d $SYSROOT/freebsd/$arch ]; then
+              mkdir -p $SYSROOT/freebsd/$arch
               curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz \
-                | tar -xJf - -C $sysroots/freebsd/$arch 2>/dev/null &
+                | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
             else
-              echo "FreeBSD $arch already exists in $sysroots/freebsd, skipping download."
+              echo "FreeBSD $arch already exists in $SYSROOT/freebsd, skipping download."
             fi
           done
 
           # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
           # bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
-          # mkdir $sysroots/dfly
-          # sudo mount -o loop dfly-x86_64-6.4.2_REL.iso $sysroots/dfly
+          # mkdir $SYSROOT/dfly
+          # sudo mount -o loop dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
           for arch in "${openbsd[@]}"; do
-            if [ ! -d $sysroots/openbsd/$arch ]; then
-              mkdir -p $sysroots/openbsd/$arch
+            if [ ! -d $SYSROOT/openbsd/$arch ]; then
+              mkdir -p $SYSROOT/openbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C $sysroots/openbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C $SYSROOT/openbsd/$arch 2>/dev/null &
               done
             else
-              echo "OpenBSD $arch already exists in $sysroots/openbsd, skipping download."
+              echo "OpenBSD $arch already exists in $SYSROOT/openbsd, skipping download."
             fi
           done
 
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
-            if [ ! -d $sysroots/netbsd/$arch ]; then
-              mkdir -p $sysroots/netbsd/$arch
+            if [ ! -d $SYSROOT/netbsd/$arch ]; then
+              mkdir -p $SYSROOT/netbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C $sysroots/netbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C $SYSROOT/netbsd/$arch 2>/dev/null &
               done
             else
-              echo "NetBSD $arch already exists in $sysroots/netbsd, skipping download."
+              echo "NetBSD $arch already exists in $SYSROOT/netbsd, skipping download."
             fi
           done
 

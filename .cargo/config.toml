@@ -334,57 +334,57 @@ rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 [target.x86_64-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/freebsd/amd64",
+    "-Clink-arg=--sysroot=sysroot/freebsd/amd64",
     "-Clink-arg=-target",
     "-Clink-arg=x86_64--freebsd",
 ]
-runner = "qemu-x86_64 -L $sysroots/freebsd/amd64"
+runner = "qemu-x86_64 -L sysroot/freebsd/amd64"
 
 [target.aarch64-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/freebsd/arm64",
+    "-Clink-arg=--sysroot=sysroot/freebsd/arm64",
     "-Clink-arg=-target",
     "-Clink-arg=aarch64--freebsd",
 ]
-runner = "qemu-aarch64 -L $sysroots/freebsd/arm64"
+runner = "qemu-aarch64 -L sysroot/freebsd/arm64"
 
 [target.riscv64gc-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/freebsd/riscv",
+    "-Clink-arg=--sysroot=sysroot/freebsd/riscv",
     "-Clink-arg=-target",
     "-Clink-arg=riscv64gc--freebsd",
 ]
 
 [target.powerpc64-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/freebsd/powerpc64",
+    "-Clink-arg=--sysroot=sysroot/freebsd/powerpc64",
     "-Clink-arg=-target",
     "-Clink-arg=powerpc64--freebsd",
 ]
 [target.powerpc64le-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/freebsd/powerpc64le",
+    "-Clink-arg=--sysroot=sysroot/freebsd/powerpc64le",
     "-Clink-arg=-target",
     "-Clink-arg=powerpc64le--freebsd",
 ]
 
 [target.x86_64-unknown-dragonfly]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/dfly/usr",
+    "-Clink-arg=--sysroot=sysroot/dfly/usr",
     "-Clink-arg=-target",
     "-Clink-arg=x86_64--dragonfly",
 ]
 
 [target.x86_64-unknown-netbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/netbsd/amd64",
+    "-Clink-arg=--sysroot=sysroot/netbsd/amd64",
     "-Clink-arg=-target",
     "-Clink-arg=x86_64--netbsd",
 ]
 
 [target.aarch64-unknown-netbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/netbsd/evbarm-aarch64",
+    "-Clink-arg=--sysroot=sysroot/netbsd/evbarm-aarch64",
     "-Clink-arg=-target",
     "-Clink-arg=aarch64--netbsd",
 ]
@@ -394,21 +394,21 @@ rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.x86_64-unknown-openbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/openbsd/amd64",
+    "-Clink-arg=--sysroot=sysroot/openbsd/amd64",
     "-Clink-arg=-target",
     "-Clink-arg=x86_64--openbsd",
 ]
 
 [target.aarch64-unknown-openbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/openbsd/arm64",
+    "-Clink-arg=--sysroot=sysroot/openbsd/arm64",
     "-Clink-arg=-target",
     "-Clink-arg=aarch64--openbsd",
 ]
 
 [target.riscv64gc-unknown-openbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=$sysroots/openbsd/riscv64",
+    "-Clink-arg=--sysroot=sysroot/openbsd/riscv64",
     "-Clink-arg=-target",
     "-Clink-arg=riscv64gc--openbsd",
 ]
