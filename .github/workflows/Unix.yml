@@ -28,22 +28,14 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Ensure /opt dirs exist
-        run: |
-          for dir in /opt/freebsd /opt/openbsd /opt/netbsd; do
-            sudo mkdir -p "$dir"
-            sudo chown -R $USER:$USER "$dir"
-            touch "$dir/.keep"
-          done
-
-      - name: Cache /opt
+      - name: Cache sysroot
         uses: actions/cache@v4
-        id: opt-cache
+        id: sysroot-cache
         with:
-          path: /opt/freebsd /opt/openbsd /opt/netbsd
-          key: opt-${{ runner.os }}-${{ hashFiles('scripts/opt-files.txt') }}
+          path: freebsd openbsd netbsd
+          key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: |
-            opt-${{ runner.os }}-
+            sysroot-${{ runner.os }}-
 
       - name: Ubuntu apt update and install
         run: |
@@ -61,10 +53,10 @@ jobs:
 
           freebsd=(amd64 arm64 riscv)
           for arch in "${freebsd[@]}"; do
-            if [ ! -d /opt/freebsd/$arch ]; then
-                sudo mkdir -p /opt/freebsd/$arch
-                sudo sh -c "curl -fsSL https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz \
-            | tar -xJf - -C /opt/freebsd/$arch 2>/dev/null" &
+            if [ ! -d freebsd/$arch ]; then
+                mkdir -p freebsd/$arch
+                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz \
+            | tar -xJf - -C freebsd/$arch 2>/dev/null &
             else
               echo "FreeBSD $arch already exists in /opt/freebsd, skipping download."
             fi
@@ -72,10 +64,10 @@ jobs:
 
           ppc=(powerpc64 powerpc64le)
           for arch in "${ppc[@]}"; do
-            if [ ! -d /opt/freebsd/$arch ]; then
-              sudo mkdir -p /opt/freebsd/$arch
-              sudo sh -c "curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz \
-                | tar -xJf - -C /opt/freebsd/$arch 2>/dev/null" &
+            if [ ! -d freebsd/$arch ]; then
+              mkdir -p freebsd/$arch
+              curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz \
+                | tar -xJf - -C freebsd/$arch 2>/dev/null &
             else
               echo "FreeBSD $arch already exists in /opt/freebsd, skipping download."
             fi
@@ -93,10 +85,10 @@ jobs:
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
           for arch in "${openbsd[@]}"; do
-            if [ ! -d /opt/openbsd/$arch ]; then
-              sudo mkdir -p /opt/openbsd/$arch
+            if [ ! -d openbsd/$arch ]; then
+              mkdir -p openbsd/$arch
               for file in "${files[@]}"; do
-              sudo sh -c "curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C /opt/openbsd/$arch 2>/dev/null" &
+                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C openbsd/$arch 2>/dev/null &
               done
             else
               echo "OpenBSD $arch already exists in /opt/openbsd, skipping download."
@@ -106,10 +98,10 @@ jobs:
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
-            if [ ! -d /opt/netbsd/$arch ]; then
-              sudo mkdir -p /opt/netbsd/$arch
+            if [ ! -d netbsd/$arch ]; then
+              mkdir -p netbsd/$arch
               for file in "${files[@]}"; do
-                sudo sh -c "curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C /opt/netbsd/$arch 2>/dev/null" &
+                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C netbsd/$arch 2>/dev/null &
               done
             else
               echo "NetBSD $arch already exists in /opt/netbsd, skipping download."
