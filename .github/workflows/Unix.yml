@@ -52,15 +52,15 @@ jobs:
             sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null &
           done
 
-          # ppc=(powerpc64 powerpc64le)
-          # for arch in ${ppc[@]}; do
-          #   curl -fsSo "${arch}-base.txz" https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz &
-          # done
-          # wait
-          # for arch in ${ppc[@]}; do
-          #   sudo mkdir -p /opt/freebsd/$arch
-          #   sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null &
-          # done
+          ppc=(powerpc64 powerpc64le)
+          for arch in ${ppc[@]}; do
+            curl -fsSo "${arch}-base.txz" https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz &
+          done
+          wait
+          for arch in ${ppc[@]}; do
+            sudo mkdir -p /opt/freebsd/$arch
+            sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null &
+          done
 
           # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
           # bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
@@ -107,6 +107,8 @@ jobs:
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             riscv64gc-unknown-freebsd
+            powerpc64-unknown-freebsd
+            powerpc64le-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
@@ -133,6 +135,8 @@ jobs:
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"
+                  "powerpc64-unknown-freebsd FreeBSD-ppc64"
+                  "powerpc64le-unknown-freebsd FreeBSD-ppc64le"
                   "x86_64-unknown-openbsd OpenBSD-x86_64"
                   "aarch64-unknown-openbsd OpenBSD-aarch64"
                   "riscv64gc-unknown-openbsd OpenBSD-riscv64"
