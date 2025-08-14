@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v4
         id: sysroot-cache
         with:
-          path: freebsd openbsd netbsd
+          path: /tmp/freebsd /tmp/openbsd /tmp/netbsd
           key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: |
             sysroot-${{ runner.os }}-
@@ -53,23 +53,23 @@ jobs:
 
           freebsd=(amd64 arm64 riscv)
           for arch in "${freebsd[@]}"; do
-            if [ ! -d freebsd/$arch ]; then
-                mkdir -p freebsd/$arch
+            if [ ! -d /tmp/freebsd/$arch ]; then
+                mkdir -p /tmp/freebsd/$arch
                 curl -fsSL https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz \
-            | tar -xJf - -C freebsd/$arch 2>/dev/null &
+            | tar -xJf - -C /tmp/freebsd/$arch 2>/dev/null &
             else
-              echo "FreeBSD $arch already exists in /opt/freebsd, skipping download."
+              echo "FreeBSD $arch already exists in /tmp/freebsd, skipping download."
             fi
           done
 
           ppc=(powerpc64 powerpc64le)
           for arch in "${ppc[@]}"; do
-            if [ ! -d freebsd/$arch ]; then
-              mkdir -p freebsd/$arch
+            if [ ! -d /tmp/freebsd/$arch ]; then
+              mkdir -p /tmp/freebsd/$arch
               curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz \
-                | tar -xJf - -C freebsd/$arch 2>/dev/null &
+                | tar -xJf - -C /tmp/freebsd/$arch 2>/dev/null &
             else
-              echo "FreeBSD $arch already exists in /opt/freebsd, skipping download."
+              echo "FreeBSD $arch already exists in /tmp/freebsd, skipping download."
             fi
           done
 
@@ -85,26 +85,26 @@ jobs:
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
           for arch in "${openbsd[@]}"; do
-            if [ ! -d openbsd/$arch ]; then
-              mkdir -p openbsd/$arch
+            if [ ! -d /tmp/openbsd/$arch ]; then
+              mkdir -p /tmp/openbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C openbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C /tmp/openbsd/$arch 2>/dev/null &
               done
             else
-              echo "OpenBSD $arch already exists in /opt/openbsd, skipping download."
+              echo "OpenBSD $arch already exists in /tmp/openbsd, skipping download."
             fi
           done
 
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
-            if [ ! -d netbsd/$arch ]; then
-              mkdir -p netbsd/$arch
+            if [ ! -d /tmp/netbsd/$arch ]; then
+              mkdir -p /tmp/netbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C netbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C /tmp/netbsd/$arch 2>/dev/null &
               done
             else
-              echo "NetBSD $arch already exists in /opt/netbsd, skipping download."
+              echo "NetBSD $arch already exists in /tmp/netbsd, skipping download."
             fi
           done
 
