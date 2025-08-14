@@ -49,7 +49,7 @@ jobs:
           wait
           for arch in ${freebsd[@]}; do
             sudo mkdir -p /opt/freebsd/$arch
-            sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null
+            sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null &
           done
 
           # ppc=(powerpc64 powerpc64le)
@@ -59,7 +59,7 @@ jobs:
           # wait
           # for arch in ${ppc[@]}; do
           #   sudo mkdir -p /opt/freebsd/$arch
-          #   sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null
+          #   sudo tar -xJf "${arch}-base.txz" -C /opt/freebsd/$arch 2>/dev/null &
           # done
 
           # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
@@ -82,7 +82,7 @@ jobs:
           for arch in ${openbsd[@]}; do
             sudo mkdir -p /opt/openbsd/$arch
             for file in ${files[@]}; do
-              sudo tar -xzf "${arch}-${file}.tgz" -C /opt/openbsd/$arch 2>/dev/null
+              sudo tar -xzf "${arch}-${file}.tgz" -C /opt/openbsd/$arch 2>/dev/null &
             done
           done
 
@@ -97,9 +97,11 @@ jobs:
           for arch in ${netbsd[@]}; do
             sudo mkdir -p /opt/netbsd/$arch
             for file in ${files[@]}; do
-              sudo tar -xJf "${arch}-${file}.tar.xz" -C /opt/netbsd/$arch 2>/dev/null
+              sudo tar -xJf "${arch}-${file}.tar.xz" -C /opt/netbsd/$arch 2>/dev/null &
             done
           done
+
+          wait
 
           targets=(
             x86_64-unknown-freebsd
