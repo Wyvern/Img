@@ -415,3 +415,6 @@ rustflags = [
     "-Clink-arg=-target",
     "-Clink-arg=riscv64gc--openbsd",
 ]
+
+[target.powerpc64-unknown-linux-musl]
+rustflags = ["-Clink-arg=-mabi=elfv2"]
