@@ -45,13 +45,15 @@ jobs:
           freebsd=(amd64 arm64 riscv)
           for arch in "${freebsd[@]}"; do
             sudo mkdir -p /opt/freebsd/$arch
-            sudo curl -fsSL "https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz" \
-              | sudo tar -xJf - -C /opt/freebsd/$arch 2>/dev/null &
+            sudo sh -c "curl -fsSL https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz \
+              | tar -xJf - -C /opt/freebsd/$arch 2>/dev/null" &
           done
 
           ppc=(powerpc64 powerpc64le)
           for arch in "${ppc[@]}"; do
-            sudo curl -fsSL "https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz" | sudo tar -xJf - -C /opt/freebsd/$arch 2>/dev/null &
+            sudo mkdir -p /opt/freebsd/$arch
+            sudo sh -c "curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz \
+              | tar -xJf - -C /opt/freebsd/$arch 2>/dev/null" &
           done
 
           # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
@@ -66,16 +68,18 @@ jobs:
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
           for arch in "${openbsd[@]}"; do
+            sudo mkdir -p /opt/openbsd/$arch
             for file in "${files[@]}"; do
-              sudo curl -fsSL "https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz" | sudo tar -xJf - -C /opt/openbsd/$arch 2>/dev/null &
+            sudo sh -c "curl -fsSL 'https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz' | tar -xJf - -C /opt/openbsd/$arch 2>/dev/null" &
             done
           done
 
           netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
+            sudo mkdir -p /opt/netbsd/$arch
             for file in "${files[@]}"; do
-              sudo curl -fsSL "https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz" | sudo tar -xJf - -C /opt/netbsd/$arch 2>/dev/null &
+              sudo sh -c "curl -fsSL 'https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz' | tar -xJf - -C /opt/netbsd/$arch 2>/dev/null" &
             done
           done
 
