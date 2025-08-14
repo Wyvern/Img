@@ -28,15 +28,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Cache sysroot
-        uses: actions/cache@v4
-        id: sysroot-cache
-        with:
-          path: /tmp/freebsd /tmp/openbsd /tmp/netbsd
-          key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
-          restore-keys: |
-            sysroot-${{ runner.os }}-
-
       - name: Ubuntu apt update and install
         run: |
           # wget https://apt.llvm.org/llvm-snapshot.gpg.key
@@ -126,6 +117,15 @@ jobs:
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
+
+      - name: Cache sysroot
+        uses: actions/cache@v4
+        id: sysroot-cache
+        with:
+          path: /tmp/freebsd /tmp/openbsd /tmp/netbsd
+          key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
+          restore-keys: |
+            sysroot-${{ runner.os }}-
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
