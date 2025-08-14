@@ -83,8 +83,6 @@ jobs:
             done
           done
 
-          wait
-
           targets=(
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
