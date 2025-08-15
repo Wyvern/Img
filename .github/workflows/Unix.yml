@@ -28,8 +28,8 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Prepare sysroot dir
-        run: mkdir -p /home/runner/sysroots
+      # - name: Prepare sysroot dir
+      #   run: mkdir -p /home/runner/sysroots
 
       - name: Cache sysroot
         uses: actions/cache@v4
