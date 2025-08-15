@@ -42,6 +42,7 @@ jobs:
 
       - name: Build Release
         run: |
+          sudo apt install -qy libarchive-tools
           cargo update
           set +e -x
 
@@ -88,7 +89,7 @@ jobs:
             fi
           done
 
-          if [ ! -f $SYSROOT/dfly-x86_64-6.4.2_REL.iso ]; then
+          if [ ! -d $SYSROOT/dfly ]; then
             curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > dfly-x86_64-6.4.2_REL.iso
             mkdir -p $SYSROOT/dfly
             bsdtar -C $SYSROOT/dfly -xf dfly-x86_64-6.4.2_REL.iso
