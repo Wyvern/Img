@@ -119,7 +119,7 @@ jobs:
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
-          umount $SYSROOT/dfly
+          sudo umount $SYSROOT/dfly
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
