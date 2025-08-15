@@ -31,19 +31,14 @@ jobs:
       - name: Prepare sysroot dir
         run: mkdir -p /home/runner/sysroots
 
-      - name: App update and install
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -qy libarchive-tools
-
       - name: Cache sysroot
         uses: actions/cache@v4
         id: sysroot-cache
         with:
           path: /home/runner/sysroots
-          key: sysroots-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
+          key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: |
-            sysroots-${{ runner.os }}-
+            sysroot-${{ runner.os }}-
 
       - name: Build Release
         run: |
@@ -93,14 +88,15 @@ jobs:
             fi
           done
 
-          if [ ! -d $SYSROOT/dfly ]; then
-            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > dfly-x86_64-6.4.2_REL.iso
+          if [ ! -f $SYSROOT/dfly-x86_64-6.4.2_REL.iso ]; then
+            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > $SYSROOT/dfly-x86_64-6.4.2_REL.iso
             mkdir -p $SYSROOT/dfly
-            bsdtar -C $SYSROOT/dfly -xf dfly-x86_64-6.4.2_REL.iso
           fi
 
           wait
           chmod -R u+rwX "$SYSROOT"
+
+          sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
           targets=(
             x86_64-unknown-dragonfly
@@ -119,6 +115,8 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s --target $target
           done
+
+          sudo umount $SYSROOT/dfly
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
