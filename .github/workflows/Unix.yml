@@ -36,9 +36,9 @@ jobs:
         id: sysroot-cache
         with:
           path: /home/runner/sysroots
-          key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
+          key: sr-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: |
-            sysroot-${{ runner.os }}-
+            sr-${{ runner.os }}-
 
       - name: Build Release
         run: |
