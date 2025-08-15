@@ -88,15 +88,14 @@ jobs:
             fi
           done
 
+          wait
+          chmod -R u+rwX "$SYSROOT"
+
           if [ ! -f $SYSROOT/dfly-x86_64-6.4.2_REL.iso ]; then
             curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > "$SYSROOT/dfly-x86_64-6.4.2_REL.iso"
             mkdir $SYSROOT/dfly
           fi
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
-
-          wait
-          find "$SYSROOT" ! -path "$SYSROOT/dfly-x86_64-6.4.2_REL.iso" -exec chmod u+rwX {} +
-          # chmod -R u+rwX "$SYSROOT"
 
           targets=(
             x86_64-unknown-dragonfly
