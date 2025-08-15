@@ -370,7 +370,7 @@ rustflags = [
 
 [target.x86_64-unknown-dragonfly]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/dfly/usr",
+    "-Clink-arg=--sysroot=sysroot/dfly",
     "-Clink-arg=-target",
     "-Clink-arg=x86_64--dragonfly",
 ]
