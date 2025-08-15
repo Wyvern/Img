@@ -31,7 +31,7 @@ jobs:
       - name: Prepare sysroot dir
         run: mkdir -p /home/runner/sysroots
 
-      - name: Install libarchive-tools
+      - name: App update and install
         run: |
           sudo apt-get update -q
           sudo apt-get install -qy libarchive-tools
@@ -41,13 +41,12 @@ jobs:
         id: sysroot-cache
         with:
           path: /home/runner/sysroots
-          key: sysroot-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
+          key: sysroots-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: |
-            sysroot-${{ runner.os }}-
+            sysroots-${{ runner.os }}-
 
       - name: Build Release
         run: |
-          sudo apt install -qy libarchive-tools
           cargo update
           set +e -x
 
