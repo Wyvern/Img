@@ -66,10 +66,12 @@ jobs:
             fi
           done
 
-          # curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
-          # bunzip2 dfly-x86_64-6.4.2_REL.iso.bz2
-          # mkdir $SYSROOT/dfly
-          # sudo mount -o loop dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
+          if [ ! -f $SYSROOT/dfly-x86_64-6.4.2_REL.iso ]; then
+            curl -fsSO https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2
+            bunzip2 -c dfly-x86_64-6.4.2_REL.iso.bz2 > $SYSROOT/dfly-x86_64-6.4.2_REL.iso
+            mkdir $SYSROOT/dfly
+          fi
+          sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
           openbsd=(amd64 arm64 riscv64)
           files=(base77 comp77)
@@ -97,6 +99,7 @@ jobs:
           chmod -R u+rwX "$SYSROOT"
 
           targets=(
+            x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
             riscv64gc-unknown-freebsd
@@ -125,6 +128,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  "x86_64-unknown-dragonfly DragonFly-x86_64"
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
                   "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "riscv64gc-unknown-freebsd FreeBSD-riscv64"
