@@ -89,14 +89,13 @@ jobs:
           done
 
           if [ ! -f $SYSROOT/dfly-x86_64-6.4.2_REL.iso ]; then
-            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > "$SYSROOT/dfly-x86_64-6.4.2_REL.iso"
-            mkdir $SYSROOT/dfly
+            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > dfly-x86_64-6.4.2_REL.iso
+            mkdir -p $SYSROOT/dfly
+            bsdtar -C $SYSROOT/dfly -xf dfly-x86_64-6.4.2_REL.iso
           fi
 
           wait
           chmod -R u+rwX "$SYSROOT"
-
-          sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
           targets=(
             x86_64-unknown-dragonfly
@@ -119,7 +118,6 @@ jobs:
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
-          sudo umount $SYSROOT/dfly
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
