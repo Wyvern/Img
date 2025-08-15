@@ -230,7 +230,7 @@ rustflags = [
     "-Frust_2018_compatibility",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_arch="sparc64", target_arch="powerpc64"))))']
+[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']
 rustflags = [
     "-Clink-self-contained=+linker",
     "-Clinker-features=+lld",
@@ -238,7 +238,7 @@ rustflags = [
     "-Clink-arg=-Wl,--relax",
 ]
 
-[target.'cfg(target_os="linux")']
+[target.'cfg(all(target_os="linux",not(target_family="wasm")))']
 rustflags = [
     "-Clink-arg=-Wl,--gc-sections",
     "-Clink-arg=-Wl,-z,norelro",

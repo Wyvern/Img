@@ -46,6 +46,7 @@ jobs:
           set +e -x
 
           targets=(
+            wasm32-wali-linux-musl
             powerpc64-unknown-linux-gnu
             powerpc64-unknown-linux-musl
           )
@@ -67,6 +68,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  "wasm32-wali-linux-musl Linux-wali-musl"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
                   "powerpc64-unknown-linux-musl-elfv1 Linux-powerpc64-musl"
