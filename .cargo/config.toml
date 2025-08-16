@@ -144,6 +144,7 @@ feature-unification = true
 build-dir = true
 rustdoc-depinfo = true
 no-embed-metadata = true
+profile-hint-mostly-unused = true
 
 # build-std = [
 #     "core",
@@ -218,6 +219,7 @@ rustflags = [
     "-Zexperimental-default-bounds=y",
     "-Zhigher-ranked-assumptions",
     "-Zoffload=Enable",
+    "-Zhint-mostly-unused",
     # "-Zbuild-sdylib-interface",
 
     "-Anonstandard_style",
