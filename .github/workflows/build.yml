@@ -143,8 +143,11 @@ jobs:
             ~/.cargo/git
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Install cargo-ndk
-        run: cargo install --git https://github.com/bbqsrc/cargo-ndk cargo-ndk --branch main
+      - name: Cargo-ndk
+        run: |
+          curl -fsSLo cargo-ndk.tgz   https://github.com/bbqsrc/cargo-ndk/releases/latest/download/cargo-ndk-aarch64-apple-darwin-v4.1.2.tgz
+          tar -xzf cargo-ndk.tgz --strip-components=1 -C ~/.cargo/bin
+          chmod +x ~/.cargo/bin/cargo-ndk
 
       - name: Build Release
         run: |
