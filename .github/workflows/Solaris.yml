@@ -38,7 +38,7 @@ jobs:
 
       - name: Cross-rs
         run: |
-          wget https://github.com/cross-rs/cross/releases/download/v0.2.5/cross-x86_64-unknown-linux-gnu.tar.gz
+          wget https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz
           tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
           sudo mv cross /usr/local/bin/
 
