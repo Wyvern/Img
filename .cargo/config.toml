@@ -68,7 +68,7 @@ inherits = "release"
 rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 [profile.release]
-rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic", "-Zhint-mostly-unused"]
 rpath = true
 trim-paths = true
 
@@ -79,6 +79,7 @@ lto = true
 panic = "abort"
 codegen-units = 1
 rustflags = [
+    "-Zhint-mostly-unused",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
     # "-Zvirtual-function-elimination",
@@ -102,6 +103,7 @@ rustflags = [
 [profile.src]
 inherits = "lto"
 rustflags = [
+    "-Zhint-mostly-unused",
     "-Zforce-unstable-if-unmarked",
     "-Zlocation-detail=none",
     "-Ztrap-unreachable=no",
@@ -219,7 +221,6 @@ rustflags = [
     "-Zexperimental-default-bounds=y",
     "-Zhigher-ranked-assumptions",
     "-Zoffload=Enable",
-    "-Zhint-mostly-unused",
     # "-Zbuild-sdylib-interface",
 
     "-Anonstandard_style",
