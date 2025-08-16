@@ -9,8 +9,3 @@ path = "lib.rs"
 [dependencies]
 tendril = { version = "*", public = true }
 markup5ever = { version = "*", public = true }
-xml5ever = { version = "*" }
-
-# [dev-dependencies]
-# serde_json = "1.0"
-# rustc-test = "0.3"
