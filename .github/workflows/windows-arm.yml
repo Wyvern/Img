@@ -47,8 +47,8 @@ jobs:
         with:
           components: rust-src
 
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+      # - name: Run sccache-cache
+      #   uses: mozilla-actions/sccache-action@main
 
       - name: Cache Cargo registry
         uses: actions/cache@v4
