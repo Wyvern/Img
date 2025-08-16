@@ -35,9 +35,21 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Install cargo-ndk
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cargo-ndk
         run: |
-          cargo install --git https://github.com/bbqsrc/cargo-ndk cargo-ndk --branch main
+          curl -fsSLo cargo-ndk.tgz \
+            https://github.com/bbqsrc/cargo-ndk/releases/download/v4.1.2/cargo-ndk-aarch64-apple-darwin-v4.1.2.tgz
+          tar -xzf cargo-ndk.tgz
+          chmod +x cargo-ndk
+          mv cargo-ndk ~/.cargo/bin/
 
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1

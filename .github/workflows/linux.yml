@@ -28,6 +28,14 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
       - name: Ubuntu apt update and install
         run: |
           # wget https://apt.llvm.org/llvm-snapshot.gpg.key

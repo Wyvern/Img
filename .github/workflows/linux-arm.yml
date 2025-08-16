@@ -28,6 +28,14 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }
+
       - name: Ubuntu apt update and install
         run: |
           sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu musl-tools -y

@@ -31,6 +31,14 @@ jobs:
       # - name: Prepare sysroot dir
       #   run: mkdir -p /home/runner/sysroots
 
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
       - name: Cache sysroot
         uses: actions/cache@v4
         id: sysroot-cache
