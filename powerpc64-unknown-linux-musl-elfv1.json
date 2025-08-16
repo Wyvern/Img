@@ -8,8 +8,8 @@
   "os": "linux",
   "env": "musl",
   "vendor": "unknown",
-  "abi": "elfv1",
-  "llvm-abiname": "elfv1",
+  "abi": "elfv2",
+  "llvm-abiname": "elfv2",
   "linker": "powerpc64-linux-gnu-gcc",
   "linker-flavor": "gcc",
   "linker-is-gnu": true,
@@ -30,6 +30,6 @@
   "features": "",
 
   "pre-link-args": {
-    "gcc": ["-mabi=elfv1", "-static"]
+    "gcc": ["-mabi=elfv2", "-static"]
   }
 }
