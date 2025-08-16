@@ -208,6 +208,7 @@ rustflags = [
     "-Ztyping-mode-borrowck",
     "-Zexperimental-default-bounds",
     "-Zhigher-ranked-assumptions",
+    # "-Zhint-mostly-unused",
 
     "-Anonstandard_style",
     "-Adead_code",
