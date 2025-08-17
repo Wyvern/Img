@@ -232,8 +232,6 @@ rustflags = [
     "-Dclippy::redundant_clone",
     "-Dclippy::unused_io_amount",
     "-Wlinker_messages",
-    "-Frust_2018_idioms",
-    "-Frust_2018_compatibility",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']
