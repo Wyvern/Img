@@ -36,13 +36,14 @@ jobs:
             ~/.cargo/git
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Android NDK cache
+        uses: actions/cache@v4
+        with:
+          path: ~/android-ndk
+          key: android-ndk-r28c
+
       - name: Ubuntu apt update and install
         run: |
-          # wget https://apt.llvm.org/llvm-snapshot.gpg.key
-          # sudo apt-key add llvm-snapshot.gpg.key
-
-          # sudo apt-add-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-21 main"
-
           sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
 
       - name: Build Release
@@ -50,8 +51,18 @@ jobs:
           # sudo snap install zig --classic --beta
           # pipx install cargo-zigbuild
 
+          ver=r28c
+          mkdir -p ~/android-ndk
+          export ANDROID_NDK_HOME=~/android-ndk/android-ndk-$ver
+          ln -sfn "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/" sysroot
+
+          curl -fsSLO https://dl.google.com/android/repository/android-ndk-$ver-linux.zip
+          unzip android-ndk-$ver-linux.zip -d ~/android-ndk
+
           cargo update
           set +e -x
+
+          time cargo s --target riscv64-linux-android
 
           targets=(
             powerpc64-unknown-linux-gnu

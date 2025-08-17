@@ -58,8 +58,6 @@ jobs:
 
       - name: Build Release
         run: |
-          # brew install cargo-zigbuild
-
           cargo update
 
           # time cargo z riscv64-linux-android
