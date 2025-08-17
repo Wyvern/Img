@@ -45,7 +45,8 @@ jobs:
 
       - name: Cargo-ndk
         run: |
-          curl -fsSLo cargo-ndk.tgz   https://github.com/bbqsrc/cargo-ndk/releases/latest/download/cargo-ndk-aarch64-apple-darwin-v4.1.2.tgz
+          ver=v4.1.2
+          curl -fsSLo cargo-ndk.tgz   https://github.com/bbqsrc/cargo-ndk/releases/download/$ver/cargo-ndk-aarch64-apple-darwin-$ver.tgz
           tar -xzf cargo-ndk.tgz --strip-components=1 -C ~/.cargo/bin
           chmod +x ~/.cargo/bin/cargo-ndk
 
