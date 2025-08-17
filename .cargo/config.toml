@@ -420,4 +420,4 @@ rustflags = [
 [target.riscv64-linux-android]
 ar = "sysroot/bin/riscv64-linux-android-ar"
 linker = "sysroot/bin/riscv64-linux-android35-clang"
-rustflags = ["-Clink-arg=--sysroot=sysroot"]
+rustflags = ["-Clink-arg=--sysroot=sysroot/sysroot"]
