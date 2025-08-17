@@ -66,7 +66,7 @@ jobs:
             time cargo s --target $target
           done
 
-          lipo -create target/aarch64-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+          lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
           find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
