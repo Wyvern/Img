@@ -36,11 +36,19 @@ jobs:
             ~/.cargo/git
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Get latest Android NDK version
+        id: ndk-ver
+        run: |
+          latest_ndk=$(curl -fsSL https://developer.android.com/ndk/downloads \
+            | sed -n 's/.*Latest Stable Version (\([^)]*\)).*/\1/p')
+          echo "NDK_VERSION=$latest_ndk" >> $GITHUB_ENV
+          echo "Latest NDK: $latest_ndk"
+
       - name: Android NDK cache
         uses: actions/cache@v4
         with:
           path: ~/android-ndk
-          key: android-ndk-r28c
+          key: android-ndk-${{ env.NDK_VERSION }}
 
       - name: Ubuntu apt update and install
         run: |
@@ -51,7 +59,7 @@ jobs:
           # sudo snap install zig --classic --beta
           # pipx install cargo-zigbuild
 
-          ver=r28c
+          ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk/android-ndk-$ver
           ln -sfn "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/" sysroot
 
