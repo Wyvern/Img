@@ -50,10 +50,18 @@ jobs:
           tar -xzf cargo-ndk.tgz --strip-components=1 -C ~/.cargo/bin
           chmod +x ~/.cargo/bin/cargo-ndk
 
+      - name: Get latest Android NDK version
+        id: ndk-ver
+        run: |
+          latest_ndk=$(curl -fsSL https://developer.android.com/ndk/downloads \
+            | sed -n 's/.*Latest Stable Version (\([^)]*\)).*/\1/p')
+          echo "NDK_VERSION=$latest_ndk" >> $GITHUB_ENV
+          echo "Latest NDK: $latest_ndk"
+
       - name: Android NDK setup
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r28c
+          ndk-version: ${{ env.NDK_VERSION }}
           link-to-sdk: true
           local-cache: true
 
