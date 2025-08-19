@@ -74,6 +74,9 @@ jobs:
 
           targets=(
             riscv64-linux-android
+            aarch64-linux-android
+            armv7-linux-androideabi
+            x86_64-linux-android
             powerpc64-unknown-linux-gnu
             ./powerpc64-unknown-linux-musl-elfv1.json
             powerpc64-unknown-linux-musl
@@ -96,6 +99,9 @@ jobs:
         run: |
           targets=(
                   "riscv64-linux-android Android-riscv64"
+                  "aarch64-linux-android Android-aarch64"
+                  "armv7-linux-androideabi Android-armv7"
+                  "x86_64-linux-android Android-x86_64"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
                   "powerpc64-unknown-linux-musl-elfv1 Linux-powerpc64-musl"
