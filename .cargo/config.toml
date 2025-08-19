@@ -133,7 +133,6 @@ public-dependency = true
 cargo-lints = true
 checksum-freshness = true
 feature-unification = true
-build-dir = true
 rustdoc-depinfo = true
 no-embed-metadata = true
 profile-hint-mostly-unused = true
