@@ -20,6 +20,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Set cache key date
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: rust-${{ runner.os }}-nightly-${{ env.DATE }}
+          restore-keys: |
+            rust-${{ runner.os }}-nightly-
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -30,14 +44,6 @@ jobs:
 
       # - name: Prepare sysroot dir
       #   run: mkdir -p /home/runner/sysroots
-
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Cache sysroot
         uses: actions/cache@v4
