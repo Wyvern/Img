@@ -1,9 +1,6 @@
 mod util;
 use {std::*, util::*};
 
-#[cfg(target_os = "hermit")]
-use hermit as _;
-
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
@@ -795,11 +792,7 @@ fn magic_number_type(pb: path::PathBuf) {
         pb.with_extension(t.map_or_else(
             || {
                 let str = String::from_utf8_lossy(&buf);
-                if str.contains("<svg") {
-                    "svg"
-                } else {
-                    ""
-                }
+                if str.contains("<svg") { "svg" } else { "" }
             },
             |ty| ty.extension(),
         )),
