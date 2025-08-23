@@ -72,7 +72,7 @@ jobs:
           if [ ! -d ~/android-ndk ]; then
             mkdir -p ~/android-ndk
           curl -fsSLO https://dl.google.com/android/repository/android-ndk-$ver-linux.zip
-          unzip android-ndk-$ver-linux.zip -d ~/android-ndk -q
+          unzip -q android-ndk-$ver-linux.zip -d ~/android-ndk
           fi
 
           cargo update
