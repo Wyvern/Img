@@ -5,20 +5,8 @@ fn main() {
     let parts = [2, 3];
     let [os, abi] = array::from_fn(|n| target.split('-').nth(parts[n]).unwrap_or("unknown"));
 
-    match os {
-        "freebsd" => {
-            println!("cargo::rustc-link-arg=-Wl,--allow-multiple-definition");
-            println!("cargo::rustc-link-arg=-Wl,--export-dynamic");
-        }
-        "solaris" | "illumos" => {
-            println!("cargo::rustc-link-arg=-Wl,-z,noexecstack");
-            println!("cargo::rustc-link-arg=-Wl,-z,nocopyreloc");
-        }
+    match [os, abi] {
         _ => (),
-    }
-    if abi == "ohos" {
-        println!("cargo::rustc-link-arg=-Wl,--no-undefined");
-        println!("cargo::rustc-link-arg=-Wl,--as-needed");
     }
 
     println!("cargo::rerun-if-changed=build.rs");
