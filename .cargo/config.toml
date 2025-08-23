@@ -219,10 +219,10 @@ rustflags = [
     "-Zchecksum-hash-algorithm=blake3",
     "-Ztrap-unreachable=no",
     "-Zmir-strip-debuginfo=all-locals",
-    "-Ztyping-mode-borrowck=y",
-    "-Zexperimental-default-bounds=y",
-    "-Zhigher-ranked-assumptions",
-    "-Zoffload=Enable",
+    # "-Ztyping-mode-borrowck=y",
+    # "-Zexperimental-default-bounds=y",
+    # "-Zhigher-ranked-assumptions",
+    # "-Zoffload=Enable",
     # "-Zbuild-sdylib-interface",
 
     "-Anonstandard_style",
@@ -434,3 +434,6 @@ linker = "sysroot/bin/x86_64-linux-android35-clang"
 [target.armv7-linux-androideabi]
 ar = "sysroot/bin/arm-linux-androideabi-ar"
 linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
+
+[target.'cfg(target_os = "hermit")']
+linker = "rust-lld"

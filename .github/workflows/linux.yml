@@ -79,6 +79,9 @@ jobs:
           set +e -x
 
           targets=(
+            aarch64-unknown-hermit
+            riscv64gc-unknown-hermit
+            x86_64-unknown-hermit
             riscv64-linux-android
             aarch64-linux-android
             armv7-linux-androideabi

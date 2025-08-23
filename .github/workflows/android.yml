@@ -2,9 +2,9 @@ name: Android
 
 on:
   push:
-    branches: ["dev"]
+    branches: ["devx"]
   pull_request:
-    branches: ["dev"]
+    branches: ["devx"]
 
 env:
   CARGO_TERM_COLOR: always
