@@ -3,11 +3,7 @@ use std::*;
 fn main() {
     let target = env::var("TARGET").expect("TARGET environment variable is not set");
     let parts = [2, 3];
-    let [os, abi] = array::from_fn(|n| target.split('-').nth(parts[n]).unwrap_or("unknown"));
-
-    match [os, abi] {
-        _ => (),
-    }
+    let [_os, _abi] = array::from_fn(|n| target.split('-').nth(parts[n]).unwrap_or("unknown"));
 
     println!("cargo::rerun-if-changed=build.rs");
     // println!("cargo::rustc-link-lib=lib");

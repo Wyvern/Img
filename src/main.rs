@@ -1135,9 +1135,8 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
-    use std::cmp::Reverse;
-
     use super::*;
+    use std::cmp::Reverse;
 
     #[inline]
     fn arg(default: &str) -> String {

@@ -1,6 +1,4 @@
-use std::{fmt::Debug, *};
-
-use crate::tdbg;
+use std::*;
 
 ///Colorized terminal constants
 /**
@@ -160,16 +158,16 @@ impl<T> AsBytes for T {}
 
 pub trait Dbg
 where
-    Self: Debug,
+    Self: fmt::Debug,
 {
     fn dbg(&self) {
-        tdbg!(self);
+        crate::tdbg!(self);
     }
     fn dbg_pause(&self) {
-        tdbg!(self;);
+        crate::tdbg!(self;);
     }
 }
-impl<T: Debug> Dbg for T {}
+impl<T: fmt::Debug> Dbg for T {}
 
 pub fn pause() {
     use io::*;
@@ -239,7 +237,7 @@ mod test {
 
     #[test]
     fn dyn_any() {
-        tdbg!(target_endian());
+        crate::tdbg!(target_endian());
 
         let x = [&mut 7 as &dyn any::Any, &4.3];
         let y = 123;
