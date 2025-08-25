@@ -142,13 +142,12 @@ mod macros {
 }
 }
 
-pub trait AsBytes
-where
-    Self: Sized,
-{
+pub trait AsBytes: Sized {
+    fn from_bytes(bytes: &[u8]) -> &Self {
+        unsafe { &*(bytes.as_ptr() as *const Self) }
+    }
     fn as_bytes(&self) -> &[u8] {
-        let len = mem::size_of::<Self>();
-        unsafe { slice::from_raw_parts((self as *const Self).cast::<u8>(), len) }
+        unsafe { slice::from_raw_parts((self as *const Self).cast::<u8>(), mem::size_of::<Self>()) }
     }
     fn eql<Other>(&self, other: &Other) -> bool {
         self.as_bytes() == other.as_bytes()
@@ -156,10 +155,7 @@ where
 }
 impl<T> AsBytes for T {}
 
-pub trait Dbg
-where
-    Self: fmt::Debug,
-{
+pub trait Dbg: fmt::Debug {
     fn dbg(&self) {
         crate::tdbg!(self);
     }
