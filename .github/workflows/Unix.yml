@@ -107,7 +107,9 @@ jobs:
           fi
 
           if [ ! -d sysroot/omnios ]; then
-            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151054.zfs.xz | xz -d > sysroot/omnios-r151054.zfs
+            sudo truncate -s 2G sysroot/zpool.img
+            sudo zpool create -m none omnios sysroot/zpool.img
+            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151054.zfs.xz | xz -d | sudo zfs receive -F omnios/ROOT
             mkdir -p sysroot/omnios
           fi
 
@@ -116,9 +118,10 @@ jobs:
 
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
-          LOOPDEV=$(sudo losetup -fP --show sysroot/omnios-r151054.zfs)
-          sudo losetup -a
-          sudo zpool import -d "$LOOPDEV" -R "sysroot/omnios" omnios
+          sudo zpool create -f -m none omnios sysroot/zpool.img
+          sudo zfs set mountpoint=sysroot/omnios omnios/ROOT
+          sudo zfs mount omnios/ROOT
+
           zpool status
           zfs list
 

@@ -42,18 +42,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Set cache key date
-        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
       - name: Cache Rust toolchain
         uses: actions/cache@v4
         with:
           path: |
             ~/.rustup
-            ~/.cargo/registry
-            ~/.cargo/git
-            target/
-          key: rust-${{ runner.os }}-nightly-${{ env.DATE }}
+            ~/.cargo
+          key: rust-${{ runner.os }}-nightly-${{ hashFiles('scripts/rust-files.txt') }}
           restore-keys: |
             rust-${{ runner.os }}-nightly-
 
