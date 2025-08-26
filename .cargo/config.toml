@@ -442,5 +442,6 @@ linker = "clang"
 rustflags = [
     "-Clink-arg=--sysroot=sysroot/omnios/rpool/ROOT/omnios-r151054",
     "-Clink-arg=-target",
-    "-Clink-arg=x86_64-pc-solaris2.11",
+    "-Clink-arg=x86_64--illumos",
 ]
+# x86_64-pc-solaris2.11
