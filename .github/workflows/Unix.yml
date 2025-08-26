@@ -38,9 +38,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      # - name: Prepare sysroot dir
-      #   run: mkdir -p /home/runner/sysroots
-
       - name: Cache sysroot
         uses: actions/cache@v4
         id: sysroot-cache
@@ -118,7 +115,7 @@ jobs:
 
           sudo truncate -s 2G $SYSROOT/zpool.img
           sudo zpool create -m none omnios $SYSROOT/zpool.img
-          sudo zfs receive -u -F omnios/ROOT < sysroot/omnios-r151054.zfs
+          sudo zfs receive -F omnios/ROOT < sysroot/omnios-r151054.zfs
           sudo zfs set mountpoint=$SYSROOT/omnios omnios/ROOT
           sudo zfs mount omnios/ROOT
 
