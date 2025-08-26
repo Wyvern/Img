@@ -106,12 +106,12 @@ jobs:
             mkdir -p $SYSROOT/dfly
           fi
 
-          if [ ! -d sysroot/omnios ]; then
+          # if [ ! -d sysroot/omnios ]; then
             sudo truncate -s 2G $SYSROOT/zpool.img
             sudo zpool create -m none omnios $SYSROOT/zpool.img
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151054.zfs.xz | xz -d | sudo zfs receive -F omnios/ROOT
             mkdir -p sysroot/omnios
-          fi
+          # fi
 
           wait
           chmod -R u+rwX "$SYSROOT"
