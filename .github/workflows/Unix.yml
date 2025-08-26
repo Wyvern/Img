@@ -26,9 +26,9 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: rust-${{ runner.os }}-nightly-${{ hashFiles('scripts/rust-files.txt') }}
+          key: rust-${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('scripts/rust-files.txt') }}
           restore-keys: |
-            rust-${{ runner.os }}-nightly-
+            rust-${{ runner.os }}-${{ runner.arch }}-nightly-
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -108,7 +108,7 @@ jobs:
 
           if [ ! -d sysroot/omnios ]; then
             sudo truncate -s 2G sysroot/zpool.img
-            sudo zpool create -m none omnios sysroot/zpool.img
+            sudo zpool create -m none omnios $(pwd)/sysroot/zpool.img
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151054.zfs.xz | xz -d | sudo zfs receive -F omnios/ROOT
             mkdir -p sysroot/omnios
           fi
@@ -118,7 +118,7 @@ jobs:
 
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
-          sudo zpool create -f -m none omnios sysroot/zpool.img
+          sudo zpool create -f -m none omnios $(pwd)/sysroot/zpool.img
           sudo zfs set mountpoint=sysroot/omnios omnios/ROOT
           sudo zfs mount omnios/ROOT
 
