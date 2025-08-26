@@ -112,6 +112,7 @@ jobs:
 
           if [ ! -d sysroot/omnios ]; then
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151054.zfs.xz | xz -d > sysroot/omnios-r151054.zfs
+            ls -hl sysroot/omnios*
             mkdir -p sysroot/omnios
           fi
 
