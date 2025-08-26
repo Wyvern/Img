@@ -332,7 +332,7 @@ rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 rustflags = ["-Zrelax-elf-relocations"]
 
 
-[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
+[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="illumos"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
@@ -441,5 +441,5 @@ linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 rustflags = [
     "-Clink-arg=--sysroot=sysroot/omnios/rpool/ROOT/omnios-r151054",
     "-Clink-arg=-target",
-    "-Clink-arg=x86_64--illumos",
+    "-Clink-arg=x86_64-pc-solaris2.11",
 ]
