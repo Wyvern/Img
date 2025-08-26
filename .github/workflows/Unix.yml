@@ -123,9 +123,10 @@ jobs:
           sudo zpool create -O mountpoint=sysroot/omnios omnios sysroot/omnios-r151054.zfs
           sudo zpool import -o altroot=sysroot/omnios omnios
 
-          ll -ahl sysroot/omnios
+          ls -ahl sysroot/omnios
 
           targets=(
+            x86_64-unknown-illumos
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
