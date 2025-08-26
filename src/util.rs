@@ -181,7 +181,7 @@ pub fn pause() {
         if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
             i.keys().next()
         {
-            write!(o, " Quit!",).unwrap();
+            write!(o, "{CL}{BEG}Quit!",).unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);
