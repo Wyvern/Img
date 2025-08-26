@@ -116,10 +116,11 @@ jobs:
 
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
-          sudo zpool create -O mountpoint=sysroot/omnios omnios sysroot/omnios-r151054.zfs
-          sudo zpool import -o altroot=sysroot/omnios omnios
-
-          ls -ahl sysroot/omnios*
+          LOOPDEV=$(sudo losetup -fP --show sysroot/omnios-r151054.zfs)
+          sudo losetup -a
+          sudo zpool import -d "$LOOPDEV" -R "sysroot/omnios" omnios
+          zpool status
+          zfs list
 
           targets=(
             x86_64-unknown-illumos
