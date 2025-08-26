@@ -54,6 +54,9 @@ jobs:
           restore-keys: |
             sr-${{ runner.os }}-
 
+      - name: Ubuntu apt update and install
+        run: sudo apt install -y zfsutils-linux
+
       - name: Build Release
         run: |
           cargo update
@@ -103,14 +106,24 @@ jobs:
           done
 
           if [ ! -f $SYSROOT/dfly-x86_64-6.4.2_REL.iso ]; then
-            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > $SYSROOT/dfly-x86_64-6.4.2_REL.iso
+            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > $SYSROOT/dfly-x86_64-6.4.2_REL.iso &
             mkdir -p $SYSROOT/dfly
+          fi
+
+          if [ ! -d sysroot/omnios ]; then
+            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151054.zfs.xz | xz -d > sysroot/omnios-r151054.zfs
+            mkdir -p sysroot/omnios
           fi
 
           wait
           chmod -R u+rwX "$SYSROOT"
 
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
+
+          sudo zpool create -O mountpoint=sysroot/omnios omnios sysroot/omnios-r151054.zfs
+          sudo zpool import -o altroot=sysroot/omnios omnios
+
+          ll -ahl sysroot/omnios
 
           targets=(
             x86_64-unknown-dragonfly
