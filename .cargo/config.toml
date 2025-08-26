@@ -418,7 +418,7 @@ rustflags = [
 ]
 
 [target.'cfg(target_os = "android")']
-rustflags = ["-Clink-arg=--sysroot=sysroot/android"]
+rustflags = ["-Clink-arg=--sysroot=sysroot/sysroot"]
 
 [target.riscv64-linux-android]
 ar = "sysroot/bin/riscv64-linux-android-ar"

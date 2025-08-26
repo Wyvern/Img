@@ -68,7 +68,6 @@ jobs:
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk/android-ndk-$ver
           ln -sfn "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/" sysroot
-          ln -sfn sysroot/sysroot sysroot/android
 
           if [ ! -d ~/android-ndk ]; then
             mkdir -p ~/android-ndk
