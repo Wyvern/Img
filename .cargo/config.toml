@@ -437,12 +437,10 @@ ar = "sysroot/bin/arm-linux-androideabi-ar"
 linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 
 
-[target.x86_64-unknown-illumos]
-linker = "clang"
-rustflags = [
-    "-Clink-arg=--sysroot=sysroot/omnios/rpool/ROOT/omnios-r151054",
-    "-Clink-arg=-target",
-    "-Clink-arg=x86_64-pc-solaris2.11",
-]
-# x86_64-pc-solaris2.11
-# sysroot/omnios/rpool/ROOT/omnios-r151054/usr/bin/ld
+# [target.x86_64-unknown-illumos]
+# linker = "clang"
+# rustflags = [
+#     "-Clink-arg=--sysroot=sysroot/omnios/rpool/ROOT/omnios-r151054",
+#     "-Clink-arg=-target",
+#     "-Clink-arg=x86_64-pc-solaris2.11",
+# ]
