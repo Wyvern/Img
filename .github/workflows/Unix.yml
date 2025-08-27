@@ -76,7 +76,7 @@ jobs:
             fi
           done
 
-          openbsd=(amd64 arm64 riscv64)
+          openbsd=(amd64 arm64 riscv64 powerpc64)
           files=(base77 comp77)
           for arch in "${openbsd[@]}"; do
             if [ ! -d $SYSROOT/openbsd/$arch ]; then
@@ -132,6 +132,7 @@ jobs:
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
+            powerpc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
           )
@@ -163,6 +164,7 @@ jobs:
                   "x86_64-unknown-openbsd OpenBSD-x86_64"
                   "aarch64-unknown-openbsd OpenBSD-aarch64"
                   "riscv64gc-unknown-openbsd OpenBSD-riscv64"
+                  "powerpc64-unknown-openbsd OpenBSD-ppc64"
                   "x86_64-unknown-netbsd NetBSD-x86_64"
                   "aarch64-unknown-netbsd NetBSD-aarch64"
           )

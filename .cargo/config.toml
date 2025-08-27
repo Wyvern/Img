@@ -422,6 +422,13 @@ rustflags = [
     "-Clink-arg=riscv64gc--openbsd",
 ]
 
+[target.powerpc64-unknown-openbsd]
+rustflags = [
+    "-Clink-arg=--sysroot=sysroot/openbsd/powerpc64",
+    "-Clink-arg=-target",
+    "-Clink-arg=powerpc64--openbsd",
+]
+
 [target.'cfg(target_os = "android")']
 rustflags = ["-Clink-arg=--sysroot=sysroot/android"]
 
