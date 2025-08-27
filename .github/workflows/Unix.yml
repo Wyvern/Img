@@ -43,9 +43,8 @@ jobs:
         id: sysroot-cache
         with:
           path: /home/runner/sysroots
-          key: sr-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
-          restore-keys: |
-            sr-${{ runner.os }}-
+          key: BSD-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
+          restore-keys: BSD-${{ runner.os }}-
 
       - name: Ubuntu apt update and install
         run: sudo apt update && sudo apt install -y zfsutils-linux
