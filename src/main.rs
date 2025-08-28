@@ -41,15 +41,16 @@ fn main() {
 
     if !dir.is_empty() {
         let path = path::Path::new(&dir);
-        if !path.exists() || !path.is_dir() {
-            quit!("The path {} is invalid!", &dir)
-        } else {
+        if path.exists() && path.is_dir() {
             env::set_current_dir(path)
                 .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
+        } else {
+            quit!("The path {} is invalid!", &dir)
         }
     }
 
     check_host(&url);
+
     let mut next_page = parse(&url);
     if cfg!(not(test)) {
         while !next_page.is_empty() {
@@ -71,7 +72,7 @@ fn check_host(addr: &str) -> &str {
 
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if !host.contains('.') {
-        quit!("{}: Invalid web host name.", host);
+        quit!("Invalid web host name: {}", host);
     }
     host
 }
