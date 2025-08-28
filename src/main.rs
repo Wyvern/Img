@@ -611,13 +611,35 @@ fn canonicalize(url: &str, addr: &str) -> String {
     }
 }
 
+///replace os specific special/reversed chars in path name
+fn sanitize_path(name: &str) -> String {
+    #[cfg(target_os = "macos")]
+    {
+        name.replace("/", ":")
+    }
+
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        name.replace("/", "_")
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        name.chars()
+            .map(|c| match c {
+                '\\' | '/' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
+                _ => c,
+            })
+            .collect()
+    }
+}
 ///Perform photo download operation
 fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if cfg!(all(test, not(feature = "download"))) {
         return;
     }
 
-    let slash2colon = dir.replace('/', ":");
+    let slash2colon = sanitize_path(dir);
     let path = path::Path::new(&slash2colon);
     let create_dir = || {
         if !path.exists() {
@@ -1152,7 +1174,6 @@ fn link_text(text: &str, addr: &str) -> String {
 #[cfg(test)]
 mod img {
     use super::*;
-    use std::cmp::Reverse;
 
     #[inline]
     fn arg(default: &str) -> String {
@@ -1326,7 +1347,7 @@ mod img {
         );
 
         if !dup_sel.is_empty() {
-            dup_sel.sort_unstable_by_key(|x| Reverse(x.1));
+            dup_sel.sort_unstable_by_key(|x| cmp::Reverse(x.1));
             for (sel, count) in dup_sel {
                 pl!("({},{})", sel, count);
             }
