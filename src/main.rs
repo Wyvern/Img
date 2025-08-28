@@ -618,7 +618,7 @@ fn sanitize_path(name: &str) -> String {
         name.replace("/", ":")
     }
 
-    #[cfg(all(unix, not(target_os = "macos")))]
+    #[cfg(any(all(unix, not(target_os = "macos")), target_family = "wasm"))]
     {
         name.replace("/", "_")
     }
