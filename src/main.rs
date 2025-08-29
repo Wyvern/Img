@@ -623,7 +623,7 @@ fn sanitize_path(name: &str) -> String {
         name.replace("/", "_")
     }
 
-    #[cfg(target_os = "windows")]
+    #[cfg(target_family = "windows")]
     {
         name.chars()
             .map(|c| match c {
