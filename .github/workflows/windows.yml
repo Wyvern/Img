@@ -48,9 +48,9 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: rust-${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('rust-version.txt') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('rust-version.txt') }}
           restore-keys: |
-            rust-${{ runner.os }}-${{ runner.arch }}-nightly-
+            ${{ runner.os }}-${{ runner.arch }}-nightly-
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
