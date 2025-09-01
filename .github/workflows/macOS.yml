@@ -33,7 +33,7 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: rust-${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('scripts/rust-files.txt') }}
+          key: rust-${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('rust-version.txt') }}
           restore-keys: |
             rust-${{ runner.os }}-${{ runner.arch }}-nightly-
 
@@ -42,6 +42,9 @@ jobs:
         with:
           target: wasm32-wasip2
           components: rust-src
+
+      - name: Generate rustc hash
+        run: rustc --version > rust-version.txt
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
