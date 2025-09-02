@@ -27,13 +27,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Set date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
       - name: Cache Rust toolchain
         uses: actions/cache@v4
         with:
           path: |
             ~/.rustup
             ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('rust-version.txt') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.date.outputs.date}}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-nightly-
 
@@ -41,9 +45,6 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-
-      - name: Generate rustc hash
-        run: rustc --version > rust-version.txt
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
