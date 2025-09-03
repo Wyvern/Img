@@ -188,7 +188,6 @@ rustflags = [
     "-Cstrip=symbols",
     "-Ccollapse-macro-debuginfo=y",
     "-Cpanic=abort",
-    "-Clinker-plugin-lto=no",
 
     "-Zunstable-options",
     "-Zexport-executable-symbols",
