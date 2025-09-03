@@ -45,19 +45,17 @@ jobs:
       - name: Get latest nightly build ID
         id: ver
         run: |
-          $toml = Invoke-WebRequest -Uri https://static.rust-lang.org/dist/channel-rust-nightly.toml -UseBasicParsing | Select-Object -Expand Content
-          $lines = $toml -split "`n"
-          $inRust = $false
-          foreach ($line in $lines) {
-              if ($line -match '^\[pkg\.rust\]') { $inRust = $true; continue }
-              if ($inRust -and $line -match '^\[pkg\.') { $inRust = $false }
-              if ($inRust -and $line -match '^version\s*=\s*"(.*)"') {
-                  $ver = $Matches[1]
-                  break
-              }
-          }
+          $url = 'https://static.rust-lang.org/dist/channel-rust-nightly.toml'
+          $toml = (Invoke-WebRequest -Uri $url -UseBasicParsing).Content
+
+          # Match the [pkg.rust] section, then the first version line inside it
+          $pattern = '(?ms)^\s*\[pkg\.rust\][\s\S]*?^\s*version\s*=\s*"(.*?)"'
+          $m = [regex]::Match($toml, $pattern)
+
+          $ver = $m.Groups[1].Value
           Write-Host "Found Rust nightly version: $ver"
-          "ver=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+          "rust=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Cache Rust toolchain
         uses: actions/cache@v4
