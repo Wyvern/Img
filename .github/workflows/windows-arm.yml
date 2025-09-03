@@ -46,9 +46,9 @@ jobs:
         id: ver
         run: |
           $url = 'https://static.rust-lang.org/dist/channel-rust-nightly.toml'
-          $toml = (Invoke-WebRequest -Uri $url -UseBasicParsing).Content
+          $toml = Invoke-RestMethod -Uri $url
 
-          $pattern = '(?ms)(?<=\[pkg\.rust\][\s\S]*?version\s*=\s*")(.*?)"'
+          $pattern = '\[pkg\.rust\][\s\S]*?version\s*=\s*"(.*?)"'
           $m = [regex]::Match($toml, $pattern)
 
           $ver = $m.Groups[1].Value
