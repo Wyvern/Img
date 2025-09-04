@@ -27,6 +27,7 @@ jobs:
             | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
             | grep '^version' \
             | cut -d'"' -f2)
+          echo $rust
           echo "rust=$rust" >> $GITHUB_OUTPUT
 
       - name: Cache Rust toolchain
