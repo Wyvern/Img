@@ -50,7 +50,6 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          # target: wasm32-wasip2
           components: rust-src
 
       - name: Run sccache-cache
