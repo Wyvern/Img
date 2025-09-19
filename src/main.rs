@@ -16,26 +16,42 @@ static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
     // "-OJ",
 ];
 
-fn check_args() -> String {
-    if env::args().len() > if cfg!(test) { 2 + 3 } else { 2 } {
-        quit!("Too many arguments.\nUsage: {}", "Img <url>");
+fn check_args() -> (String, String) {
+    let mut args;
+    #[cfg(test)]
+    {
+        args = env::args().skip(3);
     }
-
-    if cfg!(test) {
-        env::args().skip(3).nth(1)
-    } else {
-        env::args().nth(1)
+    #[cfg(not(test))]
+    {
+        args = env::args();
+    };
+    if args.len() > 3 {
+        quit!("Too many arguments.\nUsage: {}", "Img <url> [dir]");
     }
-    .unwrap_or_else(|| {
+    let url = args.nth(1).unwrap_or_else(|| {
         quit!("Please input <url> argument.");
-    })
+    });
+    let dir = args.next().unwrap_or_default();
+    (url, dir)
 }
 
 fn main() {
-    let arg = check_args();
-    check_host(&arg);
-    let mut next_page = parse(&arg);
+    let (url, dir) = check_args();
 
+    if !dir.is_empty() {
+        let path = path::Path::new(&dir);
+        if path.exists() && path.is_dir() {
+            env::set_current_dir(path)
+                .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
+        } else {
+            quit!("The path {} is invalid!", &dir)
+        }
+    }
+
+    check_host(&url);
+
+    let mut next_page = parse(&url);
     if cfg!(not(test)) {
         while !next_page.is_empty() {
             next_page = parse(&next_page);
@@ -56,7 +72,7 @@ fn check_host(addr: &str) -> &str {
 
     let host = &rest[..rest.find('/').unwrap_or(rest.len())];
     if !host.contains('.') {
-        quit!("{}: Invalid host info.", host);
+        quit!("Invalid web host name: {}", host);
     }
     host
 }
@@ -595,13 +611,35 @@ fn canonicalize(url: &str, addr: &str) -> String {
     }
 }
 
+///replace os specific special/reversed chars in path name
+fn sanitize_path(name: &str) -> String {
+    #[cfg(target_os = "macos")]
+    {
+        name.replace("/", ":")
+    }
+
+    #[cfg(any(all(unix, not(target_os = "macos")), target_family = "wasm"))]
+    {
+        name.replace("/", "_")
+    }
+
+    #[cfg(target_family = "windows")]
+    {
+        name.chars()
+            .map(|c| match c {
+                '\\' | '/' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
+                _ => c,
+            })
+            .collect()
+    }
+}
 ///Perform photo download operation
 fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if cfg!(all(test, not(feature = "download"))) {
         return;
     }
 
-    let slash2colon = dir.replace('/', ":");
+    let slash2colon = sanitize_path(dir);
     let path = path::Path::new(&slash2colon);
     let create_dir = || {
         if !path.exists() {
@@ -1135,8 +1173,6 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
-    use std::cmp::Reverse;
-
     use super::*;
 
     #[inline]
@@ -1311,7 +1347,7 @@ mod img {
         );
 
         if !dup_sel.is_empty() {
-            dup_sel.sort_unstable_by_key(|x| Reverse(x.1));
+            dup_sel.sort_unstable_by_key(|x| cmp::Reverse(x.1));
             for (sel, count) in dup_sel {
                 pl!("({},{})", sel, count);
             }

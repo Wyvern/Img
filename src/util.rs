@@ -142,19 +142,28 @@ mod macros {
 }
 }
 
-pub trait AsBytes
-where
-    Self: Sized,
-{
+pub trait AsBytes: Sized {
+    fn from_bytes(bytes: &[u8]) -> &Self {
+        unsafe { &*(bytes.as_ptr() as *const Self) }
+    }
     fn as_bytes(&self) -> &[u8] {
-        let len = mem::size_of::<Self>();
-        unsafe { slice::from_raw_parts((self as *const Self).cast::<u8>(), len) }
+        unsafe { slice::from_raw_parts((self as *const Self).cast::<u8>(), mem::size_of::<Self>()) }
     }
     fn eql<Other>(&self, other: &Other) -> bool {
         self.as_bytes() == other.as_bytes()
     }
 }
 impl<T> AsBytes for T {}
+
+pub trait Dbg: fmt::Debug {
+    fn dbg(&self) {
+        crate::tdbg!(self);
+    }
+    fn dbg_pause(&self) {
+        crate::tdbg!(self;);
+    }
+}
+impl<T: fmt::Debug> Dbg for T {}
 
 pub fn pause() {
     use io::*;
@@ -172,7 +181,7 @@ pub fn pause() {
         if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
             i.keys().next()
         {
-            write!(o, " Quit!",).unwrap();
+            write!(o, "{CL}{BEG}Quit!",).unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);
@@ -221,10 +230,10 @@ const fn target_endian() -> &'static str {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::*;
+
     #[test]
     fn dyn_any() {
-        tdbg!(target_endian());
+        crate::tdbg!(target_endian());
 
         let x = [&mut 7 as &dyn any::Any, &4.3];
         let y = 123;
