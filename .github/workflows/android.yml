@@ -91,7 +91,7 @@ jobs:
             armv7-linux-androideabi
           )
           for target in ${targets[@]}; do
-            time cargo ndk -t $target b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=panic_immediate_abort,optimize_for_size -q
+            time cargo ndk -t $target b --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size -q
           done
 
           find ./target -iname img -type f | xargs ls -hl
