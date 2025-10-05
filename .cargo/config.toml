@@ -105,6 +105,7 @@ rustflags = [
 #src
 [profile.src]
 inherits = "lto"
+panic = "immediate-abort"
 rustflags = [
     "-Zhint-mostly-unused",
     "-Zforce-unstable-if-unmarked",
@@ -150,6 +151,7 @@ rustdoc-depinfo = true
 no-embed-metadata = true
 build-dir-new-layout = true
 profile-hint-mostly-unused = true
+panic-immediate-abort=true
 
 # build-std = [
 #     "core",
