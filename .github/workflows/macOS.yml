@@ -50,7 +50,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: wasm32-wasip2
+          targets: wasm32-wasip3
           components: rust-src
 
       - name: Run sccache-cache
@@ -71,7 +71,7 @@ jobs:
             aarch64-apple-darwin
             arm64e-apple-darwin
             x86_64h-apple-darwin
-            wasm32-wasip2
+            wasm32-wasip3
           )
 
           for target in ${targets[@]}; do
@@ -111,7 +111,7 @@ jobs:
             gh release upload Nightly target/$arch/src/$name --clobber || true
           done
 
-          echo "Uploading wasm32-wasip2.wasm..."
-          gh release upload Nightly target/wasm32-wasip2/src/Img.wasm#wasm32-wasip2.wasm --clobber || true
+          echo "Uploading wasm32-wasip3.wasm..."
+          gh release upload Nightly target/wasm32-wasip3/src/Img.wasm#wasm32-wasip3.wasm --clobber || true
           echo "Uploading Apple-macOS-universal..."
           gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
