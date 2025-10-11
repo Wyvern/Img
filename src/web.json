@@ -227,8 +227,8 @@
     },
     {
       "Site": "xchina.co",
-      "Img": "div.photos > a[href] | div.container > img",
-      "Next": "div.pager a",
+      "Img": "div.photo-image > a[href] | div.container > img",
+      "Next": "a.pager-next",
       "Album": "div.item > a[href] > img"
     },
     {
