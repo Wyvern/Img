@@ -17,14 +17,28 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Purge Ubuntu
-        run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-          sudo apt autoremove && sudo apt clean
-          sudo systemctl disable --now systemd-journald
-
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Get latest stable build ID
+        id: ver
+        run: |
+          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
+            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
+            | grep '^version' \
+            | cut -d'"' -f2)
+          echo $rust
+          echo "rust=$rust" >> $GITHUB_OUTPUT
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-stable-
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -33,15 +47,6 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            target/
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Ubuntu apt update and install
         continue-on-error: true
@@ -119,6 +124,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Get latest stable build ID
+        id: ver
+        run: |
+          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
+            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
+            | grep '^version' \
+            | cut -d'"' -f2)
+          echo $rust
+          echo "rust=$rust" >> $GITHUB_OUTPUT
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-stable-
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -133,15 +158,6 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            target/
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Cargo-ndk
         run: |
@@ -247,6 +263,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Get latest stable build ID
+        id: ver
+        run: |
+          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
+            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
+            | grep '^version' \
+            | cut -d'"' -f2)
+          echo $rust
+          echo "rust=$rust" >> $GITHUB_OUTPUT
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-stable-
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -255,15 +291,6 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            target/
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build release
         continue-on-error: true
@@ -333,6 +360,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Get latest stable build ID
+        id: ver
+        run: |
+          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
+            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
+            | grep '^version' \
+            | cut -d'"' -f2)
+          echo $rust
+          echo "rust=$rust" >> $GITHUB_OUTPUT
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-stable-
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -341,15 +388,6 @@ jobs:
 
       # - name: Run sccache-cache
       #   uses: mozilla-actions/sccache-action@main
-
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            target/
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build release
         continue-on-error: true
