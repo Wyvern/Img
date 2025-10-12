@@ -138,7 +138,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,riscv64-linux-android,armv7-linux-androideabi,powerpc64-unknown-linux-gnu
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,powerpc64-unknown-linux-gnu
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -181,7 +181,6 @@ jobs:
           ln -sf $(readlink sysroot)/sysroot $(readlink sysroot)/android
 
           targets=(
-            riscv64-linux-android
             aarch64-linux-android
             armv7-linux-androideabi
             x86_64-linux-android
@@ -204,7 +203,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "riscv64-linux-android Android-riscv64"
                   "aarch64-linux-android Android-aarch64"
                   "armv7-linux-androideabi Android-armv7"
                   "x86_64-linux-android Android-x86_64"
@@ -359,12 +357,16 @@ jobs:
       - name: Get latest stable build ID
         id: ver
         run: |
-          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
-            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
-            | grep '^version' \
-            | cut -d'"' -f2)
-          echo $rust
-          echo "rust=$rust" >> $GITHUB_OUTPUT
+          $url = 'https://static.rust-lang.org/dist/channel-rust-stable.toml'
+          $toml = Invoke-RestMethod -Uri $url
+
+          $pattern = '\[pkg\.rust\][\s\S]*?version\s*=\s*"(.*?)"'
+          $m = [regex]::Match($toml, $pattern)
+
+          $ver = $m.Groups[1].Value
+          Write-Host "Found Rust stable version: $ver"
+
+          "rust=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Cache Rust toolchain
         uses: actions/cache@v4
@@ -456,12 +458,16 @@ jobs:
       - name: Get latest stable build ID
         id: ver
         run: |
-          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
-            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
-            | grep '^version' \
-            | cut -d'"' -f2)
-          echo $rust
-          echo "rust=$rust" >> $GITHUB_OUTPUT
+          $url = 'https://static.rust-lang.org/dist/channel-rust-stable.toml'
+          $toml = Invoke-RestMethod -Uri $url
+
+          $pattern = '\[pkg\.rust\][\s\S]*?version\s*=\s*"(.*?)"'
+          $m = [regex]::Match($toml, $pattern)
+
+          $ver = $m.Groups[1].Value
+          Write-Host "Found Rust stable version: $ver"
+
+          "rust=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
       - name: Cache Rust toolchain
         uses: actions/cache@v4
