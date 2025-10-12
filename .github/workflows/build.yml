@@ -13,8 +13,8 @@ env:
 
 jobs:
   Linux:
-    name: Ubuntu-24.04
-    runs-on: ubuntu-24.04
+    name: Ubuntu-24.04-arm
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout
@@ -43,7 +43,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -51,7 +51,7 @@ jobs:
       - name: Ubuntu apt update and install
         continue-on-error: true
         run: |
-          sudo apt update -q && sudo apt install -q gcc-aarch64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-x86_64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
@@ -59,7 +59,6 @@ jobs:
           set +e -x
 
           targets=(
-            powerpc64-unknown-linux-gnu
             powerpc64le-unknown-linux-gnu
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
@@ -90,7 +89,6 @@ jobs:
         run: |
           targets=(
                   "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
-                  "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
                   "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
                   "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
@@ -101,6 +99,116 @@ jobs:
                   "s390x-unknown-linux-gnu Linux-s390x-gnu"
                   "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"
                   "loongarch64-unknown-linux-musl Linux-loongarch64-musl"
+          )
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            gh release upload Stable target/$arch/lto/$name --clobber || true
+          done
+
+  Android:
+    name: Ubuntu-24.04
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Get latest stable build ID
+        id: ver
+        run: |
+          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
+            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
+            | grep '^version' \
+            | cut -d'"' -f2)
+          echo $rust
+          echo "rust=$rust" >> $GITHUB_OUTPUT
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-stable-
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-linux-android,aarch64-linux-android,riscv64-linux-android,armv7-linux-androideabi,powerpc64-unknown-linux-gnu
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Get latest Android NDK version
+        id: ndk-ver
+        run: |
+          latest_ndk=$(curl -fsSL https://developer.android.com/ndk/downloads \
+            | sed -n 's/.*Latest Stable Version (\([^)]*\)).*/\1/p')
+          echo "NDK_VERSION=$latest_ndk" >> $GITHUB_ENV
+          echo "Latest NDK: $latest_ndk"
+
+      - name: Android NDK cache
+        uses: actions/cache@v4
+        with:
+          path: ~/android-ndk
+          key: android-ndk-${{ env.NDK_VERSION }}
+
+      - name: Ubuntu apt update and install
+        continue-on-error: true
+        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          ver=${NDK_VERSION}
+          export ANDROID_NDK_HOME=~/android-ndk/android-ndk-$ver
+          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/" sysroot
+
+          if [ ! -d ~/android-ndk ]; then
+            mkdir -p ~/android-ndk
+            echo "Downloading Android NDK..."
+            curl -fsSLO https://dl.google.com/android/repository/android-ndk-$ver-linux.zip
+            echo "Unzipping Android NDK..."
+            unzip -q android-ndk-$ver-linux.zip -d ~/android-ndk
+          fi
+
+          ln -sf $(readlink sysroot)/sysroot $(readlink sysroot)/android
+
+          targets=(
+            riscv64-linux-android
+            aarch64-linux-android
+            armv7-linux-androideabi
+            x86_64-linux-android
+            powerpc64-unknown-linux-gnu
+          )
+
+          for target in ${targets[@]}; do
+            time cargo l --target $target
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  "riscv64-linux-android Android-riscv64"
+                  "aarch64-linux-android Android-aarch64"
+                  "armv7-linux-androideabi Android-armv7"
+                  "x86_64-linux-android Android-x86_64"
+                  "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
@@ -147,28 +255,13 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,wasm32-wasip2
-
-      - name: Android NDK setup
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r28c
-          link-to-sdk: true
-          local-cache: true
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Cargo-ndk
-        run: |
-          curl -fsSLo cargo-ndk.tgz   https://github.com/bbqsrc/cargo-ndk/releases/latest/download/cargo-ndk-aarch64-apple-darwin-v4.1.2.tgz
-          tar -xzf cargo-ndk.tgz --strip-components=1 -C ~/.cargo/bin
-          chmod +x ~/.cargo/bin/cargo-ndk
-
       - name: Build Release
         run: |
-          # brew install cargo-zigbuild
-
           cargo update
           set +e -x
           targets=(
