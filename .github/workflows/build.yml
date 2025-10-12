@@ -43,7 +43,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -203,9 +203,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  "x86_64-linux-android Android-x86_64"
                   "aarch64-linux-android Android-aarch64"
                   "armv7-linux-androideabi Android-armv7"
-                  "x86_64-linux-android Android-x86_64"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
           )
           for target in "${targets[@]}"; do
@@ -274,15 +274,6 @@ jobs:
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
-          targets=(
-            x86_64-linux-android
-            aarch64-linux-android
-            armv7-linux-androideabi
-          )
-          for target in ${targets[@]}; do
-            time cargo ndk -t $target b --profile lto -q
-          done
-
           find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
           hostinfo
@@ -312,18 +303,6 @@ jobs:
           gh release upload Stable target/wasm32-wasip2/lto/Img.wasm#wasm32-wasip2.wasm --clobber || true
           echo "Uploading Apple-macOS-universal..."
           gh release upload Stable Img-Universal#Apple-macOS-universal --clobber || true
-
-          targets=(
-                  "x86_64-linux-android Android-x86_64"
-                  "aarch64-linux-android Android-aarch64"
-                  "armv7-linux-androideabi Android-armv7"
-          )
-          for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
-            echo "Uploading $name..."
-            mv target/$arch/lto/Img target/$arch/lto/$name || true
-            gh release upload Stable target/$arch/lto/$name --clobber || true
-          done
 
   Windows-2025:
     name: Windows-2025
