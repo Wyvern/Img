@@ -13,16 +13,10 @@ env:
 
 jobs:
   Linux:
-    name: Building for {Free,Net,Open}BSD and Solaris/Illumos.
+    name: BSD Unix
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Purge Ubuntu
-        run: |
-          sudo apt purge ufw rsyslog logrotate sysstat python3-problem-report sosreport apport
-          sudo apt autoremove && sudo apt clean
-          sudo systemctl disable --now systemd-journald
-
       - name: Checkout
         uses: actions/checkout@v5
 
