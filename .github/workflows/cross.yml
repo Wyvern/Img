@@ -12,7 +12,58 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Linux:
+  Illumos:
+    name: Solaris/Illumos.
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Cross-rs
+        run: |
+          wget https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz
+          tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
+          sudo mv cross /usr/local/bin/
+
+      - name: Build Release
+        continue-on-error: true
+        run: |
+          cargo update
+          set +e -x
+          targets=(
+            x86_64-unknown-illumos
+            x86_64-pc-solaris
+            sparcv9-sun-solaris
+          )
+          for target in ${targets[@]}; do
+            time cross build -q --config 'build.rustc-wrapper=""' --profile lto --target $target
+          done
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  "x86_64-unknown-illumos Illumos-x86_64"
+                  "x86_64-pc-solaris Solaris-x86_64"
+                  "sparcv9-sun-solaris Solaris-sparcv9"
+          )
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            gh release upload Stable target/$arch/lto/$name --clobber || true
+          done
+
+  Unix:
     name: BSD Unix
     runs-on: ubuntu-24.04-arm
 
