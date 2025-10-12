@@ -841,11 +841,6 @@ fn magic_number_type(pb: path::PathBuf) {
 /// Check `next` selector link page info
 fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     let mut next_link: String;
-    let splitter = |e: &crabquery::Element| {
-        e.attr("class")
-            .is_some_and(|c| ["cur", "now", "active"].iter().any(|cls| c.contains(cls)))
-            || e.attr("aria-current").is_some()
-    };
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
     let attr = nxt
@@ -872,10 +867,13 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
             }
         })
     };
-    let nexts = page.select(nxt);
+    let mut nexts = page.select(nxt);
+    nexts.sort_by_cached_key(|x| x.attr(attr));
+    nexts.dedup_by_key(|x| x.attr(attr));
+
     if nexts.is_empty() {
         next_link = String::default();
-        tdbg!("NO next page <element> found.");
+        tdbg!("NO next page <element> found with selector: {nxt}");
     } else if nexts.len() == 1 {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
@@ -888,81 +886,70 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
             next_link = element.attr(attr).unwrap();
         }
     } else {
-        let element = &nexts[0];
-        if element.tag().unwrap() == "div" && nexts.len() == 2 {
-            let items = element.children();
-            let tags = items
-                .split(|e| {
-                    e.children()
-                        .first()
-                        .map_or_else(|| e.tag().unwrap() == "span" || splitter(e), splitter)
-                })
-                .next_back()
-                .unwrap();
-            next_link = set_next(tags);
-        } else {
-            let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
-                let mut t = n.text();
-                if t.is_some() && t.as_deref().unwrap().trim().is_empty() {
-                    t.take();
-                }
-                let next_下 = |mut t: String| {
-                    t.make_ascii_lowercase();
-                    t.contains('下') || t.contains("next")
-                };
-                match t {
-                    Some(text) => next_下(text) || (n.attr("target").is_some()),
-                    None => {
-                        t = n.attr("title");
-                        match t {
-                            Some(title) => next_下(title),
-                            None => {
-                                let span = n.select("span.currenttext");
-                                if span.is_empty() {
-                                    return false;
-                                }
-                                t = span[0].text();
-                                match t {
-                                    Some(text) => next_下(text),
-                                    None => false,
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            next_link = match last2 {
-                Some(v) => v.attr(attr).unwrap_or(String::default()),
-                None => {
-                    let pos = nexts.iter().rposition(|e| {
-                        e.attr(attr).is_some_and(|h| {
-                            cur.trim().ends_with(h.trim())
-                                || h.trim() == "#"
-                                || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
-                                    format!("{}{suffix}", cur.trim_end_matches('/'))
-                                        .ends_with(h.trim())
-                                })
-                        })
-                    });
-                    match pos {
-                        Some(p) => {
-                            if p < nexts.len() - 1 {
-                                nexts[p + 1].attr(attr).unwrap()
-                            } else {
-                                String::default()
-                            }
-                        }
-                        None => String::default(),
-                    }
-                }
+        let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
+            let mut t = n.text();
+            if t.is_some() && t.as_deref().unwrap().trim().is_empty() {
+                t.take();
+            }
+            let next_下 = |mut t: String| {
+                t.make_ascii_lowercase();
+                t.contains('下') || t.contains("next")
             };
-        }
+            match t {
+                Some(text) => next_下(text) || (n.attr("target").is_some()),
+                None => {
+                    t = n.attr("title");
+                    match t {
+                        Some(title) => next_下(title),
+                        None => {
+                            let span = n.select("span.currenttext");
+                            if span.is_empty() {
+                                return false;
+                            }
+                            t = span[0].text();
+                            match t {
+                                Some(text) => next_下(text),
+                                None => false,
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        next_link = match last2 {
+            Some(v) => v.attr(attr).unwrap_or(String::default()),
+            None => {
+                let pos = nexts.iter().rposition(|e| {
+                    e.attr(attr).is_some_and(|h| {
+                        cur.trim().ends_with(h.trim())
+                            || h.trim() == "#"
+                            || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
+                                format!("{}{suffix}", cur.trim_end_matches('/')).ends_with(h.trim())
+                            })
+                    })
+                });
+                match pos {
+                    Some(p) => {
+                        if p < nexts.len() - 1 {
+                            nexts[p + 1].attr(attr).unwrap()
+                        } else {
+                            String::default()
+                        }
+                    }
+                    None => String::default(),
+                }
+            }
+        };
     }
     // if !next.is_empty() && !next[next.rfind('/').unwrap()..].contains(['_', '-', '?']) {
     //     next = String::default();
     // }
 
-    if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
+    if cur.trim().ends_with(&next_link)
+        || next_link.trim() == "#"
+        || next_link.trim() == "javascript:;"
+        || next_link.trim() == "/"
+    {
         next_link = String::default();
     }
     if !next_link.is_empty() {
@@ -1173,6 +1160,7 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
+
     use super::*;
 
     #[inline]

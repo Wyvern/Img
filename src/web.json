@@ -83,15 +83,21 @@
       "Img": "a.rgg-simplelightbox.size-medium.rgg-img[href]"
     },
     {
-      "Site": "buondua.com,xiutaku.com",
+      "Site": "buondua.com",
       "Img": "div.article-fulltext img",
-      "Next": "div.pagination-list",
+      "Next": "a.pagination-next",
+      "Album": "div.page-header > h2 > a"
+    },
+    {
+      "Site": "xiutaku.com",
+      "Img": "div.article-fulltext img",
+      "Next": "a.pagination-link",
       "Album": "div.page-header > h2 > a"
     },
     {
       "Site": "mrcong.com,misskon.com",
       "Img": "img.aligncenter",
-      "Next": "div.page-link",
+      "Next": "span.current",
       "Album": "h2.post-box-title a"
     },
     {
@@ -227,8 +233,8 @@
     },
     {
       "Site": "xchina.co",
-      "Img": "div.photos > a[href] | div.container > img",
-      "Next": "div.pager a",
+      "Img": "div.photo-image > a[href] | div.container > img",
+      "Next": "a.pager-next",
       "Album": "div.item > a[href] > img"
     },
     {
