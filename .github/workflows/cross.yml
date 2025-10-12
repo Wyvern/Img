@@ -14,56 +14,127 @@ env:
 jobs:
   Linux:
     name: BSD Unix
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Get latest stable build ID
+        id: ver
+        run: |
+          rust=$(curl -s https://static.rust-lang.org/dist/channel-rust-stable.toml \
+            | sed -n '/^\[pkg.rust\]/,/^\[pkg\./p' \
+            | grep '^version' \
+            | cut -d'"' -f2)
+          echo $rust
+          echo "rust=$rust" >> $GITHUB_OUTPUT
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-stable-
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-freebsd,x86_64-unknown-openbsd,x86_64-unknown-netbsd
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Cross-rs
+      - name: Cache sysroot
+        uses: actions/cache@v4
+        id: sysroot-cache
+        with:
+          path: /home/runner/sysroots
+          key: BSD-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
+          restore-keys: BSD-${{ runner.os }}-
+
+      - name: Ubuntu apt update and install
         run: |
-          wget https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
-          sudo mv cross /usr/local/bin/
 
       - name: Build Release
-        continue-on-error: true
         run: |
           cargo update
           set +e -x
 
+          SYSROOT="/home/runner/sysroots"
+          ln -sfn "$SYSROOT" sysroot
+
+          freebsd=(amd64)
+          for arch in "${freebsd[@]}"; do
+            if [ ! -d $SYSROOT/freebsd/$arch ]; then
+                mkdir -p $SYSROOT/freebsd/$arch
+                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz \
+            | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
+            fi
+          done
+
+          # ppc=(powerpc64 powerpc64le)
+          # for arch in "${ppc[@]}"; do
+          #   if [ ! -d $SYSROOT/freebsd/$arch ]; then
+          #     mkdir -p $SYSROOT/freebsd/$arch
+          #     curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz \
+          #       | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
+          #   fi
+          # done
+
+          openbsd=(amd64)
+          files=(base77 comp77)
+          for arch in "${openbsd[@]}"; do
+            if [ ! -d $SYSROOT/openbsd/$arch ]; then
+              mkdir -p $SYSROOT/openbsd/$arch
+              for file in "${files[@]}"; do
+                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C $SYSROOT/openbsd/$arch 2>/dev/null &
+              done
+            fi
+          done
+
+          netbsd=(amd64)
+          files=(base comp etc)
+          for arch in "${netbsd[@]}"; do
+            if [ ! -d $SYSROOT/netbsd/$arch ]; then
+              mkdir -p $SYSROOT/netbsd/$arch
+              for file in "${files[@]}"; do
+                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C $SYSROOT/netbsd/$arch 2>/dev/null &
+              done
+            fi
+          done
+
+          wait
+          chmod -R u+rwX "$SYSROOT"
+
           targets=(
             x86_64-unknown-freebsd
+            x86_64-unknown-openbsd
             x86_64-unknown-netbsd
-            x86_64-unknown-illumos
-            x86_64-pc-solaris
-            sparcv9-sun-solaris
           )
 
           for target in ${targets[@]}; do
-            time cross build -q --config 'build.rustc-wrapper=""' --profile lto --target $target
+            time cargo l --target $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
 
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
       - name: Upload binaries to a GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "x86_64-unknown-freebsd Freebsd-x86_64"
-                  "x86_64-unknown-netbsd Netbsd-x86_64"
-                  "x86_64-unknown-illumos Illumos-x86_64"
-                  "x86_64-pc-solaris Solaris-x86_64"
-                  "sparcv9-sun-solaris Solaris-sparcv9"
+                  "x86_64-unknown-freebsd FreeBSD-x86_64"
+                  "x86_64-unknown-openbsd OpenBSD-x86_64"
+                  "x86_64-unknown-netbsd NetBSD-x86_64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"

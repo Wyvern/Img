@@ -43,7 +43,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -51,7 +51,7 @@ jobs:
       - name: Ubuntu apt update and install
         continue-on-error: true
         run: |
-          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
@@ -62,8 +62,6 @@ jobs:
             powerpc64le-unknown-linux-gnu
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
-            x86_64-unknown-linux-gnu
-            x86_64-unknown-linux-musl
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
             sparc64-unknown-linux-gnu
@@ -91,8 +89,6 @@ jobs:
                   "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
                   "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
                   "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
-                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
-                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
                   "aarch64-unknown-linux-gnu Linux-aarch64-gnu"
                   "aarch64-unknown-linux-musl Linux-aarch64-musl"
                   "sparc64-unknown-linux-gnu Linux-sparc64-gnu"
@@ -138,7 +134,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,powerpc64-unknown-linux-gnu
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,powerpc64-unknown-linux-gnu,x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -181,6 +177,8 @@ jobs:
           ln -sf $(readlink sysroot)/sysroot $(readlink sysroot)/android
 
           targets=(
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
             aarch64-linux-android
             armv7-linux-androideabi
             x86_64-linux-android
@@ -207,6 +205,8 @@ jobs:
                   "aarch64-linux-android Android-aarch64"
                   "armv7-linux-androideabi Android-armv7"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
+                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
+                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
