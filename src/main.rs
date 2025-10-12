@@ -873,7 +873,7 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
 
     if nexts.is_empty() {
         next_link = String::default();
-        tdbg!("NO next page <element> found.");
+        tdbg!("NO next page <element> found with selector: {nxt}");
     } else if nexts.len() == 1 {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
@@ -945,7 +945,11 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
     //     next = String::default();
     // }
 
-    if cur.trim().ends_with(&next_link) || next_link.trim() == "#" || next_link.trim() == "/" {
+    if cur.trim().ends_with(&next_link)
+        || next_link.trim() == "#"
+        || next_link.trim() == "javascript:;"
+        || next_link.trim() == "/"
+    {
         next_link = String::default();
     }
     if !next_link.is_empty() {
