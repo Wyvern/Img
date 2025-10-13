@@ -48,7 +48,6 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Get latest Android NDK version
-        id: ndk-ver
         run: |
           latest_ndk=$(curl -fsSL https://developer.android.com/ndk/downloads \
             | sed -n 's/.*Latest Stable Version (\([^)]*\)).*/\1/p')
