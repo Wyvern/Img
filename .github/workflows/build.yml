@@ -152,6 +152,7 @@ jobs:
         with:
           path: ~/android-ndk
           key: android-ndk-${{ env.NDK_VERSION }}
+          restore-keys: android-ndk-${{ env.NDK_VERSION }}
 
       - name: Ubuntu apt update and install
         continue-on-error: true
