@@ -63,8 +63,7 @@ jobs:
           restore-keys: android-ndk-${{ env.NDK_VERSION }}
 
       - name: Ubuntu apt update and install
-        run: |
-          sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
+        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
 
       - name: Build Release
         run: |
