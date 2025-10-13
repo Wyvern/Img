@@ -150,7 +150,7 @@ jobs:
       - name: Android NDK cache
         uses: actions/cache@v4
         with:
-          path: ~/android-ndk
+          path: ~/android-ndk-${{ env.NDK_VERSION }}
           key: android-ndk-${{ env.NDK_VERSION }}
           restore-keys: android-ndk-${{ env.NDK_VERSION }}
 
@@ -164,15 +164,15 @@ jobs:
           set +e -x
 
           ver=${NDK_VERSION}
-          export ANDROID_NDK_HOME=~/android-ndk/android-ndk-$ver
+          export ANDROID_NDK_HOME=~/android-ndk-$ver
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/" sysroot
 
-          if [ ! -d ~/android-ndk ]; then
-            mkdir -p ~/android-ndk
+          if [ ! -d ~/android-ndk-${ver} ]; then
+            mkdir -p ~/android-ndk-${ver}
             echo "Downloading Android NDK..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-$ver-linux.zip
+            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ver}-linux.zip
             echo "Unzipping Android NDK..."
-            unzip -q android-ndk-$ver-linux.zip -d ~/android-ndk
+            unzip -q android-ndk-${ver}-linux.zip -d ~/
           fi
 
           ln -sf $(readlink sysroot)/sysroot $(readlink sysroot)/android
