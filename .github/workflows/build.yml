@@ -134,7 +134,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,powerpc64-unknown-linux-gnu,x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -181,6 +181,7 @@ jobs:
             x86_64-unknown-linux-musl
             aarch64-linux-android
             armv7-linux-androideabi
+            thumbv7neon-linux-androideabi
             x86_64-linux-android
             powerpc64-unknown-linux-gnu
           )
@@ -204,6 +205,7 @@ jobs:
                   "x86_64-linux-android Android-x86_64"
                   "aarch64-linux-android Android-aarch64"
                   "armv7-linux-androideabi Android-armv7"
+                  "thumbv7neon-linux-androideabi Android-thumbv7neon"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
                   "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
                   "x86_64-unknown-linux-musl Linux-x86_64-musl"
