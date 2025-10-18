@@ -86,8 +86,8 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
         .as_array()
         .expect("Parse `Sites` in `web.json` key error!")
         .iter()
-        .find(|&s| {
-            s["Site"].as_str().is_some_and(|s| {
+        .find(|&site| {
+            site["Site"].as_str().is_some_and(|s| {
                 s.split_terminator(',').any(|s| {
                     let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
                     parts.reverse();
