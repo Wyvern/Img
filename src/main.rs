@@ -1080,7 +1080,7 @@ fn url_redirect_and_query_cleanup(url: &str) -> String {
             })
         })
         .unwrap_or(cleanup.len())];
-    cleanup.into()
+    cleanup.to_ascii_lowercase()
 }
 
 ///Parse inline `url(),image()`
@@ -1102,10 +1102,11 @@ fn url_image(content: &str) -> Option<String> {
             || url.starts_with(['{', '$'])
             || url.contains('#')
             || [
-                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".pdf", ".fnt", ".eot", ".cff",
+                ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif",
+                ".svg", ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
             ]
             .iter()
-            .any(|&ext| url.ends_with(ext))
+            .any(|&ext| !url.ends_with(ext))
         {
             None
         } else {
