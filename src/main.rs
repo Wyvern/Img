@@ -1080,7 +1080,7 @@ fn url_redirect_and_query_cleanup(url: &str) -> String {
             })
         })
         .unwrap_or(cleanup.len())];
-    cleanup.to_ascii_lowercase()
+    cleanup.into()
 }
 
 ///Parse inline `url(),image()`
@@ -1097,20 +1097,19 @@ fn url_image(content: &str) -> Option<String> {
         let dec = url_redirect_and_query_cleanup(url);
         url = dec.as_str();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
-        if url.is_empty()
-            || url == "undefined"
-            || url.starts_with(['{', '$'])
-            || url.contains('#')
-            || [
-                ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif",
-                ".svg", ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
-            ]
-            .iter()
-            .any(|&ext| !url.ends_with(ext))
+        if url.is_empty() || url == "undefined" || url.starts_with(['{', '$']) || url.contains('#')
         {
             None
-        } else {
+        } else if [
+            ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif",
+            ".svg", ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
+        ]
+        .iter()
+        .any(|&ext| url.to_ascii_lowercase().ends_with(ext))
+        {
             Some(url.trim().into())
+        } else {
+            None
         }
     } else {
         None
