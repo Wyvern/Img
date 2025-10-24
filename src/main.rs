@@ -86,8 +86,8 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
         .as_array()
         .expect("Parse `Sites` in `web.json` key error!")
         .iter()
-        .find(|&s| {
-            s["Site"].as_str().is_some_and(|s| {
+        .find(|&site| {
+            site["Site"].as_str().is_some_and(|s| {
                 s.split_terminator(',').any(|s| {
                     let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
                     parts.reverse();
@@ -1097,19 +1097,19 @@ fn url_image(content: &str) -> Option<String> {
         let dec = url_redirect_and_query_cleanup(url);
         url = dec.as_str();
         url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
-        if url.is_empty()
-            || url == "undefined"
-            || url.starts_with(['{', '$'])
-            || url.contains('#')
-            || [
-                ".otf", ".ttf", ".woff", ".woff2", ".cur", ".css", ".pdf", ".fnt", ".eot", ".cff",
-            ]
-            .iter()
-            .any(|&ext| url.ends_with(ext))
+        if url.is_empty() || url == "undefined" || url.starts_with(['{', '$']) || url.contains('#')
         {
             None
-        } else {
+        } else if [
+            ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif",
+            ".svg", ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
+        ]
+        .iter()
+        .any(|&ext| url.to_ascii_lowercase().ends_with(ext))
+        {
             Some(url.trim().into())
+        } else {
+            None
         }
     } else {
         None
