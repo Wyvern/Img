@@ -530,7 +530,7 @@
     },
     {
       "Site": "hjd2048.com,xxx7788.com",
-      "Img": "div#read_tpc img"
+      "Img": "div#read_tpc img[data-original]"
     },
     {
       "Site": "meimeicun.com",
