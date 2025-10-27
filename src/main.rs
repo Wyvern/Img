@@ -333,9 +333,15 @@ fn parse(addr: &str) -> String {
             let [mut empty, mut dup, mut embed] = [0usize; 3];
 
             for elm in html_img {
-                let value = ["data-src", "data-lazy", "data-lazy-src", attr]
-                    .into_iter()
-                    .find_map(|a| elm.attr(a));
+                let value = [
+                    "data-src",
+                    "data-lazy",
+                    "data-lazy-src",
+                    "data-original",
+                    attr,
+                ]
+                .into_iter()
+                .find_map(|a| elm.attr(a));
                 let mut handle_embed = |s: String| {
                     if cfg!(feature = "embed") {
                         if !urls.insert(s) {

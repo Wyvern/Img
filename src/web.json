@@ -115,7 +115,7 @@
     },
     {
       "Site": "mmm.red,mmm999.red",
-      "Img": "div[data-fancybox=\"gallery\"] img[data-original]",
+      "Img": "div[data-fancybox=\"gallery\"] img",
       "Album": "a.item-link div"
     },
     {
@@ -250,7 +250,7 @@
     },
     {
       "Site": "everiaclub.com",
-      "Img": "div.mainleft > img[data-original]",
+      "Img": "div.mainleft > img",
       "Album": "div.leftp a > img"
     },
     {
@@ -530,7 +530,7 @@
     },
     {
       "Site": "hjd2048.com,xxx7788.com",
-      "Img": "div#read_tpc img[data-original]"
+      "Img": "div#read_tpc img"
     },
     {
       "Site": "meimeicun.com",
@@ -551,7 +551,7 @@
     },
     {
       "Site": "xsnvshen.com",
-      "Img": "div.swi-hd img[data-original]",
+      "Img": "div.swi-hd img",
       "Album": "div.camLiTitleC  a"
     },
     {
@@ -688,7 +688,7 @@
     },
     {
       "Site": "media-education-culture.net",
-      "Img": "div.lvyecms_img > img[data-original]",
+      "Img": "div.lvyecms_img > img",
       "Album": "h3[itemprop] > a[itemprop]"
     },
     {
