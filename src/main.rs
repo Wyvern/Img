@@ -143,7 +143,7 @@ fn parse(addr: &str) -> String {
     let (html, ll) = get_html(addr);
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
-    let [mut img, mut next_sel, mut album, mut title] = host_info(host);
+    let [mut img, mut next_sel, mut album, mut title_sel] = host_info(host);
     let page = crabquery::Document::from(&html[..ll]);
 
     if img.is_none() {
@@ -168,7 +168,7 @@ fn parse(addr: &str) -> String {
             }
         }) {
             tdbg!(series[0]);
-            [img, next_sel, album, title] = host_info(series[2]);
+            [img, next_sel, album, title_sel] = host_info(series[2]);
         }
     }
 
@@ -233,7 +233,7 @@ fn parse(addr: &str) -> String {
         "title"
     });
 
-    let title = title.map_or_else(
+    let title = title_sel.map_or_else(
         || {
             if !json_img.is_empty() {
                 titles
@@ -263,11 +263,15 @@ fn parse(addr: &str) -> String {
         |t| page.select(t)[0].text().unwrap(),
     );
 
-    let mut t = title
-        .rsplit(['/', '-', '_', '|', '–'])
-        .skip(1)
-        .max_by_key(|x| x.trim().len())
-        .unwrap_or(title.as_str());
+    let mut t = if title_sel.is_some() {
+        title.as_str()
+    } else {
+        title
+            .rsplit(['/', '-', '_', '|', '–'])
+            .skip(1)
+            .max_by_key(|x| x.trim().len())
+            .unwrap_or(title.as_str())
+    };
 
     let albums = album.map(|a| page.select(a));
 
@@ -1167,7 +1171,6 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
-
     use super::*;
 
     #[inline]
