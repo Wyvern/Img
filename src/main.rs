@@ -233,6 +233,17 @@ fn parse(addr: &str) -> String {
         "title"
     });
 
+    let albums = album.map(|a| page.select(a));
+    let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
+    let page_title = || {
+        titles
+            .first()
+            .unwrap_or_else(|| {
+                quit!("Not a valid HTML page.");
+            })
+            .text()
+            .expect("NO title text.")
+    };
     let title = title_sel.map_or_else(
         || {
             if !json_img.is_empty() {
@@ -251,16 +262,16 @@ fn parse(addr: &str) -> String {
                     .unwrap()
                     .to_owned()
             } else {
-                titles
-                    .first()
-                    .unwrap_or_else(|| {
-                        quit!("Not a valid HTML page.");
-                    })
-                    .text()
-                    .expect("NO title text.")
+                page_title()
             }
         },
-        |t| page.select(t)[0].text().unwrap(),
+        |t| {
+            if has_album {
+                page_title()
+            } else {
+                page.select(t)[0].text().unwrap()
+            }
+        },
     );
 
     let mut t = if title_sel.is_some() {
@@ -273,9 +284,6 @@ fn parse(addr: &str) -> String {
             .unwrap_or(title.as_str())
     };
 
-    let albums = album.map(|a| page.select(a));
-
-    let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
     let [albums_len, imgs_len, json_len] = [
         albums.as_ref().map_or(0, |a| a.len()),
         html_img.len() + css_img.len() + json_img.len(),
