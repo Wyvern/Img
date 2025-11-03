@@ -460,10 +460,10 @@ fn parse(addr: &str) -> String {
                                     }
                                 })
                             });
-                            urls.insert(title_alt.map_or_else(
-                                || canonicalize(&src, addr),
-                                |x| format!("{}{SEP}{x}", canonicalize(&src, addr)),
-                            ));
+                            let cano = || canonicalize(&src, addr);
+                            urls.insert(
+                                title_alt.map_or_else(&cano, |x| format!("{}{SEP}{x}", cano())),
+                            );
                         }
                     }
                     _ => (),
