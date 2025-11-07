@@ -15,6 +15,10 @@ static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
     "-S",
     // "-OJ",
 ];
+static IMGS: [&str; 18] = [
+    ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif", ".svg",
+    ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
+];
 
 fn check_args() -> (String, String) {
     let mut args;
@@ -1124,12 +1128,9 @@ fn url_image(content: &str) -> Option<String> {
             || url == "undefined"
             || url.starts_with(['{', '$'])
             || url.contains('#')
-            || [
-                ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif",
-                ".svg", ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
-            ]
-            .iter()
-            .all(|&ext| !url.to_ascii_lowercase().ends_with(ext))
+            || IMGS
+                .iter()
+                .all(|&ext| !url.to_ascii_lowercase().ends_with(ext))
         {
             None
         } else {
