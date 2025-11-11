@@ -311,8 +311,7 @@
     {
       "Site": "bisipic.online,bisipic.xyz",
       "Img": "div.t_fsz img[file]",
-      "Album": "div.cacklist h2",
-      "Title": "h1.focusbox-title"
+      "Album": "div.cacklist h2"
     },
     {
       "Site": "chinagirlclub.com",
