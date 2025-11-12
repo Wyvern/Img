@@ -15,6 +15,10 @@ static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
     "-S",
     // "-OJ",
 ];
+static IMGS: [&str; 18] = [
+    ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif", ".svg",
+    ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
+];
 
 fn check_args() -> (String, String) {
     let mut args;
@@ -143,7 +147,7 @@ fn parse(addr: &str) -> String {
     let (html, ll) = get_html(addr);
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
-    let [mut img, mut next_sel, mut album, mut title] = host_info(host);
+    let [mut img, mut next_sel, mut album, mut title_sel] = host_info(host);
     let page = crabquery::Document::from(&html[..ll]);
 
     if img.is_none() {
@@ -168,7 +172,7 @@ fn parse(addr: &str) -> String {
             }
         }) {
             tdbg!(series[0]);
-            [img, next_sel, album, title] = host_info(series[2]);
+            [img, next_sel, album, title_sel] = host_info(series[2]);
         }
     }
 
@@ -233,7 +237,18 @@ fn parse(addr: &str) -> String {
         "title"
     });
 
-    let title = title.map_or_else(
+    let albums = album.map(|a| page.select(a));
+    let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
+    let page_title = || {
+        titles
+            .first()
+            .unwrap_or_else(|| {
+                quit!("Not a valid HTML page.");
+            })
+            .text()
+            .expect("NO title text.")
+    };
+    let title = title_sel.map_or_else(
         || {
             if !json_img.is_empty() {
                 titles
@@ -251,27 +266,28 @@ fn parse(addr: &str) -> String {
                     .unwrap()
                     .to_owned()
             } else {
-                titles
-                    .first()
-                    .unwrap_or_else(|| {
-                        quit!("Not a valid HTML page.");
-                    })
-                    .text()
-                    .expect("NO title text.")
+                page_title()
             }
         },
-        |t| page.select(t)[0].text().unwrap(),
+        |t| {
+            if has_album {
+                page_title()
+            } else {
+                page.select(t)[0].text().unwrap()
+            }
+        },
     );
 
-    let mut t = title
-        .rsplit(['/', '-', '_', '|', '–'])
-        .skip(1)
-        .max_by_key(|x| x.trim().len())
-        .unwrap_or(title.as_str());
+    let mut t = if title_sel.is_some() {
+        title.as_str()
+    } else {
+        title
+            .rsplitn(5, ['/', '-', '_', '|', '–'])
+            .skip(1)
+            .max_by_key(|x| x.trim().len())
+            .unwrap_or(title.as_str())
+    };
 
-    let albums = album.map(|a| page.select(a));
-
-    let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
     let [albums_len, imgs_len, json_len] = [
         albums.as_ref().map_or(0, |a| a.len()),
         html_img.len() + css_img.len() + json_img.len(),
@@ -333,9 +349,15 @@ fn parse(addr: &str) -> String {
             let [mut empty, mut dup, mut embed] = [0usize; 3];
 
             for elm in html_img {
-                let value = ["data-src", "data-lazy", "data-lazy-src", attr]
-                    .into_iter()
-                    .find_map(|a| elm.attr(a));
+                let value = [
+                    "data-src",
+                    "data-lazy",
+                    "data-lazy-src",
+                    "data-original",
+                    attr,
+                ]
+                .into_iter()
+                .find_map(|a| elm.attr(a));
                 let mut handle_embed = |s: String| {
                     if cfg!(feature = "embed") {
                         if !urls.insert(s) {
@@ -442,10 +464,10 @@ fn parse(addr: &str) -> String {
                                     }
                                 })
                             });
-                            urls.insert(title_alt.map_or_else(
-                                || canonicalize(&src, addr),
-                                |x| format!("{}{SEP}{x}", canonicalize(&src, addr)),
-                            ));
+                            let cano = || canonicalize(&src, addr);
+                            urls.insert(
+                                title_alt.map_or_else(&cano, |x| format!("{}{SEP}{x}", cano())),
+                            );
                         }
                     }
                     _ => (),
@@ -1101,12 +1123,9 @@ fn url_image(content: &str) -> Option<String> {
             || url == "undefined"
             || url.starts_with(['{', '$'])
             || url.contains('#')
-            || [
-                ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif",
-                ".svg", ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
-            ]
-            .iter()
-            .all(|&ext| !url.to_ascii_lowercase().ends_with(ext))
+            || IMGS
+                .iter()
+                .all(|&ext| !url.to_ascii_lowercase().ends_with(ext))
         {
             None
         } else {
@@ -1161,7 +1180,6 @@ fn link_text(text: &str, addr: &str) -> String {
 
 #[cfg(test)]
 mod img {
-
     use super::*;
 
     #[inline]
