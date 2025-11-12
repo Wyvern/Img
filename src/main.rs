@@ -287,7 +287,7 @@ fn parse(addr: &str) -> String {
         title.as_str()
     } else {
         title
-            .rsplit(['/', '-', '_', '|', '–'])
+            .rsplitn(5, ['/', '-', '_', '|', '–'])
             .skip(1)
             .max_by_key(|x| x.trim().len())
             .unwrap_or(title.as_str())
