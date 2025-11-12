@@ -273,12 +273,7 @@ fn parse(addr: &str) -> String {
             if has_album {
                 page_title()
             } else {
-                page.select(t)[0]
-                    .text()
-                    .unwrap()
-                    .trim_end_matches("...")
-                    .trim()
-                    .into()
+                page.select(t)[0].text().unwrap()
             }
         },
     );
