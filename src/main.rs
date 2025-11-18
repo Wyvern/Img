@@ -543,7 +543,7 @@ fn parse(addr: &str) -> String {
 
                     _ = writeln!(
                         stdout,
-                        "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} ?{N}",
+                        "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{} {N}{B}?{N}",
                         i + 1,
                         t.trim(),
                     );
