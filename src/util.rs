@@ -31,7 +31,7 @@ use std::*;
 */
 macro_rules! color {
             ($($i:ident = $l:literal),+) => {
-                STATIC!(pub &str;$($i=$l),+);
+                STATIC!(pub &str;$($i=concat!("\x1b[",$l,'m')),+);
             }
         }
 
@@ -47,28 +47,29 @@ macro_rules! STATIC {
 //             }
 //         }
 
-color!(
-    N = "\x1b[0m",
-    B = "\x1b[1m",
-    _B = "\x1b[22m",
-    I = "\x1b[3m",
-    _I = "\x1b[23m",
-    U = "\x1b[4m",
-    _U = "\x1b[24m",
+STATIC!(pub &str;
     BEG = "\x1b[G", //Move to begin of line
     CL = "\x1b[2K", //Erase the entire line
-    UU = "\x1b[21m",
-    R = "\x1b[91m",
-    G = "\x1b[92m",
-    Y = "\x1b[93m",
-    BLUE = "\x1b[94m",
-    HL = "\x1b[103m",
-    BG = "\x1b[100m",
-    FG = "\x1b[97m",
-    SAVE = "\x1b[s", //"\x1b7" save cursor & attrs
-    REST = "\x1b[u", //"\x1b8" unsave cursor & attrs
     MARK = "\x1b]1337;SetMark\x07",
     TEXT = "The quick brown fox jumps over the lazy dog"
+);
+
+color!(
+    N = 0,
+    B = 1,
+    _B = 22,
+    I = 3,
+    _I = 23,
+    U = 4,
+    _U = 24,
+    UU = 21,
+    R = 91,
+    G = 92,
+    Y = 93,
+    BLUE = 94,
+    HL = 103,
+    BG = 100,
+    FG = 97
 );
 
 mod macros {
