@@ -92,7 +92,7 @@ jobs:
             echo "Downloading CSKY toolchain..."
             curl -fsSLO https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz
             echo "Unzipping csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz ..."
-            tar -qxzf csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz -C ~/csky
+            tar -xzf csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz -C ~/csky
           fi
 
           ln -sf ~/csky csky
