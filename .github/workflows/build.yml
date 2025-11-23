@@ -43,7 +43,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -51,7 +51,7 @@ jobs:
       - name: Ubuntu apt update and install
         continue-on-error: true
         run: |
-          sudo apt update -q && sudo apt install -q gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu musl-tools -y
 
       - name: Build Release
         run: |
@@ -59,6 +59,8 @@ jobs:
           set +e -x
 
           targets=(
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
             powerpc64le-unknown-linux-gnu
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
@@ -86,6 +88,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
+                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
                   "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
                   "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
                   "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
@@ -134,7 +138,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -167,7 +171,7 @@ jobs:
 
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk-$ver
-          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/" sysroot
+          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" sysroot
 
           if [ ! -d ~/android-ndk-${ver} ]; then
             mkdir -p ~/android-ndk-${ver}
@@ -179,9 +183,13 @@ jobs:
 
           ln -sf $(readlink sysroot)/sysroot $(readlink sysroot)/android
 
+          ln -sf $OHOS_SDK_NATIVE/llvm ohos
+          ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
+
           targets=(
-            x86_64-unknown-linux-gnu
-            x86_64-unknown-linux-musl
+            aarch64-unknown-linux-ohos
+            armv7-unknown-linux-ohos
+            x86_64-unknown-linux-ohos
             aarch64-linux-android
             armv7-linux-androideabi
             thumbv7neon-linux-androideabi
@@ -210,8 +218,9 @@ jobs:
                   "armv7-linux-androideabi Android-armv7"
                   "thumbv7neon-linux-androideabi Android-thumbv7neon"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
-                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
-                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
+                  "aarch64-unknown-linux-ohos Android-aarch64-ohos"
+                  "armv7-unknown-linux-ohos Android-armv7-ohos"
+                  "x86_64-unknown-linux-ohos Android-x86_64-ohos"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
