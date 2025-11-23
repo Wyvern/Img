@@ -76,7 +76,7 @@ jobs:
 
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk-$ver
-          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" sysroot
+          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
 
           if [ ! -d ~/android-ndk-${ver} ]; then
             mkdir -p ~/android-ndk-${ver}
@@ -85,11 +85,6 @@ jobs:
             echo "Unzipping Android NDK..."
             unzip -q android-ndk-${ver}-linux.zip -d ~/
           fi
-
-          ln -sf $(readlink sysroot)/sysroot $(readlink sysroot)/android
-
-          # mkdir -p $(readlink sysroot)/android
-          # sudo mount --bind sysroot/sysroot sysroot/android
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
