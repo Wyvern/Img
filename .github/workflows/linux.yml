@@ -91,7 +91,7 @@ jobs:
           # sudo mount --bind sysroot/sysroot sysroot/android
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
-          find $OHOS_SDK_NATIVE -name sysroot
+          ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           cargo update
           set +e -x
