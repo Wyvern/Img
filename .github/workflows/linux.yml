@@ -62,6 +62,10 @@ jobs:
           key: android-ndk-${{ env.NDK_VERSION }}
           restore-keys: android-ndk-${{ env.NDK_VERSION }}
 
+      - name: Setup OpenHarmony SDK
+        id: ohos
+        uses: openharmony-rs/setup-ohos-sdk@main
+
       - name: Ubuntu apt update and install
         run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
 
@@ -98,10 +102,18 @@ jobs:
 
           ln -sf ~/csky csky
 
+          OHOS_NDK_ROOT="${{ steps.ohos.outputs.ohos_sdk_native }}"
+          echo $OHOS_NDK_ROOT
+          ln -sf $OHOS_NDK_ROOT ohos
+
           cargo update
           set +e -x
 
           targets=(
+            aarch64-unknown-linux-ohos
+            armv7-unknown-linux-ohos
+            loongarch64-unknown-linux-ohos
+            x86_64-unknown-linux-ohos
             csky-unknown-linux-gnuabiv2
             riscv64-linux-android
             aarch64-linux-android
@@ -138,6 +150,10 @@ jobs:
                   "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
                   "powerpc64-unknown-linux-musl-elfv1 Linux-powerpc64-musl"
                   "csky-unknown-linux-gnuabiv2 Linux-csky-gnuabiv2"
+                  "aarch64-unknown-linux-ohos Android-aarch64-ohos"
+                  "armv7-unknown-linux-ohos Android-armv7-ohos"
+                  "loongarch64-unknown-linux-ohos Android-loongarch64-ohos"
+                  "x86_64-unknown-linux-ohos Android-x86_64-ohos"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"

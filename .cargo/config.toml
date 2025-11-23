@@ -459,6 +459,9 @@ linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 [target.'cfg(target_arch = "csky")']
 linker = "csky/bin/csky-linux-gnuabiv2-gcc"
 
+[target.'cfg(target_env="ohos")']
+linker = "ohos/bin/clang"
+
 # [target.x86_64-unknown-illumos]
 # linker = "clang"
 # rustflags = [
