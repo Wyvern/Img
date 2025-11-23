@@ -467,8 +467,20 @@ rustflags = [
     "-Clink-arg=aarch64--linux-ohos",
 ]
 [target.armv7-unknown-linux-ohos]
+rustflags = [
+    "-Clink-arg=-target",
+    "-Clink-arg=armv7--linux-ohos",
+]
 [target.loongarch64-unknown-linux-ohos]
+rustflags = [
+    "-Clink-arg=-target",
+    "-Clink-arg=loongarch64--linux-ohos",
+]
 [target.x86_64-unknown-linux-ohos]
+rustflags = [
+    "-Clink-arg=-target",
+    "-Clink-arg=x86_64--linux-ohos",
+]
 
 # [target.x86_64-unknown-illumos]
 # linker = "clang"
