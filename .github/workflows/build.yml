@@ -153,6 +153,9 @@ jobs:
           key: android-ndk-${{ env.NDK_VERSION }}
           restore-keys: android-ndk-${{ env.NDK_VERSION }}
 
+      - name: Setup OpenHarmony SDK
+        uses: openharmony-rs/setup-ohos-sdk@main
+
       - name: Ubuntu apt update and install
         continue-on-error: true
         run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
