@@ -102,9 +102,7 @@ jobs:
 
           ln -sf ~/csky csky
 
-          OHOS_NDK_ROOT="${{ steps.ohos.outputs.ohos_sdk_native }}"
-          echo $OHOS_NDK_ROOT
-          ln -sf $OHOS_NDK_ROOT ohos
+          ln -sf $OHOS_SDK_NATIVE/toolchains/llvm/prebuilt/linux-x86_64 ohos
 
           cargo update
           set +e -x
