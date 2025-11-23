@@ -238,7 +238,7 @@ rustflags = [
     "-Wlinker_messages",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']
+[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64")))']
 rustflags = [
     "-Clink-self-contained=+linker",
     "-Clinker-features=+lld",
@@ -456,9 +456,8 @@ linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 ar = "sysroot/bin/arm-linux-androideabi-ar"
 linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 
-[target.'config(target_arch = "csky")']
+[target.'cfg(target_arch = "csky")']
 cc = "csky/bin/csky-linux-gnuabiv2-gcc"
-linker = "csky/bin/csky-linux-gnuabiv2-gcc"
 
 # [target.x86_64-unknown-illumos]
 # linker = "clang"

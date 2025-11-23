@@ -36,6 +36,7 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
+            ~/csky
           key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.ver.outputs.rust}}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-nightly-
 
