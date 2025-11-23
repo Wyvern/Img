@@ -466,10 +466,7 @@ rustflags = ["-Clink-arg=--target=aarch64--linux-ohos"]
 [target.armv7-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=armv7--linux-ohos"]
 [target.loongarch64-unknown-linux-ohos]
-rustflags = [
-    "-Clink-arg=-target",
-    "-Clink-arg=loongarch64--linux-ohos",
-]
+rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 [target.x86_64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
