@@ -100,7 +100,6 @@ jobs:
           targets=(
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
-            loongarch64-unknown-linux-ohos
             x86_64-unknown-linux-ohos
             riscv64-linux-android
             aarch64-linux-android
@@ -138,7 +137,6 @@ jobs:
                   "powerpc64-unknown-linux-musl-elfv1 Linux-powerpc64-musl"
                   "aarch64-unknown-linux-ohos Android-aarch64-ohos"
                   "armv7-unknown-linux-ohos Android-armv7-ohos"
-                  "loongarch64-unknown-linux-ohos Android-loongarch64-ohos"
                   "x86_64-unknown-linux-ohos Android-x86_64-ohos"
           )
           for target in "${targets[@]}"; do
