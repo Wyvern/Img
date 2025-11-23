@@ -91,7 +91,7 @@ jobs:
           # sudo mount --bind sysroot/sysroot sysroot/android
 
           ln -sf $OHOS_SDK_NATIVE/toolchains/llvm/prebuilt/linux-x86_64 ohos
-          ls -alhR $OHOS_SDK_NATIVE
+          find "$OHOS_SDK_NATIVE" -name clang
 
           cargo update
           set +e -x
