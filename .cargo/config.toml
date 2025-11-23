@@ -456,8 +456,6 @@ linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 ar = "sysroot/bin/arm-linux-androideabi-ar"
 linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 
-[target.'cfg(target_arch = "csky")']
-linker = "csky/bin/csky-linux-gnuabiv2-gcc"
 
 [target.'cfg(target_env="ohos")']
 linker = "ohos/bin/clang"
