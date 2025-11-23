@@ -75,7 +75,7 @@ jobs:
 
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk-$ver
-          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/" sysroot
+          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" sysroot
 
           if [ ! -d ~/android-ndk-${ver} ]; then
             mkdir -p ~/android-ndk-${ver}
@@ -91,7 +91,6 @@ jobs:
           # sudo mount --bind sysroot/sysroot sysroot/android
 
           ln -sf $OHOS_SDK_NATIVE/toolchains/llvm/prebuilt/linux-x86_64 ohos
-          readlink ohos
 
           cargo update
           set +e -x
