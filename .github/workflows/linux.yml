@@ -62,7 +62,6 @@ jobs:
           restore-keys: android-ndk-${{ env.NDK_VERSION }}
 
       - name: Setup OpenHarmony SDK
-        id: ohos
         uses: openharmony-rs/setup-ohos-sdk@main
         with:
           version: "6.0"
