@@ -458,7 +458,7 @@ linker = "sysroot/bin/armv7a-linux-androideabi35-clang"
 
 [target.'cfg(target_arch = "csky")']
 cc = "csky/bin/csky-linux-gnuabiv2-gcc"
-# linker = "csky/bin/csky-linux-gnuabiv2-gcc"
+linker = "csky/bin/csky-linux-gnuabiv2-gcc"
 
 # [target.x86_64-unknown-illumos]
 # linker = "clang"
