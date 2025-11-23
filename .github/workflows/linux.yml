@@ -90,8 +90,7 @@ jobs:
           # mkdir -p $(readlink sysroot)/android
           # sudo mount --bind sysroot/sysroot sysroot/android
 
-          ln -sf $OHOS_SDK_NATIVE/toolchains/llvm/prebuilt/linux-x86_64 ohos
-          find "$OHOS_SDK_NATIVE" -name clang
+          ln -sf $OHOS_SDK_NATIVE/llvm ohos
 
           cargo update
           set +e -x
