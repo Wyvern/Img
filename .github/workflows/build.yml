@@ -63,6 +63,7 @@ jobs:
             x86_64-unknown-linux-musl
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
+            riscv64a23-unknown-linux-gnu
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
             aarch64-unknown-linux-gnu
@@ -93,6 +94,7 @@ jobs:
                   "x86_64-unknown-linux-musl Linux-x86_64-musl"
                   "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
                   "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"
+                  "riscv64a23-unknown-linux-gnu Linux-riscv64a23-gnu"
                   "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
                   "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
                   "aarch64-unknown-linux-gnu Linux-aarch64-gnu"
