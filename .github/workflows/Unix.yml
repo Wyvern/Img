@@ -50,14 +50,13 @@ jobs:
 
       - name: Cache sysroot
         uses: actions/cache@v4
-        id: sysroot-cache
         with:
           path: /home/runner/sysroots
           key: BSD-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: BSD-${{ runner.os }}-
 
-      - name: Ubuntu apt update and install
-        run: sudo apt update && sudo apt install -y zfsutils-linux
+      # - name: Ubuntu apt update and install
+      #   run: sudo apt update && sudo apt install -y zfsutils-linux
 
       - name: Build Release
         run: |
