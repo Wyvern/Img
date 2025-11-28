@@ -121,14 +121,10 @@ jobs:
 
       - name: Cache sysroot
         uses: actions/cache@v4
-        id: sysroot-cache
         with:
           path: /home/runner/sysroots
           key: BSD-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: BSD-${{ runner.os }}-
-
-      - name: Ubuntu apt update and install
-        run: |
 
       - name: Build Release
         run: |
