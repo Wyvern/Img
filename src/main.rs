@@ -19,6 +19,7 @@ static IMGS: [&str; 18] = [
     ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif", ".svg",
     ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
 ];
+static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 
 fn check_args() -> (String, String) {
     let mut args;
@@ -294,7 +295,17 @@ fn parse(addr: &str) -> String {
         json_img.len(),
     ];
 
-    let term_title = link_text(t, addr);
+    let term_title = if *TERM.get_or_init(|| {
+        std::env::var("TERM").is_ok_and(|o| {
+            ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
+                .iter()
+                .any(|x| o.contains(x))
+        })
+    }) {
+        format_args!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\",)
+    } else {
+        format_args!("{G} {t}")
+    };
 
     let name_count = |name: &[&str], count: &[usize]| -> String {
         name.iter()
@@ -1158,34 +1169,6 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
         }
     });
     images
-}
-
-///Linkable Text based upon terminal type
-fn link_text<'a>(text: &'a str, addr: &'a str) -> impl fmt::Display {
-    struct LinkText<'a> {
-        text: &'a str,
-        addr: &'a str,
-    }
-
-    impl<'a> fmt::Display for LinkText<'a> {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            if std::env::var("TERM").is_ok_and(|o| {
-                ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
-                    .iter()
-                    .any(|x| o.contains(x))
-            }) {
-                write!(
-                    f,
-                    "{G} \x1b]8;;{}\x1b\\{}\x1b]8;;\x1b\\",
-                    self.addr, self.text,
-                )
-            } else {
-                write!(f, "{G} {}", self.text)
-            }
-        }
-    }
-
-    LinkText { text, addr }
 }
 
 #[cfg(test)]
