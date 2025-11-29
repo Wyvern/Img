@@ -301,14 +301,12 @@ fn parse(addr: &str) -> String {
             .zip(count)
             .filter_map(|(&n, &c)| {
                 if c > 0 {
-                    Some(format!(
-                        "{n}{}",
-                        if c == count.iter().sum::<usize>() {
-                            String::default()
-                        } else {
-                            format!("({c})")
-                        }
-                    ))
+                    let cnt = if c == count.iter().sum::<usize>() {
+                        format_args!("")
+                    } else {
+                        format_args!("({c})")
+                    };
+                    Some(format!("{n}{cnt}"))
                 } else {
                     None
                 }
@@ -1063,14 +1061,12 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     'l: loop {
         for char in chars {
             let secs = t.elapsed().as_secs();
-            print!(
-                "{BEG}{char}...{}",
-                if secs > 0 {
-                    format!("{secs:>2}s")
-                } else {
-                    String::default()
-                }
-            );
+            let time = if secs > 0 {
+                format_args!("{secs:>2}s")
+            } else {
+                format_args!("")
+            };
+            print!("{BEG}{char}...{time}");
             _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
@@ -1117,8 +1113,7 @@ fn url_image(content: &str) -> Option<String> {
             return Some(url.into());
         }
         let dec = url_redirect_and_query_cleanup(url);
-        url = dec.as_str();
-        url = &url[..url.rfind("#xywh").unwrap_or(url.len())];
+        url = &dec[..dec.rfind("#xywh").unwrap_or(dec.len())];
         if url.is_empty()
             || url == "undefined"
             || url.starts_with(['{', '$'])
@@ -1166,16 +1161,31 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
 }
 
 ///Linkable Text based upon terminal type
-fn link_text(text: &str, addr: &str) -> String {
-    if env::var("TERM").is_ok_and(|o| {
-        ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
-            .iter()
-            .any(|x| o.contains(x))
-    }) {
-        format!("{G} \x1b]8;;{addr}\x1b\\{text}\x1b]8;;\x1b\\")
-    } else {
-        format!("{G} {text}")
+fn link_text<'a>(text: &'a str, addr: &'a str) -> impl fmt::Display {
+    struct LinkText<'a> {
+        text: &'a str,
+        addr: &'a str,
     }
+
+    impl<'a> fmt::Display for LinkText<'a> {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            if std::env::var("TERM").is_ok_and(|o| {
+                ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
+                    .iter()
+                    .any(|x| o.contains(x))
+            }) {
+                write!(
+                    f,
+                    "{G} \x1b]8;;{}\x1b\\{}\x1b]8;;\x1b\\",
+                    self.addr, self.text,
+                )
+            } else {
+                write!(f, "{G} {}", self.text)
+            }
+        }
+    }
+
+    LinkText { text, addr }
 }
 
 #[cfg(test)]
