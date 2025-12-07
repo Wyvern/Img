@@ -29,7 +29,7 @@ use std::*;
     90-97 	bright foreground color (non-standard)
     100-107 	bright background color (non-standard)
 */
-macro_rules! color {
+macro_rules! Color {
             ($($i:ident = $l:literal),+) => {
                 STATIC!(pub &str;$($i=concat!("\x1b[",$l,'m')),+);
             }
@@ -54,7 +54,7 @@ STATIC!(pub &str;
     TEXT = "The quick brown fox jumps over the lazy dog"
 );
 
-color!(
+Color!(
     N = 0,
     B = 1,
     _B = 22,
