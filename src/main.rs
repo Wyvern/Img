@@ -1077,7 +1077,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             } else {
                 format_args!("")
             };
-            print!("{BEG}{char}...{time}");
+            print!("{CL}{char}...{time}");
             _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
@@ -1087,7 +1087,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             thread::sleep(time::Duration::from_millis(200));
         }
     }
-    print!("{CL}{BEG}");
+    print!("{CL}");
     _ = o.flush();
 }
 
