@@ -1066,7 +1066,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     use sync::mpsc::*;
 
     let chars = ['◯', '◔', '◑', '◕', '●'];
-    // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
+
     let mut o = stdout().lock();
     let t = time::Instant::now();
     'l: loop {
@@ -1077,7 +1077,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             } else {
                 format_args!("")
             };
-            print!("{CL}{char}...{time}");
+            print!("{CL}{char}..{time}");
             _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
