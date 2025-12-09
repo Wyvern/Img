@@ -330,14 +330,14 @@ fn parse(addr: &str) -> String {
         ["HTML", "CSS", "JSON"].as_slice(),
         [html_img.len(), css_img.len(), json_len].as_slice(),
     );
-
+    let prefix = "✔︎ Totally found";
     match (has_album, imgs_len > 0) {
         (true, true) => {
-            pl!("Totally found <{albums_len}> 📸 and <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}")
+            pl!("{prefix} <{albums_len}> 📸 and <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}")
         }
 
-        (true, false) => pl!("Totally found <{albums_len}> 📸 in 📄:{term_title}"),
-        (false, true) => pl!("Totally found <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}"),
+        (true, false) => pl!("{prefix} <{albums_len}> 📸 in 📄:{term_title}"),
+        (false, true) => pl!("{prefix} <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
@@ -1066,7 +1066,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
     use sync::mpsc::*;
 
     let chars = ['◯', '◔', '◑', '◕', '●'];
-    // let chars = ["◯", "◔.", "◑..", "◕...", "●...."];
+
     let mut o = stdout().lock();
     let t = time::Instant::now();
     'l: loop {
@@ -1077,7 +1077,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             } else {
                 format_args!("")
             };
-            print!("{BEG}{char}...{time}");
+            print!("{CL}{char}..{time}");
             _ = o.flush();
             match r.try_recv() {
                 Err(TryRecvError::Empty) => (),
@@ -1087,7 +1087,7 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             thread::sleep(time::Duration::from_millis(200));
         }
     }
-    print!("{CL}{BEG}");
+    print!("{CL}");
     _ = o.flush();
 }
 

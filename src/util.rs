@@ -29,7 +29,7 @@ use std::*;
     90-97 	bright foreground color (non-standard)
     100-107 	bright background color (non-standard)
 */
-macro_rules! color {
+macro_rules! Color {
             ($($i:ident = $l:literal),+) => {
                 STATIC!(pub &str;$($i=concat!("\x1b[",$l,'m')),+);
             }
@@ -48,13 +48,12 @@ macro_rules! STATIC {
 //         }
 
 STATIC!(pub &str;
-    BEG = "\x1b[G", //Move to begin of line
-    CL = "\x1b[2K", //Erase the entire line
+    CL = "\r\x1b[2K", //Clear current line + move to start
     MARK = "\x1b]1337;SetMark\x07",
     TEXT = "The quick brown fox jumps over the lazy dog"
 );
 
-color!(
+Color!(
     N = 0,
     B = 1,
     _B = 22,
@@ -182,12 +181,12 @@ pub fn pause() {
         if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
             i.keys().next()
         {
-            write!(o, "{CL}{BEG}Quit!",).unwrap();
+            write!(o, "{CL}Quit!",).unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);
         } else {
-            write!(o, "{CL}{BEG}",).unwrap();
+            write!(o, "{CL}",).unwrap();
             o.flush().unwrap();
         }
     }
