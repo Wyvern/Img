@@ -136,6 +136,8 @@ feature-unification = true
 rustdoc-depinfo = true
 no-embed-metadata = true
 profile-hint-mostly-unused = true
+panic-immediate-abort = true
+rustc-unicode = true
 
 # build-std = [
 #     "core",
