@@ -163,7 +163,7 @@ incremental = true
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
-[target.'cfg(true)']
+[target.'cfg(all())']
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Csymbol-mangling-version=hashed",
