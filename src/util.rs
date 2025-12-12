@@ -193,7 +193,7 @@ pub fn pause() {
     #[cfg(any(target_family = "windows", target_family = "wasm"))]
     {
         let mut o = stdout().lock();
-        write!(o, "Press any key to continue, or [Q̲]uit").unwrap();
+        write!(o, "Press any key to continue, or [Q̲]uit:").unwrap();
         o.flush().unwrap();
         let mut s = String::default();
         _ = stdin().lock().read_line(&mut s);
