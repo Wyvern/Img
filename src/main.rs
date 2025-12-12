@@ -1236,7 +1236,7 @@ mod img {
     #[test]
     fn run() {
         // https://bisipic.online/portal.php?page=2
-        tdbg!(123;);
+
         if let Some(arg) = env::args().nth(4) {
             parse(&arg);
         } else {
