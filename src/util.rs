@@ -174,7 +174,7 @@ pub fn pause() {
         use termion::raw::IntoRawMode;
 
         let mut o = stdout().into_raw_mode().unwrap();
-        write!(o, "Press any key to continue, or [Q\u{332}]uit:").unwrap();
+        write!(o, "Press [Q̲]uit (or any key to continue):").unwrap();
         o.flush().unwrap();
 
         let i = stdin();
@@ -193,7 +193,7 @@ pub fn pause() {
     #[cfg(any(target_family = "windows", target_family = "wasm"))]
     {
         let mut o = stdout().lock();
-        _ = write!(o, "Press any key to continue, or [Q\u{332}]uit:");
+        _ = write!(o, "Press [Q̲]uit (or any key to continue):");
         _ = o.flush();
         let mut s = String::default();
         _ = stdin().lock().read_line(&mut s);
