@@ -178,7 +178,7 @@ build-dir = "build-dir"
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
-[target.'cfg(all())']
+[target.'cfg(true)']
 rustflags = [
     "-Ctarget-feature=-crt-static",
     "-Csymbol-mangling-version=hashed",
