@@ -899,12 +899,12 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
         })
     };
     let mut nexts = page.select(nxt);
-    nexts.sort_by_cached_key(|x| x.attr(attr));
+    nexts.sort_by_key(|x| x.attr(attr));
     nexts.dedup_by_key(|x| x.attr(attr));
 
     if nexts.is_empty() {
         next_link = String::default();
-        tdbg!("NO next page <element> found with selector: {nxt}");
+        tdbg!(nxt);
     } else if nexts.len() == 1 {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
@@ -1242,8 +1242,8 @@ mod img {
         } else {
             [
                 "https://xiutaku.com",
-                "https://meitu9.com/",
                 "https://bisipic.online",
+                "https://meitu9.com/",
             ]
             .into_iter()
             .for_each(|u| {
