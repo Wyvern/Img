@@ -48,6 +48,7 @@ macro_rules! STATIC {
 //         }
 
 STATIC!(pub &str;
+    UP = "\r\x1b[1A",
     CL = "\r\x1b[2K", //Clear current line + move to start
     MARK = "\x1b]1337;SetMark\x07",
     TEXT = "The quick brown fox jumps over the lazy dog"
@@ -174,34 +175,38 @@ pub fn pause() {
         use termion::raw::IntoRawMode;
 
         let mut o = stdout().into_raw_mode().unwrap();
-        write!(o, "Press any key to continue, or [Q\u{332}]uit:").unwrap();
+        write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
         o.flush().unwrap();
 
         let i = stdin();
         if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
             i.keys().next()
         {
-            write!(o, "{CL}Quit!",).unwrap();
+            write!(o, "{CL}Quit!").unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);
         } else {
-            write!(o, "{CL}",).unwrap();
+            write!(o, "{CL}").unwrap();
             o.flush().unwrap();
         }
     }
     #[cfg(any(target_family = "windows", target_family = "wasm"))]
     {
         let mut o = stdout().lock();
-        _ = write!(o, "Press any key to continue, or [Q\u{332}]uit:");
-        _ = o.flush();
+        write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
+        o.flush().unwrap();
         let mut s = String::default();
-        _ = stdin().lock().read_line(&mut s);
+        stdin().lock().read_line(&mut s).unwrap();
         s.make_ascii_lowercase();
         if s.trim() == "q" {
-            write!(o, " Quit!",).unwrap();
+            write!(o, "{UP}{CL}Quit!").unwrap();
             o.flush().unwrap();
+            drop(o);
             process::exit(0);
+        } else {
+            write!(o, "{UP}{CL}").unwrap();
+            o.flush().unwrap();
         }
     }
 }
