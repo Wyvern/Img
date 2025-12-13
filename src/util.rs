@@ -48,7 +48,7 @@ macro_rules! STATIC {
 //         }
 
 STATIC!(pub &str;
-    UP = "\r\x1b[1A",
+    UP = "\x1b[1A",
     CL = "\r\x1b[2K", //Clear current line + move to start
     MARK = "\x1b]1337;SetMark\x07",
     TEXT = "The quick brown fox jumps over the lazy dog"
