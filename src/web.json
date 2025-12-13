@@ -512,9 +512,9 @@
     },
     {
       "Site": "hotgirlchina.com",
-      "Img": "div.entry-inner img",
-      "Next": "nav.pagination span.current",
-      "Album": "h2.post-title a"
+      "Img": "p.wp-block-gallery > a[href]",
+      "Next": "div.nav-next > a",
+      "Album": "div.wp_rss_retriever_item_wrapper > a"
     },
     {
       "Site": "mhgirl.com,kunv.cc",
@@ -733,6 +733,11 @@
       "h1.elementor-heading-title > a[href]",
       "girldreamy.com"
     ],
-    ["Chinese Beauties", "div.site-branding a[href]", "sxchinesegirlz.one"]
+    [
+      "Hot Girl China",
+      "div.site-branding-logo > a.custom-logo-link",
+      "hotgirlchina.com"
+    ],
+    ["Chinese Beauties", "div.site-branding > a[href]", "sxchinesegirlz.one"]
   ]
 }
