@@ -264,10 +264,11 @@ rustflags = [
     "-Clink-arg=/INCREMENTAL:NO",
     "-Clink-arg=/MERGE:.rdata=.text",
     "-Clink-arg=/MERGE:.pdata=.text",
-    "-Clink-arg=/FILEALIGN:512",
     "-Clink-arg=/VERSION:0.0",
     "-Clink-arg=/PDB:NONE",
-    "-Clink-arg=/LTCG",
+    # "-Clink-arg=/LTCG",
+    # "-Clink-arg=/FILEALIGN:512",
+    # "-Clink-arg=/ALIGN:1",
     # "-Clink-arg=/DYNAMICBASE",
     # "-Clink-arg=/NXCOMPAT",
 ]
