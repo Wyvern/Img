@@ -264,6 +264,8 @@ rustflags = [
     "-Clink-arg=/INCREMENTAL:NO",
     "-Clink-arg=/MERGE:.rdata=.text",
     "-Clink-arg=/MERGE:.pdata=.text",
+    "-Clink-arg=--no-function-sections",
+    "-Clink-arg=--no-data-sections",
     "-Clink-arg=/VERSION:0.0",
     "-Clink-arg=/PDB:NONE",
     # "-Clink-arg=/LTCG",
