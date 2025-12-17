@@ -2,7 +2,6 @@
 name = "Img"
 version = "1.0.0"
 edition = "2024"
-# build = "build.rs"
 
 [features]
 default = ["curl"]
@@ -16,7 +15,7 @@ name = "color"
 path = "src/color.rs"
 
 [dependencies]
-crabquery = { path = "./crabquery" }
+arcdom = { path = "arcdom" }
 serde_json = { version = "*", default-features = false, features = ["alloc"] }
 percent-encoding = "*"
 
@@ -28,3 +27,6 @@ termion = "*"
 
 [dev-dependencies]
 # file-format = { version = "*", features = ["reader-xml"] }
+
+[workspace]
+members=["arcdom"]

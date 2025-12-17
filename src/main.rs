@@ -1,4 +1,5 @@
 mod util;
+use arcdom as dom;
 use {std::*, util::*};
 
 static SEP: &str = " | ";
@@ -149,7 +150,7 @@ fn parse(addr: &str) -> String {
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
     let [mut img, mut next_sel, mut album, mut title_sel] = host_info(host);
-    let page = crabquery::Document::from(&html[..ll]);
+    let page = dom::Document::from(&html[..ll]);
 
     if img.is_none() {
         let cat = JSON
@@ -450,7 +451,7 @@ fn parse(addr: &str) -> String {
                             .output()
                             .unwrap();
                         let html = String::from_utf8_lossy(&o.stdout);
-                        let page = crabquery::Document::from(html.as_ref());
+                        let page = dom::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
                         for e in html_img {
@@ -870,7 +871,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
+fn check_next(next: &str, cur: &str, page: dom::Document) -> String {
     let mut next_link: String;
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
@@ -881,7 +882,7 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
         .rsplit(['[', ']'])
         .nth(1)
         .unwrap_or("href");
-    let set_next = |tags: &[crabquery::Element]| -> String {
+    let set_next = |tags: &[dom::Element]| -> String {
         let tag = tags.iter().find(|e| {
             e.tag().unwrap() == "a"
                 || e.children()
