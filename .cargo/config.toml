@@ -458,12 +458,12 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
 [target.x86_64-unknown-illumos]
-linker = "ld.lld"
+linker = "clang"
 rustflags = [
     "-Clink-arg=--sysroot=sysroot/omnios",
     "-Clink-arg=-Lsysroot/omnios/lib/amd64",
     "-Clink-arg=-Lsysroot/omnios/usr/lib/amd64",
-    "-Clink-arg=-lc -lm -lpthread -lsocket -lnsl",
+    "-Clink-arg=--target=x86_64--illumos",
 ]
 
 # [target.x86_64-pc-solaris]
