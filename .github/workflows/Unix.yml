@@ -111,9 +111,9 @@ jobs:
             mkdir -p $SYSROOT/dfly
           fi
 
-          if [ ! -d sysroot/omnios ]; then
-            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > sysroot/omnios-r151056.zfs
-            mkdir -p sysroot/omnios
+          if [ ! -d $SYSROOT/omnios ]; then
+            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
+            mkdir -p $SYSROOT/omnios
           fi
 
           wait
@@ -121,8 +121,9 @@ jobs:
 
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
-          sudo zpool create -f solaris /tmp/omnios.img 1G
-          sudo zfs recv -o mountpoint=sysroot/omnios solaris/omnios < omnios-r151056.zfs
+          sudo truncate -s 1G /tmp/omnios.img
+          sudo zpool create -f solaris /tmp/omnios.img
+          sudo zfs recv -o mountpoint=$SYSROOT/omnios solaris/omnios < $SYSROOT/omnios-r151056.zfs
 
           zpool status
           zfs list

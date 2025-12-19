@@ -461,9 +461,9 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 linker = "clang"
 rustflags = [
     "-Clink-arg=--sysroot=sysroot/omnios",
-    "-Clink-arg=-target=x86_64--solaris2.11"
+    "-Clink-arg=--target=x86_64--solaris2.11"
 ]
 
 [target.x86_64-pc-solaris]
 linker = "clang"
-rustflags = ["-Clink-arg=--sysroot=sysroot/omnios","-Clink-arg=-target=x86_64--solaris2.11"]
+rustflags = ["-Clink-arg=--sysroot=sysroot/omnios","-Clink-arg=--target=x86_64--solaris2.11"]
