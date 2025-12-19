@@ -461,12 +461,14 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 linker = "ld.lld"
 rustflags = [
     "-Clink-arg=--sysroot=sysroot/omnios",
-    "-Clink-arg=--target=x86_64--illumos"
+    "-Clink-arg=-Lsysroot/omnios/lib/amd64",
+    "-Clink-arg=-Lsysroot/omnios/usr/lib/amd64"
 ]
 
 [target.x86_64-pc-solaris]
 linker = "ld.lld"
 rustflags = [
 "-Clink-arg=--sysroot=sysroot/omnios",
-"-Clink-arg=--target=x86_64--solaris2.11"
+"-Clink-arg=-Lsysroot/omnios/lib/amd64",
+"-Clink-arg=-Lsysroot/omnios/usr/lib/amd64"
 ]
