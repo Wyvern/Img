@@ -463,7 +463,7 @@ rustflags = [
     "-Clink-arg=--sysroot=sysroot/omnios",
     "-Clink-arg=-Lsysroot/omnios/lib/amd64",
     "-Clink-arg=-Lsysroot/omnios/usr/lib/amd64",
-    # "-Clink-arg=--target=x86_64--illumos",
+    "-Clink-arg=-lc -lm -lpthread -lsocket -lnsl",
 ]
 
 # [target.x86_64-pc-solaris]
