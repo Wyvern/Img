@@ -111,26 +111,25 @@ jobs:
             mkdir -p $SYSROOT/dfly
           fi
 
-          # if [ ! -d sysroot/omnios ]; then
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151054.zfs.xz | xz -d > sysroot/omnios-r151054.zfs
-          #   mkdir -p sysroot/omnios
-          # fi
+          if [ ! -d sysroot/omnios ]; then
+            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > sysroot/omnios-r151056.zfs
+            mkdir -p sysroot/omnios
+          fi
 
           wait
           chmod -R u+rwX "$SYSROOT"
 
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
-          # sudo truncate -s 2G $SYSROOT/zpool.img
-          # sudo zpool create -m none omnios $SYSROOT/zpool.img
-          # sudo zfs receive -F omnios/ROOT < sysroot/omnios-r151054.zfs
-          # sudo zfs set mountpoint=$SYSROOT/omnios omnios/ROOT
-          # sudo zfs mount omnios/ROOT
+          sudo zpool create -f solaris /tmp/omnios.img 1G
+          sudo zfs recv -o mountpoint=sysroot/omnios solaris/omnios < omnios-r151056.zfs
 
-          # zpool status
-          # zfs list
+          zpool status
+          zfs list
 
           targets=(
+            x86_64-unknown-illumos
+            x86_64-pc-solaris
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
@@ -150,6 +149,8 @@ jobs:
           done
 
           sudo umount $SYSROOT/dfly
+          sudo zfs destroy omnios
+          sudo zpool destroy solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
