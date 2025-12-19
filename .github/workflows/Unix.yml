@@ -56,7 +56,7 @@ jobs:
           restore-keys: BSD-${{ runner.os }}-
 
       - name: Ubuntu apt update and install
-        run: sudo apt install -y zfsutils-linux lld
+        run: sudo apt install -y zfsutils-linux
 
       - name: Build Release
         run: |
