@@ -92,8 +92,8 @@ jobs:
           cargo update
           set +e -x
 
-          time cargo z --target x86_64-unknown-illumos
-          time cargo z --target x86_64-pc-solaris
+          time cargo z x86_64-unknown-illumos
+          time cargo z x86_64-pc-solaris
 
           targets=(
             aarch64-unknown-linux-ohos
