@@ -71,8 +71,8 @@ jobs:
 
       - name: Build Release
         run: |
-          sudo snap install zig --classic --beta
-          pipx install cargo-zigbuild
+          # sudo snap install zig --classic --beta
+          # pipx install cargo-zigbuild
 
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk-$ver
@@ -91,9 +91,6 @@ jobs:
 
           cargo update
           set +e -x
-
-          time cargo z x86_64-unknown-illumos
-          time cargo z x86_64-pc-solaris
 
           targets=(
             aarch64-unknown-linux-ohos
