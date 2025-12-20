@@ -69,11 +69,11 @@ jobs:
           cargo update
           set +e -x
 
+          mkdir -p /home/runner/Illumos;
           SYSROOT="/home/runner/Illumos"
           ln -sfn "$SYSROOT" sysroot
-          mkdir -p /home/runner/Illumos;
 
-          if [ ! -d $SYSROOT/omnios ]; then
+          if [ ! -d $SYSROOT/omnios-r151056.zfs ]; then
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
             mkdir -p $SYSROOT/omnios
           fi
