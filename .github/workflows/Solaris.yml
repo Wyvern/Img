@@ -67,7 +67,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target -- -Clink-arg=-Wl,--as-needed -Clink-arg=-D_XOPEN_SOURCE=600
           done
 
           find ./target -iname img -type f | xargs ls -hl
