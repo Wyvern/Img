@@ -73,6 +73,8 @@ jobs:
           SYSROOT="/home/runner/Illumos"
           ln -sfn "$SYSROOT" sysroot
 
+          sudo snap install zig --classic --beta
+
           if [ ! -d $SYSROOT/omnios-r151056.zfs ]; then
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
             mkdir -p $SYSROOT/omnios
