@@ -340,7 +340,7 @@ linker = "mipsisa64r6el-linux-gnuabi64-gcc"
 rustflags = ["-Zrelax-elf-relocations"]
 
 
-[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="illumos"))']
+[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
