@@ -340,7 +340,7 @@ linker = "mipsisa64r6el-linux-gnuabi64-gcc"
 rustflags = ["-Zrelax-elf-relocations"]
 
 
-[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="illumos"))']
+[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
@@ -458,8 +458,10 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
 [target.x86_64-unknown-illumos]
+linker="zig"
 rustflags = [
-    "-Clinker=zig",
+    "-Zunstable-options",
+    "-Clinker-flavor=unix-cc",
     "-Clink-arg=--sysroot=sysroot/omnios",
     "-Clink-arg=-Lsysroot/omnios/lib/amd64",
     "-Clink-arg=-Lsysroot/omnios/usr/lib/amd64",
