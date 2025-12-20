@@ -71,6 +71,7 @@ jobs:
 
           SYSROOT="/home/runner/Illumos"
           ln -sfn "$SYSROOT" sysroot
+          mkdir -p /home/runner/Illumos;
 
           if [ ! -d $SYSROOT/omnios ]; then
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
