@@ -460,6 +460,7 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 [target.x86_64-unknown-illumos]
 linker="zig"
 rustflags = [
+    "-Zunstable-options",
     "-Clinker-flavor=unix-cc",
     "-Clink-arg=--sysroot=sysroot/omnios",
     "-Clink-arg=-Lsysroot/omnios/lib/amd64",
