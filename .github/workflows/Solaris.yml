@@ -54,8 +54,8 @@ jobs:
           tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
           sudo mv cross /usr/local/bin/
 
-      - name: Ubuntu apt update and install
-        run: sudo apt install -y zfsutils-linux
+      # - name: Ubuntu apt update and install
+      #   run: sudo apt install -y zfsutils-linux
 
       - name: Cache Illumos/Solaris
         uses: actions/cache@v4
@@ -69,35 +69,36 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p /home/runner/Illumos;
-          SYSROOT="/home/runner/Illumos"
-          ln -sfn "$SYSROOT" sysroot
+          # mkdir -p /home/runner/Illumos;
+          # SYSROOT="/home/runner/Illumos"
+          # ln -sfn "$SYSROOT" sysroot
 
-          sudo snap install zig --classic --beta
+          # sudo snap install zig --classic --beta
 
-          if [ ! -d $SYSROOT/omnios-r151056.zfs ]; then
-            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
-            mkdir -p $SYSROOT/omnios
-          fi
+          # if [ ! -d $SYSROOT/omnios-r151056.zfs ]; then
+          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
+          #   mkdir -p $SYSROOT/omnios
+          # fi
 
-          sudo truncate -s 1G /tmp/omnios.img
-          sudo zpool create -f solaris /tmp/omnios.img
-          sudo zfs recv -o mountpoint=$SYSROOT/omnios solaris/omnios < $SYSROOT/omnios-r151056.zfs
+          # sudo truncate -s 1G /tmp/omnios.img
+          # sudo zpool create -f solaris /tmp/omnios.img
+          # sudo zfs recv -o mountpoint=$SYSROOT/omnios solaris/omnios < $SYSROOT/omnios-r151056.zfs
 
-          zpool status
-          zfs list
+          # zpool status
+          # zfs list
 
-          time cargo s --target x86_64-unknown-illumos
+          # time cargo s --target x86_64-unknown-illumos
 
-          sudo zfs destroy omnios
-          sudo zpool destroy solaris
+          # sudo zfs destroy omnios
+          # sudo zpool destroy solaris
 
           targets=(
-
+            x86_64-unknown-illumos
           )
-          # x86_64-unknown-illumos
+
           #   x86_64-pc-solaris
           #   sparcv9-sun-solaris
+
           for target in ${targets[@]}; do
             time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
