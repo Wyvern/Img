@@ -128,7 +128,7 @@ jobs:
           zpool status
           zfs list
 
-          sudo snap install zig --classic --beta
+          # sudo snap install zig --classic --beta
 
           targets=(
             x86_64-unknown-illumos
