@@ -55,9 +55,6 @@ jobs:
           key: BSD-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: BSD-${{ runner.os }}-
 
-      - name: Ubuntu apt update and install
-        run: sudo apt install -y zfsutils-linux
-
       - name: Build Release
         run: |
           cargo update
@@ -111,25 +108,12 @@ jobs:
             mkdir -p $SYSROOT/dfly
           fi
 
-          if [ ! -d $SYSROOT/omnios ]; then
-            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
-            mkdir -p $SYSROOT/omnios
-          fi
-
           wait
           chmod -R u+rwX "$SYSROOT"
 
           sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
 
-          sudo truncate -s 1G /tmp/omnios.img
-          sudo zpool create -f solaris /tmp/omnios.img
-          sudo zfs recv -o mountpoint=$SYSROOT/omnios solaris/omnios < $SYSROOT/omnios-r151056.zfs
-
-          zpool status
-          zfs list
-
           targets=(
-            x86_64-unknown-illumos
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
@@ -149,8 +133,6 @@ jobs:
           done
 
           sudo umount $SYSROOT/dfly
-          sudo zfs destroy omnios
-          sudo zpool destroy solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
