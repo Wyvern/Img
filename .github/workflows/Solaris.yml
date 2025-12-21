@@ -44,7 +44,6 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: x86_64-unknown-illumos,x86_64-pc-solaris,sparcv9-sun-solaris
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -92,8 +91,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            # time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-            time cargo l --target $target
+            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
           # sudo zfs destroy -r solaris/omnios
