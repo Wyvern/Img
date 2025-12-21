@@ -93,12 +93,12 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s --target $target
-            # time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+            # time cargo s --target $target
+            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
-          # sudo zfs destroy omnios
-          # sudo zpool destroy solaris
+          sudo zfs destroy solaris/omnios
+          sudo zpool destroy solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
