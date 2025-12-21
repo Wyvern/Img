@@ -1,5 +1,7 @@
-[target.sparcv9-sun-solaris]
-dockerfile = "./Dockerfile.sparcv9-sun-solaris"
+[target.sparcv9-sun-solaris.env]
+CROSS_TOOLCHAIN_PREFIX="sparcv9-sun-solaris2.11-"
+CROSS_SYSROOT="/usr/local/sparcv9-sun-solaris2.11"
 
-[target.x86_64-pc-solaris]
-dockerfile = "./Dockerfile.x86_64-pc-solaris"
+[target.x86_64-pc-solaris.env]
+CROSS_TOOLCHAIN_PREFIX="x86_64-pc-solaris2.11-"
+CROSS_SYSROOT="/usr/local/x86_64-pc-solaris2.11"
