@@ -466,7 +466,7 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 # ]
 
 [target.sparcv9-sun-solaris]
-rustflags = ["-Clink-arg=--sysroot=sysroot/omnios","-Clink-arg=-lsunmath"]
+rustflags = ["-Clink-arg=--sysroot=sysroot/omnios",]
 
 [target.x86_64-pc-solaris]
 rustflags = ["-Clink-arg=--sysroot=sysroot/omnios",
