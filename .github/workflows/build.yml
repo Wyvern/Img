@@ -141,7 +141,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,x86_64-unknown-illumos,x86_64-pc-solaris,sparcv9-sun-solaris
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -188,6 +188,9 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           targets=(
+            x86_64-unknown-illumos
+            x86_64-pc-solaris
+            sparcv9-sun-solaris
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
             x86_64-unknown-linux-ohos
