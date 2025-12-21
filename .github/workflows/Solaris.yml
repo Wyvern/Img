@@ -73,10 +73,6 @@ jobs:
               time cargo s --target $target
             done
 
-            find ./target -iname img -type f | xargs ls -hl
-            lscpu
-            free -m
-
       # - name: Ubuntu apt update and install
       #   run: sudo apt install -y zfsutils-linux
 
@@ -115,10 +111,10 @@ jobs:
             sparcv9-sun-solaris
           )
 
-          for target in ${targets[@]}; do
-            # time cargo s --target $target
-            # time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-          done
+          # for target in ${targets[@]}; do
+          #   time cargo s --target $target
+          #   time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+          # done
 
           # sudo zfs destroy -r solaris/omnios
           # sudo zpool destroy solaris
