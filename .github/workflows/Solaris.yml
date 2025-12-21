@@ -73,7 +73,7 @@ jobs:
           SYSROOT="/home/runner/Illumos"
           ln -sfn "$SYSROOT" sysroot
 
-          sudo snap install zig --classic --beta
+          # sudo snap install zig --classic --beta
 
           if [ ! -d $SYSROOT/omnios-r151056.zfs ]; then
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
@@ -87,7 +87,7 @@ jobs:
           zpool status
           zfs list
 
-          time cargo s --target illumos.json
+          time cargo s --target x86_64-unknown-illumos
 
           sudo zfs destroy omnios
           sudo zpool destroy solaris
