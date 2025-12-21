@@ -54,24 +54,23 @@ jobs:
           tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
           sudo mv cross /usr/local/bin/
 
-      - name: Solaris
-        uses: vmactions/solaris-vm@v1
-        continue-on-error: true
-        with:
-          usesh: true
-          run: |
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly --component rust-src
+      # - name: Solaris
+      #   uses: vmactions/solaris-vm@v1
+      #   with:
+      #     usesh: true
+      #     run: |
+      #       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain nightly --component rust-src
 
-            cargo update
-            set +e -x
+      #       cargo update
+      #       set +e -x
 
-            targets=(
-              x86_64-pc-solaris
-            )
+      #       targets=(
+      #         x86_64-pc-solaris
+      #       )
 
-            for target in ${targets[@]}; do
-              time cargo s --target $target
-            done
+      #       for target in ${targets[@]}; do
+      #         time cargo s --target $target
+      #       done
 
       # - name: Ubuntu apt update and install
       #   run: sudo apt install -y zfsutils-linux
@@ -111,10 +110,10 @@ jobs:
             sparcv9-sun-solaris
           )
 
-          # for target in ${targets[@]}; do
-          #   time cargo s --target $target
-          #   time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-          # done
+          for target in ${targets[@]}; do
+            time cargo s --target $target
+            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+          done
 
           # sudo zfs destroy -r solaris/omnios
           # sudo zpool destroy solaris
