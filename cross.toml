@@ -1,0 +1,7 @@
+
+
+[target.sparcv9-sun-solaris]
+dockerfile = "./Dockerfile.sparcv9-sun-solaris"
+
+[target.x86_64-pc-solaris]
+dockerfile = "./Dockerfile.x86_64-pc-solaris"
