@@ -61,8 +61,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /home/runner/Illumos
-          key: Illomos-${{ runner.os }}-
-          restore-keys: Illomos-${{ runner.os }}-
+          key: Illomos-${{ runner.os }}-ZFS
+          restore-keys: Illomos-${{ runner.os }}-ZFS
 
       - name: Build Release
         run: |
@@ -72,8 +72,6 @@ jobs:
           mkdir -p /home/runner/Illumos;
           SYSROOT="/home/runner/Illumos"
           ln -sfn "$SYSROOT" sysroot
-
-          # sudo snap install zig --classic --beta
 
           if [ ! -d $SYSROOT/omnios-r151056.zfs ]; then
             curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
@@ -86,22 +84,21 @@ jobs:
 
           zpool status
           zfs list
-          sudo find sysroot/omnios -name 'crt*.o'
 
-          time cargo s --target x86_64-unknown-illumos
+          # time cargo s --target x86_64-unknown-illumos
 
           sudo zfs destroy omnios
           sudo zpool destroy solaris
 
           targets=(
-
+            x86_64-unknown-illumos
+            x86_64-pc-solaris
+            sparcv9-sun-solaris
           )
-          #   x86_64-unknown-illumos
-          #   x86_64-pc-solaris
-          #   sparcv9-sun-solaris
 
           for target in ${targets[@]}; do
-            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+            time cargo s --target $target
+            # time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
