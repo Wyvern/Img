@@ -87,9 +87,6 @@ jobs:
 
           # time cargo s --target x86_64-unknown-illumos
 
-          sudo zfs destroy omnios
-          sudo zpool destroy solaris
-
           targets=(
             x86_64-unknown-illumos
             x86_64-pc-solaris
@@ -100,6 +97,9 @@ jobs:
             time cargo s --target $target
             # time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
+
+          sudo zfs destroy omnios
+          sudo zpool destroy solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
