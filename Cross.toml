@@ -1,6 +1,10 @@
 [target.sparcv9-sun-solaris.env]
 CROSS_TOOLCHAIN_PREFIX="sparcv9-sun-solaris2.11-"
 CROSS_SYSROOT="/usr/local/sparcv9-sun-solaris2.11"
+CARGO_TARGET_SPARCV9_SUN_SOLARIS_LINKER = "sparcv9-sun-solaris2.11-gcc"
+CC_sparcv9_sun_solaris = "sparcv9-sun-solaris2.11-gcc"
+CXX_sparcv9_sun_solaris = "sparcv9-sun-solaris2.11-g++"
+
 
 [target.x86_64-pc-solaris.env]
 CROSS_TOOLCHAIN_PREFIX="x86_64-pc-solaris2.11-"
