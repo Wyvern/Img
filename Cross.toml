@@ -1,5 +1,3 @@
-
-
 [target.sparcv9-sun-solaris]
 dockerfile = "./Dockerfile.sparcv9-sun-solaris"
 
