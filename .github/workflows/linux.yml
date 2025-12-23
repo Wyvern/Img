@@ -69,9 +69,6 @@ jobs:
       - name: Ubuntu apt update and install
         run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  libfuse-dev pkg-config -qy
 
-      - name: Cargo binstall
-        uses: cargo-bins/cargo-binstall@main
-
       - name: Build Release
         run: |
           # sudo snap install zig --classic --beta
@@ -95,18 +92,17 @@ jobs:
           cargo update
           set +e -x
 
-          export CARGO_BINSTALL_TELEMETRY=false
-          cargo binstall redoxer --no-confirm
-          redoxer toolchain
+          # cargo install redoxer -q
+          # redoxer toolchain
 
-          targets=(
-            x86_64-unknown-redox
-            aarch64-unknown-redox
-            riscv64gc-unknown-redox
-          )
-          for target in ${targets[@]}; do
-            time redoxer build -- -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size,compiler-builtins-mem --target $target
-          done
+          # targets=(
+          #   x86_64-unknown-redox
+          #   aarch64-unknown-redox
+          #   riscv64gc-unknown-redox
+          # )
+          # for target in ${targets[@]}; do
+          #   time redoxer build -- -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size,compiler-builtins-mem --target $target
+          # done
 
           targets=(
             x86_64-unknown-hermit
