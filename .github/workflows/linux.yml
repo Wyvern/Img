@@ -43,6 +43,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
+          targets: aarch64-unknown-hermit,riscv64gc-unknown-hermit,x86_64-unknown-hermit
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
