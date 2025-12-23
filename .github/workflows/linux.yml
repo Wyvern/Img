@@ -67,7 +67,7 @@ jobs:
           version: "6.0"
 
       - name: Ubuntu apt update and install
-        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
+        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev pkg-config -qy
 
       - name: Build Release
         run: |
@@ -92,7 +92,7 @@ jobs:
           cargo update
           set +e -x
 
-          cargo install redoxer
+          cargo install -q redoxer
           redoxer toolchain
 
           targets=(
