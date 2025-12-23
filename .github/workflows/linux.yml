@@ -95,8 +95,8 @@ jobs:
           cargo update
           set +e -x
 
-          export BINSTALL_TELEMETRY=0
-          cargo binstall -q redoxer
+          export CARGO_BINSTALL_TELEMETRY=false
+          cargo binstall -q redoxer --no-confirm
           redoxer toolchain
 
           targets=(
