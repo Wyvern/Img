@@ -67,7 +67,7 @@ jobs:
           version: "6.0"
 
       - name: Ubuntu apt update and install
-        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  libfuse-dev pkg-config -qy
+        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  -qy
 
       - name: Build Release
         run: |
@@ -122,7 +122,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s --target $target
+            time cargo s $target
           done
 
           find ./target -iname img -type f | xargs ls -hl

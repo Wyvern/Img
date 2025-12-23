@@ -18,10 +18,10 @@ ti = "t -- --exact --nocapture"
 
 l = "b -q --profile lto"
 
-h = "s --target x86_64h-apple-darwin"
-e = "s --target arm64e-apple-darwin"
-s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size"
-z = "zigbuild -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size,compiler-builtins-mem --target"
+h = "s x86_64h-apple-darwin"
+e = "s arm64e-apple-darwin"
+s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target"
+z = "zigbuild -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target"
 
 
 [cargo-new]

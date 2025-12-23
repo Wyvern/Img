@@ -87,7 +87,7 @@ jobs:
                     )
           foreach ($target in $targets) {
               Write-Host "Building: $target"
-              Measure-Command { cargo s --target $target }
+              Measure-Command { cargo s $target }
           }
 
           # cmd /c dir /s target\src\Img.exe

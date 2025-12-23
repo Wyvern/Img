@@ -85,7 +85,7 @@ jobs:
           # powerpc64-unknown-linux-gnu,
           # powerpc64-unknown-linux-musl,
           for target in ${targets[@]}; do
-            time cargo s --target $target
+            time cargo s $target
           done
 
           find ./target -iname img -type f | xargs ls -hl

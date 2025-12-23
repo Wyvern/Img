@@ -75,7 +75,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s --target $target
+            time cargo s $target
           done
 
           lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
