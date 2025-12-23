@@ -92,6 +92,18 @@ jobs:
           cargo update
           set +e -x
 
+          cargo install redoxer
+          redoxer toolchain
+
+          targets=(
+            x86_64-unknown-redox
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+          )
+          for target in ${targets[@]}; do
+            time redoxer build -- -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size,compiler-builtins-mem --target $target
+          done
+
           targets=(
             x86_64-unknown-hermit
             riscv64gc-unknown-hermit
