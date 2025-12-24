@@ -329,7 +329,7 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 [target.'cfg(all(target_arch="aarch64",any(target_os="linux",target_os="redox"),not(target_env="ohos")))']
 linker = "aarch64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="x86_64",any(target_os="linux",target_os="redox"),not(target_env="ohos")))']
 linker = "x86_64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
@@ -340,7 +340,7 @@ linker = "powerpc64le-linux-gnu-gcc"
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
 linker = "powerpc64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="riscv64",target_os="linux"))']
+[target.'cfg(all(target_arch="riscv64",any(target_os="linux",target_os="redox")))']
 linker = "riscv64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="sparc64",target_os="linux"))']
