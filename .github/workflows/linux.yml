@@ -110,6 +110,7 @@ jobs:
           done
 
           if [ ! -d /home/runner/openwrt ]; then
+            mkdir -p /home/runner/openwrt
             curl -LsSf https://downloads.openwrt.org/releases/24.10.5/targets/x86/64/openwrt-toolchain-24.10.5-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
           fi
 
