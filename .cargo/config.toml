@@ -261,9 +261,6 @@ rustflags = [
     "-Wlinker_messages",
 ]
 
-[target.'cfg(target_os="redox")']
-linker="ld.lld"
-
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']
 rustflags = [
     "-Clink-self-contained=+linker",
