@@ -104,7 +104,7 @@ jobs:
 
           mkdir -p openwrt
           curl -LsSf https://downloads.openwrt.org/releases/24.10.5/targets/x86/64/openwrt-toolchain-24.10.5-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C openwrt
-          ln -sf openwrt/staging_dir/toolchain-mips64_gcc-13.3.0_musl/ wrt
+          ln -sf openwrt/toolchain-mips64_gcc-13.3.0_musl/ wrt
 
           targets=(
             mips64-openwrt-linux-musl
