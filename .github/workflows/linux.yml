@@ -67,7 +67,7 @@ jobs:
           version: "6.0"
 
       - name: Ubuntu apt update and install
-        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  -qy
+        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  pkg-config libfuse3-dev -qy
 
       - name: Build Release
         run: |
@@ -92,17 +92,17 @@ jobs:
           cargo update
           set +e -x
 
-          # cargo install redoxer -q
-          # redoxer toolchain
+          cargo install redoxer -q
+          redoxer toolchain
 
-          # targets=(
-          #   x86_64-unknown-redox
-          #   aarch64-unknown-redox
-          #   riscv64gc-unknown-redox
-          # )
-          # for target in ${targets[@]}; do
-          #   time redoxer build -- -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-          # done
+          targets=(
+            x86_64-unknown-redox
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+          )
+          for target in ${targets[@]}; do
+            time redoxer build -- -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+          done
 
           targets=(
             aarch64-unknown-linux-ohos
