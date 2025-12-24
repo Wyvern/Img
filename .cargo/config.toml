@@ -131,6 +131,7 @@ rustflags = [
 [profile.redox]
 inherits = "lto"
 rustflags = [
+    "-Awarnings",
     "-Zhint-mostly-unused",
     "-Zforce-unstable-if-unmarked",
     "-Zlocation-detail=none",
@@ -258,6 +259,14 @@ rustflags = [
     "-Dclippy::redundant_clone",
     "-Dclippy::unused_io_amount",
     "-Wlinker_messages",
+]
+
+[target.'cfg(target_os="redox")']
+rustflags = [
+    "-Clink-self-contained=+linker",
+    "-Clinker-features=+lld",
+    "-Clink-arg=-Wl,--icf=all",
+    "-Clink-arg=-Wl,--relax",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']

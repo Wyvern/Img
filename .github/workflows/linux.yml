@@ -92,7 +92,6 @@ jobs:
           cargo update
           set +e -x
 
-          # cargo install redoxer -q --locked --version 0.2.61
           cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git redoxer -q
           redoxer toolchain
 
@@ -155,4 +154,14 @@ jobs:
             echo "Uploading $name..."
             mv target/$arch/src/Img target/$arch/src/$name || true
             gh release upload Nightly target/$arch/src/$name --clobber || true
+          done
+
+          targets=("x86_64-unknown-redox Redox-x86_64"
+                  "aarch64-unknown-redox Redox-aarch64"
+                  "riscv64gc-unknown-redox Redox-riscv64gc")
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/redox/Img target/$arch/redox/$name || true
+            gh release upload Nightly target/$arch/redox/$name --clobber || true
           done
