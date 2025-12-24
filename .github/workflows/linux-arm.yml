@@ -50,7 +50,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 musl-tools libfuse3-dev -y
 
       - name: Build Release
         run: |
@@ -59,6 +59,16 @@ jobs:
 
           cargo update
           set +e -x
+
+          cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git redoxer -q
+          redoxer toolchain
+
+          targets=(
+            aarch64-unknown-redox
+          )
+          for target in ${targets[@]}; do
+            time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+          done
 
           targets=(
             powerpc64le-unknown-linux-gnu
@@ -126,4 +136,12 @@ jobs:
             echo "Uploading $name..."
             mv target/$arch/src/Img target/$arch/src/$name || true
             gh release upload Nightly target/$arch/src/$name --clobber || true
+          done
+
+          targets=("aarch64-unknown-redox Redox-aarch64")
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            mv target/$arch/redox/Img target/$arch/redox/$name || true
+            gh release upload Nightly target/$arch/redox/$name --clobber || true
           done
