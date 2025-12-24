@@ -25,9 +25,6 @@ infer = { version = "*", default-features = false, optional = true }
 [target.'cfg(unix)'.dependencies]
 termion = "*"
 
-[target.'cfg(target_os = "hermit")'.dependencies]
-hermit ="*"
-
 [dev-dependencies]
 # file-format = { version = "*", features = ["reader-xml"] }
 
