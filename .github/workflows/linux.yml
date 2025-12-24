@@ -66,6 +66,13 @@ jobs:
         with:
           version: "6.0"
 
+      - name: Cache openwrt
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/openwrt
+          key: WRT-${{ runner.os }}-${{ runner.arch }}-
+          restore-keys: WRT-${{ runner.os }}-${{ runner.arch }}-
+
       - name: Ubuntu apt update and install
         run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  libfuse3-dev -qy
 
@@ -102,9 +109,11 @@ jobs:
             time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
-          mkdir -p openwrt
-          curl -LsSf https://downloads.openwrt.org/releases/24.10.5/targets/x86/64/openwrt-toolchain-24.10.5-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C openwrt
-          ln -sf openwrt/toolchain-mips64_gcc-13.3.0_musl/ wrt
+          if [ ! -d /home/runner/openwrt ]; then
+            curl -LsSf https://downloads.openwrt.org/releases/24.10.5/targets/x86/64/openwrt-toolchain-24.10.5-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
+          fi
+
+          ln -sf /home/runner/openwrt/toolchain-x86_64_gcc-13.3.0_musl wrt
 
           targets=(
             mips64-openwrt-linux-musl
