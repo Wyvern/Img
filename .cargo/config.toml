@@ -225,7 +225,7 @@ rustflags = [
     "-Ztyping-mode-borrowck=y",
     "-Zexperimental-default-bounds=y",
     "-Zhigher-ranked-assumptions",
-    "-Zoffload=Enable",
+    # "-Zoffload=Enable",
     # "-Zbuild-sdylib-interface",
 
     "-Anonstandard_style",
