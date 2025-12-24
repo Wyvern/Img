@@ -94,9 +94,6 @@ jobs:
 
           cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git redoxer -q
           redoxer toolchain
-          redoxer toolchain aarch64-unknown-redox
-          redoxer toolchain riscv64gc-unknown-redox
-          redoxer list
 
           targets=(
             x86_64-unknown-redox
