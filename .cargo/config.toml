@@ -128,6 +128,30 @@ rustflags = [
     "-Ztrap-unreachable=no",
 ]
 
+[profile.redox]
+inherits = "lto"
+rustflags = [
+    "-Zhint-mostly-unused",
+    "-Zforce-unstable-if-unmarked",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+    "-Zcross-crate-inline-threshold=yes",
+]
+[profile.redox.build-override]
+inherits = "redox"
+rustflags = [
+    "-Cprefer-dynamic",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+]
+[profile.redox.package."*"]
+inherits = "redox"
+rustflags = [
+    "-Cprefer-dynamic",
+    "-Zlocation-detail=none",
+    "-Ztrap-unreachable=no",
+]
+
 [unstable]
 unstable-options = true
 avoid-dev-deps = true
