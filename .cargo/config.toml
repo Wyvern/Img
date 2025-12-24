@@ -82,24 +82,24 @@ lto = true
 panic = "abort"
 codegen-units = 1
 rustflags = [
-    "-Zhint-mostly-unused",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
-    # "-Zvirtual-function-elimination",
+  "-Zhint-mostly-unused",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
+  # "-Zvirtual-function-elimination",
 ]
 [profile.lto.build-override]
 inherits = "lto"
 rustflags = [
-    "-Cprefer-dynamic",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
+  "-Cprefer-dynamic",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
 ]
 [profile.lto.package."*"]
 inherits = "lto"
 rustflags = [
-    "-Cprefer-dynamic",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
+  "-Cprefer-dynamic",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
 ]
 
 #src
@@ -107,50 +107,50 @@ rustflags = [
 inherits = "lto"
 panic = "immediate-abort"
 rustflags = [
-    "-Zhint-mostly-unused",
-    "-Zforce-unstable-if-unmarked",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
-    "-Zcross-crate-inline-threshold=yes",
+  "-Zhint-mostly-unused",
+  "-Zforce-unstable-if-unmarked",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
+  "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.src.build-override]
 inherits = "src"
 rustflags = [
-    # "-Cprefer-dynamic",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
+  # "-Cprefer-dynamic",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
 ]
 [profile.src.package."*"]
 inherits = "src"
 rustflags = [
-    # "-Cprefer-dynamic",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
+  # "-Cprefer-dynamic",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
 ]
 
 [profile.redox]
 inherits = "lto"
 rustflags = [
-    "-Awarnings",
-    "-Zhint-mostly-unused",
-    "-Zforce-unstable-if-unmarked",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
-    "-Zcross-crate-inline-threshold=yes",
+  "-Awarnings",
+  "-Zhint-mostly-unused",
+  "-Zforce-unstable-if-unmarked",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
+  "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.redox.build-override]
 inherits = "redox"
 rustflags = [
-    "-Cprefer-dynamic",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
+  "-Cprefer-dynamic",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
 ]
 [profile.redox.package."*"]
 inherits = "redox"
 rustflags = [
-    "-Cprefer-dynamic",
-    "-Zlocation-detail=none",
-    "-Ztrap-unreachable=no",
+  "-Cprefer-dynamic",
+  "-Zlocation-detail=none",
+  "-Ztrap-unreachable=no",
 ]
 
 [unstable]
@@ -204,120 +204,120 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [target.'cfg(all())']
 rustflags = [
-    "-Ctarget-feature=-crt-static",
-    "-Csymbol-mangling-version=hashed",
-    "-Coverflow-checks=no",
-    "-Cforce-frame-pointers=no",
-    "-Cforce-unwind-tables=no",
-    "-Copt-level=s",
-    "-Cno-redzone",
-    "-Cdebuginfo=0",
-    "-Cstrip=symbols",
-    "-Ccollapse-macro-debuginfo=y",
-    "-Cpanic=immediate-abort",
-    "-Cjump-tables=false",
+  "-Ctarget-feature=-crt-static",
+  "-Csymbol-mangling-version=hashed",
+  "-Coverflow-checks=no",
+  "-Cforce-frame-pointers=no",
+  "-Cforce-unwind-tables=no",
+  "-Copt-level=s",
+  "-Cno-redzone",
+  "-Cdebuginfo=0",
+  "-Cstrip=symbols",
+  "-Ccollapse-macro-debuginfo=y",
+  "-Cpanic=immediate-abort",
+  "-Cjump-tables=false",
 
-    "-Zunstable-options",
-    "-Zexport-executable-symbols",
-    "-Zno-profiler-runtime",
-    "-Zlocation-detail=none",
-    "-Zplt",
-    "-Zthinlto",
-    "-Zdylib-lto",
-    "-Zno-generate-arange-section",
-    "-Zdep-info-omit-d-target",
-    "-Zpolonius=next",
-    "-Ztrim-diagnostic-paths",
-    "-Zshare-generics",
-    "-Zmerge-functions=aliases",
-    "-Zinline-mir",
-    "-Zinline-mir-preserve-debug=n",
-    "-Zmir-opt-level=4",
-    "-Zpacked-bundled-libs",
-    "-Zmaximal-hir-to-mir-coverage",
-    "-Zterminal-urls",
-    "-Zthreads=0",
-    "-Zstaticlib-allow-rdylib-deps",
-    "-Zstaticlib-prefer-dynamic",
-    "-Znext-solver=coherence",
-    "-Zpanic-in-drop=abort",
-    "-Zuse-sync-unwind",
-    "-Zgraphviz-dark-mode",
-    "-Zshell-argfiles",
-    "-Zchecksum-hash-algorithm=blake3",
-    "-Ztrap-unreachable=no",
-    "-Zmir-strip-debuginfo=all-locals",
-    "-Ztyping-mode-borrowck=y",
-    "-Zexperimental-default-bounds=y",
-    "-Zhigher-ranked-assumptions",
-    # "-Zoffload=Enable",
-    # "-Zbuild-sdylib-interface",
+  "-Zunstable-options",
+  "-Zexport-executable-symbols",
+  "-Zno-profiler-runtime",
+  "-Zlocation-detail=none",
+  "-Zplt",
+  "-Zthinlto",
+  "-Zdylib-lto",
+  "-Zno-generate-arange-section",
+  "-Zdep-info-omit-d-target",
+  "-Zpolonius=next",
+  "-Ztrim-diagnostic-paths",
+  "-Zshare-generics",
+  "-Zmerge-functions=aliases",
+  "-Zinline-mir",
+  "-Zinline-mir-preserve-debug=n",
+  "-Zmir-opt-level=4",
+  "-Zpacked-bundled-libs",
+  "-Zmaximal-hir-to-mir-coverage",
+  "-Zterminal-urls",
+  "-Zthreads=0",
+  "-Zstaticlib-allow-rdylib-deps",
+  "-Zstaticlib-prefer-dynamic",
+  "-Znext-solver=coherence",
+  "-Zpanic-in-drop=abort",
+  "-Zuse-sync-unwind",
+  "-Zgraphviz-dark-mode",
+  "-Zshell-argfiles",
+  "-Zchecksum-hash-algorithm=blake3",
+  "-Ztrap-unreachable=no",
+  "-Zmir-strip-debuginfo=all-locals",
+  "-Ztyping-mode-borrowck=y",
+  "-Zexperimental-default-bounds=y",
+  "-Zhigher-ranked-assumptions",
+  # "-Zoffload=Enable",
+  # "-Zbuild-sdylib-interface",
 
-    "-Anonstandard_style",
-    "-Adead_code",
-    "-Aclippy::tabs_in_doc_comments",
-    "-Dclippy::redundant_clone",
-    "-Dclippy::unused_io_amount",
-    "-Wlinker_messages",
+  "-Anonstandard_style",
+  "-Adead_code",
+  "-Aclippy::tabs_in_doc_comments",
+  "-Dclippy::redundant_clone",
+  "-Dclippy::unused_io_amount",
+  "-Wlinker_messages",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']
 rustflags = [
-    "-Clink-self-contained=+linker",
-    "-Clinker-features=+lld",
-    "-Clink-arg=-Wl,--icf=all",
-    "-Clink-arg=-Wl,--relax",
+  "-Clink-self-contained=+linker",
+  "-Clinker-features=+lld",
+  "-Clink-arg=-Wl,--icf=all",
+  "-Clink-arg=-Wl,--relax",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm"))))']
 rustflags = [
-    "-Clink-arg=-Wl,--gc-sections",
-    "-Clink-arg=-Wl,-z,norelro",
-    "-Clink-arg=-Wl,--as-needed",
-    "-Clink-arg=-Wl,--discard-all",
-    "-Clink-arg=-Wl,--build-id=none",
-    "-Clink-arg=-Wl,--strip-all",
-    "-Clink-arg=-Wl,--no-eh-frame-hdr",
+  "-Clink-arg=-Wl,--gc-sections",
+  "-Clink-arg=-Wl,-z,norelro",
+  "-Clink-arg=-Wl,--as-needed",
+  "-Clink-arg=-Wl,--discard-all",
+  "-Clink-arg=-Wl,--build-id=none",
+  "-Clink-arg=-Wl,--strip-all",
+  "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
-    "-Cforce-unwind-tables=y",
-    "-Clink-arg=/OPT:REF",
-    "-Clink-arg=/OPT:ICF",
-    "-Clink-arg=/DEBUG:NONE",
-    "-Clink-arg=/INCREMENTAL:NO",
-    "-Clink-arg=/MERGE:.rdata=.text",
-    "-Clink-arg=/MERGE:.pdata=.text",
-    "-Clink-arg=/VERSION:0.0",
-    "-Clink-arg=/PDB:NONE",
-    # "-Clink-arg=/LTCG",
-    # "-Clink-arg=/FILEALIGN:512",
-    # "-Clink-arg=/ALIGN:1",
-    # "-Clink-arg=/DYNAMICBASE",
-    # "-Clink-arg=/NXCOMPAT",
+  "-Cforce-unwind-tables=y",
+  "-Clink-arg=/OPT:REF",
+  "-Clink-arg=/OPT:ICF",
+  "-Clink-arg=/DEBUG:NONE",
+  "-Clink-arg=/INCREMENTAL:NO",
+  "-Clink-arg=/MERGE:.rdata=.text",
+  "-Clink-arg=/MERGE:.pdata=.text",
+  "-Clink-arg=/VERSION:0.0",
+  "-Clink-arg=/PDB:NONE",
+  # "-Clink-arg=/LTCG",
+  # "-Clink-arg=/FILEALIGN:512",
+  # "-Clink-arg=/ALIGN:1",
+  # "-Clink-arg=/DYNAMICBASE",
+  # "-Clink-arg=/NXCOMPAT",
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
-    "-Clink-self-contained=+linker",
-    "-Clinker-features=+lld",
-    "-Clink-arg=-Wl,--icf=all",
-    "-Clink-arg=-Wl,--relax",
-    "-Clink-arg=-Wl,--gc-sections",
-    "-Clink-arg=-Wl,-z,norelro",
-    "-Clink-arg=-Wl,--as-needed",
-    "-Clink-arg=-Wl,--discard-all",
-    "-Clink-arg=-Wl,--build-id=none",
-    "-Clink-arg=-Wl,--strip-all",
-    "-Clink-arg=-Wl,--no-eh-frame-hdr",
+  "-Clink-self-contained=+linker",
+  "-Clinker-features=+lld",
+  "-Clink-arg=-Wl,--icf=all",
+  "-Clink-arg=-Wl,--relax",
+  "-Clink-arg=-Wl,--gc-sections",
+  "-Clink-arg=-Wl,-z,norelro",
+  "-Clink-arg=-Wl,--as-needed",
+  "-Clink-arg=-Wl,--discard-all",
+  "-Clink-arg=-Wl,--build-id=none",
+  "-Clink-arg=-Wl,--strip-all",
+  "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
-    "-Clink-arg=-Wl,-no_uuid",
-    "-Clink-arg=-Wl,-S",
-    "-Clink-arg=-Wl,-dead_strip",
-    "-Clink-arg=-Wl,-dead_strip_dylibs",
+  "-Clink-arg=-Wl,-no_uuid",
+  "-Clink-arg=-Wl,-S",
+  "-Clink-arg=-Wl,-dead_strip",
+  "-Clink-arg=-Wl,-dead_strip_dylibs",
 ]
 
 [target.'cfg(target_arch="x86_64")']
@@ -371,51 +371,51 @@ rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 [target.x86_64-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/freebsd/amd64",
-    "-Clink-arg=--target=x86_64--freebsd"
+  "-Clink-arg=--sysroot=sysroot/freebsd/amd64",
+  "-Clink-arg=--target=x86_64--freebsd",
 ]
 runner = "qemu-x86_64 -L sysroot/freebsd/amd64"
 
 [target.aarch64-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/freebsd/arm64",
-    "-Clink-arg=--target=aarch64--freebsd"
+  "-Clink-arg=--sysroot=sysroot/freebsd/arm64",
+  "-Clink-arg=--target=aarch64--freebsd",
 ]
 runner = "qemu-aarch64 -L sysroot/freebsd/arm64"
 
 [target.riscv64gc-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/freebsd/riscv",
-    "-Clink-arg=--target=riscv64gc--freebsd"
+  "-Clink-arg=--sysroot=sysroot/freebsd/riscv",
+  "-Clink-arg=--target=riscv64gc--freebsd",
 ]
 
 [target.powerpc64-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/freebsd/powerpc64",
-    "-Clink-arg=--target=powerpc64--freebsd"
+  "-Clink-arg=--sysroot=sysroot/freebsd/powerpc64",
+  "-Clink-arg=--target=powerpc64--freebsd",
 ]
 [target.powerpc64le-unknown-freebsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/freebsd/powerpc64le",
-    "-Clink-arg=--target=powerpc64le--freebsd"
+  "-Clink-arg=--sysroot=sysroot/freebsd/powerpc64le",
+  "-Clink-arg=--target=powerpc64le--freebsd",
 ]
 
 [target.x86_64-unknown-dragonfly]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/dfly",
-    "-Clink-arg=--target=x86_64--dragonfly"
+  "-Clink-arg=--sysroot=sysroot/dfly",
+  "-Clink-arg=--target=x86_64--dragonfly",
 ]
 
 [target.x86_64-unknown-netbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/netbsd/amd64",
-    "-Clink-arg=--target=x86_64--netbsd"
+  "-Clink-arg=--sysroot=sysroot/netbsd/amd64",
+  "-Clink-arg=--target=x86_64--netbsd",
 ]
 
 [target.aarch64-unknown-netbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/netbsd/evbarm-aarch64",
-    "-Clink-arg=--target=aarch64--netbsd"
+  "-Clink-arg=--sysroot=sysroot/netbsd/evbarm-aarch64",
+  "-Clink-arg=--target=aarch64--netbsd",
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -423,26 +423,26 @@ rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.x86_64-unknown-openbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/openbsd/amd64",
-    "-Clink-arg=--target=x86_64--openbsd"
+  "-Clink-arg=--sysroot=sysroot/openbsd/amd64",
+  "-Clink-arg=--target=x86_64--openbsd",
 ]
 
 [target.aarch64-unknown-openbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/openbsd/arm64",
-    "-Clink-arg=--target=aarch64--openbsd"
+  "-Clink-arg=--sysroot=sysroot/openbsd/arm64",
+  "-Clink-arg=--target=aarch64--openbsd",
 ]
 
 [target.riscv64gc-unknown-openbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/openbsd/riscv64",
-    "-Clink-arg=--target=riscv64gc--openbsd"
+  "-Clink-arg=--sysroot=sysroot/openbsd/riscv64",
+  "-Clink-arg=--target=riscv64gc--openbsd",
 ]
 
 [target.powerpc64-unknown-openbsd]
 rustflags = [
-    "-Clink-arg=--sysroot=sysroot/openbsd/powerpc64",
-    "-Clink-arg=--target=powerpc64--openbsd"
+  "-Clink-arg=--sysroot=sysroot/openbsd/powerpc64",
+  "-Clink-arg=--target=powerpc64--openbsd",
 ]
 
 [target.'cfg(target_os = "android")']
@@ -489,3 +489,7 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 #     "-Clink-arg=-Lsysroot/omnios/lib/amd64",
 #     "-Clink-arg=-Lsysroot/omnios/usr/lib/amd64",
 # ]
+
+[target.mips64-openwrt-linux-musl]
+linker = "wrt/bin/mips64-openwrt-linux-musl-gcc"
+rustflags = ["-Clink-arg=--sysroot=wrt/sysroot"]
