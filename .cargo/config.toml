@@ -262,7 +262,12 @@ rustflags = [
 ]
 
 [target.'cfg(target_os="redox")']
-linker = "ld.lld"
+rustflags = [
+    "-Clink-self-contained=+linker",
+    "-Clinker-features=+lld",
+    "-Clink-arg=-Wl,--icf=all",
+    "-Clink-arg=-Wl,--relax",
+]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']
 rustflags = [
