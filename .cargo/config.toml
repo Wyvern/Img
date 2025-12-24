@@ -190,7 +190,7 @@ rustflags = [
     "-Cstrip=symbols",
     "-Ccollapse-macro-debuginfo=y",
     "-Cpanic=immediate-abort",
-    # "-Cjump-tables=false",
+    "-Cjump-tables=false",
 
     "-Zunstable-options",
     "-Zexport-executable-symbols",

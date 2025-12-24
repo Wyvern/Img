@@ -105,7 +105,6 @@ jobs:
           # done
 
           targets=(
-            x86_64-unknown-hermit
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
             x86_64-unknown-linux-ohos

@@ -1,3 +1,5 @@
+#[cfg(target_os = "hermit")]
+use hermit as _;
 mod util;
 use arcdom as dom;
 use {std::*, util::*};
