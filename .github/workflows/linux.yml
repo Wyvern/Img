@@ -92,7 +92,7 @@ jobs:
           cargo update
           set +e -x
 
-          cargo install redoxer -q
+          cargo install redoxer -q --locked --version 0.2.61
           redoxer toolchain
 
           targets=(
