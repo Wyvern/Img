@@ -491,5 +491,5 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 # ]
 
 [target.mips64-openwrt-linux-musl]
-# linker = "wrt/bin/mips64-openwrt-linux-musl-gcc"
+linker = "wrt/bin/x86_64-openwrt-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=wrt/"]
