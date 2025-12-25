@@ -70,8 +70,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /home/runner/openwrt
-          key: WRT-${{ runner.os }}-${{ runner.arch }}-
-          restore-keys: WRT-${{ runner.os }}-${{ runner.arch }}-
+          key: openwrt-${{ runner.os }}-${{ runner.arch }}-
+          restore-keys: openwrt-${{ runner.os }}-${{ runner.arch }}-
 
       - name: Ubuntu apt update and install
         run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  libfuse3-dev -qy
@@ -111,10 +111,10 @@ jobs:
 
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
-            curl -LsSf https://downloads.openwrt.org/releases/24.10.5/targets/x86/64/openwrt-toolchain-24.10.5-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
+            curl -LsSf https://downloads.openwrt.org/releases/24.10.5/targets/octeon/generic/openwrt-toolchain-24.10.5-octeon-generic_gcc-13.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
           fi
 
-          ln -sf /home/runner/openwrt/openwrt-toolchain-24.10.5-x86-64_gcc-13.3.0_musl.Linux-x86_64/toolchain-x86_64_gcc-13.3.0_musl wrt
+          ln -sf /home/runner/openwrt/openwrt-toolchain-24.10.5-octeon-generic_gcc-13.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-13.3.0_musl wrt
 
           targets=(
             mips64-openwrt-linux-musl
