@@ -56,12 +56,24 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Cache llvm-mingw
+        uses: actions/cache@v4
+        with:
+          path: llvm-mingw
+          key: ${{ runner.os }}-llvm-mingw
+          restore-keys: ${{ runner.os }}-llvm-mingw
+
       - name: Build Release
         run: |
           cargo update
           set +e -x
-          curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf -
-          export PATH=$PWD/llvm-mingw-20251216-ucrt-macos-universal/bin:$PATH
+
+          if [ ! -e llvm-mingw ]; then
+            mkdir llvm-mingw
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf -C llvm-mingw
+          fi
+          export PATH=$PWD/llvm-mingw/bin:$PATH
+
           targets=(
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
