@@ -273,11 +273,27 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Cache llvm-mingw
+        uses: actions/cache@v4
+        with:
+          path: llvm-mingw
+          key: ${{ runner.os }}-llvm-mingw
+          restore-keys: ${{ runner.os }}-llvm-mingw
+
       - name: Build Release
         run: |
           cargo update
           set +e -x
+
+          if [ ! -e llvm-mingw ]; then
+            mkdir llvm-mingw
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw
+          fi
+          export PATH=$PWD/llvm-mingw/bin:$PATH
+
           targets=(
+            aarch64-pc-windows-gnullvm
+            x86_64-pc-windows-gnullvm
             aarch64-apple-darwin
             aarch64-apple-ios
             x86_64-apple-darwin
@@ -289,7 +305,7 @@ jobs:
 
           lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
 
-          find . \( -iname img -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
+          find ./target \( -iname img -o -iname img.exe -o-iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
           hostinfo
           sysctl -a | grep brand
@@ -305,17 +321,23 @@ jobs:
                   "x86_64-apple-darwin Apple-macOS-x86_64"
                   "aarch64-apple-darwin Apple-macOS-aarch64"
                   "aarch64-apple-ios Apple-iOS-aarch64"
+                  "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe",
+                  "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe",
+                  "wasm32-wasip2 wasm32-wasip2.wasm",
           )
 
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            for f in Img Img.exe Img.wasm; do
+                if [ -e "target/$arch/lto/$f" ]; then
+                    mv "target/$arch/lto/$f" "target/$arch/lto/$name"
+                    break
+                fi
+            done
             gh release upload Stable target/$arch/lto/$name --clobber || true
           done
 
-          echo "Uploading wasm32-wasip2.wasm..."
-          gh release upload Stable target/wasm32-wasip2/lto/Img.wasm#wasm32-wasip2.wasm --clobber || true
           echo "Uploading Apple-macOS-universal..."
           gh release upload Stable Img-Universal#Apple-macOS-universal --clobber || true
 
