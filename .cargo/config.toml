@@ -298,8 +298,10 @@ rustflags = [
   # "-Clink-arg=/NXCOMPAT",
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
+linker="clang"
 rustflags = [
   "-Cforce-unwind-tables=y",
+  "-Clink-arg=-fuse-ld=lld",
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
   "-Clink-arg=-Wl,--icf=all",
