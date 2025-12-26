@@ -303,14 +303,10 @@ rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
   "-Clink-arg=-Wl,--icf=all",
-  "-Clink-arg=-Wl,--relax",
   "-Clink-arg=-Wl,--gc-sections",
-  "-Clink-arg=-Wl,-z,norelro",
   "-Clink-arg=-Wl,--as-needed",
-  "-Clink-arg=-Wl,--discard-all",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
-  "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
 
 [target.'cfg(target_vendor="apple")']

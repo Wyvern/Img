@@ -105,6 +105,8 @@ jobs:
                   "arm64e-apple-tvos Apple-tvOS-arm64e"
                   "aarch64-apple-watchos Apple-watchOS-aarch64"
                   "aarch64-apple-visionos Apple-visionOS-aarch64"
+                  "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe",
+                  "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
           )
 
           for target in "${targets[@]}"; do
