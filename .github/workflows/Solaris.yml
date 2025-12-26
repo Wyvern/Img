@@ -69,7 +69,7 @@ jobs:
           cargo update
           set +e -x
 
-          ln -sfn /home/runner/Illumos sysroot
+          ln -sfn /home/runner/Illumos Illumos
 
           # if [ ! -d sysroot/omnios-r151056.zfs ]; then
           #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > sysroot/omnios-r151056.zfs
@@ -83,7 +83,10 @@ jobs:
           # zpool status
           # zfs list
 
-          curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C sysroot
+          if [ ! -d /home/runner/Illumos ]; then
+            mkdir -p /home/runner/Illumos
+            curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C Illumos
+          fi
 
           targets=(
             x86_64-unknown-illumos
