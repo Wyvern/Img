@@ -68,9 +68,9 @@ jobs:
           cargo update
           set +e -x
 
-          if [ ! -e llvm-mingw ]; then
+          if [ ! -d llvm-mingw ]; then
             mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
           fi
           export PATH=$PWD/llvm-mingw/bin:$PATH
 
