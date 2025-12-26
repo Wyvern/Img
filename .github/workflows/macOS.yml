@@ -70,7 +70,7 @@ jobs:
 
           if [ ! -e llvm-mingw ]; then
             mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf -C llvm-mingw
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw
           fi
           export PATH=$PWD/llvm-mingw/bin:$PATH
 
