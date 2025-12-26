@@ -87,7 +87,7 @@ jobs:
             mkdir -p /home/runner/Illumos
             curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C Illumos
           fi
-          find Illumos -iname crtn.o -type f |xargs ls -hl
+
           targets=(
             x86_64-unknown-illumos
             x86_64-pc-solaris
