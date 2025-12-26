@@ -484,10 +484,14 @@ linker = "clang"
 rustflags = [
   "-Clink-arg=-fuse-ld=lld",
   "-Clink-arg=-no-pie",
-  "-Clink-arg=--sysroot=illumos",
-  "-Clink-arg=-Lillumos/lib/amd64",
-  "-Clink-arg=-Lillumos/usr/lib/amd64",
+  "-Clink-arg=--sysroot=sysroot",
+  "-Clink-arg=-Lsysroot/lib/amd64",
+  "-Clink-arg=-Lsysroot/usr/lib/amd64",
 ]
+[target.x86_64-unknown-illumos]
+rustflags = ["-Clink-arg=--target=x86_64--illumos"]
+[target.x86_64-pc-solaris]
+rustflags = ["-Clink-arg=--target=x86_64-pc-solaris2.11"]
 
 [target.mips64-openwrt-linux-musl]
 linker = "wrt/bin/mips64-openwrt-linux-gcc"

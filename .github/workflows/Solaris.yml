@@ -57,35 +57,33 @@ jobs:
       # - name: Ubuntu apt update and install
       #   run: sudo apt install -y zfsutils-linux
 
-      # - name: Cache Illumos/Solaris
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: /home/runner/Illumos
-      #     key: Illomos-${{ runner.os }}-ZFS
-      #     restore-keys: Illomos-${{ runner.os }}-ZFS
+      - name: Cache Illumos/Solaris
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/Illumos
+          key: Illomos-${{ runner.os }}-${{ runner.arch }}
+          restore-keys: Illomos-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          # SYSROOT="/home/runner/Illumos"
-          # ln -sfn "$SYSROOT" sysroot
+          ln -sfn /home/runner/Illumos sysroot
 
-          # if [ ! -d $SYSROOT/omnios-r151056.zfs ]; then
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > $SYSROOT/omnios-r151056.zfs
-          #   mkdir -p $SYSROOT/omnios
+          # if [ ! -d sysroot/omnios-r151056.zfs ]; then
+          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > sysroot/omnios-r151056.zfs
+          #   mkdir -p sysroot/omnios
           # fi
 
           # sudo truncate -s 1G /tmp/omnios.img
           # sudo zpool create -f solaris /tmp/omnios.img
-          # sudo zfs recv -o mountpoint=$SYSROOT/omnios solaris/omnios < $SYSROOT/omnios-r151056.zfs
+          # sudo zfs recv -o mountpoint=sysroot/omnios solaris/omnios < sysroot/omnios-r151056.zfs
 
           # zpool status
           # zfs list
 
-          mkdir illumos
-          curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C illumos
+          curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C sysroot
 
           targets=(
             x86_64-unknown-illumos
