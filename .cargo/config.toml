@@ -479,13 +479,13 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 [target.x86_64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
-# [target.'cfg(any(target_os="illumos",target_os="solaris"))']
-# linker = "clang"
-# rustflags = [
-#     "-Clink-arg=--sysroot=sysroot/omnios",
-#     "-Clink-arg=-Lsysroot/omnios/lib/amd64",
-#     "-Clink-arg=-Lsysroot/omnios/usr/lib/amd64",
-# ]
+[target.'cfg(any(target_os="illumos",target_os="solaris"))']
+linker = "clang"
+rustflags = [
+  "-Clink-arg=--sysroot=illumos",
+  # "-Clink-arg=-Lsysroot/omnios/lib/amd64",
+  # "-Clink-arg=-Lsysroot/omnios/usr/lib/amd64",
+]
 
 [target.mips64-openwrt-linux-musl]
 linker = "wrt/bin/mips64-openwrt-linux-gcc"
