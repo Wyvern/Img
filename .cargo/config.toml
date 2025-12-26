@@ -482,7 +482,7 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 [target.'cfg(any(target_os="illumos",target_os="solaris"))']
 linker = "clang"
 rustflags = [
-  "-Clink-arg=-fuse-ld=lld",
+  # "-Clink-arg=-fuse-ld=lld",
   "-Clink-arg=-no-pie",
   "-Clink-arg=--sysroot=Illumos",
   "-Clink-arg=-LIllumos/lib/amd64",
