@@ -78,7 +78,7 @@ jobs:
 
           sudo truncate -s 1G /tmp/omnios.img
           sudo zpool create -f solaris /tmp/omnios.img
-          sudo zfs recv -o mountpoint=Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
+          sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
 
           zpool status
           zfs list
