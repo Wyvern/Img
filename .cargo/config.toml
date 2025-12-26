@@ -484,9 +484,12 @@ linker = "clang"
 rustflags = [
   "-Clink-arg=-fuse-ld=lld",
   "-Clink-arg=-no-pie",
+  "-Clink-arg=--sysroot=Illumos",
   "-Clink-arg=-LIllumos/lib/amd64",
   "-Clink-arg=-LIllumos/usr/lib/amd64",
-  "-Clink-arg=--sysroot=Illumos",
+  "-Clink-arg=-lIllumos/usr/lib/amd64/crt1.o",
+  "-Clink-arg=-lIllumos/usr/lib/amd64/crti.o",
+  "-Clink-arg=-lIllumos/usr/lib/amd64/crtn.o",
 ]
 # [target.x86_64-unknown-illumos]
 # rustflags = ["-Clink-arg=--target=x86_64-unknown-illumos"]
