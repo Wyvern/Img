@@ -277,8 +277,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: llvm-mingw
-          key: ${{ runner.os }}-llvm-mingw
-          restore-keys: ${{ runner.os }}-llvm-mingw
+          key: ${{ runner.os }}-llvm-mingw-
+          restore-keys: ${{ runner.os }}-llvm-mingw-
 
       - name: Build Release
         run: |
