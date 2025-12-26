@@ -83,7 +83,7 @@ jobs:
 
           lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
 
-          find . \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls ./target -hl
+          find ./target \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
           hostinfo
           sysctl -a | grep brand
@@ -113,7 +113,12 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            mv target/$arch/src/Img target/$arch/src/$name || mv target/$arch/src/Img.exe target/$arch/src/$name || mv target/$arch/src/Img.wasm target/$arch/src/$name || true
+            for f in Img Img.exe Img.wasm; do
+                if [ -e "target/$arch/src/$f" ]; then
+                    mv "target/$arch/src/$f" "target/$arch/src/$name"
+                    break
+                fi
+            done
             gh release upload Nightly target/$arch/src/$name --clobber || true
           done
 
