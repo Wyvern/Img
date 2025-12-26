@@ -61,7 +61,7 @@ jobs:
           cargo update
           set +e -x
           curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf -
-          export PATH=$PWD/llvm-mingw-*/bin:$PATH
+          export PATH=$PWD/llvm-mingw-20251216-ucrt-macos-universal/bin:$PATH
           targets=(
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
