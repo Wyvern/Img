@@ -483,8 +483,8 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 linker = "clang"
 rustflags = [
   "-Clink-arg=--sysroot=illumos",
-  "-Clink-arg=-Lsysroot/illumos/lib/amd64",
-  "-Clink-arg=-Lsysroot/illumos/usr/lib/amd64",
+  "-Clink-arg=-Lillumos/lib/amd64",
+  "-Clink-arg=-Lillumos/usr/lib/amd64",
 ]
 
 [target.mips64-openwrt-linux-musl]

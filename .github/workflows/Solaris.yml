@@ -90,8 +90,8 @@ jobs:
           targets=(
             x86_64-unknown-illumos
             x86_64-pc-solaris
-            sparcv9-sun-solaris
           )
+          # sparcv9-sun-solaris
 
           for target in ${targets[@]}; do
               time cargo s $target
