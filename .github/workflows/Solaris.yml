@@ -54,8 +54,8 @@ jobs:
           tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
           sudo mv cross /usr/local/bin/
 
-      - name: Ubuntu apt update and install
-        run: sudo apt install -y zfsutils-linux
+      # - name: Ubuntu apt update and install
+      # run: sudo apt install -y zfsutils-linux
 
       - name: Cache Illumos/Solaris
         uses: actions/cache@v4
@@ -71,22 +71,22 @@ jobs:
 
           ln -sfn /home/runner/Illumos Illumos
 
-          if [ ! -f Illumos/omnios-r151056.zfs ]; then
-            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > Illumos/omnios-r151056.zfs
-            mkdir -p Illumos/omnios
-          fi
-
-          sudo truncate -s 1G /tmp/omnios.img
-          sudo zpool create -f solaris /tmp/omnios.img
-          sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
-
-          zpool status
-          zfs list
-
-          # if [ ! -d /home/runner/Illumos ]; then
-          #   mkdir -p /home/runner/Illumos
-          #   curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C Illumos
+          # if [ ! -f Illumos/omnios-r151056.zfs ]; then
+          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > Illumos/omnios-r151056.zfs
+          #   mkdir -p Illumos/omnios
           # fi
+
+          # sudo truncate -s 1G /tmp/omnios.img
+          # sudo zpool create -f solaris /tmp/omnios.img
+          # sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
+
+          # zpool status
+          # zfs list
+
+          if [ ! -d /home/runner/Illumos ]; then
+            mkdir -p /home/runner/Illumos
+            curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C Illumos
+          fi
 
           targets=(
             x86_64-unknown-illumos
@@ -99,8 +99,8 @@ jobs:
             # time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
-          sudo zfs destroy -r solaris/omnios
-          sudo zpool destroy solaris
+          # sudo zfs destroy -r solaris/omnios
+          # sudo zpool destroy solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
