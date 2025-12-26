@@ -488,10 +488,10 @@ rustflags = [
   "-Clink-arg=-LIllumos/lib/amd64",
   "-Clink-arg=-LIllumos/usr/lib/amd64",
 ]
-# [target.x86_64-unknown-illumos]
-# rustflags = ["-Clink-arg=--target=x86_64-unknown-illumos"]
-# [target.x86_64-pc-solaris]
-# rustflags = ["-Clink-arg=--target=x86_64-pc-solaris2.11"]
+[target.x86_64-unknown-illumos]
+rustflags = ["-Clink-arg=--target=x86_64-unknown-illumos"]
+[target.x86_64-pc-solaris]
+rustflags = ["-Clink-arg=--target=x86_64-pc-solaris2.11"]
 
 [target.mips64-openwrt-linux-musl]
 linker = "wrt/bin/mips64-openwrt-linux-gcc"
