@@ -36,7 +36,7 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.ver.outputs.rust}}
+          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.ver.outputs.rust}}-${{hashfiles('~/.cargo/bin/*')}}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-nightly-
 
       - name: Rust Toolchain
