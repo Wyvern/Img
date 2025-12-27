@@ -134,7 +134,7 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ steps.ver.outputs.rust}}-${{ hashFiles('~/.cargo/bin/*') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-stable-
 
@@ -168,6 +168,8 @@ jobs:
         run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
 
       - name: Build Release
+        env:
+          REDOX_CONFIG: ${{ github.workspace }}/.config/config.toml
         run: |
           cargo update
           set +e -x
