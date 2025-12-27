@@ -212,6 +212,7 @@ rustflags = [
 
   "-Anonstandard_style",
   "-Adead_code",
+  "-Awarnings",
   "-Aclippy::tabs_in_doc_comments",
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
