@@ -118,7 +118,6 @@ inherits = "src"
 unstable-options = true
 avoid-dev-deps = true
 panic-abort-tests = true
-config-include = true
 bindeps = true
 binary-dep-depinfo = true
 profile-rustflags = true
