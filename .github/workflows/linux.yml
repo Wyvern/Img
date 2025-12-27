@@ -74,7 +74,7 @@ jobs:
           restore-keys: openwrt-${{ runner.os }}-${{ runner.arch }}-
 
       - name: Ubuntu apt update and install
-        run: sudo apt update -q && sudo apt install gcc-powerpc64-linux-gnu musl-tools  libfuse3-dev -qy
+        run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
 
       - name: Build Release
         run: |
