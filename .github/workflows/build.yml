@@ -167,6 +167,13 @@ jobs:
         continue-on-error: true
         run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
 
+      - name: Cache Redoxer
+        uses: actions/cache@v4
+        with:
+          path: ~/.redoxer
+          key: redoxer-${{ runner.os }}
+          restore-keys: redoxer-${{ runner.os }}
+
       - name: Build Release
         run: |
           cargo update
