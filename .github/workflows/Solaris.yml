@@ -92,7 +92,6 @@ jobs:
           fi
 
           ln -sf /home/runner/Fuchsia fuchsia
-          find fuchsia -iname sysroot
 
           targets=(
             aarch64-unknown-fuchsia
