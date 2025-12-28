@@ -92,7 +92,8 @@ jobs:
           fi
 
           ln -sf /home/runner/Fuchsia fuchsia
-          find /home/runner/Fuchsia -iname clang
+          find /home/runner/Fuchsia -type f -executable -iname clang
+
           targets=(
             aarch64-unknown-fuchsia
             riscv64gc-unknown-fuchsia
