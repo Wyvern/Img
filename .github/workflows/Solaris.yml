@@ -1,4 +1,4 @@
-name: Solaris
+name: Solaris+Fuchsia
 
 on:
   push:
@@ -83,10 +83,21 @@ jobs:
           # zpool status
           # zfs list
 
-          # if [ ! -d /home/runner/Illumos ]; then
-          #   mkdir -p /home/runner/Illumos
-          #   curl -LsSf https://github.com/illumos/sysroot/releases/download/20181213-de6af22ae73b-v1/illumos-sysroot-i386-20181213-de6af22ae73b-v1.tar.gz | tar -xzf - -C Illumos
-          # fi
+          if [ ! -d /home/runner/Fuchsia ]; then
+            mkdir -p /home/runner/Fuchsia
+            curl -LsSf 'storage.googleapis.com/chrome-infra-packages/store/SHA256/0edb8b24198c462f19e1782d8162598f5bc91c883ba19d942b9091efa4603799?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=chrome-infra-packages%40appspot.gserviceaccount.com%2F20251228%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20251228T053422Z&X-Goog-Expires=7199&X-Goog-Signature=8a35c6fa5f52708ef9fc58e051967baf60fc76159f2bda3ac0f1aa97c92b0e2d031a0d8911db6fe6f4044e054b3da7e950a715f77e02888868e6659b78ff687309f16de5ebb3c1bb6069ac7ad0f8da1e5da4a6bf4f5cb9d8fdf49265ccb60177bc8ff3aa0d31f65746c95050dc891f2ecc0f9d933f884883b22a5268d51d5f768e6a94282adc688ac3f2662cfe992fef9a9386da147dcc4614584fd75d6b9fb8e52d3f14de41754711a780b76c33b5384075d0e9745a80a95b79bfb7641284eb8eae5fbf5dbabfa6e48d68d841120c03b450b4eabe283e00c498eff5f28c1c17956e958bd2054ccda49aba3750a371358ab53fd9c6c3ce357542442a0977ea3b&X-Goog-SignedHeaders=host&response-content-disposition=attachment%3B+filename%3D"core-linux-amd64.zip"' | unzip - -d /home/runner/Fuchsia
+          fi
+
+          ln -sfn /home/runner/Fuchsia fuchsia
+
+          targets=(
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
 
           targets=(
             x86_64-unknown-illumos
