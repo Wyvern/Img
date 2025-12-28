@@ -84,7 +84,7 @@ jobs:
           # zfs list
 
           if [ ! -d /home/runner/Fuchsia ]; then
-            curl -LsSf https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest
+            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
             mkdir -p /home/runner/Fuchsia
