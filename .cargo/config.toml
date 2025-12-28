@@ -500,20 +500,20 @@ rustflags = ["-Clink-arg=-fuse-ld=lld"]
 rustflags = [
   "-Clink-arg=--target=aarch64--fuchsia",
   "-Clink-arg=--sysroot=fuchsia/arch/arm64/sysroot",
-  # "-Lnative=fuchsia/arch/arm64/lib",
+  "-Lnative=fuchsia/arch/arm64/lib",
   # "-Lnative=fuchsia/arch/arm64/sysroot/lib"
 ]
 [target.x86_64-unknown-fuchsia]
 rustflags = [
   "-Clink-arg=--target=x86_64--fuchsia",
   "-Clink-arg=--sysroot=fuchsia/arch/x64/sysroot",
-  # "-Lnative=fuchsia/arch/x64/lib",
+  "-Lnative=fuchsia/arch/x64/lib",
   # "-Lnative=fuchsia/arch/x64/sysroot/lib"
 ]
 [target.riscv64gc-unknown-fuchsia]
 rustflags = [
   "-Clink-arg=--target=riscv64gc--fuchsia",
   "-Clink-arg=--sysroot=fuchsia/arch/rv64/sysroot",
-  # "-Lnative=fuchsia/arch/rv64/lib",
+  "-Lnative=fuchsia/arch/rv64/lib",
   # "-Lnative=fuchsia/arch/rv64/sysroot/lib"
 ]
