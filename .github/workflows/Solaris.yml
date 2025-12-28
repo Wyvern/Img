@@ -92,7 +92,8 @@ jobs:
           fi
 
           ln -sfn /home/runner/Fuchsia fuchsia
-
+          ls -ahl fuchsia/bin/*
+          ls -ahl fuchsia
           targets=(
             aarch64-unknown-fuchsia
             riscv64gc-unknown-fuchsia
