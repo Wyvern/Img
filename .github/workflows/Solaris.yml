@@ -88,11 +88,11 @@ jobs:
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
             mkdir -p /home/runner/Fuchsia
-            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
+            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia -q
           fi
 
           ln -sf /home/runner/Fuchsia fuchsia
-          ls -ahl /home/runner/Fuchsia
+          find /home/runner/Fuchsia -iname clang
           targets=(
             aarch64-unknown-fuchsia
             riscv64gc-unknown-fuchsia
