@@ -92,6 +92,7 @@ jobs:
           fi
 
           ln -sf /home/runner/Fuchsia fuchsia
+          l -ahl fuchsia/arch
 
           targets=(
             aarch64-unknown-fuchsia
