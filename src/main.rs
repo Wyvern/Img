@@ -40,6 +40,7 @@ fn check_args() -> (String, String) {
 }
 
 fn main() {
+    #[cfg(not(any(windows, unix)))]
     match process::Command::new("curl").arg("--version").output() {
         Ok(output) => {
             if !output.status.success() {
