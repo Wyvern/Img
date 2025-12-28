@@ -42,15 +42,9 @@ fn check_args() -> (String, String) {
 fn main() {
     #[cfg(not(any(windows, unix)))]
     match process::Command::new("curl").arg("--version").output() {
-        Ok(output) => {
-            if !output.status.success() {
-                quit!("The <curl> is not installed, program exit!");
-            }
-        }
-        Err(_) => {
-            quit!("The <curl> is not installed, program exit!");
-        }
-    }
+        Ok(output) if output.status.success() => (),
+        _ => quit!("The <curl> is not installed, program exit!"),
+    };
 
     let (url, dir) = check_args();
 
