@@ -88,7 +88,7 @@ jobs:
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
             mkdir -p /home/runner/Fuchsia
-            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia -q
+            cipd install -q fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
           fi
 
           ln -sf /home/runner/Fuchsia fuchsia
