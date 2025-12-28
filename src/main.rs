@@ -1,8 +1,6 @@
 #![feature(cfg_select)]
 
 mod util;
-use core::cfg_select;
-
 use arcdom as dom;
 use {std::*, util::*};
 
