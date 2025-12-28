@@ -1,11 +1,15 @@
+#![feature(cfg_select)]
+
 mod util;
+use core::cfg_select;
+
 use arcdom as dom;
 use {std::*, util::*};
 
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
+static CURL: [&str; cfg_select! {debug_assertions=>7,_=>6}] = [
     "--compressed",
     "-kfsL",
     "-A",
@@ -23,14 +27,9 @@ static IMGS: [&str; 18] = [
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 
 fn check_args() -> (String, String) {
-    let mut args;
-    #[cfg(test)]
-    {
-        args = env::args().skip(3);
-    }
-    #[cfg(not(test))]
-    {
-        args = env::args();
+    let mut args = cfg_select! {
+        test=>{env::args().skip(3)}
+        _=>{env::args()}
     };
     if args.len() > 3 {
         quit!("Too many arguments.\nUsage: {}", "Img <url> [dir]");
@@ -43,6 +42,17 @@ fn check_args() -> (String, String) {
 }
 
 fn main() {
+    match process::Command::new("curl").arg("--version").output() {
+        Ok(output) => {
+            if !output.status.success() {
+                quit!("The <curl> is not installed, program exit!");
+            }
+        }
+        Err(_) => {
+            quit!("The <curl> is not installed, program exit!");
+        }
+    }
+
     let (url, dir) = check_args();
 
     if !dir.is_empty() {
@@ -57,10 +67,11 @@ fn main() {
 
     check_host(&url);
 
-    let mut next_page = parse(&url);
-    if cfg!(not(test)) {
-        while !next_page.is_empty() {
-            next_page = parse(&next_page);
+    let mut _next_page = parse(&url);
+    #[cfg(not(test))]
+    {
+        while !_next_page.is_empty() {
+            _next_page = parse(&_next_page);
         }
     }
 }
@@ -645,24 +656,16 @@ fn canonicalize(url: &str, addr: &str) -> String {
 
 ///replace os specific special/reversed chars in path name
 fn sanitize_path(name: &str) -> String {
-    #[cfg(target_os = "macos")]
-    {
-        name.replace("/", ":")
-    }
-
-    #[cfg(any(all(unix, not(target_os = "macos")), target_family = "wasm"))]
-    {
-        name.replace("/", "_")
-    }
-
-    #[cfg(target_family = "windows")]
-    {
-        name.chars()
+    cfg_select! {
+        target_os = "macos"=> {name.replace("/", ":")}
+        any(all(unix, not(target_os = "macos")), target_family = "wasm")=>{name.replace("/", "_")}
+        target_family = "windows"=>{name.chars()
             .map(|c| match c {
                 '\\' | '/' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
                 _ => c,
             })
-            .collect()
+            .collect()}
+        _=>{name.into()}
     }
 }
 ///Perform photo download operation
@@ -862,11 +865,7 @@ fn magic_number_type(pb: path::PathBuf) {
         pb.with_extension(t.map_or_else(
             || {
                 let str = String::from_utf8_lossy(&buf);
-                if str.contains("<svg") {
-                    "svg"
-                } else {
-                    ""
-                }
+                if str.contains("<svg") { "svg" } else { "" }
             },
             |ty| ty.extension(),
         )),
