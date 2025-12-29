@@ -39,9 +39,7 @@ jobs:
       - name: Cache Targets
         uses: actions/cache@v4
         with:
-          path: |
-            ./target
-            ./build-dir
+          path: ./target
           key: macOS-${{ hashFiles('./target/**/CACHEDIR.TAG') }}
           restore-keys: macOS-
 
