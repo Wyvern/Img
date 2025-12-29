@@ -173,7 +173,7 @@ jobs:
             echo "Uploading $name..."
             for d in src redox; do
                 if [ -d "target/$arch/$d" ]; then
-                    gh release upload Nightly target/$arch/$d/Img#$name --clobber || true
+                    gh release upload Nightly "target/$arch/$d/Img#$name" --clobber || true
                     break
                 fi
             done
