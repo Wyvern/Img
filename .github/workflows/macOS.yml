@@ -123,8 +123,9 @@ jobs:
             echo "Uploading $name..."
             for f in Img Img.exe Img.wasm; do
                 if [ -f "target/$arch/src/$f" ]; then
-                    gh release upload Nightly "target/$arch/src/$f#$name" --clobber || true
-                    break
+                  cp target/$arch/src/$f target/$arch/src/$name || true
+                  gh release upload Nightly target/$arch/src/$name --clobber || true
+                  break
                 fi
             done
           done
