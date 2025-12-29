@@ -171,14 +171,10 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            cp target/$arch/src/Img target/$arch/src/$name || true
-            gh release upload Nightly target/$arch/src/$name --clobber || true
-          done
-
-          targets=("x86_64-unknown-redox Redox-x86_64")
-          for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
-            echo "Uploading $name..."
-            cp target/$arch/redox/Img target/$arch/redox/$name || true
-            gh release upload Nightly target/$arch/redox/$name --clobber || true
+            for d in src redox; do
+                if [ -d "target/$arch/$d" ]; then
+                    gh release upload Nightly target/$arch/$d/Img#$name --clobber || true
+                    break
+                fi
+            done
           done
