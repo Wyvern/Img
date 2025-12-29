@@ -168,7 +168,6 @@ impl<T: fmt::Debug> Dbg for T {}
 
 pub fn pause() {
     use io::*;
-
     #[cfg(target_family = "unix")]
     {
         use termion::input::TermRead;
