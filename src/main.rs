@@ -13,7 +13,7 @@ static CURL: [&str; cfg_select! {debug_assertions=>7,_=>6}] = [
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
-    "--tcp-nodelay",
+    "--http2",
     #[cfg(debug_assertions)]
     "-S",
     // "-OJ",
