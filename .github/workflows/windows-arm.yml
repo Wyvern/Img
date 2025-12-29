@@ -62,10 +62,15 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-            ./target
-          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.ver.outputs.rust}}-${{ hashFiles('./target/**/CACHEDIR.TAG') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-nightly-
+          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.ver.outputs.rust}}
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-nightly-
+
+      - name: Cache Targets
+        uses: actions/cache@v4
+        with:
+          path: ./target
+          key: Windows-${{ hashFiles('./target/**/CACHEDIR.TAG') }}
+          restore-keys: Windows-
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
