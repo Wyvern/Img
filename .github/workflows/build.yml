@@ -363,7 +363,7 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('~/.cargo/bin/*') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('C:/Users/runneradmin/.cargo/bin/*.exe') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-stable-
 
       - name: Rust Toolchain
@@ -449,7 +449,7 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-
+          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('C:/Users/runneradmin/.cargo/bin/*.exe') }}
           restore-keys: ${{ runner.os }}-${{ runner.arch }}-stable-
 
       - name: Rust Toolchain
