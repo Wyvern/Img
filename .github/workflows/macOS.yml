@@ -123,7 +123,7 @@ jobs:
             echo "Uploading $name..."
             for f in Img Img.exe Img.wasm; do
                 if [ -e "target/$arch/src/$f" ]; then
-                    mv "target/$arch/src/$f" "target/$arch/src/$name"
+                    cp "target/$arch/src/$f" "target/$arch/src/$name"
                     break
                 fi
             done

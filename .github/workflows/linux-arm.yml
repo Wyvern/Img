@@ -120,6 +120,6 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            mv target/$arch/src/Img target/$arch/src/$name || true
+            cp target/$arch/src/Img target/$arch/src/$name || true
             gh release upload Nightly target/$arch/src/$name --clobber || true
           done
