@@ -36,7 +36,8 @@ jobs:
           path: |
             ~/.rustup
             ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.ver.outputs.rust}}
+            ./target
+          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ steps.ver.outputs.rust}}-${{ hashFiles('./target/**/CACHEDIR.TAG') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-nightly-
 

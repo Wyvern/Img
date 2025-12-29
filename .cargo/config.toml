@@ -196,6 +196,7 @@ rustflags = ["-Ctarget-cpu=native", "-Ztune-cpu=native"]
 rustflags = ["-Zpanic-in-drop=abort"]
 incremental = true
 build-dir = "build-dir"
+# target-dir = "/home/runner/target-dir"
 warnings = "allow"
 
 [package.metadata.docs.rs]
