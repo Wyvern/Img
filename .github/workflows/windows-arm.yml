@@ -8,8 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  # SCCACHE_GHA_ENABLED: "on"
-  # RUSTC_WRAPPER: "sccache"
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
 
 jobs:
   Windows-arm:
@@ -42,29 +42,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup
-            ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('C:/Users/runneradmin/.cargo/bin/*.exe') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-nightly-
-
-      - name: Cache Targets
-        uses: actions/cache@v4
-        with:
-          path: ./target
-          key: Windows-${{ hashFiles('./target/**/*') }}
-          restore-keys: Windows-
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
 
-      # - name: Run sccache-cache
-      #   uses: mozilla-actions/sccache-action@main
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@latest
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
 
       - name: Build release
         continue-on-error: true

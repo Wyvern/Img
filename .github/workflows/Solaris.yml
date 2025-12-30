@@ -20,26 +20,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup
-            ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-nightly-${{ hashFiles('~/.cargo/bin/*') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-nightly-
-
-      - name: Cache Targets
-        uses: actions/cache@v4
-        with:
-          path: ./target
-          key: Solaris-${{ hashFiles('./target/**/*') }}
-          restore-keys: Solaris-
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@latest
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
