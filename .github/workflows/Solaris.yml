@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./target
-          key: Solaris-${{ hashFiles('./target/**/CACHEDIR.TAG') }}
+          key: Solaris-${{ hashFiles('./target/**/*') }}
           restore-keys: Solaris-
 
       - name: Rust Toolchain

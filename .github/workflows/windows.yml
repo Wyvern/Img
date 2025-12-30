@@ -55,7 +55,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./target
-          key: Windows-${{ hashFiles('./target/**/CACHEDIR.TAG') }}
+          key: Windows-${{ hashFiles('./target/**/*') }}
           restore-keys: Windows-
 
       - name: Rust Toolchain

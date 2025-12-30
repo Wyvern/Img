@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./target
-          key: LinuxArm-${{ hashFiles('./target/**/CACHEDIR.TAG') }}
+          key: LinuxArm-${{ hashFiles('./target/**/*') }}
           restore-keys: LinuxArm-
 
       - name: Rust Toolchain
