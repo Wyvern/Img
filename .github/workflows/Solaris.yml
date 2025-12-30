@@ -127,8 +127,6 @@ jobs:
         run: |
           targets=(
             "x86_64-unknown-illumos Illumos-x86_64"
-            "x86_64-pc-solaris Solaris-x86_64"
-            "sparcv9-sun-solaris Solaris-sparcv9"
             "aarch64-unknown-fuchsia Fuchsia-aarch64"
             "riscv64gc-unknown-fuchsia Fuchsia-riscv64gc"
             "x86_64-unknown-fuchsia Fuchsia-x86_64"

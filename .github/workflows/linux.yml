@@ -128,7 +128,6 @@ jobs:
             x86_64-linux-android
             powerpc64-unknown-linux-gnu
             ./powerpc64-unknown-linux-musl-elfv1.json
-            powerpc64-unknown-linux-musl
           )
 
           for target in ${targets[@]}; do
@@ -153,7 +152,6 @@ jobs:
                   "thumbv7neon-linux-androideabi Android-thumbv7neon"
                   "x86_64-linux-android Android-x86_64"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
-                  "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
                   "powerpc64-unknown-linux-musl-elfv1 Linux-powerpc64-musl"
                   "aarch64-unknown-linux-ohos Android-aarch64-ohos"
                   "armv7-unknown-linux-ohos Android-armv7-ohos"
