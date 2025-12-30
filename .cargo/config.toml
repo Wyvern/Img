@@ -430,3 +430,29 @@ rustflags = ["-Clink-arg=--target=armv7--linux-ohos"]
 rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 [target.x86_64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
+
+[target.mips64-openwrt-linux-musl]
+linker = "wrt/bin/mips64-openwrt-linux-gcc"
+rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
+
+[target.'cfg(target_os="fuchsia")']
+linker = "clang"
+rustflags = ["-Clink-arg=-fuse-ld=lld"]
+[target.aarch64-unknown-fuchsia]
+rustflags = [
+  "-Clink-arg=--target=aarch64--fuchsia",
+  "-Clink-arg=--sysroot=fuchsia/arch/arm64/sysroot",
+  "-Lnative=fuchsia/arch/arm64/lib",
+]
+[target.x86_64-unknown-fuchsia]
+rustflags = [
+  "-Clink-arg=--target=x86_64--fuchsia",
+  "-Clink-arg=--sysroot=fuchsia/arch/x64/sysroot",
+  "-Lnative=fuchsia/arch/x64/lib",
+]
+[target.riscv64gc-unknown-fuchsia]
+rustflags = [
+  "-Clink-arg=--target=riscv64gc--fuchsia",
+  "-Clink-arg=--sysroot=fuchsia/arch/riscv64/sysroot",
+  "-Lnative=fuchsia/arch/riscv64/lib",
+]
