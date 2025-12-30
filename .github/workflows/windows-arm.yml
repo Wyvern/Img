@@ -8,8 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SCCACHE_GHA_ENABLED: "on"
-  RUSTC_WRAPPER: "sccache"
+  # SCCACHE_GHA_ENABLED: "on"
+  # RUSTC_WRAPPER: "sccache"
 
 jobs:
   Windows-arm:
@@ -50,8 +50,8 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.8.2
 
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+      # - name: Run sccache-cache
+      #   uses: mozilla-actions/sccache-action@main
 
       - name: Build release
         continue-on-error: true
