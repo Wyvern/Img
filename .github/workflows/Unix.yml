@@ -37,7 +37,7 @@ jobs:
       - name: Cache sysroot
         uses: actions/cache@v4
         with:
-          path: /home/runner/sysroots
+          path: /home/runner/unix
           key: BSD-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
           restore-keys: BSD-${{ runner.os }}-
 
@@ -46,58 +46,57 @@ jobs:
           cargo update
           set +e -x
 
-          SYSROOT="/home/runner/sysroots"
-          ln -sfn "$SYSROOT" sysroot
+          ln -sf /home/runner/unix sysroot
 
           freebsd=(amd64 arm64 riscv)
           for arch in "${freebsd[@]}"; do
-            if [ ! -d $SYSROOT/freebsd/$arch ]; then
-                mkdir -p $SYSROOT/freebsd/$arch
+            if [ ! -d sysroot/freebsd/$arch ]; then
+                mkdir -p sysroot/freebsd/$arch
                 curl -fsSL https://download.freebsd.org/ftp/releases/$arch/15.0-RELEASE/base.txz \
-            | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
+            | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
             fi
           done
 
           ppc=(powerpc64 powerpc64le)
           for arch in "${ppc[@]}"; do
-            if [ ! -d $SYSROOT/freebsd/$arch ]; then
-              mkdir -p $SYSROOT/freebsd/$arch
+            if [ ! -d sysroot/freebsd/$arch ]; then
+              mkdir -p sysroot/freebsd/$arch
               curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/15.0-RELEASE/base.txz \
-                | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
+                | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
             fi
           done
 
           openbsd=(amd64 arm64 riscv64 powerpc64)
           files=(base78 comp78)
           for arch in "${openbsd[@]}"; do
-            if [ ! -d $SYSROOT/openbsd/$arch ]; then
-              mkdir -p $SYSROOT/openbsd/$arch
+            if [ ! -d sysroot/openbsd/$arch ]; then
+              mkdir -p sysroot/openbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.8/$arch/$file.tgz | tar -xzf - -C $SYSROOT/openbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.8/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
               done
             fi
           done
 
-          netbsd=(amd64 evbarm-aarch64)
+          netbsd=(amd64 evbarm-aarch64 sparc64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
-            if [ ! -d $SYSROOT/netbsd/$arch ]; then
-              mkdir -p $SYSROOT/netbsd/$arch
+            if [ ! -d sysroot/netbsd/$arch ]; then
+              mkdir -p sysroot/netbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C $SYSROOT/netbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
               done
             fi
           done
 
-          if [ ! -f $SYSROOT/dfly-x86_64-6.4.2_REL.iso ]; then
-            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > $SYSROOT/dfly-x86_64-6.4.2_REL.iso &
-            mkdir -p $SYSROOT/dfly
+          if [ ! -f sysroot/dfly-x86_64-6.4.2_REL.iso ]; then
+            curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-6.4.2_REL.iso &
+            mkdir -p sysroot/dfly
           fi
 
           wait
-          chmod -R u+rwX "$SYSROOT"
+          chmod -R u+rwX sysroot/*.iso
 
-          sudo mount -o loop $SYSROOT/dfly-x86_64-6.4.2_REL.iso $SYSROOT/dfly
+          sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
           targets=(
             x86_64-unknown-dragonfly
@@ -112,13 +111,14 @@ jobs:
             powerpc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
+            sparc64-unknown-netbsd
           )
 
           for target in ${targets[@]}; do
             time cargo s $target
           done
 
-          sudo umount $SYSROOT/dfly
+          sudo umount sysroot/dfly
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -144,6 +144,7 @@ jobs:
                   "powerpc64-unknown-openbsd OpenBSD-ppc64"
                   "x86_64-unknown-netbsd NetBSD-x86_64"
                   "aarch64-unknown-netbsd NetBSD-aarch64"
+                  "sparc64-unknown-netbsd NetBSD-sparc64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
