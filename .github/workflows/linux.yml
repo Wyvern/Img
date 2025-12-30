@@ -66,7 +66,9 @@ jobs:
       - name: Cache Redoxer
         uses: actions/cache@v4
         with:
-          path: ~/.redoxer
+          path: |
+            ~/.redoxer
+            ~/.cargo/bin/redoxer
           key: redoxer-${{ runner.os }}
           restore-keys: redoxer-${{ runner.os }}
 
