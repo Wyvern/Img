@@ -89,8 +89,8 @@ jobs:
 
           ln -sf /home/runner/Fuchsia fuchsia
 
-          cargo install fortanix-sgx-tools -q
-          cargo sgx build --profile src -- -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target x86_64-fortanix-unknown-sgx
+          cargo install fortanix-sgx-tools cargo-sgx -q
+          cargo sgx build --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target x86_64-fortanix-unknown-sgx
 
           targets=(
             aarch64-unknown-fuchsia
