@@ -240,7 +240,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -270,6 +270,7 @@ jobs:
           export PATH=$PWD/llvm-mingw/bin:$PATH
 
           targets=(
+            x86_64-fortanix-unknown-sgx
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             aarch64-apple-darwin
@@ -299,9 +300,10 @@ jobs:
                   "x86_64-apple-darwin Apple-macOS-x86_64"
                   "aarch64-apple-darwin Apple-macOS-aarch64"
                   "aarch64-apple-ios Apple-iOS-aarch64"
-                  "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe",
-                  "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe",
-                  "wasm32-wasip2 wasm32-wasip2.wasm",
+                  "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe"
+                  "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
+                  "wasm32-wasip2 wasm32-wasip2.wasm"
+                  "x86_64-fortanix-unknown-sgx Fortanix-sgx"
           )
 
           for target in "${targets[@]}"; do
