@@ -51,7 +51,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install -y protobuf-compiler
+          # sudo apt install -y protobuf-compiler
           # sudo apt install -y zfsutils-linux
 
       # - name: Cache Illumos/Solaris
@@ -90,7 +90,7 @@ jobs:
 
           ln -sf /home/runner/Fuchsia fuchsia
 
-          cargo install fortanix-sgx-tools sgxs-tools -q
+          # cargo install fortanix-sgx-tools sgxs-tools -q
 
           targets=(
             x86_64-fortanix-unknown-sgx
@@ -131,6 +131,7 @@ jobs:
             "aarch64-unknown-fuchsia Fuchsia-aarch64"
             "riscv64gc-unknown-fuchsia Fuchsia-riscv64gc"
             "x86_64-unknown-fuchsia Fuchsia-x86_64"
+            "x86_64-fortanix-unknown-sgx Fortanix-sgx"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
