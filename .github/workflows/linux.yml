@@ -26,7 +26,7 @@ jobs:
           components: rust-src
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@latest
+        uses: Swatinem/rust-cache@v2.8.2
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
