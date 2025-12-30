@@ -240,7 +240,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-unknown-fuchsia,x86_64-unknown-fuchsia
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -258,6 +258,14 @@ jobs:
           key: ${{ runner.os }}-llvm-mingw-
           restore-keys: ${{ runner.os }}-llvm-mingw-
 
+      - name: Cache Fuchsia
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/Fuchsia
+          key: ${{ runner.os }}-${{ runner.arch }}-Fuchsia
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-Fuchsia
+
       - name: Build Release
         run: |
           cargo update
@@ -269,7 +277,19 @@ jobs:
           fi
           export PATH=$PWD/llvm-mingw/bin:$PATH
 
+          if [ ! -d /home/runner/Fuchsia ]; then
+            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=mac-arm64&version=latest' -o cipd
+            chmod +x cipd
+            sudo mv cipd /usr/local/bin/
+            mkdir -p /home/runner/Fuchsia
+            cipd install fuchsia/sdk/core/mac-arm64 latest -root /home/runner/Fuchsia
+          fi
+
+          ln -sf /home/runner/Fuchsia fuchsia
+
           targets=(
+            aarch64-unknown-fuchsia
+            x86_64-unknown-fuchsia
             x86_64-fortanix-unknown-sgx
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
@@ -304,6 +324,8 @@ jobs:
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
                   "wasm32-wasip2 wasm32-wasip2.wasm"
                   "x86_64-fortanix-unknown-sgx Fortanix-sgx"
+                  "aarch64-unknown-fuchsia Fuchsia-aarch64"
+                  "x86_64-unknown-fuchsia Fuchsia-x86_64"
           )
 
           for target in "${targets[@]}"; do
