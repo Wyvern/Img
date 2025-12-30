@@ -26,7 +26,7 @@ jobs:
           targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64le-unknown-linux-musl,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
@@ -110,7 +110,7 @@ jobs:
           targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,x86_64-unknown-redox
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
@@ -243,7 +243,7 @@ jobs:
           targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
@@ -354,7 +354,7 @@ jobs:
           targets: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
@@ -436,7 +436,7 @@ jobs:
           targets: x86_64-pc-windows-msvc,arm64ec-pc-windows-msvc
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
