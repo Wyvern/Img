@@ -24,7 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: x86_64-fortanix-unknown-sgx
+          targets: x86_64-fortanix-unknown-sgx,x86_64-pc-solaris,sparcv9-sun-solaris
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
