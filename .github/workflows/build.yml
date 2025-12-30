@@ -20,19 +20,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup
-            ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('~/.cargo/bin/*') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-stable-
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64le-unknown-linux-musl,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.8.2
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -107,19 +101,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup
-            ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('~/.cargo/bin/*') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-stable-
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,x86_64-unknown-redox
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.8.2
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -243,19 +231,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup
-            ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('~/.cargo/bin/*') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-stable-
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.8.2
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -357,20 +339,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup
-            ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('C:/Users/runneradmin/.cargo/bin/*.exe') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-stable-
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc
-          # components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.8.2
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
@@ -443,20 +418,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.rustup
-            ~/.cargo
-          key: ${{ runner.os }}-${{ runner.arch }}-stable-${{ hashFiles('C:/Users/runneradmin/.cargo/bin/*.exe') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-stable-
-
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-pc-windows-msvc,arm64ec-pc-windows-msvc
-          # components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.8.2
 
       # - name: Run sccache-cache
       #   uses: mozilla-actions/sccache-action@main
