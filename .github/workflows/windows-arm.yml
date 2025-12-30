@@ -48,7 +48,7 @@ jobs:
           components: rust-src
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
@@ -97,6 +97,6 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Copy-Item target/$arch/src/Img.exe target/$arch/src/$name -Force; $?
+              Move-Item target/$arch/src/Img.exe target/$arch/src/$name -Force; $?
               gh release upload Nightly target/$arch/src/$name --clobber; $?
           }

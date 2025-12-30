@@ -26,7 +26,7 @@ jobs:
           components: rust-src
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
@@ -163,7 +163,7 @@ jobs:
             echo "Uploading $name..."
             for d in src redox; do
                 if [ -d "target/$arch/$d" ]; then
-                  cp target/$arch/$d/Img target/$arch/$d/$name || true
+                  mv target/$arch/$d/Img target/$arch/$d/$name || true
                   gh release upload Nightly target/$arch/$d/$name --clobber || true
                   break
                 fi

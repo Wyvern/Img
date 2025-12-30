@@ -26,7 +26,7 @@ jobs:
           components: rust-src
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.8.2
+        uses: Swatinem/rust-cache@v2
         with:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
@@ -129,6 +129,6 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            cp target/$arch/src/Img target/$arch/src/$name || true
+            mv target/$arch/src/Img target/$arch/src/$name || true
             gh release upload Nightly target/$arch/src/$name --clobber || true
           done
