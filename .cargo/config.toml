@@ -417,7 +417,7 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-netbsd]
-linker = "sparc64-linux-gnu-gcc"
+linker = "sparc64--netbsd-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
 ]
