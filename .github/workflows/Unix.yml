@@ -46,7 +46,7 @@ jobs:
           cargo update
           set +e -x
 
-          sudo mkdir -p /home/runner/unix;
+          mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
 
           freebsd=(amd64 arm64 riscv)
@@ -95,7 +95,7 @@ jobs:
           fi
 
           wait
-          chmod -R u+rwX sysroot/*.iso
+          chmod -R u+rwX sysroot
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
