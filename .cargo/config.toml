@@ -420,7 +420,6 @@ rustflags = [
 linker = "sparc64-linux-gnu-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
-  "-Clink-arg=--target=sparc64--netbsd",
 ]
 
 [target.'cfg(target_os = "openbsd")']
