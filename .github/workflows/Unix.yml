@@ -38,14 +38,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /home/runner/unix
-          key: BSD-${{ runner.os }}-${{ hashFiles('scripts/sysroot-files.txt') }}
-          restore-keys: BSD-${{ runner.os }}-
+          key: BSD-${{ runner.os }}-${{ runner.arch }}
+          restore-keys: BSD-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
+          mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
 
           freebsd=(amd64 arm64 riscv)
