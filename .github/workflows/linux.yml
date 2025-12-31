@@ -61,7 +61,7 @@ jobs:
           restore-keys: openwrt-${{ runner.os }}-${{ runner.arch }}
 
       - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
+        run: sudo apt install gcc-powerpc64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
 
       - name: Cache Redoxer
         uses: actions/cache@v4
@@ -128,6 +128,7 @@ jobs:
             x86_64-linux-android
             powerpc64-unknown-linux-gnu
             ./powerpc64-unknown-linux-musl-elfv1.json
+            x86_64-unknown-hurd-gnu
           )
 
           for target in ${targets[@]}; do
@@ -157,6 +158,7 @@ jobs:
                   "armv7-unknown-linux-ohos Android-armv7-ohos"
                   "x86_64-unknown-linux-ohos Android-x86_64-ohos"
                   "mips64-openwrt-linux-musl Openwrt-mips64-musl"
+                  "x86_64-unknown-hurd-gnu Hurd-x86_64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"

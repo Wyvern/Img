@@ -51,7 +51,6 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install crosshurd
           # sudo apt install -y protobuf-compiler
           # sudo apt install -y zfsutils-linux
 
@@ -94,7 +93,6 @@ jobs:
           # cargo install fortanix-sgx-tools sgxs-tools -q
 
           targets=(
-            x86_64-unknown-hurd-gnu
             x86_64-fortanix-unknown-sgx
             aarch64-unknown-fuchsia
             riscv64gc-unknown-fuchsia
@@ -106,9 +104,9 @@ jobs:
 
           targets=(
             x86_64-unknown-illumos
+            x86_64-pc-solaris
+            sparcv9-sun-solaris
           )
-          # x86_64-pc-solaris
-          # sparcv9-sun-solaris
 
           for target in ${targets[@]}; do
             time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
@@ -131,7 +129,8 @@ jobs:
             "riscv64gc-unknown-fuchsia Fuchsia-riscv64gc"
             "x86_64-unknown-fuchsia Fuchsia-x86_64"
             "x86_64-fortanix-unknown-sgx Fortanix-sgx"
-            "x86_64-unknown-hurd-gnu Hurd-x86_64"
+            "x86_64-pc-solaris Solaris-x86_64"
+            "sparcv9-sun-solaris Solaris-sparcv9"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
