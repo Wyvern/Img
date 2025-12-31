@@ -46,7 +46,7 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p /home/runner/unix;
+          sudo mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
 
           freebsd=(amd64 arm64 riscv)
