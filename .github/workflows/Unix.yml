@@ -45,6 +45,7 @@ jobs:
         run: |
           cargo update
           set +e -x
+          sudo apt install gcc-sparc64-linux-gnu -y
 
           mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
