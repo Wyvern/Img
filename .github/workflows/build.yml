@@ -255,8 +255,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: llvm-mingw
-          key: ${{ runner.os }}-llvm-mingw-
+          key: ${{ runner.os }}-llvm-mingw-${{ hashFiles('llvm-mingw/**') }}
           restore-keys: ${{ runner.os }}-llvm-mingw-
+
+      - name: llvm-mingw
+        run: |
+          if [ ! -d llvm-mingw ]; then
+            mkdir llvm-mingw
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
+          fi
+          echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
       - name: Cache Fuchsia
         uses: actions/cache@v4
@@ -270,12 +278,6 @@ jobs:
         run: |
           cargo update
           set +e -x
-
-          if [ ! -e llvm-mingw/bin ]; then
-            mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
-          fi
-          export PATH=$PWD/llvm-mingw/bin:$PATH
 
           if [ ! -d /home/runner/Fuchsia ]; then
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=mac-arm64&version=latest' -o cipd
