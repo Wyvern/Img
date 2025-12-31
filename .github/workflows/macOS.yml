@@ -49,16 +49,18 @@ jobs:
           key: ${{ runner.os }}-llvm-mingw-${{ hashFiles('llvm-mingw/**') }}
           restore-keys: ${{ runner.os }}-llvm-mingw-
 
-      - name: Build Release
+      - name: llvm-mingw
         run: |
-          cargo update
-          set +e -x
-
           if [ ! -d llvm-mingw ]; then
             mkdir llvm-mingw
             curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
           fi
           export PATH=$PWD/llvm-mingw/bin:$PATH
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
 
           targets=(
             aarch64-pc-windows-gnullvm
