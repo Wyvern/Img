@@ -55,7 +55,7 @@ jobs:
             mkdir llvm-mingw
             curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
           fi
-          export PATH=$PWD/llvm-mingw/bin:$PATH
+          echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
       - name: Build Release
         run: |
