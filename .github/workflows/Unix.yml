@@ -38,8 +38,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /home/runner/unix
-          key: BSD-${{ runner.os }}-${{ runner.arch }}
-          restore-keys: BSD-${{ runner.os }}-${{ runner.arch }}
+          key: Unix-${{ runner.os }}-${{ runner.arch }}
+          restore-keys: Unix-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Release
         run: |
