@@ -177,6 +177,7 @@ build-dir-new-layout = true
 profile-hint-mostly-unused = true
 panic-immediate-abort = true
 rustc-unicode = true
+fine-grain-locking = true
 
 # build-std = [
 #     "core",
