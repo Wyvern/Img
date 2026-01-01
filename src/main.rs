@@ -1076,12 +1076,10 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             };
             print!("{CL}{char}..{time}");
             _ = o.flush();
-            match r.try_recv() {
-                Err(TryRecvError::Empty) => (),
+            match r.recv_timeout(time::Duration::from_millis(200)) {
+                Err(RecvTimeoutError::Timeout) => (),
                 _ => break 'l,
             }
-            thread::yield_now();
-            thread::sleep(time::Duration::from_millis(200));
         }
     }
     print!("{CL}");
@@ -1285,7 +1283,6 @@ mod img {
         thread::spawn(|| {
             circle_indicator(r);
         });
-        thread::yield_now();
         thread::sleep(time::Duration::from_secs(5));
         s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
     }
