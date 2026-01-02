@@ -488,7 +488,7 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
 [target.'cfg(any(target_os="illumos",target_os="solaris"))']
-linker = "Illumos/omnios/bin/ld"
+linker = "clang"
 rustflags = [
   "-Clink-arg=-no-pie",
   "-Clink-arg=-Wl,-ztext",

@@ -92,7 +92,6 @@ jobs:
           ln -sf /home/runner/Fuchsia fuchsia
 
           # cargo install fortanix-sgx-tools sgxs-tools -q
-          sudo find Illumos/omnios -iname crt*.o
 
           targets=(
             x86_64-pc-solaris
