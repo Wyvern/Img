@@ -93,7 +93,7 @@ jobs:
 
           # cargo install fortanix-sgx-tools sgxs-tools -q
           sudo snap install zig --classic --beta
-          sudo ls -ahl Illumos/omnios/**/libc.so
+
           targets=(
             x86_64-unknown-illumos
             x86_64-pc-solaris
@@ -106,15 +106,15 @@ jobs:
             time cargo s $target
           done
 
-          targets=(
-            x86_64-unknown-illumos
-            x86_64-pc-solaris
-            sparcv9-sun-solaris
-          )
+          # targets=(
+          #   x86_64-unknown-illumos
+          #   x86_64-pc-solaris
+          #   sparcv9-sun-solaris
+          # )
 
-          for target in ${targets[@]}; do
-            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-          done
+          # for target in ${targets[@]}; do
+          #   time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+          # done
 
           sudo zfs destroy -r solaris/omnios
           sudo zpool destroy solaris
