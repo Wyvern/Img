@@ -490,7 +490,6 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 [target.'cfg(any(target_os="illumos",target_os="solaris"))']
 linker = "clang"
 rustflags = [
-    "-Clink-arg=-BIllumos/omnios/bin",
   "-Clink-arg=-no-pie",
   "-Clink-arg=-Wl,-zignore",
   "-Clink-arg=-Wl,-ztext",
@@ -498,14 +497,6 @@ rustflags = [
   "-Clink-arg=--sysroot=Illumos/omnios",
   "-LIllumos/omnios/lib/amd64",
   "-LIllumos/omnios/usr/lib/amd64",
-]
-[target.x86_64-pc-solaris]
-rustflags = [
-  "-Clink-arg=--target=x86_64-pc-solaris"
-]
-[target.x86_64-unknown-illumos]
-rustflags = [
-  "-Clink-arg=--target=x86_64-unknown-illumos"
 ]
 
 [target.mips64-openwrt-linux-musl]
