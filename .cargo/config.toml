@@ -491,7 +491,6 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 linker = "clang"
 rustflags = [
   "-Clink-arg=-no-pie",
-  "-Clink-arg=-Wl,-zignore",
   "-Clink-arg=-Wl,-ztext",
   "-Clink-arg=-Wl,--no-relax",
   "-Clink-arg=--sysroot=Illumos/omnios",
