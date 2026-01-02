@@ -491,8 +491,9 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--sysroot=Illumos/omnios",
-  # "-Clink-arg=-LIllumos/omnios/lib/amd64",
-  # "-Clink-arg=-LIllumos/omnios/usr/lib/amd64",
+  "-Clink-arg=-LIllumos/omnios/lib/amd64",
+  "-Clink-arg=-LIllumos/omnios/lib",
+  "-Clink-arg=-LIllumos/omnios/usr/lib/amd64",
 ]
 
 [target.mips64-openwrt-linux-musl]
