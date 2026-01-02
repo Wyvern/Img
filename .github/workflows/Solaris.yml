@@ -97,6 +97,7 @@ jobs:
             -w /workspace \
             sondrelvp/solaris:jenkins.dev \
             bash -c "\
+              pkg install curl && \
               curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly --component rust-src && \
               source \$HOME/.cargo/env && \
               cargo s x86_64-pc-solaris
