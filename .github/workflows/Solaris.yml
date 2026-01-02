@@ -52,33 +52,33 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           # sudo apt install -y protobuf-compiler
-          # sudo apt install -y zfsutils-linux
+          sudo apt install -y zfsutils-linux
 
-      # - name: Cache Illumos/Solaris
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: /home/runner/Illumos
-      #     key: Illomos-${{ runner.os }}-${{ runner.arch }}
-      #     restore-keys: Illomos-${{ runner.os }}-${{ runner.arch }}
+      - name: Cache Illumos/Solaris
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/Illumos
+          key: Illomos-${{ runner.os }}-${{ runner.arch }}
+          restore-keys: Illomos-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          # ln -sfn /home/runner/Illumos Illumos
+          ln -sfn /home/runner/Illumos Illumos
 
-          # if [ ! -f Illumos/omnios-r151056.zfs ]; then
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > Illumos/omnios-r151056.zfs
-          #   mkdir -p Illumos/omnios
-          # fi
+          if [ ! -f Illumos/omnios-r151056.zfs ]; then
+            mkdir -p Illumos/omnios
+            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > Illumos/omnios-r151056.zfs
+          fi
 
-          # sudo truncate -s 1G /tmp/omnios.img
-          # sudo zpool create -f solaris /tmp/omnios.img
-          # sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
+          sudo truncate -s 1G /tmp/omnios.img
+          sudo zpool create -f solaris /tmp/omnios.img
+          sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
 
-          # zpool status
-          # zfs list
+          zpool status
+          zfs list
 
           if [ ! -d /home/runner/Fuchsia ]; then
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
@@ -93,6 +93,8 @@ jobs:
           # cargo install fortanix-sgx-tools sgxs-tools -q
 
           targets=(
+            x86_64-pc-solaris
+            x86_64-unknown-illumos
             x86_64-fortanix-unknown-sgx
             aarch64-unknown-fuchsia
             riscv64gc-unknown-fuchsia
@@ -102,18 +104,18 @@ jobs:
             time cargo s $target
           done
 
-          targets=(
-            x86_64-unknown-illumos
-            x86_64-pc-solaris
-            sparcv9-sun-solaris
-          )
+          # targets=(
+          #   x86_64-unknown-illumos
+          #   x86_64-pc-solaris
+          #   sparcv9-sun-solaris
+          # )
 
-          for target in ${targets[@]}; do
-            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-          done
+          # for target in ${targets[@]}; do
+          #   time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+          # done
 
-          # sudo zfs destroy -r solaris/omnios
-          # sudo zpool destroy solaris
+          sudo zfs destroy -r solaris/omnios
+          sudo zpool destroy solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
