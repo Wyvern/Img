@@ -490,7 +490,7 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 [target.'cfg(any(target_os="illumos",target_os="solaris"))']
 linker = "./zig-cc.sh"
 rustflags = [
-  "-Clink-arg=",
+  # "-Clink-arg=-no-pie",
   # "-Clink-arg=-Wl,-ztext",
   # "-Clink-arg=-Wl,--no-relax",
   "-Clink-arg=--sysroot=Illumos/omnios",
