@@ -117,6 +117,7 @@ jobs:
           ln -sf /home/runner/openwrt/openwrt-toolchain-24.10.5-octeon-generic_gcc-13.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-13.3.0_musl wrt
 
           targets=(
+            aarch64-unknown-teeos
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
