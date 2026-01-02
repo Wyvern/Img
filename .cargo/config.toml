@@ -20,7 +20,7 @@ l = "b -q --profile lto"
 
 h = "s x86_64h-apple-darwin"
 e = "s arm64e-apple-darwin"
-s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=optimize_for_size --target"
+s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target"
 z = "zigbuild -q --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target"
 
 
@@ -496,6 +496,7 @@ rustflags = [
   "-Clink-arg=--sysroot=Illumos/omnios",
   "-LIllumos/omnios/lib/amd64",
   "-LIllumos/omnios/usr/lib/amd64",
+  "-LIllumos/omnios/usr/include",
 ]
 
 [target.mips64-openwrt-linux-musl]
