@@ -66,6 +66,7 @@ jobs:
           cargo update
           set +e -x
 
+          mkdir -p /home/runner/Illumos
           ln -sfn /home/runner/Illumos Illumos
 
           if [ ! -f Illumos/omnios-r151056.zfs ]; then
