@@ -474,7 +474,7 @@ ar = "ndk/bin/arm-linux-androideabi-ar"
 linker = "ndk/bin/armv7a-linux-androideabi35-clang"
 
 
-[target.'cfg(any(target_env="ohos",target_os="teeos"))']
+[target.'cfg(target_env="ohos")']
 linker = "ohos/bin/clang"
 rustflags = ["-Clink-arg=--sysroot=ohos-root"]
 
@@ -487,7 +487,12 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 [target.x86_64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 [target.aarch64-unknown-teeos]
-rustflags = ["-Clink-arg=--target=aarch64--teeos"]
+cc = "aarch64-unknown-teeos-clang.sh"
+cxx = "aarch64-unknown-teeos-clang.sh"
+linker = "aarch64-unknown-teeos-clang.sh"
+ar = "ohos/bin/llvm-ar"
+ranlib = "ohos/bin/llvm-ranlib"
+llvm-config = "ohos/bin/llvm-config"
 
 # [target.'cfg(any(target_os="illumos",target_os="solaris"))']
 # linker = "clang"
