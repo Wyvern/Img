@@ -487,12 +487,14 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 [target.x86_64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 [target.aarch64-unknown-teeos]
-cc = "aarch64-unknown-teeos-clang.sh"
-cxx = "aarch64-unknown-teeos-clang.sh"
 linker = "aarch64-unknown-teeos-clang.sh"
 ar = "ohos/bin/llvm-ar"
 ranlib = "ohos/bin/llvm-ranlib"
 llvm-config = "ohos/bin/llvm-config"
+rustflags = [
+  "-Clink-arg=--target=aarch64--linux-gnu",
+  "-Clink-arg=--sysroot=ohos-root",
+]
 
 # [target.'cfg(any(target_os="illumos",target_os="solaris"))']
 # linker = "clang"
