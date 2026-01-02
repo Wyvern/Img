@@ -93,7 +93,7 @@ jobs:
 
           # cargo install fortanix-sgx-tools sgxs-tools -q
           sudo snap install zig --classic --beta
-
+          ls -ahl Illumos/**/libc.so
           targets=(
             x86_64-unknown-illumos
             x86_64-pc-solaris
