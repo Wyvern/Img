@@ -423,10 +423,10 @@ rustflags = [
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
 
-[target.sparc64-unknown-netbsd]
+[target.armv7-unknown-netbsd-eabihf]
 rustflags = [
-  "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
-  "-Clink-arg=--target=sparc64--netbsd",
+  "-Clink-arg=--sysroot=sysroot/netbsd/evbarm-earmv7hf",
+  "-Clink-arg=--target=armv7--netbsd-eabihf",
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -454,12 +454,6 @@ rustflags = [
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/powerpc64",
   "-Clink-arg=--target=powerpc64--openbsd",
-]
-
-[target.sparc64-unknown-openbsd]
-rustflags = [
-  "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
-  "-Clink-arg=--target=sparc64--openbsd",
 ]
 
 [target.'cfg(target_os = "android")']
