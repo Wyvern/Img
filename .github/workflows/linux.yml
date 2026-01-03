@@ -69,8 +69,8 @@ jobs:
           path: |
             ~/.redoxer
             ~/.cargo/bin/redoxer
-          key: redoxer-${{ runner.os }}
-          restore-keys: redoxer-${{ runner.os }}
+          key: redoxer-${{ runner.os }}-${{ runner.arch }}
+          restore-keys: redoxer-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Release
         run: |
@@ -101,14 +101,11 @@ jobs:
           if [ ! -d ~/.redoxer ]; then
             redoxer toolchain
           fi
-          redoxer list
+
           targets=(
-            aarch64-unknown-redox
             x86_64-unknown-redox
-            riscv64gc-unknown-redox
           )
           for target in ${targets[@]}; do
-            redoxer toolchain default $target
             time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
