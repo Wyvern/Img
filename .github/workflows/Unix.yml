@@ -78,17 +78,13 @@ jobs:
             fi
           done
 
-          netbsd=(amd64 evbarm-aarch64 evbarm-earmv7hf)
+          netbsd=(amd64 evbarm-aarch64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
             if [ ! -d sysroot/netbsd/$arch ]; then
               mkdir -p sysroot/netbsd/$arch
               for file in "${files[@]}"; do
-              if [[ "$arch" == evbarm-earmv7hf* ]]; then
-                  curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tgz | tar -xzf - -C sysroot/netbsd/$arch 2>/dev/null &
-              else
-                  curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
-              fi
+                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
               done
             fi
           done
@@ -104,7 +100,6 @@ jobs:
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
           targets=(
-            armv7-unknown-netbsd-eabihf
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd

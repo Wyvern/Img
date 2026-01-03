@@ -423,12 +423,6 @@ rustflags = [
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
 
-[target.armv7-unknown-netbsd-eabihf]
-rustflags = [
-  "-Clink-arg=--sysroot=sysroot/netbsd/evbarm-earmv7hf",
-  "-Clink-arg=--target=armv7--netbsd-eabihf",
-]
-
 [target.'cfg(target_os = "openbsd")']
 rustflags = ["-Ctarget-feature=+crt-static"]
 
