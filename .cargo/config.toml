@@ -364,7 +364,7 @@ linker = "mipsisa64r6el-linux-gnuabi64-gcc"
 rustflags = ["-Zrelax-elf-relocations"]
 
 
-[target.'cfg(all(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"),not(target_arch=sparc64)))']
+[target.'cfg(all(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"),not(target_arch="sparc64")))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
@@ -424,7 +424,7 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-netbsd]
-# linker="gcc"
+linker="./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
   "-Clink-arg=--target=sparc64--netbsd",
