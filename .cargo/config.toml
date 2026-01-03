@@ -423,6 +423,12 @@ rustflags = [
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
 
+[target.sparc64-unknown-netbsd]
+rustflags = [
+  "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
+  "-Clink-arg=--target=sparc64--netbsd",
+]
+
 [target.'cfg(target_os = "openbsd")']
 rustflags = ["-Ctarget-feature=+crt-static"]
 
