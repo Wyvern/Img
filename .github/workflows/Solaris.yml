@@ -38,9 +38,8 @@ jobs:
       - name: Cross-rs
         run: |
           # cargo install cross --git https://github.com/cross-rs/cross --branch main -q
-          wget https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
-          sudo mv cross /usr/local/bin/
+          wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+          sudo mv cross ~/.cargo/bin/
           cross --version
 
       - name: Cache Fuchsia
