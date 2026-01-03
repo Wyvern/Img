@@ -24,7 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: x86_64-fortanix-unknown-sgx
+          targets: x86_64-fortanix-unknown-sgx,x86_64-unknown-illumos,x86_64-pc-solaris,sparcv9-sun-solaris
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -113,7 +113,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cross build -q --config 'build.rustc-wrapper=""' --profile lto --target $target
+            time cross build -q --config 'build.rustc-wrapper=""' --profile lto  --target $target
           done
 
           # sudo zfs destroy -r solaris/omnios
