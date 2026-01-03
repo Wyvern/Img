@@ -36,7 +36,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 musl-tools -y
+          sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 musl-tools libfuse3-dev -y
 
       - name: Cache Redoxer
         uses: actions/cache@v4
@@ -62,12 +62,7 @@ jobs:
             redoxer toolchain
           fi
 
-          targets=(
-            aarch64-unknown-redox
-          )
-          for target in ${targets[@]}; do
-            time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-          done
+          time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target aarch64-unknown-redox
 
           targets=(
             powerpc64le-unknown-linux-gnu
@@ -109,6 +104,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  "aarch64-unknown-redox Redox-aarch64"
                   "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
                   "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"
                   "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"

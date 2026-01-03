@@ -102,12 +102,7 @@ jobs:
             redoxer toolchain
           fi
 
-          targets=(
-            x86_64-unknown-redox
-          )
-          for target in ${targets[@]}; do
-            time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-          done
+          time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target x86_64-unknown-redox
 
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
