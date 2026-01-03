@@ -37,9 +37,11 @@ jobs:
 
       - name: Cross-rs
         run: |
-          wget https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
-          sudo mv cross /usr/local/bin/
+          cargo install cross --git https://github.com/cross-rs/cross --branch main -q
+          cross --version
+          # wget https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz
+          # tar -xzf cross-x86_64-unknown-linux-gnu.tar.gz
+          # sudo mv cross /usr/local/bin/
 
       - name: Cache Fuchsia
         uses: actions/cache@v4
