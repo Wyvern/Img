@@ -98,7 +98,7 @@ jobs:
           chmod -R u+rwX sysroot
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
-          sudo snap install zig --classic --beta
+
           targets=(
             sparc64-unknown-netbsd
             x86_64-unknown-dragonfly
