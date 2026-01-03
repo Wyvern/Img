@@ -100,10 +100,11 @@ jobs:
           fi
           if [ ! -d ~/.redoxer ]; then
             redoxer toolchain
-            redoxer install aarch64-unknown-redox
-            redoxer install riscv64gc-unknown-redox
-          fi
 
+          fi
+          redoxer install aarch64-unknown-redox
+          redoxer install riscv64gc-unknown-redox
+          redoxer toolchain list
           targets=(
             aarch64-unknown-redox
             x86_64-unknown-redox
