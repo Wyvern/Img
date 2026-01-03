@@ -113,7 +113,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+            time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size -Zdual-proc-macros --target $target
           done
 
           # sudo zfs destroy -r solaris/omnios
