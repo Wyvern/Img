@@ -88,15 +88,6 @@ jobs:
               done
             fi
           done
-          netbsd=(evbmips-mipsel evbppc)
-          for arch in "${netbsd[@]}"; do
-            if [ ! -d sysroot/netbsd/$arch ]; then
-              mkdir -p sysroot/netbsd/$arch
-              for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tgz | tar -xzf - -C sysroot/netbsd/$arch 2>/dev/null &
-              done
-            fi
-          done
 
           if [ ! -f sysroot/dfly-x86_64-6.4.2_REL.iso ]; then
             curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-6.4.2_REL.iso &
@@ -109,8 +100,6 @@ jobs:
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
           targets=(
-            mipsel-unknown-netbsd
-            powerpc-unknown-netbsd
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
