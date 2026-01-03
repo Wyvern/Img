@@ -100,17 +100,15 @@ jobs:
           fi
           if [ ! -d ~/.redoxer ]; then
             redoxer toolchain
-
           fi
-          redoxer install aarch64-unknown-redox
-          redoxer install riscv64gc-unknown-redox
-          redoxer toolchain list
+          redoxer list
           targets=(
             aarch64-unknown-redox
             x86_64-unknown-redox
             riscv64gc-unknown-redox
           )
           for target in ${targets[@]}; do
+            redoxer toolchain default $target
             time redoxer build -- -q --profile redox -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
