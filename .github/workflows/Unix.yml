@@ -84,7 +84,11 @@ jobs:
             if [ ! -d sysroot/netbsd/$arch ]; then
               mkdir -p sysroot/netbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
+              if [[ "$arch" == evbarm-earmv7hf* ]]; then
+                  curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tgz | tar -xzf - -C sysroot/netbsd/$arch 2>/dev/null &
+              else
+                  curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
+              fi
               done
             fi
           done
