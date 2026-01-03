@@ -427,6 +427,8 @@ rustflags = [
 # linker="./zig-cc.sh"
 rustflags = [
   "-Crelocation-model=pic",
+  "-Ccode-model=small",
+  # "-Clink-arg=-no-pie",
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
   "-Clink-arg=--target=sparc64--netbsd",
 ]
