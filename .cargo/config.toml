@@ -427,7 +427,7 @@ rustflags = [
 linker="./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
-  "-Clink-arg=--target=sparc64--netbsd",
+  "-Clink-arg=--target=sparc64-netbsd",
 ]
 
 [target.'cfg(target_os = "openbsd")']
