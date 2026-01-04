@@ -269,25 +269,24 @@ jobs:
       - name: Cache Fuchsia
         uses: actions/cache@v4
         with:
-          path: /home/runner/Fuchsia
+          path: /opt/Fuchsia
           key: ${{ runner.os }}-${{ runner.arch }}-Fuchsia
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-Fuchsia
+          restore-keys: ${{ runner.os }}-${{ runner.arch }}-Fuchsia
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          if [ ! -d /home/runner/Fuchsia ]; then
+          if [ ! -d /opt/Fuchsia ]; then
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=mac-arm64&version=latest' -o cipd
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
-            sudo mkdir -p /home/runner/Fuchsia
-            cipd install fuchsia/sdk/core/mac-arm64 latest -root /home/runner/Fuchsia
+            sudo mkdir -p /opt/Fuchsia
+            cipd install fuchsia/sdk/core/mac-arm64 latest -root /opt/Fuchsia
           fi
 
-          ln -sf /home/runner/Fuchsia fuchsia
+          ln -sf /opt/Fuchsia fuchsia
 
           targets=(
             aarch64-unknown-fuchsia
