@@ -98,8 +98,7 @@ jobs:
           chmod -R u+rwX sysroot
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
-          cargo s sparc64-unknown-netbsd
-          exit
+
           targets=(
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
