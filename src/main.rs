@@ -1,16 +1,19 @@
+#![feature(cfg_select)]
+
 mod util;
+use arcdom as dom;
 use {std::*, util::*};
 
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; if cfg!(debug_assertions) { 7 } else { 6 }] = [
+static CURL: [&str; cfg_select! {debug_assertions=>7,_=>6}] = [
     "--compressed",
     "-kfsL",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
-    "--tcp-nodelay",
+    "--http2",
     #[cfg(debug_assertions)]
     "-S",
     // "-OJ",
@@ -22,14 +25,9 @@ static IMGS: [&str; 18] = [
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 
 fn check_args() -> (String, String) {
-    let mut args;
-    #[cfg(test)]
-    {
-        args = env::args().skip(3);
-    }
-    #[cfg(not(test))]
-    {
-        args = env::args();
+    let mut args = cfg_select! {
+        test=>{env::args().skip(3)}
+        _=>{env::args()}
     };
     if args.len() > 3 {
         quit!("Too many arguments.\nUsage: {}", "Img <url> [dir]");
@@ -42,6 +40,12 @@ fn check_args() -> (String, String) {
 }
 
 fn main() {
+    #[cfg(not(any(windows, unix)))]
+    match process::Command::new("curl").arg("--version").output() {
+        Ok(output) if output.status.success() => (),
+        _ => quit!("The <curl> is not installed, program exit!"),
+    };
+
     let (url, dir) = check_args();
 
     if !dir.is_empty() {
@@ -56,10 +60,11 @@ fn main() {
 
     check_host(&url);
 
-    let mut next_page = parse(&url);
-    if cfg!(not(test)) {
-        while !next_page.is_empty() {
-            next_page = parse(&next_page);
+    let mut _next_page = parse(&url);
+    #[cfg(not(test))]
+    {
+        while !_next_page.is_empty() {
+            _next_page = parse(&_next_page);
         }
     }
 }
@@ -149,7 +154,7 @@ fn parse(addr: &str) -> String {
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
     let [mut img, mut next_sel, mut album, mut title_sel] = host_info(host);
-    let page = crabquery::Document::from(&html[..ll]);
+    let page = dom::Document::from(&html[..ll]);
 
     if img.is_none() {
         let cat = JSON
@@ -450,7 +455,7 @@ fn parse(addr: &str) -> String {
                             .output()
                             .unwrap();
                         let html = String::from_utf8_lossy(&o.stdout);
-                        let page = crabquery::Document::from(html.as_ref());
+                        let page = dom::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
                         for e in html_img {
@@ -644,24 +649,16 @@ fn canonicalize(url: &str, addr: &str) -> String {
 
 ///replace os specific special/reversed chars in path name
 fn sanitize_path(name: &str) -> String {
-    #[cfg(target_os = "macos")]
-    {
-        name.replace("/", ":")
-    }
-
-    #[cfg(any(all(unix, not(target_os = "macos")), target_family = "wasm"))]
-    {
-        name.replace("/", "_")
-    }
-
-    #[cfg(target_family = "windows")]
-    {
-        name.chars()
+    cfg_select! {
+        target_os = "macos"=> {name.replace("/", ":")}
+        any(all(unix, not(target_os = "macos")), target_family = "wasm")=>{name.replace("/", "_")}
+        target_family = "windows"=>{name.chars()
             .map(|c| match c {
                 '\\' | '/' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
                 _ => c,
             })
-            .collect()
+            .collect()}
+        _=>{name.into()}
     }
 }
 ///Perform photo download operation
@@ -870,7 +867,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
+fn check_next(next: &str, cur: &str, page: dom::Document) -> String {
     let mut next_link: String;
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
@@ -881,7 +878,7 @@ fn check_next(next: &str, cur: &str, page: crabquery::Document) -> String {
         .rsplit(['[', ']'])
         .nth(1)
         .unwrap_or("href");
-    let set_next = |tags: &[crabquery::Element]| -> String {
+    let set_next = |tags: &[dom::Element]| -> String {
         let tag = tags.iter().find(|e| {
             e.tag().unwrap() == "a"
                 || e.children()
@@ -1079,12 +1076,10 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             };
             print!("{CL}{char}..{time}");
             _ = o.flush();
-            match r.try_recv() {
-                Err(TryRecvError::Empty) => (),
+            match r.recv_timeout(time::Duration::from_millis(200)) {
+                Err(RecvTimeoutError::Timeout) => (),
                 _ => break 'l,
             }
-            thread::yield_now();
-            thread::sleep(time::Duration::from_millis(200));
         }
     }
     print!("{CL}");
@@ -1288,7 +1283,6 @@ mod img {
         thread::spawn(|| {
             circle_indicator(r);
         });
-        thread::yield_now();
         thread::sleep(time::Duration::from_secs(5));
         s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
     }

@@ -168,7 +168,6 @@ impl<T: fmt::Debug> Dbg for T {}
 
 pub fn pause() {
     use io::*;
-
     #[cfg(target_family = "unix")]
     {
         use termion::input::TermRead;
@@ -191,7 +190,7 @@ pub fn pause() {
             o.flush().unwrap();
         }
     }
-    #[cfg(any(target_family = "windows", target_family = "wasm"))]
+    #[cfg(not(target_family = "unix"))]
     {
         let mut o = stdout().lock();
         write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();

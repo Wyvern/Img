@@ -283,7 +283,7 @@ jobs:
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=mac-arm64&version=latest' -o cipd
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
-            mkdir -p /home/runner/Fuchsia
+            sudo mkdir -p /home/runner/Fuchsia
             cipd install fuchsia/sdk/core/mac-arm64 latest -root /home/runner/Fuchsia
           fi
 
