@@ -4,7 +4,7 @@
   "crt-objects-fallback": "false",
   "data-layout": "E-m:e-i64:64-i128:128-n32:64-S128",
   "default-dwarf-version": 2,
-  "dynamic-linking": true,
+  "dynamic-linking": false,
   "has-rpath": true,
   "has-thread-local": true,
   "linker-flavor": "gnu-cc",
