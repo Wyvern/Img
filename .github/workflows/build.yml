@@ -284,7 +284,7 @@ jobs:
             sudo mv cipd /usr/local/bin/
             sudo mkdir -p /opt/Fuchsia
             sudo chown $(whoami) /opt/Fuchsia
-            cipd install fuchsia/sdk/core/mac-arm64 latest -root /opt/Fuchsia
+            cipd install fuchsia/sdk/core/mac-amd64 latest -root /opt/Fuchsia
           fi
 
           ln -sf /opt/Fuchsia fuchsia
