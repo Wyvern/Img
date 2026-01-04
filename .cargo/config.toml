@@ -155,8 +155,9 @@ rustflags = ["-Ctarget-cpu=native", "-Ztune-cpu=native", "-Cprefer-dynamic"]
 [build]
 rustflags = ["-Zpanic-in-drop=abort"]
 incremental = true
+build-dir = "build-dir"
+warnings = "allow"
 # rustc-wrapper = "sccache"
-# build-dir = true
 
 [package.metadata.docs.rs]
 all-features = true
