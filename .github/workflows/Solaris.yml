@@ -114,6 +114,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
+            export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
             time cross build -q --config 'build.rustc-wrapper=""' --profile src -Zbuild-std=std,proc_macro,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
