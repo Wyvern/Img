@@ -94,10 +94,10 @@ lto = true
 panic = "abort"
 codegen-units = 1
 [profile.lto.build-override]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 [profile.lto.package."*"]
-# rustflags = ["-Cprefer-dynamic"]
+rustflags = ["-Cprefer-dynamic"]
 inherits = "lto"
 
 #src
@@ -212,8 +212,6 @@ rustflags = [
 
   "-Anonstandard_style",
   "-Adead_code",
-  "-Awarnings",
-  "-Aunused",
   "-Aclippy::tabs_in_doc_comments",
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
