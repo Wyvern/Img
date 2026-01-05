@@ -157,6 +157,7 @@ rustflags = ["-Zpanic-in-drop=abort"]
 incremental = true
 build-dir = "build-dir"
 warnings = "allow"
+rustflags = ["-Awarnings", "-Aunused"]
 # rustc-wrapper = "sccache"
 
 [package.metadata.docs.rs]
@@ -214,7 +215,6 @@ rustflags = [
   "-Anonstandard_style",
   "-Adead_code",
   "-Aclippy::tabs_in_doc_comments",
-  "-Awarnings",
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
   "-Wlinker_messages",
