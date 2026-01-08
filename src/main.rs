@@ -24,7 +24,7 @@ static IMGS: [&str; 18] = [
 ];
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 
-fn check_args() -> (String, String) {
+fn check_args() -> [String; 2] {
     let mut args = cfg_select! {
         test=>{env::args().skip(3)}
         _=>{env::args()}
@@ -36,7 +36,7 @@ fn check_args() -> (String, String) {
         quit!("Please input <url> argument.");
     });
     let dir = args.next().unwrap_or_default();
-    (url, dir)
+    [url, dir]
 }
 
 fn main() {
@@ -46,7 +46,7 @@ fn main() {
         _ => quit!("The <curl> is not installed, program exit!"),
     };
 
-    let (url, dir) = check_args();
+    let [url, dir] = check_args();
 
     if !dir.is_empty() {
         let path = path::Path::new(&dir);
@@ -88,7 +88,7 @@ fn check_host(addr: &str) -> &str {
 }
 
 ///Get `host` info and Generate `img/next/album` selector data
-fn host_info(host: &str) -> [Option<&str>; 4] {
+fn host_info(host: &str) -> [Option<&str>; 5] {
     let site = JSON
         .get_or_init(website)
         .as_object()
@@ -110,8 +110,8 @@ fn host_info(host: &str) -> [Option<&str>; 4] {
             })
         });
 
-    site.map_or([None; 4], |s| {
-        ["Img", "Next", "Album", "Title"].map(|key| s[key].as_str().map(|v| v.trim()))
+    site.map_or([None; 5], |s| {
+        ["Img", "Next", "Album", "Title", "Page"].map(|key| s[key].as_str().map(|v| v.trim()))
     })
 }
 
@@ -153,7 +153,13 @@ fn parse(addr: &str) -> String {
     let (html, ll) = get_html(addr);
     let url_effective = &html[ll + 1..];
     let host = check_host(url_effective);
-    let [mut img, mut next_sel, mut album, mut title_sel] = host_info(host);
+    let [
+        mut img,
+        mut next_sel,
+        mut album,
+        mut title_sel,
+        mut page_sel,
+    ] = host_info(host);
     let page = dom::Document::from(&html[..ll]);
 
     if img.is_none() {
@@ -178,7 +184,7 @@ fn parse(addr: &str) -> String {
             }
         }) {
             tdbg!(series[0]);
-            [img, next_sel, album, title_sel] = host_info(series[2]);
+            [img, next_sel, album, title_sel, page_sel] = host_info(series[2]);
         }
     }
 
@@ -464,13 +470,11 @@ fn parse(addr: &str) -> String {
                                 e.attr(a).and_then(|x| {
                                     let attr = x.trim();
                                     if !attr.is_empty()
-                                        && [".jpg", ".jpeg", ".png", ".webp", ".avif", ".bmp"]
-                                            .iter()
-                                            .any(|&ext| {
-                                                attr.rfind('.').is_some_and(|dot| {
-                                                    attr[dot..].eq_ignore_ascii_case(ext)
-                                                })
+                                        && IMGS.iter().any(|&ext| {
+                                            attr.rfind('.').is_some_and(|dot| {
+                                                attr[dot..].eq_ignore_ascii_case(ext)
                                             })
+                                        })
                                     {
                                         Some(x)
                                     } else {
@@ -480,7 +484,7 @@ fn parse(addr: &str) -> String {
                             });
                             let cano = || canonicalize(&src, addr);
                             urls.insert(
-                                title_alt.map_or_else(&cano, |x| format!("{}{SEP}{x}", cano())),
+                                title_alt.map_or_else(cano, |x| format!("{}{SEP}{x}", cano())),
                             );
                         }
                     }
@@ -588,6 +592,7 @@ fn parse(addr: &str) -> String {
                         _ => {
                             pl!("Canceled all albums download.");
                             next_sel = None;
+                            page_sel = None;
                             break;
                         }
                     };
@@ -597,29 +602,32 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    next_sel.map_or_else(<_>::default, |n| {
-        if n == "<script>" {
-            if json_len == 0 {
-                String::default()
+    next_sel.map_or_else(
+        || page_sel.map_or_else(<_>::default, |p| check_next(p, addr, &page)),
+        |n| {
+            if n == "<script>" {
+                if json_len == 0 {
+                    String::default()
+                } else {
+                    let num = addr
+                        .split_terminator('/')
+                        .next_back()
+                        .unwrap_or("")
+                        .parse::<u8>()
+                        .unwrap_or(1);
+                    let next_page = format!(
+                        "{}/{}",
+                        addr.trim_end_matches('/')
+                            .trim_end_matches(&format!("/{num}")),
+                        num + 1
+                    );
+                    tdbg!(next_page)
+                }
             } else {
-                let num = addr
-                    .split_terminator('/')
-                    .next_back()
-                    .unwrap_or("")
-                    .parse::<u8>()
-                    .unwrap_or(1);
-                let next_page = format!(
-                    "{}/{}",
-                    addr.trim_end_matches('/')
-                        .trim_end_matches(&format!("/{num}")),
-                    num + 1
-                );
-                tdbg!(next_page)
+                check_next(n, addr, &page)
             }
-        } else {
-            check_next(n, addr, page)
-        }
-    })
+        },
+    )
 }
 
 ///Canonicalize `img/next` link `url` in `addr`
@@ -867,7 +875,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(next: &str, cur: &str, page: dom::Document) -> String {
+fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     let mut next_link: String;
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
@@ -1187,7 +1195,7 @@ mod img {
         let addr = arg("https://www.hotgirlpix.com/");
         let host = check_host(&addr);
         let (html, ll) = get_html(&addr);
-        let [img, _, album, _] = host_info(host);
+        let [img, _, album, ..] = host_info(host);
         use process::*;
 
         let hq = |sel: &str| {
