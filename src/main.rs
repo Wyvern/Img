@@ -24,7 +24,7 @@ static IMGS: [&str; 18] = [
 ];
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 
-fn check_args() -> (String, String) {
+fn check_args() -> [String; 2] {
     let mut args = cfg_select! {
         test=>{env::args().skip(3)}
         _=>{env::args()}
@@ -36,7 +36,7 @@ fn check_args() -> (String, String) {
         quit!("Please input <url> argument.");
     });
     let dir = args.next().unwrap_or_default();
-    (url, dir)
+    [url, dir]
 }
 
 fn main() {
@@ -46,7 +46,7 @@ fn main() {
         _ => quit!("The <curl> is not installed, program exit!"),
     };
 
-    let (url, dir) = check_args();
+    let [url, dir] = check_args();
 
     if !dir.is_empty() {
         let path = path::Path::new(&dir);
