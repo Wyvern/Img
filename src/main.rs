@@ -567,35 +567,74 @@ fn parse(addr: &str) -> String {
                     );
                     _ = write!(
                         stdout,
-                        "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel: {N}",
+                        "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel[Esc]: {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
                     );
                     _ = stdout.flush();
 
-                    let mut input = String::new();
-                    stdin.read_line(&mut input).unwrap_or_else(|e| {
-                        quit!("{}", e);
-                    });
-                    input.make_ascii_lowercase();
+                    #[cfg(target_family = "unix")]
+                    {
+                        use termion::event::Key;
+                        use termion::input::TermRead;
+                        use termion::raw::IntoRawMode;
 
-                    match input.trim() {
-                        "y" | "yes" | "" => parse_album(),
-                        "n" | "no" => {
-                            next_sel = None;
-                            continue;
+                        let mut o = stdout.into_raw_mode().unwrap();
+                        let clear = || {
+                            write!(o, "{CL}").unwrap();
+                            o.flush().unwrap();
+                            drop(o);
+                        };
+                        match stdin.keys().next() {
+                            Some(Ok(Key::Char('y') | Key::Char('Y') | Key::Char('\n'))) => {
+                                clear();
+                                parse_album()
+                            }
+                            Some(Ok(Key::Char('n') | Key::Char('N'))) => {
+                                clear();
+                                next_sel = None;
+                                continue;
+                            }
+                            Some(Ok(Key::Char('a') | Key::Char('A'))) => {
+                                clear();
+                                all = true;
+                                parse_album()
+                            }
+                            _ => {
+                                clear();
+                                pl!("⤴ Canceled all albums download.");
+                                next_sel = None;
+                                page_sel = None;
+                                break;
+                            }
                         }
-                        "a" | "all" => {
-                            all = true;
-                            parse_album()
-                        }
-                        _ => {
-                            pl!("Canceled all albums download.");
-                            next_sel = None;
-                            page_sel = None;
-                            break;
-                        }
-                    };
+                    }
+                    #[cfg(not(target_family = "unix"))]
+                    {
+                        let mut input = String::new();
+                        stdin.read_line(&mut input).unwrap_or_else(|e| {
+                            quit!("{}", e);
+                        });
+                        input.make_ascii_lowercase();
+
+                        match input.trim() {
+                            "y" | "yes" | "" => parse_album(),
+                            "n" | "no" => {
+                                next_sel = None;
+                                continue;
+                            }
+                            "a" | "all" => {
+                                all = true;
+                                parse_album()
+                            }
+                            _ => {
+                                pl!("⤴ Canceled all albums download.");
+                                next_sel = None;
+                                page_sel = None;
+                                break;
+                            }
+                        };
+                    }
                 }
             }
         }

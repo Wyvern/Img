@@ -696,6 +696,10 @@
       "Site": "dzdmr.com",
       "Img": "article.article-content img",
       "Album": "article.excerpt h2 > a"
+    },
+    {
+      "Site": "lustbb.com",
+      "Img": "div.post_body img"
     }
   ],
   "Series": [
