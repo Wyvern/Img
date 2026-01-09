@@ -170,6 +170,7 @@ pub fn pause() {
     use io::*;
     #[cfg(target_family = "unix")]
     {
+        use termion::event::Key;
         use termion::input::TermRead;
         use termion::raw::IntoRawMode;
 
@@ -178,10 +179,8 @@ pub fn pause() {
         o.flush().unwrap();
 
         let i = stdin();
-        if let Some(Ok(termion::event::Key::Char('q') | termion::event::Key::Char('Q'))) =
-            i.keys().next()
-        {
-            write!(o, "{CL}Quit!").unwrap();
+        if let Some(Ok(Key::Char('q') | Key::Char('Q') | Key::Esc)) = i.keys().next() {
+            write!(o, "{CL}⏏!").unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);
