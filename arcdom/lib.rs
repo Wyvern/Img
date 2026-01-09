@@ -423,6 +423,37 @@ impl TreeSink for ArcDom {
             panic!("not an element!")
         }
     }
+
+    fn mark_script_already_started(&self, _node: &Self::Handle) {}
+
+    fn pop(&self, _node: &Self::Handle) {}
+
+    fn associate_with_form(
+        &self,
+        _target: &Self::Handle,
+        _form: &Self::Handle,
+        _nodes: (&Self::Handle, Option<&Self::Handle>),
+    ) {
+    }
+
+    fn set_current_line(&self, _line_number: u64) {}
+
+    fn allow_declarative_shadow_roots(&self, _intended_parent: &Self::Handle) -> bool {
+        true
+    }
+
+    fn attach_declarative_shadow(
+        &self,
+        _location: &Self::Handle,
+        _template: &Self::Handle,
+        _attrs: &[Attribute],
+    ) -> bool {
+        false
+    }
+
+    fn clone_subtree(&self, _node: &Self::Handle) -> Self::Handle {
+        todo!()
+    }
 }
 
 impl Default for ArcDom {
