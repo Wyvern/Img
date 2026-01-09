@@ -616,18 +616,27 @@ fn parse(addr: &str) -> String {
                             quit!("{}", e);
                         });
                         input.make_ascii_lowercase();
-
+                        let mut clear = || {
+                            write!(stdout, "{UP}{CL}").unwrap();
+                            stdout.flush().unwrap();
+                        };
                         match input.trim() {
-                            "y" | "yes" | "" => parse_album(),
+                            "y" | "yes" | "" => {
+                                clear();
+                                parse_album()
+                            }
                             "n" | "no" => {
+                                clear();
                                 next_sel = None;
                                 continue;
                             }
                             "a" | "all" => {
+                                clear();
                                 all = true;
                                 parse_album()
                             }
                             _ => {
+                                clear();
                                 pl!("⤴ Canceled all albums download.");
                                 next_sel = None;
                                 page_sel = None;
