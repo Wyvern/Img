@@ -7,8 +7,6 @@ use std::io;
 use std::mem;
 use std::sync::{Arc, Weak};
 
-type StrTendril = markup5ever::tendril::StrTendril;
-
 use markup5ever::Attribute;
 use markup5ever::QualName;
 use markup5ever::interface::tree_builder;
@@ -16,6 +14,7 @@ use markup5ever::interface::tree_builder::{ElementFlags, NodeOrText, QuirksMode,
 use markup5ever::serialize::TraversalScope;
 use markup5ever::serialize::TraversalScope::{ChildrenOnly, IncludeNode};
 use markup5ever::serialize::{Serialize, Serializer};
+use markup5ever::tendril::StrTendril;
 
 /// The different kinds of nodes in the DOM.
 #[derive(Debug)]
