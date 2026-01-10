@@ -567,7 +567,7 @@ fn parse(addr: &str) -> String {
                     );
                     _ = write!(
                         stdout,
-                        "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel[Esc]: {N}",
+                        "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel ␛ : {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
                     );
