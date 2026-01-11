@@ -178,6 +178,7 @@ profile-hint-mostly-unused = true
 panic-immediate-abort = true
 rustc-unicode = true
 fine-grain-locking = true
+any-build-script-metadata = true
 
 # build-std = [
 #     "core",
