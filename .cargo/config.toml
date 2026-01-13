@@ -111,7 +111,6 @@ rustflags = [
   "-Zforce-unstable-if-unmarked",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
-  "-Zembed-metadata=no",
   "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.src.build-override]
@@ -120,7 +119,6 @@ rustflags = [
   # "-Cprefer-dynamic",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
-  "-Zembed-metadata=no",
 ]
 [profile.src.package."*"]
 inherits = "src"
@@ -223,6 +221,7 @@ rustflags = [
   "-Cjump-tables=false",
 
   "-Zunstable-options",
+  "-Zembed-metadata=no",
   "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
