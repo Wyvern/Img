@@ -176,6 +176,7 @@ rustflags = [
   "-Ccollapse-macro-debuginfo=y",
 
   "-Zunstable-options",
+  "-Zembed-metadata=no",
   "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
