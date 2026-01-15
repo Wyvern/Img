@@ -265,11 +265,10 @@ rustflags = [
   "-Wlinker_messages",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64"))))']
+[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", target_arch="powerpc64"))))']
 rustflags = [
-  # "-Clink-self-contained=+linker",
-  # "-Clinker-features=+lld",
-  "-Clink-arg=-fuse-ld=mold",
+  "-Clink-self-contained=+linker",
+  "-Clinker-features=+lld",
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--relax",
 ]
