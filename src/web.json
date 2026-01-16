@@ -410,8 +410,8 @@
       "Album": "div.card-body a"
     },
     {
-      "Site": "legbabe.com",
-      "Img": "div.col-md-2 > a[href] | img.img-res",
+      "Site": "legbabe.com,nlegs.com",
+      "Img": "div.col-md-2 > a[href] | img#Image1",
       "Next": "ul.pagination a",
       "Album": "div > span.title"
     },

@@ -291,14 +291,15 @@ fn parse(addr: &str) -> String {
     );
 
     let mut t = if title_sel.is_some() {
-        title.as_str()
+        &title
     } else {
         title
             .rsplitn(5, ['/', '-', '_', '|', '–'])
             .skip(1)
             .max_by_key(|x| x.trim().len())
-            .unwrap_or(title.as_str())
-    };
+            .unwrap_or(&title)
+    }
+    .trim();
 
     let [albums_len, imgs_len, json_len] = [
         albums.as_ref().map_or(0, |a| a.len()),
