@@ -412,8 +412,61 @@ impl TreeSink for ArcDom {
         false
     }
 
-    fn clone_subtree(&self, _node: &Self::Handle) -> Self::Handle {
-        todo!()
+    fn clone_subtree(&self, node: &Self::Handle) -> Self::Handle {
+        fn clone_node(node: &Handle) -> Handle {
+            let cloned = match &node.data {
+                NodeData::Document => Node::new(NodeData::Document),
+
+                NodeData::Doctype {
+                    name,
+                    public_id,
+                    system_id,
+                } => Node::new(NodeData::Doctype {
+                    name: name.clone(),
+                    public_id: public_id.clone(),
+                    system_id: system_id.clone(),
+                }),
+
+                NodeData::Text { contents } => Node::new(NodeData::Text {
+                    contents: RefCell::new(contents.borrow().clone()),
+                }),
+
+                NodeData::Comment { contents } => Node::new(NodeData::Comment {
+                    contents: contents.clone(),
+                }),
+
+                NodeData::ProcessingInstruction { target, contents } => {
+                    Node::new(NodeData::ProcessingInstruction {
+                        target: target.clone(),
+                        contents: contents.clone(),
+                    })
+                }
+
+                NodeData::Element {
+                    name,
+                    attrs,
+                    template_contents,
+                    mathml_annotation_xml_integration_point,
+                } => Node::new(NodeData::Element {
+                    name: name.clone(),
+                    attrs: RefCell::new(attrs.borrow().clone()),
+                    template_contents: template_contents.as_ref().map(clone_node),
+                    mathml_annotation_xml_integration_point:
+                        *mathml_annotation_xml_integration_point,
+                }),
+            };
+
+            // Clone children
+            for child in node.children.borrow().iter() {
+                let child_clone = clone_node(child);
+                child_clone.parent.set(Some(Arc::downgrade(&cloned)));
+                cloned.children.borrow_mut().push(child_clone);
+            }
+
+            cloned
+        }
+
+        clone_node(node)
     }
 }
 
