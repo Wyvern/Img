@@ -1,16 +1,16 @@
 use std::*;
 
 fn main() {
-    let target = env::var("TARGET").expect("TARGET environment variable is not set");
-    let parts = [2, 3];
-    let [_os, _abi] = array::from_fn(|n| target.split('-').nth(parts[n]).unwrap_or("unknown"));
+    use fs::*;
+    use io::*;
 
-    println!("cargo::rerun-if-changed=build.rs");
-    // println!("cargo::rustc-link-lib=lib");
-    // println!("cargo::rerun-if-env-changed=file");
-    // println!("cargo::rustc-flags=-l{}", "");
-    // println!("cargo::rustc-check-cfg=cfg(x,y)");
-    // println!("cargo::rustc-cfg=x");
+    let json_file = File::open("src/web.json").unwrap();
+    let reader = BufReader::new(json_file);
+    let value: serde_json::Value = serde_json::from_reader(reader).unwrap();
+
+    let cbor_file = File::create("src/web.cbor").unwrap();
+    let writer = BufWriter::new(cbor_file);
+    serde_cbor_2::to_writer(writer, &value).unwrap();
 }
 
 #[test]
