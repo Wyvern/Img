@@ -31,7 +31,6 @@ serde_json = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 
 [dev-dependencies]
-# zstd = "*"
 # file-format = { version = "*", features = ["reader-xml"] }
 
 [workspace]
