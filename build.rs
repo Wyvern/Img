@@ -11,6 +11,17 @@ fn main() {
     let cbor_file = File::create("src/web.cbor").unwrap();
     let writer = BufWriter::new(cbor_file);
     cbor4ii::serde::to_writer(writer, &value).unwrap();
+
+    #[cfg(unix)]
+    {
+        use process::Command;
+        let output = Command::new("gzip")
+            .args(["-kf", "src/web.cbor"])
+            .output()
+            .unwrap();
+
+        assert!(output.status.success());
+    }
 }
 
 #[test]

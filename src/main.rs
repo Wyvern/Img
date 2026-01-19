@@ -41,12 +41,6 @@ fn check_args() -> [String; 2] {
 }
 
 fn main() {
-    #[cfg(not(any(windows, unix)))]
-    match process::Command::new("curl").arg("--version").output() {
-        Ok(output) if output.status.success() => (),
-        _ => quit!("The <curl> is not installed, program exit!"),
-    };
-
     let [url, dir] = check_args();
 
     if !dir.is_empty() {
@@ -141,11 +135,11 @@ fn get_html(addr: &str) -> (String, usize) {
     _ = s.send(());
     if !out.stderr.is_empty() {
         let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
-        quit!("Fetch {} failed - {err}", addr);
+        quit!("Fetch {} failed : {}", addr, err.trim());
     }
     let s = String::from_utf8_lossy(&out.stdout).into_owned();
     let ll = s.rfind('\n').unwrap();
-    _ = h.join();
+    h.join().unwrap();
     (s, ll)
 }
 
@@ -1081,10 +1075,19 @@ fn decompress(cmd: &str, data: &[u8]) -> Vec<u8> {
 
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
-    // let decompressed = decompress_with_system_zstd(include_bytes!("web.cbor.zst"));
-    cbor4ii::serde::from_slice(include_bytes!("web.cbor")).unwrap_or_else(|e| {
-        quit!("Read `web.cbor` failed: {}", e);
-    })
+    #[cfg(unix)]
+    {
+        let decompressed = decompress("gzip", include_bytes!("web.cbor.gz"));
+        cbor4ii::serde::from_slice(&decompressed).unwrap_or_else(|e| {
+            quit!("Read `web.cbor` failed: {}", e);
+        })
+    }
+    #[cfg(not(unix))]
+    {
+        cbor4ii::serde::from_slice(include_bytes!("web.cbor")).unwrap_or_else(|e| {
+            quit!("Read `web.cbor` failed: {}", e);
+        })
+    }
 }
 
 ///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` content to file.
