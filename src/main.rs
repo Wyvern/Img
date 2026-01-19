@@ -291,14 +291,15 @@ fn parse(addr: &str) -> String {
     );
 
     let mut t = if title_sel.is_some() {
-        title.as_str()
+        &title
     } else {
         title
             .rsplitn(5, ['/', '-', '_', '|', '–'])
             .skip(1)
             .max_by_key(|x| x.trim().len())
-            .unwrap_or(title.as_str())
-    };
+            .unwrap_or(&title)
+    }
+    .trim();
 
     let [albums_len, imgs_len, json_len] = [
         albums.as_ref().map_or(0, |a| a.len()),
@@ -567,7 +568,7 @@ fn parse(addr: &str) -> String {
                     );
                     _ = write!(
                         stdout,
-                        "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel[Esc]: {N}",
+                        "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel ␛ : {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
                     );
@@ -616,18 +617,27 @@ fn parse(addr: &str) -> String {
                             quit!("{}", e);
                         });
                         input.make_ascii_lowercase();
-
+                        let mut clear = || {
+                            write!(stdout, "{UP}{CL}").unwrap();
+                            stdout.flush().unwrap();
+                        };
                         match input.trim() {
-                            "y" | "yes" | "" => parse_album(),
+                            "y" | "yes" | "" => {
+                                clear();
+                                parse_album()
+                            }
                             "n" | "no" => {
+                                clear();
                                 next_sel = None;
                                 continue;
                             }
                             "a" | "all" => {
+                                clear();
                                 all = true;
                                 parse_album()
                             }
                             _ => {
+                                clear();
                                 pl!("⤴ Canceled all albums download.");
                                 next_sel = None;
                                 page_sel = None;
@@ -1053,8 +1063,8 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
 
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
-    serde_json::from_str(include_str!("web.json")).unwrap_or_else(|e| {
-        quit!("Read `web.json` failed: {}", e);
+    serde_cbor_2::from_slice(include_bytes!("web.cbor")).unwrap_or_else(|e| {
+        quit!("Read `web.cbor` failed: {}", e);
     })
 }
 
@@ -1271,6 +1281,20 @@ mod img {
         let var = 123;
         mutv!(var, 100 * 2 + 22);
         tdbg!(var);
+    }
+
+    #[test]
+    fn cbor() {
+        use fs::*;
+        use io::*;
+
+        let json_file = File::open("src/web.json").unwrap();
+        let reader = BufReader::new(json_file);
+        let value: serde_json::Value = serde_json::from_reader(reader).unwrap();
+
+        let cbor_file = File::create("src/web.cbor").unwrap();
+        let writer = BufWriter::new(cbor_file);
+        serde_cbor_2::to_writer(writer, &value).unwrap();
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>

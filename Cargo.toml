@@ -16,14 +16,19 @@ path = "src/color.rs"
 
 [dependencies]
 arcdom = { path = "arcdom" }
-serde_json = { version = "*", default-features = false, features = ["alloc"] }
+serde_json = "*"
 percent-encoding = "*"
+serde_cbor_2 = "*"
 
 base64 = { version = "*", default-features = false, optional = true }
 infer = { version = "*", default-features = false, optional = true }
 
 [target.'cfg(unix)'.dependencies]
 termion = "*"
+
+[build-dependencies]
+serde_json = "*"
+serde_cbor_2 = "*"
 
 [dev-dependencies]
 # file-format = { version = "*", features = ["reader-xml"] }

@@ -198,7 +198,7 @@ pub fn pause() {
         stdin().lock().read_line(&mut s).unwrap();
         s.make_ascii_lowercase();
         if s.trim() == "q" {
-            write!(o, "{UP}{CL}Quit!").unwrap();
+            write!(o, "{UP}{CL}⏏!").unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);

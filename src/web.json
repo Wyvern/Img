@@ -410,8 +410,8 @@
       "Album": "div.card-body a"
     },
     {
-      "Site": "legbabe.com",
-      "Img": "div.col-md-2 > a[href] | img.img-res",
+      "Site": "legbabe.com,nlegs.com",
+      "Img": "div.col-md-2 > a[href] | img#Image1",
       "Next": "ul.pagination a",
       "Album": "div > span.title"
     },
@@ -562,7 +562,7 @@
       "Album": "h1.entry-title > a"
     },
     {
-      "Site": "inewgirl.com,nshens.com,lovestatic.com",
+      "Site": "inewgirl.com,nshens.com,lovestatic.com,ijjiao.com",
       "Img": "json: key | photourl",
       "Next": "<script>"
     },
@@ -700,6 +700,11 @@
     {
       "Site": "lustbb.com",
       "Img": "div.post_body img"
+    },
+    {
+      "Site": "ijjiao.com",
+      "Img": "div.image-item div.v-image__image[style]",
+      "Next": "ul.v-pagination li[aria-current]"
     }
   ],
   "Series": [

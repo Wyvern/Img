@@ -1,41 +1,3 @@
-// Copyright 2014-2017 The html5ever Project Developers. See the
-// COPYRIGHT file at the top-level directory of this distribution.
-//
-// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
-// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
-// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
-// option. This file may not be copied, modified, or distributed
-// except according to those terms.
-
-//! A simple reference-counted DOM.
-//!
-//! This is sufficient as a static parse tree, but don't build a
-//! web browser using it. :)
-//!
-//! A DOM is a [tree structure] with ordered children that can be represented in an XML-like
-//! format. For example, the following graph
-//!
-//! ```text
-//! div
-//!  +- "text node"
-//!  +- span
-//! ```
-//! in HTML would be serialized as
-//!
-//! ```html
-//! <div>text node<span></span></div>
-//! ```
-//!
-//! See the [document object model article on wikipedia][dom wiki] for more information.
-//!
-//! This implementation stores the information associated with each node once, and then hands out
-//! refs to children. The nodes themselves are reference-counted to avoid copying - you can create
-//! a new ref and then a node will outlive the document. Nodes own their children, but only have
-//! weak references to their parents.
-//!
-//! [tree structure]: https://en.wikipedia.org/wiki/Tree_(data_structure)
-//! [dom wiki]: https://en.wikipedia.org/wiki/Document_Object_Model
-
 use std::borrow::Cow;
 use std::cell::{Cell, RefCell};
 use std::collections::HashSet;
@@ -45,8 +7,6 @@ use std::io;
 use std::mem;
 use std::sync::{Arc, Weak};
 
-use tendril::StrTendril;
-
 use markup5ever::Attribute;
 use markup5ever::QualName;
 use markup5ever::interface::tree_builder;
@@ -54,6 +14,7 @@ use markup5ever::interface::tree_builder::{ElementFlags, NodeOrText, QuirksMode,
 use markup5ever::serialize::TraversalScope;
 use markup5ever::serialize::TraversalScope::{ChildrenOnly, IncludeNode};
 use markup5ever::serialize::{Serialize, Serializer};
+use markup5ever::tendril::StrTendril;
 
 /// The different kinds of nodes in the DOM.
 #[derive(Debug)]
@@ -422,6 +383,90 @@ impl TreeSink for ArcDom {
         } else {
             panic!("not an element!")
         }
+    }
+
+    fn mark_script_already_started(&self, _node: &Self::Handle) {}
+
+    fn pop(&self, _node: &Self::Handle) {}
+
+    fn associate_with_form(
+        &self,
+        _target: &Self::Handle,
+        _form: &Self::Handle,
+        _nodes: (&Self::Handle, Option<&Self::Handle>),
+    ) {
+    }
+
+    fn set_current_line(&self, _line_number: u64) {}
+
+    fn allow_declarative_shadow_roots(&self, _intended_parent: &Self::Handle) -> bool {
+        true
+    }
+
+    fn attach_declarative_shadow(
+        &self,
+        _location: &Self::Handle,
+        _template: &Self::Handle,
+        _attrs: &[Attribute],
+    ) -> bool {
+        false
+    }
+
+    fn clone_subtree(&self, node: &Self::Handle) -> Self::Handle {
+        fn clone_node(node: &Handle) -> Handle {
+            let cloned = match &node.data {
+                NodeData::Document => Node::new(NodeData::Document),
+
+                NodeData::Doctype {
+                    name,
+                    public_id,
+                    system_id,
+                } => Node::new(NodeData::Doctype {
+                    name: name.clone(),
+                    public_id: public_id.clone(),
+                    system_id: system_id.clone(),
+                }),
+
+                NodeData::Text { contents } => Node::new(NodeData::Text {
+                    contents: RefCell::new(contents.borrow().clone()),
+                }),
+
+                NodeData::Comment { contents } => Node::new(NodeData::Comment {
+                    contents: contents.clone(),
+                }),
+
+                NodeData::ProcessingInstruction { target, contents } => {
+                    Node::new(NodeData::ProcessingInstruction {
+                        target: target.clone(),
+                        contents: contents.clone(),
+                    })
+                }
+
+                NodeData::Element {
+                    name,
+                    attrs,
+                    template_contents,
+                    mathml_annotation_xml_integration_point,
+                } => Node::new(NodeData::Element {
+                    name: name.clone(),
+                    attrs: RefCell::new(attrs.borrow().clone()),
+                    template_contents: template_contents.as_ref().map(clone_node),
+                    mathml_annotation_xml_integration_point:
+                        *mathml_annotation_xml_integration_point,
+                }),
+            };
+
+            // Clone children
+            for child in node.children.borrow().iter() {
+                let child_clone = clone_node(child);
+                child_clone.parent.set(Some(Arc::downgrade(&cloned)));
+                cloned.children.borrow_mut().push(child_clone);
+            }
+
+            cloned
+        }
+
+        clone_node(node)
     }
 }
 
