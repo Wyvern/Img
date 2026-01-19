@@ -1,6 +1,7 @@
 #![feature(cfg_select)]
 
 mod util;
+
 use arcdom as dom;
 use {std::*, util::*};
 
@@ -1061,8 +1062,26 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     tdbg!(next_link)
 }
 
+///Decompress cbor file
+fn decompress(cmd: &str, data: &[u8]) -> Vec<u8> {
+    let mut child = process::Command::new(cmd)
+        .args(["-d", "-c"])
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+
+    use std::io::Write;
+    child.stdin.as_mut().unwrap().write_all(data).unwrap();
+
+    let out = child.wait_with_output().unwrap();
+    assert!(out.status.success());
+    out.stdout
+}
+
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
+    // let decompressed = decompress_with_system_zstd(include_bytes!("web.cbor.zst"));
     cbor4ii::serde::from_slice(include_bytes!("web.cbor")).unwrap_or_else(|e| {
         quit!("Read `web.cbor` failed: {}", e);
     })
@@ -1295,6 +1314,18 @@ mod img {
         let cbor_file = File::create("src/web.cbor").unwrap();
         let writer = BufWriter::new(cbor_file);
         cbor4ii::serde::to_writer(writer, &value).unwrap();
+
+        compress_cbor("src/web.cbor");
+    }
+
+    fn compress_cbor(file: &str) {
+        use process::Command;
+        let output = Command::new("xz").args(["-kf", file]).output().unwrap();
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            quit!("zstd failed:\n{}", stderr.trim());
+        }
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
