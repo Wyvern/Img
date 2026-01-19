@@ -10,7 +10,7 @@ fn main() {
 
     let cbor_file = File::create("src/web.cbor").unwrap();
     let writer = BufWriter::new(cbor_file);
-    serde_cbor_2::to_writer(writer, &value).unwrap();
+    cbor4ii::serde::to_writer(writer, &value).unwrap();
 }
 
 #[test]

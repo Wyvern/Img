@@ -1063,7 +1063,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
 
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
-    serde_cbor_2::from_slice(include_bytes!("web.cbor")).unwrap_or_else(|e| {
+    cbor4ii::serde::from_slice(include_bytes!("web.cbor")).unwrap_or_else(|e| {
         quit!("Read `web.cbor` failed: {}", e);
     })
 }
@@ -1294,7 +1294,7 @@ mod img {
 
         let cbor_file = File::create("src/web.cbor").unwrap();
         let writer = BufWriter::new(cbor_file);
-        serde_cbor_2::to_writer(writer, &value).unwrap();
+        cbor4ii::serde::to_writer(writer, &value).unwrap();
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
