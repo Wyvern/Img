@@ -1,6 +1,8 @@
 use std::*;
 
 fn main() {
+    println!("cargo::rerun-if-changed=src/web.json");
+
     use fs::*;
     use io::*;
 

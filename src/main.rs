@@ -118,6 +118,7 @@ fn get_html(addr: &str) -> (String, usize) {
     let h = thread::spawn(|| {
         circle_indicator(r);
     });
+
     let out = process::Command::new("curl")
         .args(CURL)
         .args([
@@ -447,16 +448,12 @@ fn parse(addr: &str) -> String {
                         urls = newurls;
                     }
                     _ if !l.starts_with("json:") && !urls.is_empty() => {
-                        let mut curl = process::Command::new("curl");
-                        for u in &urls {
-                            curl.arg(u);
-                        }
-                        let o = curl
-                            .args(CURL)
-                            .args(["-Z", "--parallel-immediate"])
-                            .output()
-                            .unwrap();
-                        let html = String::from_utf8_lossy(&o.stdout);
+                        let mut args: Vec<&str> = Vec::new();
+                        args.extend(urls.iter().map(|s| s.as_str()));
+                        args.extend(CURL);
+                        args.extend(["-Z", "--parallel-immediate"]);
+                        let o = run_cmd("curl", &args, &[]);
+                        let html = String::from_utf8_lossy(&o);
                         let page = dom::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
@@ -1056,17 +1053,19 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     tdbg!(next_link)
 }
 
-///Decompress cbor file
-fn decompress(cmd: &str, data: &[u8]) -> Vec<u8> {
+///Run arbitrary command with options and input data
+fn run_cmd(cmd: &str, options: &[&str], data: &[u8]) -> Vec<u8> {
     let mut child = process::Command::new(cmd)
-        .args(["-d", "-c"])
-        .stdin(std::process::Stdio::piped())
-        .stdout(std::process::Stdio::piped())
+        .args(options)
+        .stdin(process::Stdio::piped())
+        .stdout(process::Stdio::piped())
         .spawn()
         .unwrap();
 
-    use std::io::Write;
-    child.stdin.as_mut().unwrap().write_all(data).unwrap();
+    if !data.is_empty() {
+        use std::io::Write;
+        child.stdin.as_mut().unwrap().write_all(data).unwrap();
+    }
 
     let out = child.wait_with_output().unwrap();
     assert!(out.status.success());
@@ -1077,7 +1076,7 @@ fn decompress(cmd: &str, data: &[u8]) -> Vec<u8> {
 fn website() -> serde_json::Value {
     #[cfg(unix)]
     {
-        let decompressed = decompress("gzip", include_bytes!("web.cbor.gz"));
+        let decompressed = run_cmd("gzip", &["-d", "-c"], include_bytes!("web.cbor.gz"));
         cbor4ii::serde::from_slice(&decompressed).unwrap_or_else(|e| {
             quit!("Read `web.cbor` failed: {}", e);
         })
@@ -1263,38 +1262,21 @@ mod img {
 
     #[test]
     fn htmlq() {
-        let addr = arg("https://www.hotgirlpix.com/");
+        let addr = arg("https://bisipic.online/");
         let host = check_host(&addr);
         let (html, ll) = get_html(&addr);
         let [img, _, album, ..] = host_info(host);
-        use process::*;
-
-        let hq = |sel: &str| {
-            let cmd = Command::new("htmlq")
-                .arg(sel)
-                .stdin(Stdio::piped())
-                //.stdout(Stdio::piped())
-                .spawn()
-                .expect("Execute htmlq failed.");
-            let mut stdin = cmd.stdin.as_ref().expect("Failed to open stdin.");
-            use io::*;
-            stdin
-                .write_all(html[..ll].as_ref())
-                .expect("Failed to write stdin.");
-            if let Ok(o) = cmd.wait_with_output() {
-                if !o.stdout.is_empty() {
-                    println!("Totally found {} <img>", o.stdout.lines().count());
-                }
-            }
-        };
+        use io::*;
 
         let i = img.unwrap_or("img[src]");
         pl!("{MARK} Image Selector: {HL} {i} ");
-        hq(i);
+        let mut r = run_cmd("htmlq", &[i], html[..ll].as_ref());
+        println!("Totally found {} <img>", r.lines().count());
 
         if let Some(a) = album {
             pl!("{MARK} Album Selector: {HL} {a} ");
-            hq(a)
+            r = run_cmd("htmlq", &[a], html[..ll].as_ref());
+            println!("{}", String::from_utf8_lossy(&r));
         }
     }
 
@@ -1318,17 +1300,7 @@ mod img {
         let writer = BufWriter::new(cbor_file);
         cbor4ii::serde::to_writer(writer, &value).unwrap();
 
-        compress_cbor("gzip", "src/web.cbor");
-    }
-
-    fn compress_cbor(cmd: &str, file: &str) {
-        use process::Command;
-        let output = Command::new(cmd).args(["-kf", file]).output().unwrap();
-
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            quit!("{cmd} failed: {}", stderr.trim());
-        }
+        run_cmd("gzip", &["-kf", "src/web.cbor"], &[]);
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
