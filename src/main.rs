@@ -1318,16 +1318,16 @@ mod img {
         let writer = BufWriter::new(cbor_file);
         cbor4ii::serde::to_writer(writer, &value).unwrap();
 
-        compress_cbor("src/web.cbor");
+        compress_cbor("gzip", "src/web.cbor");
     }
 
-    fn compress_cbor(file: &str) {
+    fn compress_cbor(cmd: &str, file: &str) {
         use process::Command;
-        let output = Command::new("xz").args(["-kf", file]).output().unwrap();
+        let output = Command::new(cmd).args(["-kf", file]).output().unwrap();
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            quit!("zstd failed:\n{}", stderr.trim());
+            quit!("{cmd} failed: {}", stderr.trim());
         }
     }
 

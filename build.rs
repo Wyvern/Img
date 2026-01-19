@@ -19,7 +19,6 @@ fn main() {
             .args(["-kf", "src/web.cbor"])
             .output()
             .unwrap();
-
         assert!(output.status.success());
     }
 }
