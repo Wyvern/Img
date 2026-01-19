@@ -18,7 +18,7 @@ path = "src/color.rs"
 arcdom = { path = "arcdom" }
 serde_json = "*"
 percent-encoding = "*"
-serde_cbor_2 = "*"
+cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 
 base64 = { version = "*", default-features = false, optional = true }
 infer = { version = "*", default-features = false, optional = true }
@@ -28,7 +28,7 @@ termion = "*"
 
 [build-dependencies]
 serde_json = "*"
-serde_cbor_2 = "*"
+cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 
 [dev-dependencies]
 # file-format = { version = "*", features = ["reader-xml"] }
