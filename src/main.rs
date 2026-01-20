@@ -1053,10 +1053,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     tdbg!(next_link)
 }
 
-///Run arbitrary command with options and input data
-fn run_cmd(cmd: &str, options: &[&str], data: &[u8]) -> Vec<u8> {
+///Run arbitrary command in sync mode
+fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
     let mut child = process::Command::new(cmd)
-        .args(options)
+        .args(args)
         .stdin(process::Stdio::piped())
         .stdout(process::Stdio::piped())
         .spawn()
@@ -1076,7 +1076,7 @@ fn run_cmd(cmd: &str, options: &[&str], data: &[u8]) -> Vec<u8> {
 fn website() -> serde_json::Value {
     #[cfg(unix)]
     {
-        let decompressed = run_cmd("gzip", &["-d", "-c"], include_bytes!("web.cbor.gz"));
+        let decompressed = run_cmd("gzip", &["-dc"], include_bytes!("web.cbor.gz"));
         cbor4ii::serde::from_slice(&decompressed).unwrap_or_else(|e| {
             quit!("Read `web.cbor` failed: {}", e);
         })
