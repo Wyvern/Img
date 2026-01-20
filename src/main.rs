@@ -135,8 +135,11 @@ fn get_html(addr: &str) -> (String, usize) {
         });
     _ = s.send(());
     if !out.stderr.is_empty() {
-        let err = String::from_utf8(out.stderr).unwrap_or_else(|e| e.to_string());
-        quit!("Fetch {} failed : {}", addr, err.trim());
+        quit!(
+            "Fetch {} failed : {}",
+            addr,
+            String::from_utf8_lossy(&out.stderr).trim()
+        );
     }
     let s = String::from_utf8_lossy(&out.stdout).into_owned();
     let ll = s.rfind('\n').unwrap();
