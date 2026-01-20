@@ -16,9 +16,17 @@ fn main() {
 
     #[cfg(unix)]
     {
-        use process::Command;
-        let output = Command::new("gzip")
+        let output = process::Command::new("gzip")
             .args(["-kf", "src/web.cbor"])
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+    }
+
+    #[cfg(windows)]
+    {
+        let output = process::Command::new("tar")
+            .args(["-czf", "src/web.tar.gz", "src/web.cbor"])
             .output()
             .unwrap();
         assert!(output.status.success());
