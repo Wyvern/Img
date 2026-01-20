@@ -1077,25 +1077,20 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
 
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
-    cfg_select! {
+    let data = cfg_select! {
         unix=>{
-            let decompressed = run_cmd("gzip", &["-dc"], include_bytes!("web.cbor.gz"));
-            cbor4ii::serde::from_slice(&decompressed).unwrap_or_else(|e| {
-                quit!("Read `web.cbor` failed: {}", e);
-            })
+            run_cmd("gzip", &["-dc"], include_bytes!("web.cbor.gz"))
         }
         windows=>{
-            let decompressed = run_cmd("tar", &["-xOzf", "-"], include_bytes!("web.tar.gz"));
-            cbor4ii::serde::from_slice(&decompressed).unwrap_or_else(|e| {
-                quit!("Read `web.cbor` failed: {}", e);
-            })
+            run_cmd("tar", &["-xOzf", "-"], include_bytes!("web.tar.gz"))
         }
         _=>{
-            cbor4ii::serde::from_slice(include_bytes!("web.cbor")).unwrap_or_else(|e| {
-                quit!("Read `web.cbor` failed: {}", e);
-            })
+            include_bytes!("web.cbor")
         }
-    }
+    };
+    cbor4ii::serde::from_slice(&data).unwrap_or_else(|e| {
+        quit!("Read `web.cbor` failed: {}", e);
+    })
 }
 
 ///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` content to file.
