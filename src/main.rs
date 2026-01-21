@@ -1085,7 +1085,7 @@ fn website() -> serde_json::Value {
             run_cmd("tar", &["-xOzf", "-"], include_bytes!("web.tar.gz"))
         }
         _=>{
-            include_bytes!("web.cbor")
+            *include_bytes!("web.cbor")
         }
     };
     cbor4ii::serde::from_slice(&data).unwrap_or_else(|e| {
