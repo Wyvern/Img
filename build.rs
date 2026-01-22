@@ -10,7 +10,7 @@ fn main() {
     let reader = BufReader::new(json_file);
     let value: serde_json::Value = serde_json::from_reader(reader).unwrap();
 
-    let cbor_file = File::create("src/web.cbor").unwrap();
+    let cbor_file = File::create("web.cbor").unwrap();
     let writer = BufWriter::new(cbor_file);
     cbor4ii::serde::to_writer(writer, &value).unwrap();
 
@@ -18,11 +18,11 @@ fn main() {
 
     let mut cmd = if family == "windows" {
         let mut c = process::Command::new("tar");
-        c.args(["-czf", "src/web.tar.gz", "src/web.cbor"]);
+        c.args(["-czf", "web.tar.gz", "web.cbor"]);
         c
     } else if family == "unix" {
         let mut c = process::Command::new("gzip");
-        c.args(["-kf", "src/web.cbor"]);
+        c.args(["-kf", "web.cbor"]);
         c
     } else {
         return;
