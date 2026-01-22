@@ -14,19 +14,17 @@ fn main() {
     let writer = BufWriter::new(cbor_file);
     cbor4ii::serde::to_writer(writer, &value).unwrap();
 
-    #[cfg(unix)]
-    {
-        let output = process::Command::new("gzip")
-            .args(["-kf", "src/web.cbor"])
+    let target = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
+
+    if target == "windows" {
+        let output = process::Command::new("tar")
+            .args(["-czf", "src/web.tar.gz", "src/web.cbor"])
             .output()
             .unwrap();
         assert!(output.status.success());
-    }
-
-    #[cfg(any(windows, target_abi = "llvm"))]
-    {
-        let output = process::Command::new("tar")
-            .args(["-czf", "src/web.tar.gz", "src/web.cbor"])
+    } else {
+        let output = process::Command::new("gzip")
+            .args(["-kf", "src/web.cbor"])
             .output()
             .unwrap();
         assert!(output.status.success());
