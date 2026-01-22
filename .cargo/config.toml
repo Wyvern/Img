@@ -240,9 +240,10 @@ rustflags = [
   "-Clink-arg=-Wl,--no-eh-frame-hdr",
 ]
 
+[target.'cfg(target_family="windows")']
+rustflags = ["-Cforce-unwind-tables=y"]
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
-  "-Cforce-unwind-tables=y",
   "-Clink-arg=/OPT:REF",
   "-Clink-arg=/OPT:ICF",
   "-Clink-arg=/DEBUG:NONE",
@@ -258,7 +259,6 @@ rustflags = [
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
-  "-Cforce-unwind-tables=y",
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
   "-Clink-arg=-Wl,--icf=all",
