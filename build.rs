@@ -16,19 +16,18 @@ fn main() {
 
     let family = std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap_or_default();
 
-    if family == "windows" {
-        let output = process::Command::new("tar")
-            .args(["-czf", "src/web.tar.gz", "src/web.cbor"])
-            .output()
-            .unwrap();
-        assert!(output.status.success());
+    let mut cmd = if family == "windows" {
+        let mut c = process::Command::new("tar");
+        c.args(["-czf", "src/web.tar.gz", "src/web.cbor"]);
+        c
     } else if family == "unix" {
-        let output = process::Command::new("gzip")
-            .args(["-kf", "src/web.cbor"])
-            .output()
-            .unwrap();
-        assert!(output.status.success());
-    }
+        let mut c = process::Command::new("gzip");
+        c.args(["-kf", "src/web.cbor"]);
+        c
+    } else {
+        return;
+    };
+    assert!(cmd.output().unwrap().status.success());
 }
 
 #[test]
