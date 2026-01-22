@@ -1300,11 +1300,11 @@ mod img {
         let reader = BufReader::new(json_file);
         let value: serde_json::Value = serde_json::from_reader(reader).unwrap();
 
-        let cbor_file = File::create("../web.cbor").unwrap();
+        let cbor_file = File::create("web.cbor").unwrap();
         let writer = BufWriter::new(cbor_file);
         cbor4ii::serde::to_writer(writer, &value).unwrap();
 
-        run_cmd("gzip", &["-kf", "../web.cbor"], &[]);
+        run_cmd("gzip", &["-kf", "web.cbor"], &[]);
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
