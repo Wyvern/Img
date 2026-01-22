@@ -23,7 +23,7 @@ fn main() {
         assert!(output.status.success());
     }
 
-    #[cfg(windows)]
+    #[cfg(any(windows, target_abi = "llvm"))]
     {
         let output = process::Command::new("tar")
             .args(["-czf", "src/web.tar.gz", "src/web.cbor"])
