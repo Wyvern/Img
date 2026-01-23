@@ -23,7 +23,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64le-unknown-linux-musl,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl
+          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64le-unknown-linux-musl,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl,thumbv7neon-unknown-linux-gnueabihf
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -37,7 +37,7 @@ jobs:
       - name: Ubuntu apt update and install
         continue-on-error: true
         run: |
-          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu gcc-arm-linux-gnueabihf musl-tools -y
 
       - name: Build Release
         run: |
@@ -55,6 +55,7 @@ jobs:
             aarch64-unknown-linux-musl
             sparc64-unknown-linux-gnu
             s390x-unknown-linux-gnu
+            thumbv7neon-unknown-linux-gnueabihf
             loongarch64-unknown-linux-gnu
             loongarch64-unknown-linux-musl
           )
@@ -75,25 +76,31 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
-                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
-                  "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
-                  "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"
-                  "riscv64a23-unknown-linux-gnu Linux-riscv64a23-gnu"
-                  "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
-                  "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
-                  "aarch64-unknown-linux-gnu Linux-aarch64-gnu"
-                  "aarch64-unknown-linux-musl Linux-aarch64-musl"
-                  "sparc64-unknown-linux-gnu Linux-sparc64-gnu"
-                  "s390x-unknown-linux-gnu Linux-s390x-gnu"
-                  "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"
-                  "loongarch64-unknown-linux-musl Linux-loongarch64-musl"
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
+            powerpc64le-unknown-linux-gnu
+            powerpc64le-unknown-linux-musl
+            riscv64gc-unknown-linux-gnu
+            riscv64gc-unknown-linux-musl
+            aarch64-unknown-linux-gnu
+            aarch64-unknown-linux-musl
+            sparc64-unknown-linux-gnu
+            s390x-unknown-linux-gnu
+            thumbv7neon-unknown-linux-gnueabihf
+            loongarch64-unknown-linux-gnu
+            loongarch64-unknown-linux-musl
           )
           for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
+            IFS='-' read -r arch vendor os rest <<< "$target"
+            os_cap="${os^}"
+            if [[ -n "$rest" ]]; then
+                name="${os_cap}-${arch}-${rest}"
+              else
+                name="${os_cap}-${arch}"
+              fi
             echo "Uploading $name..."
-            mv target/$arch/lto/Img target/$arch/lto/$name || true
-            gh release upload Stable target/$arch/lto/$name --clobber || true
+            mv target/$target/lto/Img target/$target/lto/$name || true
+            gh release upload Stable target/$target/lto/$name --clobber || true
           done
 
   Android:
