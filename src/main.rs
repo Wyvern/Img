@@ -808,14 +808,15 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         }
 
         #[cfg(not(feature = "infer"))]
-        if no_ext.contains_key(&url) {
-            continue;
-        }
-        #[cfg(not(feature = "infer"))]
-        let file_name = if name_ext.is_empty() {
-            name.trim_end_matches("!lrg")
-        } else {
-            name_ext.as_str()
+        let file_name = {
+            if no_ext.contains_key(&url) {
+                continue;
+            }
+            if name_ext.is_empty() {
+                name.trim_end_matches("!lrg")
+            } else {
+                name_ext.as_str()
+            }
         };
         #[cfg(feature = "infer")]
         let file_name = name;
@@ -826,7 +827,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         curl.args([&enc_url, "-o", file_name]);
     }
 
-    // tdbg!(no_ext.keys());
+    // tdbg!(&no_ext);
     let opts = [
         "-e",
         &format!("https://{host}"),
@@ -834,18 +835,19 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         "--parallel-immediate",
         "-C-",
     ];
-    if curl.get_args().len() > 0 && cfg!(feature = "curl") {
+    if curl.get_args().len() > 0 {
         create_dir();
         let cmd = curl.args(CURL).args(opts);
         let _t = cmd.spawn();
-
         #[cfg(feature = "infer")]
-        if !need_file_type_detection.is_empty() {
-            _t.unwrap().wait().expect("curl download didn't run.");
-            for f in need_file_type_detection {
-                let file = path.join(&f);
-                if file.exists() {
-                    magic_number_type(file);
+        {
+            if !need_file_type_detection.is_empty() {
+                _t.unwrap().wait().expect("curl download didn't run.");
+                for f in need_file_type_detection {
+                    let file = path.join(&f);
+                    if file.exists() {
+                        magic_number_type(file);
+                    }
                 }
             }
         }

@@ -4,8 +4,7 @@ version = "1.0.0"
 edition = "2024"
 
 [features]
-default = ["curl"]
-curl = []
+default = []
 download = []
 infer = ["dep:infer"]
 embed = ["dep:base64"]
