@@ -346,6 +346,9 @@ linker = "riscv64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="sparc64",target_os="linux"))']
 linker = "sparc64-linux-gnu-gcc"
 
+[target.'cfg(all(target_arch="arm",target_os="linux"))']
+linker = "arm-linux-gnueabihf-gcc"
+
 [target.'cfg(all(target_arch="loongarch64",target_os="linux",not(target_env="ohos")))']
 linker = "loongarch64-linux-gnu-gcc-14"
 

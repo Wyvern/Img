@@ -36,7 +36,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 musl-tools -y
+          sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-arm-linux-gnueabihf musl-tools -y
 
       - name: Build Release
         run: |
@@ -47,6 +47,8 @@ jobs:
           set +e -x
 
           targets=(
+            thumbv7neon-unknown-linux-gnueabihf
+            thumbv7neon-unknown-linux-musleabihf
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
             riscv64gc-unknown-linux-gnu
@@ -107,6 +109,8 @@ jobs:
                   "s390x-unknown-linux-musl Linux-s390x-musl"
                   "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"
                   "loongarch64-unknown-linux-musl Linux-loongarch64-musl"
+                  "thumbv7neon-unknown-linux-gnueabihf Linux-thumbv7neon-gnueabihf"
+                  "thumbv7neon-unknown-linux-musleabihf Linux-thumbv7neon-musleabihf"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
