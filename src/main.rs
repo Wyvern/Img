@@ -840,14 +840,12 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         let cmd = curl.args(CURL).args(opts);
         let _t = cmd.spawn();
         #[cfg(feature = "infer")]
-        {
-            if !need_file_type_detection.is_empty() {
-                _t.unwrap().wait().expect("curl download didn't run.");
-                for f in need_file_type_detection {
-                    let file = path.join(&f);
-                    if file.exists() {
-                        magic_number_type(file);
-                    }
+        if !need_file_type_detection.is_empty() {
+            _t.unwrap().wait().expect("curl download didn't run.");
+            for f in need_file_type_detection {
+                let file = path.join(&f);
+                if file.exists() {
+                    magic_number_type(file);
                 }
             }
         }
