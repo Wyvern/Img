@@ -132,22 +132,28 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "x86_64-unknown-dragonfly DragonFly-x86_64"
-                  "x86_64-unknown-freebsd FreeBSD-x86_64"
-                  "aarch64-unknown-freebsd FreeBSD-aarch64"
-                  "riscv64gc-unknown-freebsd FreeBSD-riscv64"
-                  "powerpc64-unknown-freebsd FreeBSD-ppc64"
-                  "powerpc64le-unknown-freebsd FreeBSD-ppc64le"
-                  "x86_64-unknown-openbsd OpenBSD-x86_64"
-                  "aarch64-unknown-openbsd OpenBSD-aarch64"
-                  "riscv64gc-unknown-openbsd OpenBSD-riscv64"
-                  "powerpc64-unknown-openbsd OpenBSD-ppc64"
-                  "x86_64-unknown-netbsd NetBSD-x86_64"
-                  "aarch64-unknown-netbsd NetBSD-aarch64"
+            x86_64-unknown-dragonfly
+            x86_64-unknown-freebsd
+            aarch64-unknown-freebsd
+            riscv64gc-unknown-freebsd
+            powerpc64-unknown-freebsd
+            powerpc64le-unknown-freebsd
+            x86_64-unknown-openbsd
+            aarch64-unknown-openbsd
+            riscv64gc-unknown-openbsd
+            powerpc64-unknown-openbsd
+            x86_64-unknown-netbsd
+            aarch64-unknown-netbsd
           )
           for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
+            IFS='-' read -r arch vendor os rest <<< "$target"
+            os_cap="${os^}"
+            if [[ -n "$rest" ]]; then
+                name="${os_cap}-${arch}-${rest}"
+            else
+                name="${os_cap}-${arch}"
+            fi
             echo "Uploading $name..."
-            mv target/$arch/src/Img target/$arch/src/$name || true
-            gh release upload Nightly target/$arch/src/$name --clobber || true
+            mv target/$target/src/Img target/$target/src/$name || true
+            gh release upload Nightly target/$target/src/$name --clobber || true
           done
