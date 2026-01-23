@@ -88,33 +88,38 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "aarch64-unknown-redox Redox-aarch64"
-                  "powerpc64le-unknown-linux-gnu Linux-powerpc64le-gnu"
-                  "powerpc64le-unknown-linux-musl Linux-powerpc64le-musl"
-                  "riscv64gc-unknown-linux-gnu Linux-riscv64gc-gnu"
-                  "riscv64gc-unknown-linux-musl Linux-riscv64gc-musl"
-                  "riscv64a23-unknown-linux-gnu Linux-riscv64a23-gnu"
-                  "x86_64-unknown-linux-gnu Linux-x86_64-gnu"
-                  "x86_64-unknown-linux-musl Linux-x86_64-musl"
-                  "aarch64-unknown-linux-gnu Linux-aarch64-gnu"
-                  "aarch64-unknown-linux-musl Linux-aarch64-musl"
-                  "sparc64-unknown-linux-gnu Linux-sparc64-gnu"
-                  "mips64-unknown-linux-gnuabi64 Linux-mips64-gnuabi64"
-                  "mips64-unknown-linux-muslabi64 Linux-mips64-muslabi64"
-                  "mips64el-unknown-linux-gnuabi64 Linux-mips64el-gnuabi64"
-                  "mips64el-unknown-linux-muslabi64 Linux-mips64el-muslabi64"
-                  "mipsisa64r6-unknown-linux-gnuabi64 Linux-mips64r6-gnuabi64"
-                  "mipsisa64r6el-unknown-linux-gnuabi64 Linux-mips64r6el-gnuabi64"
-                  "s390x-unknown-linux-gnu Linux-s390x-gnu"
-                  "s390x-unknown-linux-musl Linux-s390x-musl"
-                  "loongarch64-unknown-linux-gnu Linux-loongarch64-gnu"
-                  "loongarch64-unknown-linux-musl Linux-loongarch64-musl"
-                  "thumbv7neon-unknown-linux-gnueabihf Linux-thumbv7neon-gnueabihf"
-                  "thumbv7neon-unknown-linux-musleabihf Linux-thumbv7neon-musleabihf"
+            thumbv7neon-unknown-linux-gnueabihf
+            thumbv7neon-unknown-linux-musleabihf
+            powerpc64le-unknown-linux-gnu
+            powerpc64le-unknown-linux-musl
+            riscv64gc-unknown-linux-gnu
+            riscv64gc-unknown-linux-musl
+            riscv64a23-unknown-linux-gnu
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
+            aarch64-unknown-linux-gnu
+            aarch64-unknown-linux-musl
+            sparc64-unknown-linux-gnu
+            mips64-unknown-linux-gnuabi64
+            mips64-unknown-linux-muslabi64
+            mips64el-unknown-linux-gnuabi64
+            mips64el-unknown-linux-muslabi64
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            s390x-unknown-linux-gnu
+            s390x-unknown-linux-musl
+            loongarch64-unknown-linux-gnu
+            loongarch64-unknown-linux-musl
           )
           for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
+            IFS='-' read -r arch vendor os rest <<< "$target"
+            os_cap="${os^}"
+            if [[ -n "$rest" ]]; then
+                name="${os_cap}-${arch}-${rest}"
+              else
+                name="${os_cap}-${arch}"
+              fi
             echo "Uploading $name..."
-            mv target/$arch/src/Img target/$arch/src/$name || true
-            gh release upload Nightly target/$arch/src/$name --clobber || true
+            mv target/$target/src/Img target/$target/src/$name || true
+            gh release upload Nightly target/$target/src/$name --clobber || true
           done
