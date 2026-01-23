@@ -121,5 +121,5 @@ jobs:
             fi
             echo "Uploading $name..."
             mv target/$target/src/Img target/$target/src/$name || true
-            gh release upload Nightly target/$target/src/$name --clobber || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
           done
