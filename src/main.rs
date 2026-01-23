@@ -732,12 +732,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let mut curl = process::Command::new("curl");
     curl.current_dir(path);
 
-    #[cfg(feature = "infer")]
-    let mut need_file_type_detection = vec![];
-
-    #[cfg(not(feature = "infer"))]
     let mut no_ext = collections::HashMap::new();
+    #[cfg(not(feature = "infer"))]
     let mut no_ext_curl = process::Command::new("curl");
+    #[cfg(not(feature = "infer"))]
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
@@ -789,9 +787,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         let mut name_ext = String::default();
         if has_ext.is_none() {
             #[cfg(feature = "infer")]
-            {
-                need_file_type_detection.push(name.to_owned());
-            }
+            no_ext.insert(url.clone(), name.to_owned());
 
             #[cfg(not(feature = "infer"))]
             {
@@ -806,17 +802,14 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         } else {
             name = name_no_query
         }
-
+        if no_ext.contains_key(&url) {
+            continue;
+        }
         #[cfg(not(feature = "infer"))]
-        let file_name = {
-            if no_ext.contains_key(&url) {
-                continue;
-            }
-            if name_ext.is_empty() {
-                name.trim_end_matches("!lrg")
-            } else {
-                name_ext.as_str()
-            }
+        let file_name = if name_ext.is_empty() {
+            name.trim_end_matches("!lrg")
+        } else {
+            name_ext.as_str()
         };
         #[cfg(feature = "infer")]
         let file_name = name;
@@ -835,59 +828,63 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         "--parallel-immediate",
         "-C-",
     ];
+    // tdbg!(curl.get_args().len() / 3, no_ext.len());
     if curl.get_args().len() > 0 {
         create_dir();
-        let cmd = curl.args(CURL).args(opts);
-        let _t = cmd.spawn();
+        _ = curl.args(CURL).args(opts).spawn();
+    }
+
+    if !no_ext.is_empty() {
+        create_dir();
+        curl = process::Command::new("curl");
+        curl.current_dir(path);
         #[cfg(feature = "infer")]
-        if !need_file_type_detection.is_empty() {
-            _t.unwrap().wait().expect("curl download didn't run.");
-            for f in need_file_type_detection {
+        {
+            curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
+            curl.args(CURL).args(opts).output().unwrap();
+            for (_, f) in no_ext {
                 let file = path.join(&f);
                 if file.exists() {
                     magic_number_type(file);
                 }
             }
         }
-    }
-
-    #[cfg(not(feature = "infer"))]
-    if !no_ext.is_empty() {
-        create_dir();
-        curl = process::Command::new("curl");
-        curl.current_dir(path);
-
-        no_ext_curl.output().map_or_else(
-            |e| pl!("Query content-type info failed: {}", e),
-            |o| {
-                let res = String::from_utf8_lossy(&o.stdout);
-                for (mut url, mut content_type) in res.lines().filter_map(|l| l.split_once("|->")) {
-                    url = url.trim();
-                    content_type = content_type.trim();
-                    if let Some(ctx) = content_type.strip_prefix("image/") {
-                        let ext = &ctx[..['+', ';', ',']
-                            .iter()
-                            .find_map(|&x| ctx.find(x))
-                            .unwrap_or(ctx.len())];
-                        let name = no_ext[url].as_str();
-                        let name_ext = if !name.ends_with(ext) {
-                            &format!("{name}.{ext}")
+        #[cfg(not(feature = "infer"))]
+        {
+            no_ext_curl.output().map_or_else(
+                |e| pl!("Query content-type info failed: {}", e),
+                |o| {
+                    let res = String::from_utf8_lossy(&o.stdout);
+                    for (mut url, mut content_type) in
+                        res.lines().filter_map(|l| l.split_once("|->"))
+                    {
+                        url = url.trim();
+                        content_type = content_type.trim();
+                        if let Some(ctx) = content_type.strip_prefix("image/") {
+                            let ext = &ctx[..['+', ';', ',']
+                                .iter()
+                                .find_map(|&x| ctx.find(x))
+                                .unwrap_or(ctx.len())];
+                            let name = no_ext[url].as_str();
+                            let name_ext = if !name.ends_with(ext) {
+                                &format!("{name}.{ext}")
+                            } else {
+                                name
+                            };
+                            curl.args([url, "-o", name_ext]);
                         } else {
-                            name
-                        };
-                        curl.args([url, "-o", name_ext]);
-                    } else {
-                        curl.args([
-                            tdbg!(url),
-                            "-o",
-                            &format!("{}.ext!{content_type}", no_ext[url]),
-                        ]);
+                            curl.args([
+                                tdbg!(url),
+                                "-o",
+                                &format!("{}.ext!{content_type}", no_ext[url]),
+                            ]);
+                        }
                     }
-                }
-            },
-        );
-        if curl.get_args().len() > 0 {
-            _ = curl.args(CURL).args(opts).spawn();
+                },
+            );
+            if curl.get_args().len() > 0 {
+                _ = curl.args(CURL).args(opts).spawn();
+            }
         }
     }
 }
