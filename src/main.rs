@@ -816,7 +816,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         let enc_url = percent_encoding::utf8_percent_encode(u, nan).to_string();
 
-        // tdbg!(&url, &enc_url);
+        // tdbg!(&url, &enc_url;);
         curl.args([&enc_url, "-o", file_name]);
     }
 
@@ -1177,7 +1177,7 @@ fn url_redirect_and_query_cleanup(url: &str) -> String {
             cleanup.rfind('/').and_then(|slash| {
                 cleanup[slash..].rfind('.').and_then(|dot| {
                     cleanup[slash + dot..]
-                        .find('&')
+                        .find(['&', '='])
                         .map(|amp| amp + dot + slash)
                 })
             })
