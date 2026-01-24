@@ -114,7 +114,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,x86_64-unknown-redox
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,powerpc64-unknown-linux-musl ,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,x86_64-unknown-redox
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -194,6 +194,7 @@ jobs:
             thumbv7neon-linux-androideabi
             x86_64-linux-android
             powerpc64-unknown-linux-gnu
+            powerpc64-unknown-linux-musl
           )
 
           for target in ${targets[@]}; do
@@ -217,6 +218,7 @@ jobs:
                   "armv7-linux-androideabi Android-armv7"
                   "thumbv7neon-linux-androideabi Android-thumbv7neon"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
+                  "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
                   "aarch64-unknown-linux-ohos Android-aarch64-ohos"
                   "armv7-unknown-linux-ohos Android-armv7-ohos"
                   "x86_64-unknown-linux-ohos Android-x86_64-ohos"
