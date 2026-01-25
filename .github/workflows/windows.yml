@@ -71,8 +71,8 @@ jobs:
               Measure-Command { cargo s $target }
           }
 
-          # cmd /c dir /s target\src\Img.exe
-          Get-ChildItem -Path target\*\src\Img.exe -File
+          # cmd /c dir /s target\src\img.exe
+          Get-ChildItem -Path target\*\src\img.exe -File
           systeminfo
 
       - name: Rust Versions
@@ -95,6 +95,6 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/Img.exe target/$arch/src/$name -Force; $?
-              gh release upload Nightly "target/$arch/src/Img.exe#$name" --clobber; $?
+              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force; $?
+              gh release upload Nightly target/$arch/src/$name --clobber; $?
           }

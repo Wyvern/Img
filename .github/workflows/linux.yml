@@ -160,7 +160,7 @@ jobs:
             echo "Uploading $name..."
             for d in src redox; do
                 if [ -d "target/$arch/$d" ]; then
-                  mv target/$arch/$d/Img target/$arch/$d/$name || true
+                  mv target/$arch/$d/img target/$arch/$d/$name || true
                   gh release upload Nightly target/$arch/$d/$name --clobber || true
                   break
                 fi

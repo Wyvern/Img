@@ -154,6 +154,6 @@ jobs:
                 name="${os_cap}-${arch}"
             fi
             echo "Uploading $name..."
-            mv target/$target/src/Img target/$target/src/$name || true
+            mv target/$target/src/img target/$target/src/$name || true
             gh release upload Nightly --clobber target/$target/src/$name || true
           done

@@ -82,7 +82,7 @@ jobs:
             time cargo s $target
           done
 
-          lipo -create target/arm64e-apple-darwin/src/Img target/x86_64h-apple-darwin/src/Img -output Img-Universal
+          lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
 
           find ./target \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
@@ -115,7 +115,7 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            for f in Img Img.exe Img.wasm; do
+            for f in img img.exe img.wasm; do
                 if [ -f "target/$arch/src/$f" ]; then
                   mv target/$arch/src/$f target/$arch/src/$name || true
                   gh release upload Nightly target/$arch/src/$name --clobber || true
