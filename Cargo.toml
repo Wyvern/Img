@@ -6,7 +6,7 @@ edition = "2024"
 [features]
 default = []
 download = []
-infer = ["dep:infer"]
+infer = ["dep:infer","dep:fork"]
 embed = ["dep:base64"]
 
 [[example]]
@@ -24,6 +24,7 @@ infer = { version = "*", default-features = false, optional = true }
 
 [target.'cfg(unix)'.dependencies]
 termion = "*"
+fork = { version = "*", optional = true }
 
 [build-dependencies]
 serde_json = "*"

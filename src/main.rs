@@ -840,13 +840,26 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         curl.current_dir(path);
         #[cfg(feature = "infer")]
         {
-            curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
-            curl.args(CURL).args(opts).status().unwrap();
-            for (_, f) in no_ext {
-                let file = path.join(&f);
-                if file.exists() {
-                    magic_number_type(file);
+            let download_and_rename = || {
+                curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
+                curl.args(CURL).args(opts).status().unwrap();
+                for (_, f) in no_ext {
+                    let file = path.join(&f);
+                    if file.exists() {
+                        magic_number_type(file);
+                    }
                 }
+            };
+            #[cfg(unix)]
+            {
+                use fork::*;
+                if let Ok(Fork::Child) = daemon(true, true) {
+                    download_and_rename();
+                }
+            }
+            #[cfg(not(unix))]
+            {
+                download_and_rename();
             }
         }
         #[cfg(not(feature = "infer"))]
