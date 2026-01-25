@@ -841,7 +841,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         #[cfg(feature = "infer")]
         {
             curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
-            curl.args(CURL).args(opts).output().unwrap();
+            curl.args(CURL).args(opts).status().unwrap();
             for (_, f) in no_ext {
                 let file = path.join(&f);
                 if file.exists() {
