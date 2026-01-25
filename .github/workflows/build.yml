@@ -99,7 +99,7 @@ jobs:
                 name="${os_cap}-${arch}"
               fi
             echo "Uploading $name..."
-            mv target/$target/lto/Img target/$target/lto/$name || true
+            mv target/$target/lto/img target/$target/lto/$name || true
             gh release upload Stable target/$target/lto/$name --clobber || true
           done
 
@@ -227,7 +227,7 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            mv target/$arch/lto/img target/$arch/lto/$name || true
             gh release upload Stable target/$arch/lto/$name --clobber || true
           done
 
@@ -313,7 +313,7 @@ jobs:
             time cargo l $target
           done
 
-          lipo -create target/aarch64-apple-darwin/lto/Img target/x86_64-apple-darwin/lto/Img -output Img-Universal
+          lipo -create target/aarch64-apple-darwin/lto/img target/x86_64-apple-darwin/lto/img -output Img-Universal
 
           find ./target \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
@@ -342,7 +342,7 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            for f in Img Img.exe Img.wasm; do
+            for f in img img.exe img.wasm; do
                 if [ -e "target/$arch/lto/$f" ]; then
                     mv "target/$arch/lto/$f" "target/$arch/lto/$name"
                     break
@@ -411,7 +411,7 @@ jobs:
               Measure-Command { cargo l $target }
           }
 
-          Get-ChildItem -Path target\*\lto\Img.exe -File
+          Get-ChildItem -Path target\*\lto\img.exe -File
           systeminfo
 
       - name: Rust Versions
@@ -432,7 +432,7 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Move-Item target/$arch/lto/Img.exe target/$arch/lto/$name; $?
+              Move-Item target/$arch/lto/img.exe target/$arch/lto/$name; $?
               gh release upload Stable target/$arch/lto/$name --clobber; $?
           }
 
@@ -496,7 +496,7 @@ jobs:
               Measure-Command { cargo l $target }
           }
 
-          Get-ChildItem -Path target\*\lto\Img.exe -File
+          Get-ChildItem -Path target\*\lto\img.exe -File
           systeminfo
 
       - name: Rust Versions
@@ -517,6 +517,6 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Move-Item target/$arch/lto/Img.exe target/$arch/lto/$name; $?
+              Move-Item target/$arch/lto/img.exe target/$arch/lto/$name; $?
               gh release upload Stable target/$arch/lto/$name --clobber; $?
           }

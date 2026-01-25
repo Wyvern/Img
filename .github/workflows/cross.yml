@@ -71,7 +71,7 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            mv target/$arch/lto/img target/$arch/lto/$name || true
             gh release upload Stable target/$arch/lto/$name --clobber || true
           done
 
@@ -182,6 +182,6 @@ jobs:
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
             echo "Uploading $name..."
-            mv target/$arch/lto/Img target/$arch/lto/$name || true
+            mv target/$arch/lto/img target/$arch/lto/$name || true
             gh release upload Stable target/$arch/lto/$name --clobber || true
           done
