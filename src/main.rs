@@ -853,8 +853,13 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             #[cfg(unix)]
             {
                 use fork::*;
-                if let Ok(Fork::Child) = daemon(true, true) {
-                    download_and_rename();
+                match fork() {
+                    Ok(Fork::Child) => {
+                        download_and_rename();
+                        process::exit(0);
+                    }
+                    Err(_) => download_and_rename(),
+                    _ => (),
                 }
             }
             #[cfg(not(unix))]
