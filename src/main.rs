@@ -739,7 +739,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
-        "-sIo",
+        "-sILo",
         if cfg!(target_os = "windows") {
             "NUL"
         } else {
@@ -910,22 +910,22 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 /// Infer file type through magic number
 #[cfg(feature = "infer")]
 fn magic_number_type(pb: path::PathBuf) {
-    use io::*;
-
-    let mut f =
-        fs::File::open(&pb).unwrap_or_else(|e| quit!("Open file {} failed: {}", pb.display(), e));
-    let mut buf = [0u8; 16];
-    f.read_exact(&mut buf)
-        .unwrap_or_else(|e| pl!("Read file {} magic number error: {}", pb.display(), e));
-
-    let t = infer::get(&buf);
+    let t = infer::get_from_path(&pb).unwrap();
     // tdbg!(&t);
     fs::rename(
         &pb,
         pb.with_extension(t.map_or_else(
             || {
+                use io::*;
+                let mut f = fs::File::open(&pb)
+                    .unwrap_or_else(|e| quit!("Open file {} failed: {}", pb.display(), e));
+                let mut buf = [0u8; 128];
+                f.read_exact(&mut buf).unwrap_or_else(|e| {
+                    pl!("Read file {} magic number error: {}", pb.display(), e)
+                });
                 let str = String::from_utf8_lossy(&buf);
-                if str.contains("<svg") { "svg" } else { "" }
+                let str = str.trim_start_matches('\u{FEFF}').trim_start();
+                if str.contains("<svg") { "svg" } else { "ext!" }
             },
             |ty| ty.extension(),
         )),
