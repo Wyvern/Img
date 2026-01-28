@@ -910,25 +910,11 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 /// Infer file type through magic number
 #[cfg(feature = "infer")]
 fn magic_number_type(pb: path::PathBuf) {
-    let t = infer::get_from_path(&pb).unwrap();
-    // tdbg!(&t);
+    use file_format::*;
+    let t = FileFormat::from_file(&pb);
     fs::rename(
         &pb,
-        pb.with_extension(t.map_or_else(
-            || {
-                use io::*;
-                let mut f = fs::File::open(&pb)
-                    .unwrap_or_else(|e| quit!("Open file {} failed: {}", pb.display(), e));
-                let mut buf = [0u8; 128];
-                f.read_exact(&mut buf).unwrap_or_else(|e| {
-                    pl!("Read file {} magic number error: {}", pb.display(), e)
-                });
-                let str = String::from_utf8_lossy(&buf);
-                let str = str.trim_start_matches('\u{FEFF}').trim_start();
-                if str.contains("<svg") { "svg" } else { "ext!" }
-            },
-            |ty| ty.extension(),
-        )),
+        pb.with_extension(t.map_or_else(|_| "ext!".to_owned(), |ty| ty.extension().into())),
     )
     .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
@@ -1446,10 +1432,12 @@ mod img {
 
     #[test]
     fn file_type() {
-        let dir = env::current_dir().unwrap();
-        let _f = dir.join("demo.file");
-        #[cfg(feature = "infer")]
-        magic_number_type(_f);
+        let dir = path::Path::new("Search");
+        for f in fs::read_dir(dir).unwrap() {
+            let _p = f.unwrap().path();
+            #[cfg(feature = "infer")]
+            magic_number_type(_p);
+        }
     }
 
     #[cfg(feature = "embed")]

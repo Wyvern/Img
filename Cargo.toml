@@ -6,7 +6,7 @@ edition = "2024"
 [features]
 default = []
 download = []
-infer = ["dep:infer","dep:fork"]
+infer = ["dep:file-format","dep:fork"]
 embed = ["dep:base64"]
 
 [[example]]
@@ -20,7 +20,7 @@ percent-encoding = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 
 base64 = { version = "*", default-features = false, optional = true }
-infer = { version = "*", optional = true }
+file-format = { version = "*", optional = true }
 
 [target.'cfg(unix)'.dependencies]
 termion = "*"
