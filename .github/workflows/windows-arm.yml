@@ -46,6 +46,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
+          targets: thumbv7a-pc-windows-msvc,thumbv7a-uwp-windows-msvc
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
