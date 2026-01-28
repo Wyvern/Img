@@ -23,6 +23,8 @@ base64 = { version = "*", default-features = false, optional = true }
 termion = "*"
 fork = "*"
 file-format = "*"
+[target.'cfg(target_os = "fuchsia")'.dependencies]
+object = "*"
 
 [build-dependencies]
 serde_json = "*"
