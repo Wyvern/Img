@@ -46,7 +46,6 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: thumbv7a-pc-windows-msvc,thumbv7a-uwp-windows-msvc
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -62,8 +61,6 @@ jobs:
         run: |
           cargo update
           $targets = @(
-                      "thumbv7a-pc-windows-msvc",
-                      "thumbv7a-uwp-windows-msvc",
                       "aarch64-pc-windows-msvc",
                       "aarch64-uwp-windows-msvc",
                       "x86_64-pc-windows-msvc",
@@ -89,8 +86,6 @@ jobs:
         continue-on-error: true
         run: |
           $targets = @(
-              @("thumbv7a-pc-windows-msvc", "Windows-thumbv7a.exe"),
-              @("thumbv7a-uwp-windows-msvc", "Windows-thumbv7a-uwp.exe"),
               @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
               @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
               @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
