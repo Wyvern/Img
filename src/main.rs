@@ -733,9 +733,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     curl.current_dir(path);
 
     let mut no_ext = collections::HashMap::new();
-    #[cfg(not(feature = "infer"))]
+    #[cfg(not(unix))]
     let mut no_ext_curl = process::Command::new("curl");
-    #[cfg(not(feature = "infer"))]
+    #[cfg(not(unix))]
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
@@ -783,36 +783,28 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
         let name_no_query = &name[..name.find('?').unwrap_or(name.len())];
         let has_ext = name_no_query.rfind('.');
-        #[cfg(not(feature = "infer"))]
         let mut name_ext = String::default();
         if has_ext.is_none() {
-            #[cfg(feature = "infer")]
-            no_ext.insert(url.clone(), name.to_owned());
-
-            #[cfg(not(feature = "infer"))]
-            {
-                lr.map_or_else(
-                    || {
-                        no_ext_curl.arg(&url);
-                        no_ext.insert(url.clone(), name.to_owned());
-                    },
-                    |(_, file_name)| name_ext = file_name.into(),
-                )
-            }
+            lr.map_or_else(
+                || {
+                    #[cfg(not(unix))]
+                    no_ext_curl.arg(&url);
+                    no_ext.insert(url.clone(), name.to_owned());
+                },
+                |(_, file_name)| name_ext = file_name.into(),
+            )
         } else {
             name = name_no_query
         }
         if no_ext.contains_key(&url) {
             continue;
         }
-        #[cfg(not(feature = "infer"))]
+
         let file_name = if name_ext.is_empty() {
             name.trim_end_matches("!lrg")
         } else {
             name_ext.as_str()
         };
-        #[cfg(feature = "infer")]
-        let file_name = name;
 
         let enc_url = percent_encoding::utf8_percent_encode(u, nan).to_string();
 
@@ -838,36 +830,26 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         create_dir();
         curl = process::Command::new("curl");
         curl.current_dir(path);
-        #[cfg(feature = "infer")]
+        #[cfg(unix)]
         {
-            let download_and_rename = || {
-                curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
-                curl.args(CURL).args(opts).status().unwrap();
-                for (_, f) in no_ext {
-                    let file = path.join(&f);
-                    if file.exists() {
-                        magic_number_type(file);
+            use fork::*;
+            match fork() {
+                Ok(Fork::Child) => {
+                    curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
+                    curl.args(CURL).args(opts).status().unwrap();
+                    for (_, f) in no_ext {
+                        let file = path.join(&f);
+                        if file.exists() {
+                            magic_number_type(file);
+                        }
                     }
+                    process::exit(0);
                 }
-            };
-            #[cfg(unix)]
-            {
-                use fork::*;
-                match fork() {
-                    Ok(Fork::Child) => {
-                        download_and_rename();
-                        process::exit(0);
-                    }
-                    Err(_) => download_and_rename(),
-                    _ => (),
-                }
-            }
-            #[cfg(not(unix))]
-            {
-                download_and_rename();
+                Err(e) => quit!("Fork process failed: {e}"),
+                _ => (),
             }
         }
-        #[cfg(not(feature = "infer"))]
+        #[cfg(not(unix))]
         {
             no_ext_curl.output().map_or_else(
                 |e| pl!("Query content-type info failed: {}", e),
@@ -908,7 +890,6 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Infer file type through magic number
-#[cfg(feature = "infer")]
 fn magic_number_type(pb: path::PathBuf) {
     use file_format::*;
     let t = FileFormat::from_file(&pb);
@@ -1434,9 +1415,8 @@ mod img {
     fn file_type() {
         let dir = path::Path::new("Search");
         for f in fs::read_dir(dir).unwrap() {
-            let _p = f.unwrap().path();
-            #[cfg(feature = "infer")]
-            magic_number_type(_p);
+            let p = f.unwrap().path();
+            magic_number_type(p);
         }
     }
 
