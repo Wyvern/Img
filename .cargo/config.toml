@@ -201,7 +201,6 @@ rustflags = ["-Zpanic-in-drop=abort"]
 incremental = true
 build-dir = "build-dir"
 # target-dir = "/home/runner/target-dir"
-warnings = "allow"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -258,9 +257,6 @@ rustflags = [
   # "-Zoffload=Enable",
   # "-Zbuild-sdylib-interface",
 
-  "-Anonstandard_style",
-  "-Adead_code",
-  "-Aclippy::tabs_in_doc_comments",
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
   "-Wlinker_messages",

@@ -1,7 +1,7 @@
 use std::*;
 macro_rules! STATIC {
             ($v:vis $t:ty; $($i:ident = $e:expr),+) => {
-                $($v static $i: $t = $e;)+
+                $(#[allow(dead_code)] $v static $i: $t = $e;)+
             }
         }
 
@@ -88,8 +88,10 @@ mod macros {
 }
 }
 
-pub trait AsBytes: Sized {
+#[allow(dead_code)]
+pub trait AsBytes: Copy + Sized {
     fn from_bytes(bytes: &[u8]) -> &Self {
+        assert_eq!(bytes.len(), mem::size_of::<Self>(), "slice size mismatch");
         unsafe { &*(bytes.as_ptr() as *const Self) }
     }
     fn as_bytes(&self) -> &[u8] {
@@ -99,8 +101,9 @@ pub trait AsBytes: Sized {
         self.as_bytes() == other.as_bytes()
     }
 }
-impl<T> AsBytes for T {}
+impl<T: Copy + Sized> AsBytes for T {}
 
+#[allow(dead_code)]
 pub trait Dbg: fmt::Debug {
     fn dbg(&self) {
         crate::tdbg!(self);
@@ -111,6 +114,7 @@ pub trait Dbg: fmt::Debug {
 }
 impl<T: fmt::Debug> Dbg for T {}
 
+#[allow(dead_code)]
 pub fn pause() {
     use io::*;
     #[cfg(target_family = "unix")]
@@ -154,30 +158,30 @@ pub fn pause() {
     }
 }
 
-fn dyn_set<T>(var: &dyn any::Any, val: T) {
-    let ptr = var as *const _ as *mut _;
-    let cell = cell::Cell::new(ptr);
-    unsafe {
-        *cell.get() = val;
-    }
-}
-
-fn dyn_cast<T: Copy>(var: &dyn any::Any) -> T {
-    let ptr = var as *const _ as *const _;
-    unsafe { *ptr }
-}
-
-const fn target_endian() -> &'static str {
-    if u16::from_ne_bytes([1, 0]) == 1 {
-        "Little Endian"
-    } else {
-        "Big Endian"
-    }
-}
-
 #[cfg(test)]
 mod test {
     use super::*;
+
+    fn dyn_set<T>(var: &dyn any::Any, val: T) {
+        let ptr = var as *const _ as *mut _;
+        let cell = cell::Cell::new(ptr);
+        unsafe {
+            *cell.get() = val;
+        }
+    }
+
+    fn dyn_cast<T: Copy>(var: &dyn any::Any) -> T {
+        let ptr = var as *const _ as *const _;
+        unsafe { *ptr }
+    }
+
+    const fn target_endian() -> &'static str {
+        if u16::from_ne_bytes([1, 0]) == 1 {
+            "Little Endian"
+        } else {
+            "Big Endian"
+        }
+    }
 
     #[test]
     fn dyn_any() {
