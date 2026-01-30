@@ -213,9 +213,6 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   # "-Zhint-mostly-unused",
 
-  "-Anonstandard_style",
-  "-Adead_code",
-  "-Aclippy::tabs_in_doc_comments",
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
   "-Wlinker_messages",
