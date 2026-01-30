@@ -18,9 +18,9 @@ serde_json = "*"
 percent-encoding = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 base64 = { version = "*", default-features = false, optional = true }
-termion = "*"
 
 [target.'cfg(unix)'.dependencies]
+termion = "*"
 fork = "*"
 file-format = "*"
 

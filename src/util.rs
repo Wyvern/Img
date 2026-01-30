@@ -1,5 +1,11 @@
 use std::*;
 
+macro_rules! Color {
+            ($($i:ident = $l:literal),+) => {
+                STATIC!(pub &str;$($i=concat!("\x1b[",$l,'m')),+);
+            }
+        }
+
 macro_rules! STATIC {
             ($v:vis $t:ty; $($i:ident = $e:expr),+) => {
                 $(#[allow(dead_code)] $v static $i: $t = $e;)+
@@ -13,9 +19,24 @@ macro_rules! STATIC {
 //         }
 
 STATIC!(pub &str;
+    UP = "\x1b[1A",
     CL = "\r\x1b[2K", //Clear current line + move to start
     MARK = "\x1b]1337;SetMark\x07",
     TEXT = "The quick brown fox jumps over the lazy dog"
+);
+
+Color!(
+    N = 0,
+    B = 1,
+    U = 4,
+    _U = 24,
+    R = 91,
+    G = 92,
+    Y = 93,
+    BLUE = 94,
+    HL = 103,
+    BG = 100,
+    FG = 97
 );
 
 mod macros {
@@ -30,7 +51,7 @@ mod macros {
     #[macro_export]
     macro_rules! pl {
         ($l:literal $(,$e:expr)*) => {
-            println!("{}{}{}",style::Bold, format_args!($l $(,format_args!("`{}{}{}{}`",color::Fg(color::LightRed),$e,style::Reset,style::Bold))*),style::Reset)
+            println!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*))
         }
     }
 
@@ -147,14 +168,13 @@ pub fn pause() {
         let mut s = String::default();
         stdin().lock().read_line(&mut s).unwrap();
         s.make_ascii_lowercase();
-        let up = termion::cursor::Up(1);
         if s.trim() == "q" {
-            write!(o, "{up}{CL}⏏!").unwrap();
+            write!(o, "{UP}{CL}⏏!").unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);
         } else {
-            write!(o, "{up}{CL}").unwrap();
+            write!(o, "{UP}{CL}").unwrap();
             o.flush().unwrap();
         }
     }

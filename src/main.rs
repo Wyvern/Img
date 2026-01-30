@@ -3,7 +3,6 @@
 mod util;
 
 use arcdom as dom;
-use termion::*;
 use {std::*, util::*};
 
 static SEP: &str = " | ";
@@ -314,12 +313,9 @@ fn parse(addr: &str) -> String {
                 .any(|x| o.contains(x))
         })
     }) {
-        format_args!(
-            "{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\",
-            G = color::Fg(color::LightGreen)
-        )
+        format_args!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\")
     } else {
-        format_args!("{G} {t}", G = color::Fg(color::LightGreen))
+        format_args!("{G} {t}")
     };
 
     let name_count = |name: &[&str], count: &[usize]| -> String {
@@ -564,20 +560,12 @@ fn parse(addr: &str) -> String {
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{}{N}{B}?{N}",
                         i + 1,
                         t.trim(),
-                        G = color::Fg(color::LightGreen),
-                        _U = style::NoUnderline,
-                        U = style::Underline,
-                        B = style::Bold,
-                        N = style::Reset
                     );
                     _ = write!(
                         stdout,
                         "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel ␛ : {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
-                        Y = color::Fg(color::LightYellow),
-                        B = style::Bold,
-                        N = style::Reset,
                     );
                     _ = stdout.flush();
 
@@ -1268,13 +1256,12 @@ mod img {
         use io::*;
 
         let i = img.unwrap_or("img[src]");
-        let ly = color::Bg(color::LightYellow);
-        pl!("{MARK} Image Selector: {ly} {i} ");
+        pl!("{MARK} Image Selector: {HL} {i} ");
         let mut r = run_cmd("htmlq", &[i], html[..ll].as_ref());
         println!("Totally found {} <img>", r.lines().count());
 
         if let Some(a) = album {
-            pl!("{MARK} Album Selector: {ly} {a} ");
+            pl!("{MARK} Album Selector: {HL} {a} ");
             r = run_cmd("htmlq", &[a], html[..ll].as_ref());
             println!("{}", String::from_utf8_lossy(&r));
         }
