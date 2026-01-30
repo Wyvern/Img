@@ -3,6 +3,7 @@
 mod util;
 
 use arcdom as dom;
+use termion::*;
 use {std::*, util::*};
 
 static SEP: &str = " | ";
@@ -313,9 +314,12 @@ fn parse(addr: &str) -> String {
                 .any(|x| o.contains(x))
         })
     }) {
-        format_args!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\",)
+        format_args!(
+            "{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\",
+            G = color::Fg(color::LightGreen)
+        )
     } else {
-        format_args!("{G} {t}")
+        format_args!("{G} {t}", G = color::Fg(color::LightGreen))
     };
 
     let name_count = |name: &[&str], count: &[usize]| -> String {
@@ -560,12 +564,20 @@ fn parse(addr: &str) -> String {
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{}{N}{B}?{N}",
                         i + 1,
                         t.trim(),
+                        G = color::Fg(color::LightGreen),
+                        _U = style::NoUnderline,
+                        U = style::Underline,
+                        B = style::Bold,
+                        N = style::Reset
                     );
                     _ = write!(
                         stdout,
                         "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel ␛ : {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
+                        Y = color::Fg(color::LightYellow),
+                        B = style::Bold,
+                        N = style::Reset,
                     );
                     _ = stdout.flush();
 
@@ -732,16 +744,14 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let mut curl = process::Command::new("curl");
     curl.current_dir(path);
 
-    #[cfg(feature = "infer")]
-    let mut need_file_type_detection = vec![];
-
-    #[cfg(not(feature = "infer"))]
     let mut no_ext = collections::HashMap::new();
+    #[cfg(not(unix))]
     let mut no_ext_curl = process::Command::new("curl");
+    #[cfg(not(unix))]
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
-        "-sIo",
+        "-sILo",
         if cfg!(target_os = "windows") {
             "NUL"
         } else {
@@ -785,48 +795,36 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         name = &name[name.find("?url=").map_or(0, |u| u + 5)..];
         let name_no_query = &name[..name.find('?').unwrap_or(name.len())];
         let has_ext = name_no_query.rfind('.');
-        #[cfg(not(feature = "infer"))]
         let mut name_ext = String::default();
         if has_ext.is_none() {
-            #[cfg(feature = "infer")]
-            {
-                need_file_type_detection.push(name.to_owned());
-            }
-
-            #[cfg(not(feature = "infer"))]
-            {
-                lr.map_or_else(
-                    || {
-                        no_ext_curl.arg(&url);
-                        no_ext.insert(url.clone(), name.to_owned());
-                    },
-                    |(_, file_name)| name_ext = file_name.into(),
-                )
-            }
+            lr.map_or_else(
+                || {
+                    #[cfg(not(unix))]
+                    no_ext_curl.arg(&url);
+                    no_ext.insert(url.clone(), name.to_owned());
+                },
+                |(_, file_name)| name_ext = file_name.into(),
+            )
         } else {
             name = name_no_query
         }
-
-        #[cfg(not(feature = "infer"))]
         if no_ext.contains_key(&url) {
             continue;
         }
-        #[cfg(not(feature = "infer"))]
+
         let file_name = if name_ext.is_empty() {
             name.trim_end_matches("!lrg")
         } else {
             name_ext.as_str()
         };
-        #[cfg(feature = "infer")]
-        let file_name = name;
 
         let enc_url = percent_encoding::utf8_percent_encode(u, nan).to_string();
 
-        // tdbg!(&url, &enc_url);
+        // tdbg!(&url, &enc_url;);
         curl.args([&enc_url, "-o", file_name]);
     }
 
-    // tdbg!(no_ext.keys());
+    // tdbg!(&no_ext);
     let opts = [
         "-e",
         &format!("https://{host}"),
@@ -834,86 +832,83 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         "--parallel-immediate",
         "-C-",
     ];
-    if curl.get_args().len() > 0 && cfg!(feature = "curl") {
+    // tdbg!(curl.get_args().len() / 3, no_ext.len());
+    if curl.get_args().len() > 0 {
         create_dir();
-        let cmd = curl.args(CURL).args(opts);
-        let _t = cmd.spawn();
-
-        #[cfg(feature = "infer")]
-        if !need_file_type_detection.is_empty() {
-            _t.unwrap().wait().expect("curl download didn't run.");
-            for f in need_file_type_detection {
-                let file = path.join(&f);
-                if file.exists() {
-                    magic_number_type(file);
-                }
-            }
-        }
+        _ = curl.args(CURL).args(opts).spawn();
     }
 
-    #[cfg(not(feature = "infer"))]
     if !no_ext.is_empty() {
         create_dir();
         curl = process::Command::new("curl");
         curl.current_dir(path);
-
-        no_ext_curl.output().map_or_else(
-            |e| pl!("Query content-type info failed: {}", e),
-            |o| {
-                let res = String::from_utf8_lossy(&o.stdout);
-                for (mut url, mut content_type) in res.lines().filter_map(|l| l.split_once("|->")) {
-                    url = url.trim();
-                    content_type = content_type.trim();
-                    if let Some(ctx) = content_type.strip_prefix("image/") {
-                        let ext = &ctx[..['+', ';', ',']
-                            .iter()
-                            .find_map(|&x| ctx.find(x))
-                            .unwrap_or(ctx.len())];
-                        let name = no_ext[url].as_str();
-                        let name_ext = if !name.ends_with(ext) {
-                            &format!("{name}.{ext}")
-                        } else {
-                            name
-                        };
-                        curl.args([url, "-o", name_ext]);
-                    } else {
-                        curl.args([
-                            tdbg!(url),
-                            "-o",
-                            &format!("{}.ext!{content_type}", no_ext[url]),
-                        ]);
+        #[cfg(unix)]
+        {
+            use fork::*;
+            match fork() {
+                Ok(Fork::Child) => {
+                    curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
+                    curl.args(CURL).args(opts).status().unwrap();
+                    for (_, f) in no_ext {
+                        let file = path.join(&f);
+                        if file.exists() {
+                            magic_number_type(file);
+                        }
                     }
+                    process::exit(0);
                 }
-            },
-        );
-        if curl.get_args().len() > 0 {
-            _ = curl.args(CURL).args(opts).spawn();
+                Err(e) => quit!("Fork process failed: {e}"),
+                _ => (),
+            }
+        }
+        #[cfg(not(unix))]
+        {
+            no_ext_curl.output().map_or_else(
+                |e| pl!("Query content-type info failed: {}", e),
+                |o| {
+                    let res = String::from_utf8_lossy(&o.stdout);
+                    for (mut url, mut content_type) in
+                        res.lines().filter_map(|l| l.split_once("|->"))
+                    {
+                        url = url.trim();
+                        content_type = content_type.trim();
+                        if let Some(ctx) = content_type.strip_prefix("image/") {
+                            let ext = &ctx[..['+', ';', ',']
+                                .iter()
+                                .find_map(|&x| ctx.find(x))
+                                .unwrap_or(ctx.len())];
+                            let name = no_ext[url].as_str();
+                            let name_ext = if !name.ends_with(ext) {
+                                &format!("{name}.{ext}")
+                            } else {
+                                name
+                            };
+                            curl.args([url, "-o", name_ext]);
+                        } else {
+                            curl.args([
+                                tdbg!(url),
+                                "-o",
+                                &format!("{}.ext!{content_type}", no_ext[url]),
+                            ]);
+                        }
+                    }
+                },
+            );
+            if curl.get_args().len() > 0 {
+                _ = curl.args(CURL).args(opts).spawn();
+            }
         }
     }
 }
 
 /// Infer file type through magic number
-#[cfg(feature = "infer")]
+#[cfg(unix)]
 fn magic_number_type(pb: path::PathBuf) {
-    use io::*;
-
-    let mut f =
-        fs::File::open(&pb).unwrap_or_else(|e| quit!("Open file {} failed: {}", pb.display(), e));
-    let mut buf = [0u8; 16];
-    f.read_exact(&mut buf)
-        .unwrap_or_else(|e| pl!("Read file {} magic number error: {}", pb.display(), e));
-
-    let t = infer::get(&buf);
-    // tdbg!(&t);
+    use file_format::*;
+    let t = FileFormat::from_file(&pb);
     fs::rename(
         &pb,
-        pb.with_extension(t.map_or_else(
-            || {
-                let str = String::from_utf8_lossy(&buf);
-                if str.contains("<svg") { "svg" } else { "" }
-            },
-            |ty| ty.extension(),
-        )),
+        pb.with_extension(t.map_or_else(|_| "ext!".to_owned(), |ty| ty.extension().into())),
     )
     .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
@@ -1180,7 +1175,7 @@ fn url_redirect_and_query_cleanup(url: &str) -> String {
             cleanup.rfind('/').and_then(|slash| {
                 cleanup[slash..].rfind('.').and_then(|dot| {
                     cleanup[slash + dot..]
-                        .find('&')
+                        .find(['&', '='])
                         .map(|amp| amp + dot + slash)
                 })
             })
@@ -1273,12 +1268,13 @@ mod img {
         use io::*;
 
         let i = img.unwrap_or("img[src]");
-        pl!("{MARK} Image Selector: {HL} {i} ");
+        let ly = color::Bg(color::LightYellow);
+        pl!("{MARK} Image Selector: {ly} {i} ");
         let mut r = run_cmd("htmlq", &[i], html[..ll].as_ref());
         println!("Totally found {} <img>", r.lines().count());
 
         if let Some(a) = album {
-            pl!("{MARK} Album Selector: {HL} {a} ");
+            pl!("{MARK} Album Selector: {ly} {a} ");
             r = run_cmd("htmlq", &[a], html[..ll].as_ref());
             println!("{}", String::from_utf8_lossy(&r));
         }
@@ -1431,10 +1427,11 @@ mod img {
 
     #[test]
     fn file_type() {
-        let dir = env::current_dir().unwrap();
-        let _f = dir.join("demo.file");
-        #[cfg(feature = "infer")]
-        magic_number_type(_f);
+        let dir = path::Path::new("Search");
+        for f in fs::read_dir(dir).unwrap() {
+            let p = f.unwrap().path();
+            magic_number_type(p);
+        }
     }
 
     #[cfg(feature = "embed")]

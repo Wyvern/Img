@@ -4,10 +4,8 @@ version = "1.0.0"
 edition = "2024"
 
 [features]
-default = ["curl"]
-curl = []
+default = []
 download = []
-infer = ["dep:infer"]
 embed = ["dep:base64"]
 
 [[example]]
@@ -19,12 +17,12 @@ arcdom = { path = "arcdom" }
 serde_json = "*"
 percent-encoding = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
-
 base64 = { version = "*", default-features = false, optional = true }
-infer = { version = "*", default-features = false, optional = true }
 
 [target.'cfg(unix)'.dependencies]
 termion = "*"
+fork = "*"
+file-format = "*"
 
 [build-dependencies]
 serde_json = "*"

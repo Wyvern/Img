@@ -1,5 +1,5 @@
+use termion::{color, *};
 use {std::*, util::*};
-
 mod util;
 
 fn main() -> io::Result<()> {
@@ -73,7 +73,17 @@ fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
 }
 
 fn exit() {
-    println!("Usage: Color {NL}`8|256` {NL}`256 {B}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {B}{R}r {G}g {BLUE}b{N} [0-255]{{3}}` \n options.",NL="\n\t");
+    println!(
+        "Usage: Color {NL}`8|256` {NL}`256 {B}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {B}{R}r {G}g {BLUE}b{N} [0-255]{{3}}` \n options.",
+        NL = "\n\t",
+        R = color::Fg(color::LightRed),
+        BLUE = color::Fg(color::LightBlue),
+        B = style::Bold,
+        N = style::Reset,
+        G = color::Fg(color::LightGreen),
+        FG = color::Fg(color::LightWhite),
+        BG = color::Bg(color::LightBlack)
+    );
     process::exit(0);
 }
 
@@ -106,14 +116,48 @@ fn color8(text: &str) -> Result<()> {
         .chain(100..=107)
         .for_each(|c| {
             _ = match c {
-                0 => writeln!(bf, "\n{B}{U}Basic Style:{N}"),
-                30 => writeln!(bf, "\n{B}{U}8-color regular foreground:{N}"),
-                40 => writeln!(bf, "\n{B}{U}8-color regular background:{N}"),
-                90 => writeln!(bf, "\n{B}{U}8-color bright foreground:{N}"),
-                100 => writeln!(bf, "\n{B}{U}8-color bright background:{N}"),
+                0 => writeln!(
+                    bf,
+                    "\n{B}{U}Basic Style:{N}",
+                    B = style::Bold,
+                    U = style::Underline,
+                    N = style::Reset
+                ),
+                30 => writeln!(
+                    bf,
+                    "\n{B}{U}8-color regular foreground:{N}",
+                    B = style::Bold,
+                    U = style::Underline,
+                    N = style::Reset
+                ),
+                40 => writeln!(
+                    bf,
+                    "\n{B}{U}8-color regular background:{N}",
+                    B = style::Bold,
+                    U = style::Underline,
+                    N = style::Reset
+                ),
+                90 => writeln!(
+                    bf,
+                    "\n{B}{U}8-color bright foreground:{N}",
+                    B = style::Bold,
+                    U = style::Underline,
+                    N = style::Reset
+                ),
+                100 => writeln!(
+                    bf,
+                    "\n{B}{U}8-color bright background:{N}",
+                    B = style::Bold,
+                    U = style::Underline,
+                    N = style::Reset
+                ),
                 _ => Ok(()),
             };
-            _ = writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
+            _ = writeln!(
+                bf,
+                "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}",
+                N = style::Reset
+            );
         });
     bf.flush()
 }
@@ -148,7 +192,10 @@ fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
                 Kind::FG => "foreground",
                 Kind::BG => "background",
                 Kind::Both => unreachable!(),
-            }
+            },
+            B = style::Bold,
+            U = style::Underline,
+            N = style::Reset,
         )?,
     }
 
@@ -161,14 +208,19 @@ fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
     if full {
         match r {
             Range::_256(_) => (0u8..=255).for_each(|c| {
-                _ = writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}");
+                _ = writeln!(
+                    bf,
+                    "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}",
+                    N = style::Reset
+                );
             }),
             Range::_RGB(..) => (0u8..=255).for_each(|r| {
                 (0u8..=255).for_each(|g| {
                     (0u8..=255).for_each(|b| {
                         _ = writeln!(
                             bf,
-                            "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}"
+                            "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}",
+                            N = style::Reset,
                         );
                     });
                     _ = bf.flush();
@@ -178,10 +230,15 @@ fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
         }
     } else {
         match r {
-            Range::_256(c) => writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}")?,
+            Range::_256(c) => writeln!(
+                bf,
+                "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}",
+                N = style::Reset
+            )?,
             Range::_RGB(r, g, b) => writeln!(
                 bf,
-                "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}"
+                "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}",
+                N = style::Reset
             )?,
         }
     }

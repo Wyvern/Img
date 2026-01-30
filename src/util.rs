@@ -1,40 +1,4 @@
 use std::*;
-
-///Colorized terminal constants
-/**
-    The 8 actual colors within the ranges (30-37, 40-47, 90-97, 100-107) are defined by the ANSI standard as follows:
-    Last Digit 	Color
-    0 	black
-    1 	red
-    2 	green
-    3 	yellow
-    4 	blue
-    5 	magenta
-    6 	cyan
-    7 	white
-
-    Some common SGR parameters are shown below:
-    Parameter 	Effect
-    0 	reset all SGR effects to their default
-    1 	bold or increased intensity
-    2 	faint or decreased intensity
-    4 	singly underlined
-    5 	slow blink
-    30-37 	foreground color (8 colors)
-    38;5;x 	foreground color (256 colors, non-standard)
-    38;2;r;g;b 	foreground color (RGB, non-standard)
-    40-47 	background color (8 colors)
-    48;5;x 	background color (256 colors, non-standard)
-    48;2;r;g;b 	background color (RGB, non-standard)
-    90-97 	bright foreground color (non-standard)
-    100-107 	bright background color (non-standard)
-*/
-macro_rules! Color {
-            ($($i:ident = $l:literal),+) => {
-                STATIC!(pub &str;$($i=concat!("\x1b[",$l,'m')),+);
-            }
-        }
-
 macro_rules! STATIC {
             ($v:vis $t:ty; $($i:ident = $e:expr),+) => {
                 $($v static $i: $t = $e;)+
@@ -48,28 +12,9 @@ macro_rules! STATIC {
 //         }
 
 STATIC!(pub &str;
-    UP = "\x1b[1A",
     CL = "\r\x1b[2K", //Clear current line + move to start
     MARK = "\x1b]1337;SetMark\x07",
     TEXT = "The quick brown fox jumps over the lazy dog"
-);
-
-Color!(
-    N = 0,
-    B = 1,
-    _B = 22,
-    I = 3,
-    _I = 23,
-    U = 4,
-    _U = 24,
-    UU = 21,
-    R = 91,
-    G = 92,
-    Y = 93,
-    BLUE = 94,
-    HL = 103,
-    BG = 100,
-    FG = 97
 );
 
 mod macros {
@@ -84,7 +29,7 @@ mod macros {
     #[macro_export]
     macro_rules! pl {
         ($l:literal $(,$e:expr)*) => {
-            println!("{B}{}{N}", format_args!($l $(,format_args!("`{R}{}{N}{B}`",$e))*))
+            println!("{}{}{}",style::Bold, format_args!($l $(,format_args!("`{}{}{}{}`",color::Fg(color::LightRed),$e,style::Reset,style::Bold))*),style::Reset)
         }
     }
 
