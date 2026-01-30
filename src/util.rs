@@ -1,4 +1,5 @@
 use std::*;
+
 macro_rules! STATIC {
             ($v:vis $t:ty; $($i:ident = $e:expr),+) => {
                 $(#[allow(dead_code)] $v static $i: $t = $e;)+
@@ -146,13 +147,14 @@ pub fn pause() {
         let mut s = String::default();
         stdin().lock().read_line(&mut s).unwrap();
         s.make_ascii_lowercase();
+        let up = termion::cursor::Up(1);
         if s.trim() == "q" {
-            write!(o, "{UP}{CL}⏏!").unwrap();
+            write!(o, "{up}{CL}⏏!").unwrap();
             o.flush().unwrap();
             drop(o);
             process::exit(0);
         } else {
-            write!(o, "{UP}{CL}").unwrap();
+            write!(o, "{up}{CL}").unwrap();
             o.flush().unwrap();
         }
     }

@@ -3,7 +3,6 @@
 mod util;
 
 use arcdom as dom;
-#[cfg(unix)]
 use termion::*;
 use {std::*, util::*};
 
