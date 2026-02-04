@@ -630,8 +630,7 @@
     },
     {
       "Site": "oorpg.com",
-      "Img": "div.text-center > img",
-      "Album": "div.gallery img"
+      "Img": "json: var | uul ="
     },
     {
       "Site": "meitu9.com",
@@ -715,6 +714,7 @@
     ["尤物秀", "h1.logo > a[title=\"尤物秀\"]", "media-education-culture.net"],
     ["爱美女", "h1.logo > a[title=\"爱美女网\"] > img[src]", "imn5.top"],
     ["我为人人", "a[href=\"/2048\"] > img[src]", "hjd2048.com"],
+    ["蜜丝社", "a.navbar-brand > img.img-fluid", "oorpg.com"],
     ["小黄书 xChina", "div.logo > a > img[alt]", "xchina.co"],
     ["资讯热线", "div.logo > a > img[alt][title]", "shzx.org"],
     ["秀人妹子", "div.nt > a > span", "656g.com"],

@@ -202,7 +202,10 @@ fn parse(addr: &str) -> String {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
         let name = sels.map(|(_, r)| r).unwrap().trim();
         let script = page.select("script");
-        for s in script.iter().filter(|&s| s.text().is_some()) {
+        for s in script
+            .iter()
+            .filter(|&s| s.text().is_some_and(|t| !t.trim().is_empty()))
+        {
             let t = s.text().unwrap();
             let urls = t.split(name).skip(1);
             for u in urls {
@@ -224,6 +227,17 @@ fn parse(addr: &str) -> String {
                             .for_each(|url| {
                                 json_img.insert(url);
                             });
+                    }
+                    "var" => {
+                        u.split('\'')
+                            .nth(1)
+                            .unwrap()
+                            .split("https://")
+                            .skip(1)
+                            .for_each(|url| {
+                                json_img.insert(format!("https://{url}"));
+                            });
+                        break;
                     }
                     _ => (),
                 }
@@ -265,8 +279,11 @@ fn parse(addr: &str) -> String {
                 titles
                     .iter()
                     .find_map(|s| {
-                        s.text()
-                            .and_then(|t| t.split_once("metaKeywords").map(|kw| kw.1.to_owned()))
+                        s.text().and_then(|t| {
+                            t.split_once("metaKeywords")
+                                .map(|kw| kw.1.to_owned())
+                                .or_else(|| t.split_once("title=").map(|x| x.1.to_owned()))
+                        })
                     })
                     .unwrap()
                     .split('"')
@@ -820,7 +837,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         "--parallel-immediate",
         "-C-",
     ];
-    // tdbg!(curl.get_args().len() / 3, no_ext.len());
+    // tdbg!(curl.get_args().len() / 3, no_ext.len(););
     if curl.get_args().len() > 0 {
         create_dir();
         _ = curl.args(CURL).args(opts).spawn();
@@ -839,7 +856,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     curl.args(CURL).args(opts).status().unwrap();
                     for (_, f) in no_ext {
                         let file = path.join(&f);
-                        if file.exists() {
+                        if file.is_file() {
                             magic_number_type(file);
                         }
                     }
