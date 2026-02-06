@@ -1,6 +1,10 @@
 {
   "Sites": [
     {
+      "Site": "beautyleg.com",
+      "Img": "td[align=\"center\"] img"
+    },
+    {
       "Site": "girldreamy.com",
       "Img": "img.aligncenter.size-full",
       "Album": "div.elementor-post__text a"
