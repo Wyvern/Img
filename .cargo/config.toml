@@ -255,7 +255,7 @@ rustflags = [
   "-Zexperimental-default-bounds=y",
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros=y",
-  # "-Zoffload=Enable",
+  "-Zoffload=Device",
   # "-Zbuild-sdylib-interface",
 
   "-Dclippy::redundant_clone",
