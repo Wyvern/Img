@@ -3,9 +3,9 @@
 mod util;
 
 use arcdom as dom;
-use termion::*;
-use {std::*, util::*};
+use {std::*, sync::atomic::*, util::*};
 
+static SPINNER: AtomicBool = AtomicBool::new(false);
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
@@ -113,11 +113,10 @@ fn host_info(host: &str) -> [Option<&str>; 5] {
 
 ///Fetch web page generate html content
 fn get_html(addr: &str) -> (String, usize) {
-    use sync::mpsc::*;
-    let (s, r) = channel();
     _ = io::stdout().lock();
     let h = thread::spawn(|| {
-        circle_indicator(r);
+        SPINNER.store(true, Ordering::Release);
+        circle_indicator();
     });
 
     let out = process::Command::new("curl")
@@ -131,10 +130,10 @@ fn get_html(addr: &str) -> (String, usize) {
         ])
         .output()
         .unwrap_or_else(|e| {
-            _ = s.send(());
+            SPINNER.store(false, Ordering::Release);
             quit!("curl: {}", e);
         });
-    _ = s.send(());
+    SPINNER.store(false, Ordering::Release);
     if !out.stderr.is_empty() {
         quit!(
             "Fetch {} failed : {}",
@@ -203,7 +202,10 @@ fn parse(addr: &str) -> String {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
         let name = sels.map(|(_, r)| r).unwrap().trim();
         let script = page.select("script");
-        for s in script.iter().filter(|&s| s.text().is_some()) {
+        for s in script
+            .iter()
+            .filter(|&s| s.text().is_some_and(|t| !t.trim().is_empty()))
+        {
             let t = s.text().unwrap();
             let urls = t.split(name).skip(1);
             for u in urls {
@@ -225,6 +227,17 @@ fn parse(addr: &str) -> String {
                             .for_each(|url| {
                                 json_img.insert(url);
                             });
+                    }
+                    "var" => {
+                        u.split('\'')
+                            .nth(1)
+                            .unwrap()
+                            .split("https://")
+                            .skip(1)
+                            .for_each(|url| {
+                                json_img.insert(format!("https://{url}"));
+                            });
+                        break;
                     }
                     _ => (),
                 }
@@ -266,8 +279,11 @@ fn parse(addr: &str) -> String {
                 titles
                     .iter()
                     .find_map(|s| {
-                        s.text()
-                            .and_then(|t| t.split_once("metaKeywords").map(|kw| kw.1.to_owned()))
+                        s.text().and_then(|t| {
+                            t.split_once("metaKeywords")
+                                .map(|kw| kw.1.to_owned())
+                                .or_else(|| t.split_once("title=").map(|x| x.1.to_owned()))
+                        })
                     })
                     .unwrap()
                     .split('"')
@@ -314,12 +330,9 @@ fn parse(addr: &str) -> String {
                 .any(|x| o.contains(x))
         })
     }) {
-        format_args!(
-            "{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\",
-            G = color::Fg(color::LightGreen)
-        )
+        format_args!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\")
     } else {
-        format_args!("{G} {t}", G = color::Fg(color::LightGreen))
+        format_args!("{G} {t}")
     };
 
     let name_count = |name: &[&str], count: &[usize]| -> String {
@@ -564,20 +577,12 @@ fn parse(addr: &str) -> String {
                         "{B}Do you want to download Album <{U}{}/{albums_len}{_U}>: {G}{}{N}{B}?{N}",
                         i + 1,
                         t.trim(),
-                        G = color::Fg(color::LightGreen),
-                        _U = style::NoUnderline,
-                        U = style::Underline,
-                        B = style::Bold,
-                        N = style::Reset
                     );
                     _ = write!(
                         stdout,
                         "{MARK}{B}{Y}Y{u}es⏎{s}N{u}o{s}A{u}ll{s}C{u}ancel ␛ : {N}",
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
-                        Y = color::Fg(color::LightYellow),
-                        B = style::Bold,
-                        N = style::Reset,
                     );
                     _ = stdout.flush();
 
@@ -832,7 +837,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         "--parallel-immediate",
         "-C-",
     ];
-    // tdbg!(curl.get_args().len() / 3, no_ext.len());
+    // tdbg!(curl.get_args().len() / 3, no_ext.len(););
     if curl.get_args().len() > 0 {
         create_dir();
         _ = curl.args(CURL).args(opts).spawn();
@@ -851,7 +856,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     curl.args(CURL).args(opts).status().unwrap();
                     for (_, f) in no_ext {
                         let file = path.join(&f);
-                        if file.exists() {
+                        if file.is_file() {
                             magic_number_type(file);
                         }
                     }
@@ -1135,15 +1140,12 @@ fn save_to_file(data: &str) {
 }
 
 ///Show `circle` progress indicator
-fn circle_indicator(r: sync::mpsc::Receiver<()>) {
+fn circle_indicator() {
     use io::*;
-    use sync::mpsc::*;
-
     let chars = ['◯', '◔', '◑', '◕', '●'];
-
     let mut o = stdout().lock();
     let t = time::Instant::now();
-    'l: loop {
+    while SPINNER.load(Ordering::Acquire) {
         for char in chars {
             let secs = t.elapsed().as_secs();
             let time = if secs > 0 {
@@ -1153,10 +1155,10 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             };
             print!("{CL}{char}..{time}");
             _ = o.flush();
-            match r.recv_timeout(time::Duration::from_millis(200)) {
-                Err(RecvTimeoutError::Timeout) => (),
-                _ => break 'l,
+            if !SPINNER.load(Ordering::Acquire) {
+                break;
             }
+            thread::sleep(time::Duration::from_millis(200));
         }
     }
     print!("{CL}");
@@ -1268,13 +1270,12 @@ mod img {
         use io::*;
 
         let i = img.unwrap_or("img[src]");
-        let ly = color::Bg(color::LightYellow);
-        pl!("{MARK} Image Selector: {ly} {i} ");
+        pl!("{MARK} Image Selector: {HL} {i} ");
         let mut r = run_cmd("htmlq", &[i], html[..ll].as_ref());
         println!("Totally found {} <img>", r.lines().count());
 
         if let Some(a) = album {
-            pl!("{MARK} Album Selector: {ly} {a} ");
+            pl!("{MARK} Album Selector: {HL} {a} ");
             r = run_cmd("htmlq", &[a], html[..ll].as_ref());
             println!("{}", String::from_utf8_lossy(&r));
         }
@@ -1355,13 +1356,12 @@ mod img {
 
     #[test]
     fn progress() {
-        use sync::mpsc::*;
-        let (s, r) = channel();
         thread::spawn(|| {
-            circle_indicator(r);
+            SPINNER.store(true, Ordering::Release);
+            circle_indicator();
         });
         thread::sleep(time::Duration::from_secs(5));
-        s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
+        SPINNER.store(false, Ordering::Release);
     }
 
     #[test]
