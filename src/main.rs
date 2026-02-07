@@ -938,15 +938,12 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                     .is_some_and(|c| c.tag().unwrap() == "a")
         });
 
-        tag.map_or(<_>::default(), |e| {
-            if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
-                <_>::default()
-            } else {
+        tag.filter(|e| e.text().is_some_and(|t| !t.trim().is_empty()) || !e.children().is_empty())
+            .and_then(|e| {
                 e.attr(attr)
-                    .or_else(|| e.children().first().and_then(|x| x.attr(attr)))
-                    .unwrap()
-            }
-        })
+                    .or_else(|| e.children().first().and_then(|c| c.attr(attr)))
+            })
+            .unwrap_or_default()
     };
     let mut nexts = page.select(nxt);
     nexts.sort_by_key(|x| x.attr(attr));
