@@ -422,7 +422,7 @@ rustflags = [
 
 [target.riscv64gc-unknown-netbsd]
 rustflags = [
-  "-Clink-arg=--sysroot=sysroot/netbsd/riscv64",
+  "-Clink-arg=--sysroot=sysroot/netbsd/riscv-riscv64",
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
 

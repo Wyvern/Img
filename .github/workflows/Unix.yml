@@ -87,7 +87,7 @@ jobs:
                 for ext in tar.xz tgz; do
                         url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-11.0_RC1/$arch/binary/sets/$file.$ext"
                         out="sysroot/netbsd/$arch"
-                        if curl -fsSI "$url" >/dev/null; then
+                        if curl -fsSI "$url" &>/dev/null; then
                             echo "→ Fetching $file.$ext"
                             if [ "$ext" = "tar.xz" ]; then
                                 curl -fsSL "$url" | tar -xJf - -C "$out" 2>/dev/null &
