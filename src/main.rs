@@ -3,8 +3,9 @@
 mod util;
 
 use arcdom as dom;
-use {std::*, util::*};
+use {std::*, sync::atomic::*, util::*};
 
+static SPINNER: AtomicBool = AtomicBool::new(false);
 static SEP: &str = " | ";
 static CSS: [&str; 3] = ["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
@@ -112,11 +113,10 @@ fn host_info(host: &str) -> [Option<&str>; 5] {
 
 ///Fetch web page generate html content
 fn get_html(addr: &str) -> (String, usize) {
-    use sync::mpsc::*;
-    let (s, r) = channel();
     _ = io::stdout().lock();
     let h = thread::spawn(|| {
-        circle_indicator(r);
+        SPINNER.store(true, Ordering::Release);
+        circle_indicator();
     });
 
     let out = process::Command::new("curl")
@@ -130,10 +130,10 @@ fn get_html(addr: &str) -> (String, usize) {
         ])
         .output()
         .unwrap_or_else(|e| {
-            _ = s.send(());
+            SPINNER.store(false, Ordering::Release);
             quit!("curl: {}", e);
         });
-    _ = s.send(());
+    SPINNER.store(false, Ordering::Release);
     if !out.stderr.is_empty() {
         quit!(
             "Fetch {} failed : {}",
@@ -1140,15 +1140,12 @@ fn save_to_file(data: &str) {
 }
 
 ///Show `circle` progress indicator
-fn circle_indicator(r: sync::mpsc::Receiver<()>) {
+fn circle_indicator() {
     use io::*;
-    use sync::mpsc::*;
-
     let chars = ['◯', '◔', '◑', '◕', '●'];
-
     let mut o = stdout().lock();
     let t = time::Instant::now();
-    'l: loop {
+    while SPINNER.load(Ordering::Acquire) {
         for char in chars {
             let secs = t.elapsed().as_secs();
             let time = if secs > 0 {
@@ -1158,10 +1155,10 @@ fn circle_indicator(r: sync::mpsc::Receiver<()>) {
             };
             print!("{CL}{char}..{time}");
             _ = o.flush();
-            match r.recv_timeout(time::Duration::from_millis(200)) {
-                Err(RecvTimeoutError::Timeout) => (),
-                _ => break 'l,
+            if !SPINNER.load(Ordering::Acquire) {
+                break;
             }
+            thread::sleep(time::Duration::from_millis(200));
         }
     }
     print!("{CL}");
@@ -1359,13 +1356,12 @@ mod img {
 
     #[test]
     fn progress() {
-        use sync::mpsc::*;
-        let (s, r) = channel();
         thread::spawn(|| {
-            circle_indicator(r);
+            SPINNER.store(true, Ordering::Release);
+            circle_indicator();
         });
         thread::sleep(time::Duration::from_secs(5));
-        s.send(()).unwrap_or_else(|e| pl!("send error: {}", e));
+        SPINNER.store(false, Ordering::Release);
     }
 
     #[test]
