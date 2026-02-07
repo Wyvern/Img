@@ -78,13 +78,24 @@ jobs:
             fi
           done
 
-          netbsd=(amd64 evbarm-aarch64 sparc64)
+          netbsd=(amd64 evbarm-aarch64 riscv-riscv64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
             if [ ! -d sysroot/netbsd/$arch ]; then
               mkdir -p sysroot/netbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
+                for ext in tar.xz tgz; do
+                        url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-11.0_RC1/$arch/binary/sets/$file.$ext"
+                        out="sysroot/netbsd/$arch"
+                        if curl -fsSI "$url" >/dev/null; then
+                            echo "→ Fetching $file.$ext"
+                            if [ "$ext" = "tar.xz" ]; then
+                                curl -fsSL "$url" | tar -xJf - -C "$out" 2>/dev/null &
+                            else
+                                curl -fsSL "$url" | tar -xzf - -C "$out" 2>/dev/null &
+                            fi
+                        fi
+                    done
               done
             fi
           done
@@ -112,6 +123,7 @@ jobs:
             powerpc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
+            riscv64gc-unknown-netbsd
           )
 
           for target in ${targets[@]}; do
@@ -144,6 +156,7 @@ jobs:
             powerpc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
+            riscv64gc-unknown-netbsd
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os rest <<< "$target"
