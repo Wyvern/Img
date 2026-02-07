@@ -488,7 +488,7 @@
       "Next": "div.fed-page-info a"
     },
     {
-      "Site": "emonl.com,taotuhome.com",
+      "Site": "emonl.com,taotuhome.com,xxiav.com",
       "Img": "div.single-content img",
       "Next": "div.page-links > span",
       "Album": "h2.grid-title > a"

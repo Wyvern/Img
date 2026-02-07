@@ -937,9 +937,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                     .first()
                     .is_some_and(|c| c.tag().unwrap() == "a")
         });
+
         tag.map_or(String::default(), |e| {
             if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
-                <_>::default()
+                String::default()
             } else {
                 e.attr(attr)
                     .or_else(|| e.children().first().and_then(|x| x.attr(attr)))
@@ -959,6 +960,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
             let tags = items.split(|e| element.eql(e)).next_back().unwrap();
+            tdbg!(tags.len(););
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr(attr).unwrap();
@@ -1145,7 +1147,7 @@ fn circle_indicator() {
     let chars = ['◯', '◔', '◑', '◕', '●'];
     let mut o = stdout().lock();
     let t = time::Instant::now();
-    while SPINNER.load(Ordering::Acquire) {
+    'l: while SPINNER.load(Ordering::Acquire) {
         for char in chars {
             let secs = t.elapsed().as_secs();
             let time = if secs > 0 {
@@ -1156,7 +1158,7 @@ fn circle_indicator() {
             print!("{CL}{char}..{time}");
             _ = o.flush();
             if !SPINNER.load(Ordering::Acquire) {
-                break;
+                break 'l;
             }
             thread::sleep(time::Duration::from_millis(200));
         }
