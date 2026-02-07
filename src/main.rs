@@ -938,9 +938,9 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                     .is_some_and(|c| c.tag().unwrap() == "a")
         });
 
-        tag.map_or(String::default(), |e| {
+        tag.map_or(<_>::default(), |e| {
             if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
-                String::default()
+                <_>::default()
             } else {
                 e.attr(attr)
                     .or_else(|| e.children().first().and_then(|x| x.attr(attr)))
@@ -959,8 +959,13 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
-            let tags = items.split(|e| element.eql(e)).next_back().unwrap();
-            tdbg!(tags.len(););
+            let mut tags = items.split(|e| element.eql(e)).next_back().unwrap();
+            if tags.len() == items.len() {
+                tags = items
+                    .split(|e| element.tag() == e.tag() && element.text() == e.text())
+                    .next_back()
+                    .unwrap()
+            }
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr(attr).unwrap();
