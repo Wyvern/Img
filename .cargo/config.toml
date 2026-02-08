@@ -112,7 +112,7 @@ rustflags = [
   "-Zforce-unstable-if-unmarked",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
-  "-Zcross-crate-inline-threshold=yes",
+  # "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.src.build-override]
 inherits = "src"
@@ -137,7 +137,7 @@ rustflags = [
   "-Zforce-unstable-if-unmarked",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
-  "-Zcross-crate-inline-threshold=yes",
+  # "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.redox.build-override]
 inherits = "redox"
