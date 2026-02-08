@@ -1147,15 +1147,15 @@ fn circle_indicator() {
     let mut o = stdout().lock();
     let t = time::Instant::now();
     'l: while SPINNER.load(Ordering::Acquire) {
+        let secs = t.elapsed().as_secs();
+        let time = if secs > 0 {
+            format_args!("{secs:>2}s")
+        } else {
+            format_args!("")
+        };
         for char in chars {
-            let secs = t.elapsed().as_secs();
-            let time = if secs > 0 {
-                format_args!("{secs:>2}s")
-            } else {
-                format_args!("")
-            };
             print!("{CL}{char}..{time}");
-            _ = o.flush();
+            o.flush().unwrap();
             if !SPINNER.load(Ordering::Acquire) {
                 break 'l;
             }
@@ -1163,7 +1163,7 @@ fn circle_indicator() {
         }
     }
     print!("{CL}");
-    _ = o.flush();
+    o.flush().unwrap();
 }
 
 ///cleanup url
