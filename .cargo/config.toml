@@ -420,6 +420,12 @@ rustflags = [
   "-Clink-arg=--target=aarch64--netbsd",
 ]
 
+[target.aarch64_be-unknown-netbsd]
+rustflags = [
+  "-Clink-arg=--sysroot=sysroot/netbsd/evbarm-aarch64eb",
+  "-Clink-arg=--target=aarch64_be--netbsd",
+]
+
 [target.riscv64gc-unknown-netbsd]
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/riscv-riscv64",
