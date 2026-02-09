@@ -221,6 +221,7 @@ rustflags = [
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
+  "-Clinker-plugin-lto",
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--relax",
 ]
@@ -257,6 +258,7 @@ rustflags = [
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
+  "-Clinker-plugin-lto",
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,--as-needed",
