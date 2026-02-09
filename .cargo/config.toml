@@ -278,7 +278,6 @@ rustflags = [
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
   "-Clink-arg=-Wl,--no-eh-frame-hdr",
-  "-Clinker-plugin-lto"
 ]
 
 [target.'cfg(target_family="windows")']
@@ -369,7 +368,7 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
 linker = "clang"
-rustflags = ["-Clink-arg=-fuse-ld=lld","-Clinker-plugin-lto"]
+rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 [target.x86_64-unknown-freebsd]
 rustflags = [
