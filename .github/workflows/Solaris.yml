@@ -98,6 +98,15 @@ jobs:
           # sudo snap install zig --classic --beta
 
           targets=(
+            aarch64-unknown-hermit
+            riscv64gc-unknown-hermit
+            x86_64-unknown-hermit
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target --config hermit.toml
+          done
+
+          targets=(
             x86_64-fortanix-unknown-sgx
             aarch64-unknown-fuchsia
             riscv64gc-unknown-fuchsia

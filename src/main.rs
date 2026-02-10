@@ -1,5 +1,8 @@
 #![feature(cfg_select)]
 
+#[cfg(target_os = "hermit")]
+use hermit as _;
+
 mod util;
 
 use arcdom as dom;
