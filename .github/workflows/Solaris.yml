@@ -102,8 +102,9 @@ jobs:
             riscv64gc-unknown-hermit
             x86_64-unknown-hermit
           )
+          export CARGO_HOME=$(pwd)/.cargo/hermit
           for target in ${targets[@]}; do
-            time cargo s $target --config hermit.toml
+            time cargo s $target
           done
 
           targets=(
@@ -112,6 +113,7 @@ jobs:
             riscv64gc-unknown-fuchsia
             x86_64-unknown-fuchsia
           )
+          unset CARGO_HOME
           for target in ${targets[@]}; do
             time cargo s $target
           done
