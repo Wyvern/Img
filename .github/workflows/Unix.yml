@@ -24,6 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
+          toolchain: nightly-2026-02-09
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
