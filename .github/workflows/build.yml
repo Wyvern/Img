@@ -249,7 +249,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-unknown-fuchsia,x86_64-unknown-fuchsia
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-unknown-fuchsia,x86_64-unknown-fuchsia,aarch64-apple-tvos,aarch64-apple-watchos,aarch64-apple-visionos
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -307,6 +307,9 @@ jobs:
             aarch64-apple-darwin
             aarch64-apple-ios
             x86_64-apple-darwin
+            aarch64-apple-tvos
+            aarch64-apple-watchos
+            aarch64-apple-visionos
             wasm32-wasip2
           )
           for target in ${targets[@]}; do
@@ -331,6 +334,9 @@ jobs:
                   "x86_64-apple-darwin Apple-macOS-x86_64"
                   "aarch64-apple-darwin Apple-macOS-aarch64"
                   "aarch64-apple-ios Apple-iOS-aarch64"
+                  "aarch64-apple-tvos Apple-tvos"
+                  "aarch64-apple-watchos Apple-watchos"
+                  "aarch64-apple-visionos Apple-visionos"
                   "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe"
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
                   "wasm32-wasip2 wasm32-wasip2.wasm"
