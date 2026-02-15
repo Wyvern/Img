@@ -30,7 +30,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: wasm32-wasip2
+          targets: wasm32-wasip3
           components: rust-src
 
       - name: Rust Cache
@@ -75,7 +75,7 @@ jobs:
             aarch64-apple-darwin
             arm64e-apple-darwin
             x86_64h-apple-darwin
-            wasm32-wasip2
+            wasm32-wasip3
           )
 
           for target in ${targets[@]}; do
@@ -108,7 +108,7 @@ jobs:
                   "aarch64-apple-visionos Apple-visionOS-aarch64"
                   "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe"
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
-                  "wasm32-wasip2 wasm32-wasip2.wasm"
+                  "wasm32-wasip3 wasm32-wasip3.wasm"
                   "riscv32imac-unknown-xous-elf Xous-riscv32imac"
           )
 
