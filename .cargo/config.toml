@@ -241,7 +241,7 @@ rustflags = [
   "-Zthreads=0",
   "-Zstaticlib-allow-rdylib-deps",
   "-Zstaticlib-prefer-dynamic",
-  "-Znext-solver=globally",
+  "-Znext-solver=coherence",
   "-Zpanic-in-drop=abort",
   "-Zuse-sync-unwind",
   "-Zgraphviz-dark-mode",
