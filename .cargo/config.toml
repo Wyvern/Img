@@ -368,6 +368,7 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
 linker = "clang"
+[target.'cfg(all(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"),not(target_arch="sparc64")))']
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 [target.x86_64-unknown-freebsd]
@@ -462,6 +463,12 @@ rustflags = [
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/powerpc64",
   "-Clink-arg=--target=powerpc64--openbsd",
+]
+
+[target.sparc64-unknown-openbsd]
+rustflags = [
+  "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
+  "-Clink-arg=--target=sparc64--openbsd",
 ]
 
 [target.'cfg(target_os = "android")']
