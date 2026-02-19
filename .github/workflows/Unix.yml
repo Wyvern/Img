@@ -68,7 +68,7 @@ jobs:
             fi
           done
 
-          openbsd=(amd64 arm64 riscv64 powerpc64 sparc64)
+          openbsd=(amd64 arm64 riscv64 powerpc64)
           files=(base78 comp78)
           for arch in "${openbsd[@]}"; do
             if [ ! -d sysroot/openbsd/$arch ]; then
@@ -79,7 +79,7 @@ jobs:
             fi
           done
 
-          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64 sparc64)
+          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
             if [ ! -d sysroot/netbsd/$arch ]; then
@@ -109,11 +109,8 @@ jobs:
           wait
           chmod -R u+rwX sysroot
 
-          # sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
+          sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
-          time cargo s sparc64-unknown-netbsd
-          time cargo s sparc64-unknown-openbsd
-          exit
           targets=(
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd

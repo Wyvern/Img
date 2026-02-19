@@ -210,7 +210,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [target.'cfg(all())']
 rustflags = [
   "-Ctarget-feature=-crt-static",
-  "-Csymbol-mangling-version=v0",
+  "-Csymbol-mangling-version=hashed",
   "-Coverflow-checks=no",
   "-Cforce-frame-pointers=no",
   "-Cforce-unwind-tables=no",
