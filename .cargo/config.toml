@@ -433,9 +433,10 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-netbsd]
+linker="./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
-  "-Clink-arg=--target=sparc64--netbsd",
+  "-Clink-arg=--target=sparc64-netbsd",
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -466,9 +467,10 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-openbsd]
+linker="./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
-  "-Clink-arg=--target=sparc64--openbsd",
+  "-Clink-arg=--target=sparc64-openbsd",
 ]
 
 [target.'cfg(target_os = "android")']
