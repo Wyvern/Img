@@ -3,17 +3,25 @@
 
 set -e
 
-args=()
+filtered=()
+skip_next=0
 
 for a in "$@"; do
+  if [[ $skip_next -eq 1 ]]; then
+    skip_next=0
+    continue
+  fi
+
   case "$a" in
-    -Wl,--dynamic-list* )
-      # strip unsupported linker flag
+    -Wl,--dynamic-list )
+      skip_next=1   # also drop following list file
+      ;;
+    -Wl,--dynamic-list=* )
       ;;
     *)
-      args+=("$a")
+      filtered+=("$a")
       ;;
   esac
 done
 
-exec zig cc "${args[@]}"
+exec zig cc "${filtered[@]}"
