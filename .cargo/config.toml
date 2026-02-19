@@ -210,7 +210,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [target.'cfg(all())']
 rustflags = [
   "-Ctarget-feature=-crt-static",
-  "-Csymbol-mangling-version=hashed",
+  "-Csymbol-mangling-version=v1",
   "-Coverflow-checks=no",
   "-Cforce-frame-pointers=no",
   "-Cforce-unwind-tables=no",
@@ -366,7 +366,7 @@ linker = "mipsisa64r6el-linux-gnuabi64-gcc"
 rustflags = ["-Zrelax-elf-relocations"]
 
 
-[target.'cfg(all(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"),not(target_arch="sparc64")))']
+[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
@@ -433,10 +433,9 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-netbsd]
-linker="./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
-  "-Clink-arg=--target=sparc64-netbsd",
+  "-Clink-arg=--target=sparc64--netbsd",
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -467,10 +466,9 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-openbsd]
-linker="./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
-  "-Clink-arg=--target=sparc64-openbsd",
+  "-Clink-arg=--target=sparc64--openbsd",
 ]
 
 [target.'cfg(target_os = "android")']

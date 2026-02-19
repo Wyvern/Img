@@ -110,7 +110,7 @@ jobs:
           chmod -R u+rwX sysroot
 
           # sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
-          sudo snap install zig --classic --beta
+
           time cargo s sparc64-unknown-netbsd
           time cargo s sparc64-unknown-openbsd
           exit
