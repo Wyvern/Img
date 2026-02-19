@@ -79,7 +79,7 @@ jobs:
             fi
           done
 
-          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64 sparc64)
+          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
             if [ ! -d sysroot/netbsd/$arch ]; then
@@ -111,9 +111,6 @@ jobs:
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
-          time cargo s sparc64-unknown-netbsd
-          time cargo s sparc64-unknown-openbsd
-          exit
           targets=(
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
@@ -125,6 +122,7 @@ jobs:
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
             powerpc64-unknown-openbsd
+            sparc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
             aarch64_be-unknown-netbsd
@@ -159,6 +157,7 @@ jobs:
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
             powerpc64-unknown-openbsd
+            sparc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
             aarch64_be-unknown-netbsd
