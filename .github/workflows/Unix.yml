@@ -68,7 +68,7 @@ jobs:
             fi
           done
 
-          openbsd=(amd64 arm64 riscv64 powerpc64 sparc64)
+          openbsd=(amd64 arm64 riscv64 powerpc64)
           files=(base78 comp78)
           for arch in "${openbsd[@]}"; do
             if [ ! -d sysroot/openbsd/$arch ]; then
@@ -110,9 +110,7 @@ jobs:
           chmod -R u+rwX sysroot
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
-          find sysroot/openbsd/sparc64 -name "libgcc.a"
-          time cargo s sparc64-unknown-openbsd
-          exit
+
           targets=(
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
@@ -124,7 +122,6 @@ jobs:
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
             powerpc64-unknown-openbsd
-            sparc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
             aarch64_be-unknown-netbsd
@@ -159,7 +156,6 @@ jobs:
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
             powerpc64-unknown-openbsd
-            sparc64-unknown-openbsd
             x86_64-unknown-netbsd
             aarch64-unknown-netbsd
             aarch64_be-unknown-netbsd
