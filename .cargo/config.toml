@@ -468,7 +468,8 @@ rustflags = [
 [target.sparc64-unknown-openbsd]
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
-  "-Clink-arg=--target=sparc64--openbsd",
+  "-Clink-arg=--target=sparc64-unknown-openbsd",
+  "-Clink-arg=-Lsysroot/openbsd/sparc64/usr/lib/gcc-lib/sparc64-unknown-openbsd7.8/4.2.1/"
 ]
 
 [target.'cfg(target_os = "android")']
