@@ -1,6 +1,11 @@
 {
   "Sites": [
     {
+      "Site": "hentaiclub.net",
+      "Img": "div#masonry > div.post-item",
+      "Album": "div.item-title div.item-link-text"
+    },
+    {
       "Site": "beautyleg.com",
       "Img": "td[align=\"center\"] img"
     },
@@ -606,7 +611,7 @@
     {
       "Site": "phimvuspot.com",
       "Img": "div.contentme img",
-      "Next": "div.pagination a",
+      "Next": "ul.pagination-site > li.dots",
       "Album": "h2.post-title > a"
     },
     {

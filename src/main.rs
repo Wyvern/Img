@@ -960,7 +960,14 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
             let tags = items
-                .split(|e| element.tag() == e.tag() && element.text() == e.text())
+                .split(|e| {
+                    if element.children().is_empty() {
+                        element.tag() == e.tag() && element.text() == e.text()
+                    } else {
+                        element.children()[0].tag() == e.children()[0].tag()
+                            && element.children()[0].text() == e.children()[0].text()
+                    }
+                })
                 .next_back()
                 .unwrap();
             next_link = set_next(tags);
@@ -1005,10 +1012,11 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             None => {
                 let pos = nexts.iter().rposition(|e| {
                     e.attr(attr).is_some_and(|h| {
-                        cur.trim().ends_with(h.trim())
+                        let href = h.trim();
+                        cur.trim().ends_with(href)
                             || h.trim() == "#"
                             || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
-                                format!("{}{suffix}", cur.trim_end_matches('/')).ends_with(h.trim())
+                                format!("{}{suffix}", cur.trim_end_matches('/')).ends_with(href)
                             })
                     })
                 });
