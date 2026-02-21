@@ -961,12 +961,13 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             let items = element.parent().unwrap().children();
             let tags = items
                 .split(|e| {
-                    if element.children().is_empty() {
-                        element.tag() == e.tag() && element.text() == e.text()
-                    } else {
-                        element.children()[0].tag() == e.children()[0].tag()
-                            && element.children()[0].text() == e.children()[0].text()
-                    }
+                    element.tag() == e.tag()
+                        && element.text() == e.text()
+                        && element.children().first().is_some_and(|x| {
+                            e.children()
+                                .first()
+                                .is_some_and(|y| x.tag() == y.tag() && x.text() == y.text())
+                        })
                 })
                 .next_back()
                 .unwrap();
@@ -1018,6 +1019,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                             || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
                                 format!("{}{suffix}", cur.trim_end_matches('/')).ends_with(href)
                             })
+                            || e.text().is_some_and(|t| t.contains("<"))
                     })
                 });
                 match pos {

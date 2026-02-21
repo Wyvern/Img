@@ -611,7 +611,7 @@
     {
       "Site": "phimvuspot.com",
       "Img": "div.contentme img",
-      "Next": "ul.pagination-site > li.dots",
+      "Next": "ul.pagination-site a.page-numbers",
       "Album": "h2.post-title > a"
     },
     {
