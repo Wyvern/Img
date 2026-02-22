@@ -162,7 +162,7 @@ binary-dep-depinfo = true
 profile-rustflags = true
 codegen-backend = true
 target-applies-to-host = true
-host-config = true
+# host-config = true
 trim-paths = true
 gc = true
 git = { shallow_index = true, shallow_deps = true }
