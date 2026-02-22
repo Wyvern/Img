@@ -960,15 +960,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
             let tags = items
-                .split(|e| {
-                    element.tag() == e.tag()
-                        && element.text() == e.text()
-                        && element.children().first().is_some_and(|x| {
-                            e.children()
-                                .first()
-                                .is_some_and(|y| x.tag() == y.tag() && x.text() == y.text())
-                        })
-                })
+                .split(|e| element.tag() == e.tag() && element.text() == e.text())
                 .next_back()
                 .unwrap();
             next_link = set_next(tags);
