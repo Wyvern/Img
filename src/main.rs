@@ -1,5 +1,8 @@
 #![feature(cfg_select)]
 
+#[cfg(target_os = "hermit")]
+use hermit as _;
+
 mod util;
 
 use arcdom as dom;
@@ -937,15 +940,13 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                     .first()
                     .is_some_and(|c| c.tag().unwrap() == "a")
         });
-        tag.map_or(String::default(), |e| {
-            if e.text().is_none_or(|t| t.trim().is_empty()) && e.children().is_empty() {
-                <_>::default()
-            } else {
+
+        tag.filter(|e| e.text().is_some_and(|t| !t.trim().is_empty()) || !e.children().is_empty())
+            .and_then(|e| {
                 e.attr(attr)
-                    .or_else(|| e.children().first().and_then(|x| x.attr(attr)))
-                    .unwrap()
-            }
-        })
+                    .or_else(|| e.children().first().and_then(|c| c.attr(attr)))
+            })
+            .unwrap_or_default()
     };
     let mut nexts = page.select(nxt);
     nexts.sort_by_key(|x| x.attr(attr));
@@ -958,7 +959,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         let element = &nexts[0];
         if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
-            let tags = items.split(|e| element.eql(e)).next_back().unwrap();
+            let tags = items
+                .split(|e| element.tag() == e.tag() && element.text() == e.text())
+                .next_back()
+                .unwrap();
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr(attr).unwrap();
@@ -1001,11 +1005,13 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             None => {
                 let pos = nexts.iter().rposition(|e| {
                     e.attr(attr).is_some_and(|h| {
-                        cur.trim().ends_with(h.trim())
+                        let href = h.trim();
+                        cur.trim().ends_with(href)
                             || h.trim() == "#"
                             || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
-                                format!("{}{suffix}", cur.trim_end_matches('/')).ends_with(h.trim())
+                                format!("{}{suffix}", cur.trim_end_matches('/')).ends_with(href)
                             })
+                            || e.text().is_some_and(|t| t.contains("<"))
                     })
                 });
                 match pos {
@@ -1145,24 +1151,24 @@ fn circle_indicator() {
     let chars = ['◯', '◔', '◑', '◕', '●'];
     let mut o = stdout().lock();
     let t = time::Instant::now();
-    while SPINNER.load(Ordering::Acquire) {
+    'l: while SPINNER.load(Ordering::Acquire) {
+        let secs = t.elapsed().as_secs();
+        let time = if secs > 0 {
+            format_args!("{secs:>2}s")
+        } else {
+            format_args!("")
+        };
         for char in chars {
-            let secs = t.elapsed().as_secs();
-            let time = if secs > 0 {
-                format_args!("{secs:>2}s")
-            } else {
-                format_args!("")
-            };
             print!("{CL}{char}..{time}");
-            _ = o.flush();
+            o.flush().unwrap();
             if !SPINNER.load(Ordering::Acquire) {
-                break;
+                break 'l;
             }
             thread::sleep(time::Duration::from_millis(200));
         }
     }
     print!("{CL}");
-    _ = o.flush();
+    o.flush().unwrap();
 }
 
 ///cleanup url

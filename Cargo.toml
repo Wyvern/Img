@@ -25,6 +25,9 @@ termion = "*"
 fork = "*"
 file-format = "*"
 
+[target.'cfg(target_os = "hermit")'.dependencies]
+hermit = "*"
+
 [build-dependencies]
 serde_json = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }

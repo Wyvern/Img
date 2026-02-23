@@ -27,7 +27,7 @@ fn main() {
     } else {
         return;
     };
-    assert!(cmd.output().unwrap().status.success());
+    assert!(cmd.status().unwrap().success());
 }
 
 #[test]
