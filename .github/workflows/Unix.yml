@@ -42,6 +42,13 @@ jobs:
           key: Unix-${{ runner.os }}-${{ runner.arch }}
           restore-keys: Unix-${{ runner.os }}-${{ runner.arch }}
 
+      - name: LLVM install
+        run: |
+          bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+          which clang
+          clang --version
+          clang-22 --version
+
       - name: Build Release
         run: |
           cargo update
