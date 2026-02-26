@@ -367,8 +367,8 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 
 [target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
-linker = "clang-22"
-rustflags = ["-Clink-arg=-fuse-ld=lld","-Clinker-plugin-lto"]
+linker = "clang"
+rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 
 [target.x86_64-unknown-freebsd]
