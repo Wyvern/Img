@@ -56,7 +56,7 @@ mod macros {
     }
 
     #[macro_export]
-    macro_rules! mutv {
+    macro_rules! mv {
         ($var:ident, $val:expr) => {
             unsafe {
                 *(&raw const $var).cast_mut() = $val;

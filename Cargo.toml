@@ -33,7 +33,7 @@ serde_json = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 
 [dev-dependencies]
-# file-format = { version = "*", features = ["reader-xml"] }
+# bincode-next = "*"
 
 [workspace]
 members = ["arcdom"]

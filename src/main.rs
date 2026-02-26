@@ -1288,7 +1288,7 @@ mod img {
     #[test]
     fn mut_val() {
         let var = 123;
-        mutv!(var, 100 * 2 + 22);
+        mv!(var, 100 * 2 + 22);
         tdbg!(var);
     }
 
