@@ -44,10 +44,11 @@ jobs:
 
       - name: LLVM install
         run: |
-          bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
           which clang
           clang --version
           clang-22 --version
+          exit
 
       - name: Build Release
         run: |
