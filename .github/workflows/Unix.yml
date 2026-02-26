@@ -44,8 +44,9 @@ jobs:
 
       - name: LLVM install
         run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
-          which clang
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 22
           clang --version
           clang-22 --version
           exit
