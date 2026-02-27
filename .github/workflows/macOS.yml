@@ -13,8 +13,8 @@ env:
 
 jobs:
   macOS:
-    name: macOS-15
-    runs-on: macos-15
+    name: macOS-26
+    runs-on: macos-26
 
     steps:
       - name: Disable macos spotlight index
