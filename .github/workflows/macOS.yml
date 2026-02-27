@@ -87,7 +87,7 @@ jobs:
           find ./target \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
           sw_vers
           hostinfo
-          sysctl -a | grep brand
+          sysctl -n machdep.cpu.brand_string
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
