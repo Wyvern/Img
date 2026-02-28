@@ -61,6 +61,7 @@ jobs:
         id: latest
         env:
           GH_TOKEN: ${{ github.token }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
         run: |
           run_id=$(gh run list \
                 --workflow macOS.yml \
