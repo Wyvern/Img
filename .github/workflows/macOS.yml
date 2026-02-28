@@ -73,7 +73,6 @@ jobs:
 
       - uses: actions/download-artifact@v8
         continue-on-error: true
-        run: echo "run_id = ${{ steps.latest.outputs.run_id }}"
         with:
           name: build-output
           run-id: ${{ steps.latest.outputs.run_id }}
