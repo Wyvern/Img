@@ -57,10 +57,21 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
+      - name: Get latest successful build run
+        id: latest
+        run: |
+          echo "run_id=$(gh run list \
+            --workflow macOS.yml \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')" >> $GITHUB_OUTPUT
+
       - uses: actions/download-artifact@v8
         continue-on-error: true
         with:
           name: build-output
+          run-id: ${{ steps.latest.outputs.run_id }}
           path: target/
 
       - name: Build Release
