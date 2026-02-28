@@ -57,6 +57,12 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: build-output
+          path: target/
+          if-no-files-found: ignore
+
       - name: Build Release
         run: |
           cargo update
@@ -91,6 +97,12 @@ jobs:
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: target/**/src/img.*
+          if-no-files-found: ignore
 
       - name: Upload binaries to a GitHub release
         env:
