@@ -58,9 +58,9 @@ jobs:
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
       - uses: actions/download-artifact@v8
+        continue-on-error: true
         with:
           name: build-output
-          continue-on-error: true
           path: target/
 
       - name: Build Release
