@@ -69,10 +69,11 @@ jobs:
                 --json databaseId \
                 --jq '.[0].databaseId')
           echo "run_id=$run_id" >> $GITHUB_OUTPUT
-          echo "Latest macOS run_id = $run_id"
+          echo "Latest run_id = $run_id"
 
       - uses: actions/download-artifact@v8
         continue-on-error: true
+        run: echo "run_id = ${{ steps.latest.outputs.run_id }}"
         with:
           name: build-output
           run-id: ${{ steps.latest.outputs.run_id }}
