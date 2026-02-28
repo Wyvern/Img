@@ -57,26 +57,26 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
-      - name: Get latest successful build run
-        id: latest
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          run_id=$(gh run list \
-                --workflow macOS.yml \
-                --status success \
-                --limit 1 \
-                --json databaseId \
-                --jq '.[0].databaseId')
-          echo "run_id=$run_id" >> $GITHUB_OUTPUT
-          echo "Latest run_id = $run_id"
+      # - name: Get latest successful build run
+      #   id: latest
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #   run: |
+      #     run_id=$(gh run list \
+      #           --workflow macOS.yml \
+      #           --status success \
+      #           --limit 1 \
+      #           --json databaseId \
+      #           --jq '.[0].databaseId')
+      #     echo "run_id=$run_id" >> $GITHUB_OUTPUT
+      #     echo "Latest run_id = $run_id"
 
-      - uses: actions/download-artifact@v8
-        continue-on-error: true
-        with:
-          name: build-output
-          run-id: ${{ steps.latest.outputs.run_id }}
-          path: target/
+      # - uses: actions/download-artifact@v8
+      #   continue-on-error: true
+      #   with:
+      #     name: build-output
+      #     run-id: ${{ steps.latest.outputs.run_id }}
+      #     path: target/
 
       - name: Build Release
         run: |
@@ -155,9 +155,3 @@ jobs:
 
           echo "Uploading Apple-macOS-universal..."
           gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
-
-      - uses: actions/download-artifact@v8
-        continue-on-error: true
-        with:
-          name: build-output
-          path: target/
