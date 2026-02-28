@@ -62,13 +62,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "run_id=$(gh run list \
-            --workflow macOS.yml \
-            --status success \
-            --limit 1 \
-            --json databaseId \
-            --jq '.[0].databaseId')" >> $GITHUB_OUTPUT
-          echo run_id=${run_id}
+          run_id=$(gh run list \
+                --workflow macOS.yml \
+                --status success \
+                --limit 1 \
+                --json databaseId \
+                --jq '.[0].databaseId')
+          echo "run_id=$run_id" >> $GITHUB_OUTPUT
+          echo "Latest macOS run_id = $run_id"
 
       - uses: actions/download-artifact@v8
         continue-on-error: true
