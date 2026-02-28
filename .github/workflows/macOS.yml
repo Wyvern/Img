@@ -68,6 +68,7 @@ jobs:
             --limit 1 \
             --json databaseId \
             --jq '.[0].databaseId')" >> $GITHUB_OUTPUT
+          echo run_id=${run_id}
 
       - uses: actions/download-artifact@v8
         continue-on-error: true
