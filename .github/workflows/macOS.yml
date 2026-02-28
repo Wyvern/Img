@@ -61,14 +61,13 @@ jobs:
         id: latest
         env:
           GH_TOKEN: ${{ github.token }}
-          CURRENT_RUN_ID: ${{ github.run_id }}
         run: |
           run_id=$(gh run list \
                 --workflow macOS.yml \
                 --status success \
                 --limit 1 \
                 --json databaseId \
-                --jq '.[0].id')
+                --jq '.[0].databaseId')
           echo "run_id=$run_id" >> $GITHUB_OUTPUT
           echo "Latest run_id = $run_id"
 
@@ -156,3 +155,9 @@ jobs:
 
           echo "Uploading Apple-macOS-universal..."
           gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
+
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: build-output
+          path: target/
