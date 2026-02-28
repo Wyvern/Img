@@ -67,7 +67,7 @@ jobs:
                 --status success \
                 --limit 1 \
                 --json databaseId \
-                --jq '.[0].databaseId')
+                --jq 'map(select(.databaseId != env.CURRENT_RUN_ID))[0].databaseId')
           echo "run_id=$run_id" >> $GITHUB_OUTPUT
           echo "Latest run_id = $run_id"
 
