@@ -69,7 +69,7 @@ jobs:
           path: |
             ~/.redoxer
             ~/.cargo/bin/redoxer
-          key: redoxer-${{ hashFiles('**/Cargo.lock') }}
+          key: redoxer-${{ hashFiles('**/bin/*') }}
           restore-keys: redoxer
 
       - name: Build Release
@@ -99,10 +99,6 @@ jobs:
             cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git --locked redoxer -q --force
           fi
 
-          # if [ ! -d ~/.redoxer ]; then
-
-          # fi
-
           mv .cargo/config.toml .cargo/config.toml.bak
           mv .cargo/redox.toml .cargo/config.toml
 
@@ -112,10 +108,12 @@ jobs:
             x86_64-unknown-redox
           )
           for target in ${targets[@]}; do
-          redoxer env TARGET=$target bash -c "
-              redoxer toolchain
-              time redoxer build -- -q --profile redox -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-              "
+            redoxer env TARGET=$target bash -c "
+                if [ ! -d ~/.redoxer/toolchain/$target ]; then
+                  redoxer toolchain
+                fi
+                time redoxer build -- -q --profile redox -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+                "
           done
 
           mv .cargo/config.toml .cargo/redox.toml
@@ -180,6 +178,8 @@ jobs:
                   "mips64-openwrt-linux-musl Openwrt-mips64-musl"
                   "x86_64-unknown-hurd-gnu Hurd-x86_64"
                   "x86_64-unknown-redox Redox-x86_64"
+                  "aarch64-unknown-redox Redox-aarch64"
+                  "riscv64gc-unknown-redox Redox-riscv64gc"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
