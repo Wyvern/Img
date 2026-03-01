@@ -59,6 +59,18 @@ jobs:
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
       - name: Upload binaries to a GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -170,6 +182,14 @@ jobs:
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
 
       - name: Upload binaries to a GitHub release
         env:
