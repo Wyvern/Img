@@ -69,8 +69,8 @@ jobs:
           path: |
             ~/.redoxer
             ~/.cargo/bin/redoxer
-          key: redoxer-${{ hashFiles('**/bin/*') }}
-          restore-keys: redoxer-${{ hashFiles('**/bin/*') }}
+          key: redoxer-${{ runner.os }}-${{ runner.arch }}
+          restore-keys: redoxer-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Release
         run: |
