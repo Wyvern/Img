@@ -95,13 +95,13 @@ jobs:
           cargo update
           set +e -x
 
-          if [ ! -f ~/.cargo/bin/redoxer ]; then
+          # if [ ! -f ~/.cargo/bin/redoxer ]; then
             cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git --locked redoxer -q
-          fi
+          # fi
 
-          if [ ! -d ~/.redoxer ]; then
+          # if [ ! -d ~/.redoxer ]; then
             redoxer toolchain
-          fi
+          # fi
 
           mv .cargo/config.toml .cargo/config.toml.bak
           mv .cargo/redox.toml .cargo/config.toml
