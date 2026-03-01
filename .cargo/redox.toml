@@ -132,7 +132,6 @@ rustflags = [
 [profile.redox]
 inherits = "lto"
 rustflags = [
-  "-Awarnings",
   "-Zhint-mostly-unused",
   "-Zforce-unstable-if-unmarked",
   "-Zlocation-detail=none",
