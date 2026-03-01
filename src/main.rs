@@ -1,3 +1,5 @@
+#![cfg_attr(target_os = "redox", feature = "cfg_select")]
+
 #[cfg(target_os = "hermit")]
 use hermit as _;
 
