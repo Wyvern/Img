@@ -309,7 +309,6 @@ rustflags = [
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
-  "-Clink-arg=-Wl,-z,pack-relative-relocs",
   "-Clinker-plugin-lto",
 ]
 
