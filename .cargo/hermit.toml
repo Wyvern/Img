@@ -136,7 +136,6 @@ rustflags = [
   "-Zforce-unstable-if-unmarked",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
-  # "-Zcross-crate-inline-threshold=yes",
 ]
 [profile.redox.build-override]
 inherits = "redox"
