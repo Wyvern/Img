@@ -267,12 +267,14 @@ rustflags = [
   "-Clinker-plugin-lto",
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--relax",
+  "-Clink-arg=-Wl,-z,pack-relative-relocs",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm"))))']
 rustflags = [
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,-z,norelro",
+  "-Clink-arg=-Wl,-z,pack-relative-relocs",
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--discard-all",
   "-Clink-arg=-Wl,--build-id=none",
@@ -307,7 +309,8 @@ rustflags = [
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
-  "-Clinker-plugin-lto"
+  "-Clink-arg=-Wl,-z,pack-relative-relocs",
+  "-Clinker-plugin-lto",
 ]
 
 [target.'cfg(target_vendor="apple")']
@@ -363,7 +366,10 @@ linker = "mipsisa64r6el-linux-gnuabi64-gcc"
 
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
-rustflags = ["-Zrelax-elf-relocations"]
+rustflags = [
+  "-Zrelax-elf-relocations",
+  "-Clink-arg=-Wl,-z,pack-relative-relocs",
+]
 
 
 [target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly"))']
