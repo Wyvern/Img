@@ -269,7 +269,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-unknown-fuchsia,x86_64-unknown-fuchsia,aarch64-apple-tvos,aarch64-apple-watchos,aarch64-apple-visionos
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-apple-tvos,aarch64-apple-watchos,aarch64-apple-visionos
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -295,32 +295,12 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
-      - name: Cache Fuchsia
-        uses: actions/cache@v5
-        with:
-          path: /opt/Fuchsia
-          key: ${{ runner.os }}-${{ runner.arch }}-Fuchsia
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-Fuchsia
-
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          if [ ! -d /opt/Fuchsia ]; then
-            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=mac-arm64&version=latest' -o cipd
-            chmod +x cipd
-            sudo mv cipd /usr/local/bin/
-            sudo mkdir -p /opt/Fuchsia
-            sudo chown $(whoami) /opt/Fuchsia
-            cipd install fuchsia/sdk/core/mac-amd64 latest -root /opt/Fuchsia
-          fi
-
-          ln -sf /opt/Fuchsia fuchsia
-
           targets=(
-            aarch64-unknown-fuchsia
-            x86_64-unknown-fuchsia
             x86_64-fortanix-unknown-sgx
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
@@ -369,8 +349,6 @@ jobs:
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
                   "wasm32-wasip2 wasm32-wasip2.wasm"
                   "x86_64-fortanix-unknown-sgx Fortanix-sgx"
-                  "aarch64-unknown-fuchsia Fuchsia-aarch64"
-                  "x86_64-unknown-fuchsia Fuchsia-x86_64"
           )
 
           for target in "${targets[@]}"; do

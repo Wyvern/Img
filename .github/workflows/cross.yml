@@ -22,7 +22,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-unknown-illumos,x86_64-pc-solaris,sparcv9-sun-solaris
+          targets: x86_64-unknown-illumos,x86_64-pc-solaris,sparcv9-sun-solaris,aarch64-unknown-fuchsia,x86_64-unknown-fuchsia
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -42,11 +42,37 @@ jobs:
           fi
           cross --version
 
+      - name: Cache Fuchsia
+        uses: actions/cache@v5
+        with:
+          path: /home/runner/Fuchsia
+          key: Fuchsia
+          restore-keys: Fuchsia
+
       - name: Build Release
         continue-on-error: true
         run: |
           cargo update
           set +e -x
+
+          if [ ! -d /home/runner/Fuchsia ]; then
+            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
+            chmod +x cipd
+            sudo mv cipd /usr/local/bin/
+            mkdir -p /home/runner/Fuchsia
+            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
+          fi
+
+          ln -sf /home/runner/Fuchsia fuchsia
+
+          targets=(
+            aarch64-unknown-fuchsia
+            x86_64-unknown-fuchsia
+          )
+          for target in ${targets[@]}; do
+            time cargo l $target
+          done
+
           targets=(
             x86_64-unknown-illumos
             x86_64-pc-solaris
@@ -56,6 +82,7 @@ jobs:
             export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
             time cross build -q --config 'build.rustc-wrapper=""' --profile lto --target $target
           done
+
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
@@ -79,6 +106,8 @@ jobs:
                   "x86_64-unknown-illumos Illumos-x86_64"
                   "x86_64-pc-solaris Solaris-x86_64"
                   "sparcv9-sun-solaris Solaris-sparcv9"
+                  "aarch64-unknown-fuchsia Fuchsia-aarch64"
+                  "x86_64-unknown-fuchsia Fuchsia-x86_64"
           )
           for target in "${targets[@]}"; do
             read -r arch name <<< "$target"
