@@ -171,11 +171,10 @@ jobs:
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
-            os_cap="${os^}"
             if [[ -n "$abi" ]]; then
-                name="${os_cap}-${arch}-${abi}"
+                name="${os^}-${arch}-${abi}"
             else
-                name="${os_cap}-${arch}"
+                name="${os^}-${arch}"
             fi
             echo "Uploading $name..."
             mv target/$target/src/img target/$target/src/$name || true

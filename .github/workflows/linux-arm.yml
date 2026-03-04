@@ -120,12 +120,11 @@ jobs:
             loongarch64-unknown-linux-musl
           )
           for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os rest <<< "$target"
-            os_cap="${os^}"
-            if [[ -n "$rest" ]]; then
-                name="${os_cap}-${arch}-${rest}"
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
             else
-                name="${os_cap}-${arch}"
+                name="${os^}-${arch}"
             fi
             echo "Uploading $name..."
             mv target/$target/src/img target/$target/src/$name || true
