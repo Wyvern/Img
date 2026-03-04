@@ -43,11 +43,20 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Cache llvm-mingw
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: llvm-mingw
           key: ${{ runner.os }}-llvm-mingw-${{ hashFiles('llvm-mingw/**') }}
           restore-keys: ${{ runner.os }}-llvm-mingw-
+
+      - name: Build output
+        uses: actions/cache@v5
+        with:
+          path: |
+            target/**/img*
+            !target/**/*.d
+          key: output-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src/**', 'Cargo.toml', 'Cargo.lock', 'build.rs')  }}
+          restore-keys: output-${{ runner.os }}-${{ runner.arch }}-
 
       - name: llvm-mingw
         run: |
