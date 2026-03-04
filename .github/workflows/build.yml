@@ -141,7 +141,7 @@ jobs:
           echo "Latest NDK: $latest_ndk"
 
       - name: Android NDK cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/android-ndk-${{ env.NDK_VERSION }}
           key: android-ndk-${{ env.NDK_VERSION }}
@@ -155,11 +155,11 @@ jobs:
         run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
 
       - name: Cache Redoxer
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.redoxer
-          key: redoxer-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: redoxer
+          key: redoxer-${{ hashFiles('~/.cargo/bin/redoxer') }}
+          restore-keys: redoxer-${{ hashFiles('~/.cargo/bin/redoxer') }}
 
       - name: Build Release
         run: |
@@ -279,7 +279,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Cache llvm-mingw
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: llvm-mingw
           key: ${{ runner.os }}-llvm-mingw-${{ hashFiles('llvm-mingw/**') }}
@@ -294,7 +294,7 @@ jobs:
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
       - name: Cache Fuchsia
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /opt/Fuchsia
           key: ${{ runner.os }}-${{ runner.arch }}-Fuchsia
