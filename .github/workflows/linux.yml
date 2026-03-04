@@ -70,7 +70,7 @@ jobs:
             ~/.redoxer
             ~/.cargo/bin/redoxer
           key: redoxer-${{ hashFiles('~/.cargo/bin/redoxer') }}
-          restore-keys: redoxer
+          restore-keys: redoxer-${{ hashFiles('~/.cargo/bin/redoxer') }}
 
       - name: Build Release
         run: |
