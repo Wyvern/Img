@@ -209,6 +209,7 @@ rustflags = [
   "-Ztyping-mode-borrowck",
   "-Zexperimental-default-bounds",
   "-Zhigher-ranked-assumptions",
+  "-Zcrate-attr=feature(cfg_select)",
   # "-Zoffload=Device",
   # "-Zcache-proc-macros=y",
 
