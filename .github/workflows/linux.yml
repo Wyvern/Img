@@ -69,8 +69,8 @@ jobs:
           path: |
             ~/.redoxer
             ~/.cargo/bin/redoxer
-          key: redoxer-${{ runner.os }}-${{ runner.arch }}
-          restore-keys: redoxer-${{ runner.os }}-${{ runner.arch }}
+          key: redoxer-${{ hashFiles('~/.cargo/bin/redoxer') }}
+          restore-keys: redoxer
 
       - name: Build Release
         run: |
@@ -95,9 +95,9 @@ jobs:
           cargo update
           set +e -x
 
-          if [ ! -f ~/.cargo/bin/redoxer ]; then
+          # if [ ! -f ~/.cargo/bin/redoxer ]; then
             cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git --locked redoxer -q --force
-          fi
+          # fi
 
           mv .cargo/config.toml .cargo/config.toml.bak
           mv .cargo/redox.toml .cargo/config.toml
@@ -109,9 +109,9 @@ jobs:
           )
           for target in ${targets[@]}; do
             redoxer env TARGET=$target bash -c "
-                if [ ! -d ~/.redoxer/toolchain/$target ]; then
+                # if [ ! -d ~/.redoxer/toolchain/$target ]; then
                   redoxer toolchain
-                fi
+                # fi
                 time redoxer build -- -q --profile redox -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
                 "
           done
@@ -165,29 +165,46 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "riscv64-linux-android Android-riscv64"
-                  "aarch64-linux-android Android-aarch64"
-                  "armv7-linux-androideabi Android-armv7"
-                  "thumbv7neon-linux-androideabi Android-thumbv7neon"
-                  "x86_64-linux-android Android-x86_64"
-                  "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
-                  "powerpc64-unknown-linux-musl-elfv1 Linux-powerpc64-musl"
-                  "aarch64-unknown-linux-ohos Android-aarch64-ohos"
-                  "armv7-unknown-linux-ohos Android-armv7-ohos"
-                  "x86_64-unknown-linux-ohos Android-x86_64-ohos"
-                  "mips64-openwrt-linux-musl Openwrt-mips64-musl"
-                  "x86_64-unknown-hurd-gnu Hurd-x86_64"
-                  "x86_64-unknown-redox Redox-x86_64"
-                  "aarch64-unknown-redox Redox-aarch64"
-                  "riscv64gc-unknown-redox Redox-riscv64gc"
+                  riscv64-linux-android
+                  aarch64-linux-android
+                  armv7-linux-androideabi
+                  thumbv7neon-linux-androideabi
+                  x86_64-linux-android
+                  powerpc64-unknown-linux-gnu
+                  powerpc64-unknown-linux-musl-elfv1
+                  aarch64-unknown-linux-ohos
+                  armv7-unknown-linux-ohos
+                  x86_64-unknown-linux-ohos
+                  mips64-openwrt-linux-musl
+                  x86_64-unknown-hurd-gnu
+                  x86_64-unknown-redox
+                  aarch64-unknown-redox
+                  riscv64gc-unknown-redox
           )
           for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$vendor" == "openwrt" ]]; then
+                    name="${vendor^}-${arch}-${abi}"
+                else
+                    if [[ "$abi" == "ohos" ]]; then
+                        name="Android-${arch}-${abi}"
+                    else
+                        name="${os^}-${arch}-${abi}"
+                    fi
+                fi
+            else
+                if [[ "$os" == "androideabi" ]]; then
+                    name="Android-${arch}"
+                else
+                    name="${os^}-${arch}"
+                fi
+            fi
             echo "Uploading $name..."
             for d in src redox; do
-                if [ -d "target/$arch/$d" ]; then
-                  mv target/$arch/$d/img target/$arch/$d/$name || true
-                  gh release upload Nightly target/$arch/$d/$name --clobber || true
+                if [ -d "target/$target/$d" ]; then
+                  mv target/$target/$d/img target/$target/$d/$name || true
+                  gh release upload Nightly target/$target/$d/$name --clobber || true
                   break
                 fi
             done

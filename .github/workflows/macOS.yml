@@ -46,8 +46,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: llvm-mingw
-          key: ${{ runner.os }}-llvm-mingw-${{ hashFiles('llvm-mingw/**') }}
-          restore-keys: ${{ runner.os }}-llvm-mingw-
+          key: ${{ runner.os }}-llvm-mingw
+          restore-keys: ${{ runner.os }}-llvm-mingw
 
       - name: llvm-mingw
         run: |
