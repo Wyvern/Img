@@ -166,8 +166,18 @@ jobs:
             "sparcv9-sun-solaris Solaris-sparcv9"
           )
           for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            os_cap="${os^}"
+            if [[ -n "$abi" ]]; then
+                if [[ "$os" == "unknown" ]]; then
+                    name="${vendor}-${abi}"
+                else
+                    name="${os_cap}-${arch}-${abi}"
+                fi
+            else
+                name="${os_cap}-${arch}"
+            fi
             echo "Uploading $name..."
-            mv target/$arch/src/img target/$arch/src/$name || true
-            gh release upload Nightly target/$arch/src/$name --clobber || true
+            mv target/$target/src/img target/$target/src/$name || true
+            gh release upload Nightly target/$target/src/$name --clobber || true
           done

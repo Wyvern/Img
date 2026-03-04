@@ -170,10 +170,10 @@ jobs:
             riscv64gc-unknown-netbsd
           )
           for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os rest <<< "$target"
+            IFS='-' read -r arch vendor os abi <<< "$target"
             os_cap="${os^}"
-            if [[ -n "$rest" ]]; then
-                name="${os_cap}-${arch}-${rest}"
+            if [[ -n "$abi" ]]; then
+                name="${os_cap}-${arch}-${abi}"
             else
                 name="${os_cap}-${arch}"
             fi
