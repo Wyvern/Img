@@ -39,8 +39,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: /home/runner/unix
-          key: Unix-${{ runner.os }}-${{ runner.arch }}
-          restore-keys: Unix-${{ runner.os }}-${{ runner.arch }}
+          key: Unix
+          restore-keys: Unix
 
       - name: Build Release
         run: |
