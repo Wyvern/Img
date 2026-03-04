@@ -112,43 +112,43 @@ jobs:
       - name: Cache sysroot
         uses: actions/cache@v5
         with:
-          path: /home/runner/sysroots
-          key: BSD-${{ runner.os }}-
-          restore-keys: BSD-${{ runner.os }}-
+          path: /home/runner/unix
+          key: Unix
+          restore-keys: Unix
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          SYSROOT="/home/runner/sysroots"
-          ln -sfn "$SYSROOT" sysroot
+          mkdir -p /home/runner/unix;
+          ln -sf /home/runner/unix sysroot
 
           freebsd=(amd64)
           for arch in "${freebsd[@]}"; do
-            if [ ! -d $SYSROOT/freebsd/$arch ]; then
-                mkdir -p $SYSROOT/freebsd/$arch
-                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/14.3-RELEASE/base.txz \
-            | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
+            if [ ! -d sysroot/freebsd/$arch ]; then
+                mkdir -p sysroot/freebsd/$arch
+                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/15.0-RELEASE/base.txz \
+            | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
             fi
           done
 
           # ppc=(powerpc64 powerpc64le)
           # for arch in "${ppc[@]}"; do
-          #   if [ ! -d $SYSROOT/freebsd/$arch ]; then
-          #     mkdir -p $SYSROOT/freebsd/$arch
-          #     curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/14.3-RELEASE/base.txz \
-          #       | tar -xJf - -C $SYSROOT/freebsd/$arch 2>/dev/null &
+          #   if [ ! -d sysroot/freebsd/$arch ]; then
+          #     mkdir -p sysroot/freebsd/$arch
+          #     curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/15.0-RELEASE/base.txz \
+          #       | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
           #   fi
           # done
 
           # openbsd=(amd64)
           # files=(base77 comp77)
           # for arch in "${openbsd[@]}"; do
-          #   if [ ! -d $SYSROOT/openbsd/$arch ]; then
-          #     mkdir -p $SYSROOT/openbsd/$arch
+          #   if [ ! -d sysroot/openbsd/$arch ]; then
+          #     mkdir -p sysroot/openbsd/$arch
           #     for file in "${files[@]}"; do
-          #       curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C $SYSROOT/openbsd/$arch 2>/dev/null &
+          #       curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
           #     done
           #   fi
           # done
@@ -156,16 +156,16 @@ jobs:
           netbsd=(amd64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
-            if [ ! -d $SYSROOT/netbsd/$arch ]; then
-              mkdir -p $SYSROOT/netbsd/$arch
+            if [ ! -d sysroot/netbsd/$arch ]; then
+              mkdir -p sysroot/netbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C $SYSROOT/netbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
               done
             fi
           done
 
           wait
-          chmod -R u+rwX "$SYSROOT"
+          chmod -R u+rwX sysroot
 
           targets=(
             x86_64-unknown-freebsd
