@@ -186,7 +186,6 @@ json-target-spec = true
 #     "core",
 #     "std",
 #     "alloc",
-#     "proc_macro",
 #     "panic_abort",
 #     "libc",
 #     "compiler_builtins",
