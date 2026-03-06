@@ -69,7 +69,7 @@ jobs:
           path: |
             ~/.redoxer
             ~/.cargo/bin/redoxer
-          key: redoxer
+          key: redoxer-
           restore-keys: redoxer-
 
       - name: Build Release
