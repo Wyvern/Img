@@ -119,10 +119,10 @@ jobs:
           mv .cargo/config.toml .cargo/redox.toml
           mv .cargo/config.toml.bak .cargo/config.toml
 
-          # if [ ! -d /home/runner/openwrt ]; then
+          if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
             curl -LsSf https://downloads.openwrt.org/releases/25.12.0/targets/octeon/generic/openwrt-toolchain-25.12.0-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
-          # fi
+          fi
 
           ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.0-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
