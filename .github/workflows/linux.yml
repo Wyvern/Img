@@ -70,7 +70,7 @@ jobs:
             ~/.redoxer
             ~/.cargo/bin/redoxer
           key: redoxer
-          restore-keys: redoxer
+          restore-keys: redoxer-
 
       - name: Build Release
         run: |
