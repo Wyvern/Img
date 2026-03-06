@@ -26,14 +26,14 @@ fork = "*"
 file-format = "*"
 
 [target.'cfg(target_os = "hermit")'.dependencies]
-hermit = "*"
+hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 
 [build-dependencies]
 serde_json = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 
 [dev-dependencies]
-# file-format = { version = "*", features = ["reader-xml"] }
+# bincode-next = "*"
 
 [workspace]
 members = ["arcdom"]
