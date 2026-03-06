@@ -20,8 +20,8 @@ l = "b -q --profile lto --target"
 
 h = "s x86_64h-apple-darwin"
 e = "s arm64e-apple-darwin"
-s = "b -q --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target"
-z = "zigbuild -q --profile src -Zbuild-std=std,proc_macro,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target "
+s = "b -q --profile src -Zbuild-std=std,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target"
+z = "zigbuild -q --profile src -Zbuild-std=std,panic_abort,compiler_builtins -Zbuild-std-features=panic_immediate_abort --target "
 
 
 [cargo-new]
@@ -146,7 +146,6 @@ json-target-spec = true
 #     "core",
 #     "std",
 #     "alloc",
-#     "proc_macro",
 #     "panic_abort",
 #     "libc",
 #     "compiler_builtins",
@@ -177,9 +176,10 @@ rustflags = [
   "-Cdebuginfo=0",
   "-Cstrip=symbols",
   "-Ccollapse-macro-debuginfo=y",
+  "-Cpanic=abort",
 
   "-Zunstable-options",
-  # "-Zembed-metadata=no",
+  "-Zembed-metadata=no",
   "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",

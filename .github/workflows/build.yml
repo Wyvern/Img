@@ -149,9 +149,10 @@ jobs:
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
+        with:
+          version: "6.0.0.1"
 
       - name: Ubuntu apt update and install
-        continue-on-error: true
         run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
 
       - name: Cache Redoxer
