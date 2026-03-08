@@ -567,7 +567,7 @@ fn parse(addr: &str) -> String {
                                     if x.trim().is_empty() {
                                         quit!("Album title text is empty.")
                                     } else {
-                                        x
+                                        x.split('\n').next_back().unwrap().trim().into()
                                     }
                                 },
                             )
@@ -1369,7 +1369,7 @@ mod img {
     }
 
     #[test]
-    fn sanity_check_json() {
+    fn sanity_check_dup() {
         let mut sites = collections::HashSet::new();
         let mut dup_site = vec![];
         let mut img_sel = collections::HashMap::new();
