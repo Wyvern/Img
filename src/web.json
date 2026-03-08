@@ -1,6 +1,12 @@
 {
   "Sites": [
     {
+      "Site": "pixibb.com",
+      "Img": "div.entry-content img",
+      "Next": "div.page-links > span",
+      "Album": "h2.post-title > a"
+    },
+    {
       "Site": "hentaiclub.net",
       "Img": "div#masonry > div.post-item",
       "Album": "div.item-title div.item-link-text"
