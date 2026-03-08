@@ -961,6 +961,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                 .split(|e| element.tag() == e.tag() && element.text() == e.text())
                 .next_back()
                 .unwrap();
+            debug_assert!(!tags.is_empty() && tags.len() < items.len());
             next_link = set_next(tags);
         } else if element.tag().unwrap() == "i" {
             next_link = element.parent().unwrap().attr(attr).unwrap();
@@ -1288,7 +1289,7 @@ mod img {
     #[test]
     fn mut_val() {
         let var = 123;
-        mv!(var, 100 * 2 + 22);
+        mv!(var = 100 * 2 + 22);
         tdbg!(var);
     }
 
