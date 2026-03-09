@@ -567,7 +567,11 @@ fn parse(addr: &str) -> String {
                                     if x.trim().is_empty() {
                                         quit!("Album title text is empty.")
                                     } else {
-                                        x.split('\n').next_back().unwrap().trim().into()
+                                        x.lines()
+                                            .max_by_key(|l| l.trim().len())
+                                            .unwrap()
+                                            .trim()
+                                            .into()
                                     }
                                 },
                             )
