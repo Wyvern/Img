@@ -3,7 +3,7 @@ use hermit as _;
 
 mod util;
 
-use arcdom as dom;
+use dom_query::{self as dom, NodeIdProver};
 use {std::*, sync::atomic::*, util::*};
 
 static SPINNER: AtomicBool = AtomicBool::new(false);
@@ -192,7 +192,7 @@ fn parse(addr: &str) -> String {
     let sel = sels.map(|(l, _)| l).or(img);
 
     let mut json_img = collections::HashSet::new();
-    let mut html_img = vec![];
+    let mut html_img = dom::Selection::default();
     let css_img = if img.is_none() {
         css_image(html.as_ref(), addr)
     } else {
@@ -203,11 +203,8 @@ fn parse(addr: &str) -> String {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
         let name = sels.map(|(_, r)| r).unwrap().trim();
         let script = page.select("script");
-        for s in script
-            .iter()
-            .filter(|&s| s.text().is_some_and(|t| !t.trim().is_empty()))
-        {
-            let t = s.text().unwrap();
+        for s in script.iter().filter(|s| !s.text().is_empty()) {
+            let t = s.text();
             let urls = t.split(name).skip(1);
             for u in urls {
                 match kind {
@@ -265,25 +262,15 @@ fn parse(addr: &str) -> String {
 
     let albums = album.map(|a| page.select(a));
     let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
-    let page_title = || {
-        titles
-            .first()
-            .unwrap_or_else(|| {
-                quit!("Not a valid HTML page.");
-            })
-            .text()
-            .expect("NO title text.")
-    };
+    let page_title = || titles.first().immediate_text();
     let title = title_sel.map_or_else(
         || {
             if !json_img.is_empty() {
                 titles
                     .iter()
                     .find_map(|s| {
-                        s.text().and_then(|t| {
-                            t.split_once("metaKeywords")
-                                .map(|kw| kw.1.to_owned())
-                                .or_else(|| t.split_once("title=").map(|x| x.1.to_owned()))
+                        ["metaKeywords", "title="].iter().find_map(|kw| {
+                            s.immediate_text().split_once(kw).map(|(_, v)| v.to_owned())
                         })
                     })
                     .unwrap()
@@ -293,7 +280,7 @@ fn parse(addr: &str) -> String {
                     .split(',')
                     .max_by_key(|&seg| seg.trim().len())
                     .unwrap()
-                    .to_owned()
+                    .into()
             } else {
                 page_title()
             }
@@ -302,7 +289,7 @@ fn parse(addr: &str) -> String {
             if has_album {
                 page_title()
             } else {
-                page.select(t)[0].text().unwrap()
+                page.select_single(t).immediate_text()
             }
         },
     );
@@ -319,8 +306,8 @@ fn parse(addr: &str) -> String {
     .trim();
 
     let [albums_len, imgs_len, json_len] = [
-        albums.as_ref().map_or(0, |a| a.len()),
-        html_img.len() + css_img.len() + json_img.len(),
+        albums.as_ref().map_or(0, |a| a.length()),
+        html_img.length() + css_img.len() + json_img.len(),
         json_img.len(),
     ];
 
@@ -357,7 +344,7 @@ fn parse(addr: &str) -> String {
 
     let htj = name_count(
         ["HTML", "CSS", "JSON"].as_slice(),
-        [html_img.len(), css_img.len(), json_len].as_slice(),
+        [html_img.length(), css_img.len(), json_len].as_slice(),
     );
     let prefix = "✔︎ Totally found";
     match (has_album, imgs_len > 0) {
@@ -386,7 +373,7 @@ fn parse(addr: &str) -> String {
             let mut urls = collections::HashSet::new();
             let [mut empty, mut dup, mut embed] = [0usize; 3];
 
-            for elm in html_img {
+            for elm in html_img.iter() {
                 let value = [
                     "data-src",
                     "data-lazy",
@@ -423,12 +410,12 @@ fn parse(addr: &str) -> String {
                                 }
                             }
                         } else if val.starts_with("data:image/") {
-                            handle_embed(val);
+                            handle_embed(val.to_string());
                         } else {
                             let url = if sel == img {
                                 url_redirect_and_query_cleanup(&val)
                             } else {
-                                val
+                                val.to_string()
                             };
                             // tdbg!(&url;);
                             if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
@@ -478,7 +465,7 @@ fn parse(addr: &str) -> String {
                         let page = dom::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
-                        for e in html_img {
+                        for e in html_img.iter() {
                             let src = e.attr("src").unwrap();
                             let title_alt = ["title", "alt"].iter().find_map(|a| {
                                 e.attr(a).and_then(|x| {
@@ -515,7 +502,7 @@ fn parse(addr: &str) -> String {
             for (i, alb) in albums.unwrap().iter().enumerate() {
                 let parse_album = || {
                     let href = alb.attr("href").unwrap_or_else(|| {
-                        let mut p = alb.parent().unwrap();
+                        let mut p = alb.parent();
                         let mut href = None;
                         let mut n = 2;
                         while n > 0 {
@@ -525,17 +512,11 @@ fn parse(addr: &str) -> String {
                             }
                             n -= 1;
                             if n > 0 {
-                                p = p.parent().unwrap();
+                                p = p.parent();
                             }
                         }
 
-                        href.unwrap_or_else(|| {
-                            p.select("a[href]")
-                                .first()
-                                .expect("NO album a[@href] attr found.")
-                                .attr("href")
-                                .unwrap()
-                        })
+                        href.unwrap_or_else(|| p.select("a[href]").first().attr("href").unwrap())
                     });
 
                     if !href.is_empty() {
@@ -561,20 +542,16 @@ fn parse(addr: &str) -> String {
                         .iter()
                         .find_map(|a| alb.attr(a))
                         .unwrap_or_else(|| {
-                            alb.text().map_or_else(
-                                || quit!("NO album title can be found."),
-                                |x| {
-                                    if x.trim().is_empty() {
-                                        quit!("Album title text is empty.")
-                                    } else {
-                                        x.lines()
-                                            .max_by_key(|l| l.trim().len())
-                                            .unwrap()
-                                            .trim()
-                                            .into()
-                                    }
-                                },
-                            )
+                            let t = alb.immediate_text();
+                            if t.trim().is_empty() {
+                                quit!("Album title text is empty.")
+                            } else {
+                                t.lines()
+                                    .max_by_key(|l| l.trim().len())
+                                    .unwrap()
+                                    .trim()
+                                    .into()
+                            }
                         });
 
                     _ = writeln!(
@@ -925,7 +902,7 @@ fn magic_number_type(pb: path::PathBuf) {
 
 /// Check `next` selector link page info
 fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
-    let mut next_link: String;
+    let mut next_link = dom::Document::default().text();
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
     let attr = nxt
@@ -935,78 +912,81 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         .rsplit(['[', ']'])
         .nth(1)
         .unwrap_or("href");
-    let set_next = |tags: &[dom::Element]| -> String {
+    let set_next = |tags: &[dom::Node]| {
         let tag = tags.iter().find(|e| {
-            e.tag().unwrap() == "a"
+            e.node_name().unwrap().as_ref() == "a"
                 || e.children()
                     .first()
-                    .is_some_and(|c| c.tag().unwrap() == "a")
+                    .is_some_and(|c| c.node_name().unwrap().as_ref() == "a")
         });
 
-        tag.filter(|e| e.text().is_some_and(|t| !t.trim().is_empty()) || !e.children().is_empty())
+        tag.filter(|e| e.is_nonempty_text() || !e.children().is_empty())
             .and_then(|e| {
                 e.attr(attr)
                     .or_else(|| e.children().first().and_then(|c| c.attr(attr)))
             })
             .unwrap_or_default()
     };
-    let mut nexts = page.select(nxt);
+    let mut nexts = page.select(nxt).nodes().to_vec();
     nexts.sort_by_key(|x| x.attr(attr));
     nexts.dedup_by_key(|x| x.attr(attr));
 
     if nexts.is_empty() {
-        next_link = String::default();
         tdbg!(nxt);
     } else if nexts.len() == 1 {
-        let element = &nexts[0];
-        if element.tag().unwrap() == "span" || element.attr(attr).is_none() {
+        let element = nexts[0];
+        if element.node_name().unwrap().as_ref() == "span" || element.attr(attr).is_none() {
             let items = element.parent().unwrap().children();
             let tags = items
-                .split(|e| element.tag() == e.tag() && element.text() == e.text())
+                .split(|e| {
+                    (&element).node_id() == e.node_id()
+                    // ptr::eq(
+                    //     element.element_ref().unwrap().deref(),
+                    //     e.element_ref().unwrap().deref(),
+                    // )
+                })
                 .next_back()
                 .unwrap();
             debug_assert!(!tags.is_empty() && tags.len() < items.len());
             next_link = set_next(tags);
-        } else if element.tag().unwrap() == "i" {
+        } else if element.node_name().unwrap().as_ref() == "i" {
             next_link = element.parent().unwrap().attr(attr).unwrap();
         } else {
             next_link = element.attr(attr).unwrap();
         }
     } else {
-        let last2 = nexts[nexts.len() - 2..].iter().rfind(|&n| {
-            let mut t = n.text();
-            if t.is_some() && t.as_deref().unwrap().trim().is_empty() {
-                t.take();
-            }
-            let next_下 = |mut t: String| {
-                t.make_ascii_lowercase();
-                t.contains('下') || t.contains("next")
+        let last2 = nexts.iter().rev().take(2).find(|n| {
+            let txt = n.immediate_text();
+            let t = txt.as_ref();
+            let next_下 = |t: &str| {
+                t.contains('下') || t.split_whitespace().any(|w| w.eq_ignore_ascii_case("next"))
             };
-            match t {
-                Some(text) => next_下(text) || (n.attr("target").is_some()),
-                None => {
-                    t = n.attr("title");
-                    match t {
-                        Some(title) => next_下(title),
-                        None => {
-                            let span = n.select("span.currenttext");
-                            if span.is_empty() {
-                                return false;
-                            }
-                            t = span[0].text();
-                            match t {
-                                Some(text) => next_下(text),
-                                None => false,
-                            }
+
+            if !t.is_empty() {
+                next_下(t) || (n.attr("target")).is_some()
+            } else {
+                match n.attr("title") {
+                    Some(title) => next_下(title.as_ref()),
+                    None => {
+                        let s = dom::Selection::from(**n);
+                        let span = s.select("span.currenttext");
+                        if span.is_empty() {
+                            return false;
+                        }
+                        let t = span.first().immediate_text();
+                        if !t.is_empty() {
+                            next_下(t.as_ref())
+                        } else {
+                            false
                         }
                     }
                 }
             }
         });
-        next_link = match last2 {
-            Some(v) => v.attr(attr).unwrap_or(String::default()),
+        match last2 {
+            Some(v) => next_link = v.attr(attr).unwrap_or_default(),
             None => {
-                let pos = nexts.iter().rposition(|e| {
+                let pos = nexts.iter().collect::<Vec<_>>().iter().rposition(|e| {
                     e.attr(attr).is_some_and(|h| {
                         let href = h.trim();
                         cur.trim().ends_with(href)
@@ -1014,18 +994,13 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                             || ["/1", "?page=1", "/page/1"].iter().any(|suffix| {
                                 format!("{}{suffix}", cur.trim_end_matches('/')).ends_with(href)
                             })
-                            || e.text().is_some_and(|t| t.contains("<"))
+                            || e.immediate_text().contains("<")
                     })
                 });
-                match pos {
-                    Some(p) => {
-                        if p < nexts.len() - 1 {
-                            nexts[p + 1].attr(attr).unwrap()
-                        } else {
-                            String::default()
-                        }
-                    }
-                    None => String::default(),
+                if let Some(p) = pos
+                    && p < nexts.len() - 1
+                {
+                    next_link = nexts.get(p + 1).unwrap().attr(attr).unwrap()
                 }
             }
         };
@@ -1034,16 +1009,17 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     //     next = String::default();
     // }
 
-    if cur.trim().ends_with(&next_link)
+    if !next_link.is_empty() && cur.trim().ends_with(next_link.as_ref())
         || next_link.trim() == "#"
         || next_link.trim() == "javascript:;"
         || next_link.trim() == "/"
     {
-        next_link = String::default();
+        next_link = dom::Document::default().text();
     }
+    let mut ret = String::default();
     if !next_link.is_empty() {
-        next_link = ns.map_or_else(
-            || canonicalize(&next_link, cur),
+        ret = ns.map_or_else(
+            || canonicalize(next_link.as_ref(), cur),
             |(_, r)| {
                 let count = r.matches('/').count();
                 format!(
@@ -1062,7 +1038,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         );
     }
 
-    tdbg!(next_link)
+    tdbg!(ret)
 }
 
 ///Run arbitrary command in sync mode
