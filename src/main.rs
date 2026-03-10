@@ -986,7 +986,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         match last2 {
             Some(v) => next_link = v.attr(attr).unwrap_or_default(),
             None => {
-                let pos = nexts.iter().collect::<Vec<_>>().iter().rposition(|e| {
+                let pos = nexts.iter().rposition(|e| {
                     e.attr(attr).is_some_and(|h| {
                         let href = h.trim();
                         cur.trim().ends_with(href)
