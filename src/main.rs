@@ -930,7 +930,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     let mut nexts = page.select(nxt).nodes().to_vec();
     nexts.sort_by_key(|x| x.attr(attr));
     nexts.dedup_by_key(|x| x.attr(attr));
-
+    tdbg!(nexts.len());
     if nexts.is_empty() {
         tdbg!(nxt);
     } else if nexts.len() == 1 {
@@ -963,7 +963,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             };
 
             if !t.is_empty() {
-                next_下(t) || (n.attr("target")).is_some()
+                next_下(t) || n.attr("target").is_some()
             } else {
                 match n.attr("title") {
                     Some(title) => next_下(title.as_ref()),
