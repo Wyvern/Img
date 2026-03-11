@@ -522,7 +522,7 @@ rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
 
 [target.hexagon-unknown-linux-musl]
 linker = "hexagon/bin/hexagon-unknown-linux-musl-clang"
-rustflags = ["-Clink-arg=--sysroot=hexagon"]
+rustflags = ["-Clink-arg=--sysroot=hexagon/hexagon-unknown-linux-musl"]
 
 [target.'cfg(target_os="fuchsia")']
 linker = "clang"

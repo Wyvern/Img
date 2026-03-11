@@ -140,12 +140,8 @@ jobs:
 
           ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/x86_64-linux-musl/ hexagon
 
-          find hexagon -iname hexagon-unknown-linux-musl-clang
-
-          time cargo s hexagon-unknown-linux-musl
-          exit
-
           targets=(
+            hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
@@ -195,6 +191,7 @@ jobs:
                   armv7-unknown-linux-ohos
                   x86_64-unknown-linux-ohos
                   mips64-openwrt-linux-musl
+                  hexagon-unknown-linux-musl
                   x86_64-unknown-hurd-gnu
                   x86_64-unknown-redox
                   aarch64-unknown-redox
