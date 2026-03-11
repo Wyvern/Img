@@ -126,6 +126,16 @@ jobs:
 
           ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.0-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
+          if [ ! -d /home/runner/hexagon ]; then
+            mkdir -p /home/runner/hexagon
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
+          fi
+
+          ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_x86_64-linux-musl hexagon
+
+          time cargo s hexagon-unknown-linux-musl
+          exit
+
           targets=(
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
