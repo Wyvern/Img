@@ -138,8 +138,7 @@ jobs:
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
 
-          find /home/runner/hexagon -iname crt1.o
-          ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/ hexagon
+          ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/x86_64-linux-musl hexagon
 
           targets=(
             hexagon-unknown-linux-musl
