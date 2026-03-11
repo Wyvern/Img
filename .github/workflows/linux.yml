@@ -138,9 +138,9 @@ jobs:
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
 
-          ln -sf /home/runner/hexagon/ hexagon
+          ln -sf /home/runner/hexagon hexagon
 
-          find ./hexagon -iname hexagon-unknown-linux-musl-clang
+          find hexagon -iname hexagon-unknown-linux-musl-clang
 
           time cargo s hexagon-unknown-linux-musl
           exit
