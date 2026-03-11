@@ -524,7 +524,7 @@ rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
 linker = "hexagon/bin/hexagon-unknown-linux-musl-clang"
 rustflags = [
   "-Clink-arg=--sysroot=hexagon/target/hexagon-unknown-linux-musl",
-  "-Clink-arg=-fno-unaligned-access",
+  "-Clink-arg=-mno-unaligned-access",
 ]
 
 [target.'cfg(target_os="fuchsia")']
