@@ -196,9 +196,9 @@
       "Next": "div.pagelist a"
     },
     {
-      "Site": "shxiaowu.com",
+      "Site": "yuleba.org",
       "Img": "div.main img",
-      "Next": "div.paging a"
+      "Next": "div.paging > a:has-text('下一页')"
     },
     {
       "Site": "umeitu.com",
@@ -734,6 +734,7 @@
     ["资讯热线", "div.logo > a > img[alt][title]", "shzx.org"],
     ["秀人妹子", "div.nt > a > span", "656g.com"],
     ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],
+    ["娱乐吧", "div.banner > a > img[alt][title]", "yuleba.org"],
     [
       "极品性感美女",
       "h1.logo > a[title] > img[alt='性感美女网']",

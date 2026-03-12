@@ -119,7 +119,6 @@ fn get_html(addr: &str) -> (String, usize) {
         SPINNER.store(true, Ordering::Release);
         circle_indicator();
     });
-
     let out = process::Command::new("curl")
         .args(CURL)
         .args([
