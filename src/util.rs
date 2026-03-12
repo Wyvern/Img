@@ -32,10 +32,7 @@ Color!(
     R = 91,
     G = 92,
     Y = 93,
-    BLUE = 94,
-    HL = 103,
-    BG = 100,
-    FG = 97
+    HL = 103
 );
 
 mod macros {

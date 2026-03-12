@@ -1,4 +1,4 @@
-use {std::*, util::*};
+use std::*;
 mod util;
 static TEXT: &str = "The quick brown fox jumps over the lazy dog.";
 
@@ -202,8 +202,15 @@ fn analyze_args(args: [Option<&str>; 4]) {
 
 fn exit() {
     println!(
-        "Usage: Color {NL}`8|256` {NL}`256 {B}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {B}{R}r {G}g {BLUE}b{N} [0-255]{{3}}` \n options.",
+        "Usage: Color {NL}`8|256` {NL}`256 {Bold}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {Bold}{R}r {G}g {B}b{N} [0-255]{{3}}` \n options.",
         NL = "\n\t",
+        Bold = Basic::Bold,
+        N = Basic::Reset,
+        FG = Basic::BrightWhite,
+        BG = Basic::BrightBlackBg,
+        R = Basic::BrightRed,
+        G = Basic::BrightGreen,
+        B = Basic::BrightBlue
     );
     process::exit(0);
 }
@@ -230,6 +237,17 @@ mod color {
 }
 
 fn color8() {
+    macro_rules! pc {
+        ($l:literal) => {
+            println!(
+                "\n{}{}{}:{}",
+                Basic::Bold,
+                Basic::Underline,
+                $l,
+                Basic::Reset
+            )
+        };
+    }
     (0u8..=9)
         .chain(22..=25)
         .chain(27..=29)
@@ -239,11 +257,12 @@ fn color8() {
         .chain(100..=107)
         .for_each(|c| {
             _ = match c {
-                0 => println!("\n{B}{U}Basic Style:{N}"),
-                30 => println!("\n{B}{U}8-color regular foreground:{N}"),
-                40 => println!("\n{B}{U}8-color regular background:{N}"),
-                90 => println!("\n{B}{U}8-color bright foreground:{N}"),
-                100 => println!("\n{B}{U}8-color bright background:{N}"),
+                0 => pc!("Basic Style"),
+                22 => pc!("Advanced Style"),
+                30 => pc!("8-color regular foreground"),
+                40 => pc!("8-color regular background"),
+                90 => pc!("8-color bright foreground"),
+                100 => pc!("8-color bright background"),
                 _ => (),
             };
             println!("{:?}", Basic::from(c));
