@@ -237,16 +237,8 @@ mod color {
 }
 
 fn color8() {
-    macro_rules! pc {
-        ($l:literal) => {
-            println!(
-                "\n{}{}{}:{}",
-                Basic::Bold,
-                Basic::Underline,
-                $l,
-                Basic::Reset
-            )
-        };
+    fn section(s: &str) {
+        println!("\n{}{}{s}:{}", Basic::Bold, Basic::Underline, Basic::Reset)
     }
     (0u8..=9)
         .chain(22..=25)
@@ -256,13 +248,13 @@ fn color8() {
         .chain(90..=97)
         .chain(100..=107)
         .for_each(|c| {
-            _ = match c {
-                0 => pc!("Basic Style"),
-                22 => pc!("Advanced Style"),
-                30 => pc!("8-color regular foreground"),
-                40 => pc!("8-color regular background"),
-                90 => pc!("8-color bright foreground"),
-                100 => pc!("8-color bright background"),
+            match c {
+                0 => section("Basic Style"),
+                22 => section("Advanced Style"),
+                30 => section("8-color regular foreground"),
+                40 => section("8-color regular background"),
+                90 => section("8-color bright foreground"),
+                100 => section("8-color bright background"),
                 _ => (),
             };
             println!("{:?}", Basic::from(c));
