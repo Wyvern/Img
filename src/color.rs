@@ -139,15 +139,15 @@ impl fmt::Debug for Color {
 }
 
 fn main() {
-    if env::args().len() > cfg_select! {test=>{5+3} _=>{5}} {
+    let args = env::args();
+    if args.len() > cfg_select! {test=>{5+3} _=>{5}} {
         exit()
     }
-    let args: [_; 4] = array::from_fn(|i| {
-        cfg_select! {
-            test=>{env::args().skip(3).nth(i + 1)}
-            _=>{env::args().nth(i + 1)}
-        }
-    });
+    let mut args = cfg_select! {
+        test => {args.skip(4)}
+        _ => {args.skip(1)}
+    };
+    let args: [_; 4] = array::from_fn(|_| args.next());
     analyze_args(array::from_fn(|i| args[i].as_deref()));
 }
 
