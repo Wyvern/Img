@@ -139,6 +139,9 @@ impl fmt::Debug for Color {
 }
 
 fn main() {
+    if env::args().len() > cfg_select! {test=>{5+3} _=>{5}} {
+        exit()
+    }
     let args: [_; 4] = array::from_fn(|i| {
         cfg_select! {
             test=>{env::args().skip(3).nth(i + 1)}
@@ -196,7 +199,7 @@ fn analyze_args(args: [Option<&str>; 4]) {
 
 fn exit() {
     println!(
-        "Usage: Color {NL}`8|256` {NL}`256 {Bold}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {Bold}{R}r {G}g {B}b{N} [0-255]{{3}}` \n options.",
+        "Usage: Color {NL}`8|256` {NL}`256 {Bold}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {Bold}{R}r {G}g {B}b{N} [0-255]{{3}}` \n\toptions.",
         NL = "\n\t",
         Bold = Basic::Bold,
         N = Basic::Reset,
