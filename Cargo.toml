@@ -11,7 +11,7 @@ embed = ["dep:base64"]
 [[example]]
 name = "color"
 path = "src/color.rs"
-test = false
+test = true
 
 [dependencies]
 serde_json = "*"

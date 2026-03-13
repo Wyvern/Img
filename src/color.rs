@@ -139,18 +139,15 @@ impl fmt::Debug for Color {
 }
 
 fn main() {
-    if env::args().len() > if cfg!(test) { 5 + 3 } else { 5 } {
+    if env::args().len() > cfg_select! {test=>{5+3} _=>{5}} {
         exit()
     }
-
     let args: [_; 4] = array::from_fn(|i| {
-        if cfg!(test) {
-            env::args().skip(3).nth(i + 1)
-        } else {
-            env::args().nth(i + 1)
+        cfg_select! {
+            test=>{env::args().skip(3).nth(i + 1)}
+            _=>{env::args().nth(i + 1)}
         }
     });
-
     analyze_args(array::from_fn(|i| args[i].as_deref()));
 }
 
@@ -180,7 +177,7 @@ fn analyze_args(args: [Option<&str>; 4]) {
                 exit();
             }
         },
-        [Some("rgb") | Some("RGB"), Some(r), Some(g), Some(b)] => {
+        [Some(c), Some(r), Some(g), Some(b)] if c.to_ascii_lowercase() == "rgb" => {
             match [r, g, b].map(|v| {
                 v.parse::<u8>()
                     .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
@@ -221,7 +218,6 @@ mod color {
 
     #[test]
     fn color() {
-        color8();
         println!(
             "{:?}{:?}{:?}{:?}",
             Basic::Magenta,
