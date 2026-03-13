@@ -139,9 +139,6 @@ impl fmt::Debug for Color {
 }
 
 fn main() {
-    if env::args().len() > cfg_select! {test=>{5+3} _=>{5}} {
-        exit()
-    }
     let args: [_; 4] = array::from_fn(|i| {
         cfg_select! {
             test=>{env::args().skip(3).nth(i + 1)}
