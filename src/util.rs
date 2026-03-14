@@ -21,8 +21,7 @@ macro_rules! STATIC {
 STATIC!(pub &str;
     UP = "\x1b[1A",
     CL = "\r\x1b[2K", //Clear current line + move to start
-    MARK = "\x1b]1337;SetMark\x07",
-    TEXT = "The quick brown fox jumps over the lazy dog"
+    MARK = "\x1b]1337;SetMark\x07"
 );
 
 Color!(
@@ -33,10 +32,7 @@ Color!(
     R = 91,
     G = 92,
     Y = 93,
-    BLUE = 94,
-    HL = 103,
-    BG = 100,
-    FG = 97
+    HL = 103
 );
 
 mod macros {
@@ -57,7 +53,7 @@ mod macros {
 
     #[macro_export]
     macro_rules! mv {
-        ($var:ident, $val:expr) => {
+        ($var:ident = $val:expr) => {
             unsafe {
                 *(&raw const $var).cast_mut() = $val;
             }

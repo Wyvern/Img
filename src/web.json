@@ -1,13 +1,24 @@
 {
   "Sites": [
     {
+      "Site": "mmrgb.com",
+      "Img": "img[zoomfile]",
+      "Album": "div.card-figure p"
+    },
+    {
       "Site": "hentaiclub.net",
-      "Img": "div#masonry > div.post-item",
+      "Img": "div.post-item > img.post-item-img",
       "Album": "div.item-title div.item-link-text"
     },
     {
+      "Site": "pixibb.com",
+      "Img": "div.entry-content img",
+      "Next": "div.page-links > span",
+      "Album": "h2.post-title > a"
+    },
+    {
       "Site": "beautyleg.com",
-      "Img": "td[align=\"center\"] img"
+      "Img": "td[align='center'] img"
     },
     {
       "Site": "girldreamy.com",
@@ -16,7 +27,7 @@
     },
     {
       "Site": "meitu131.com",
-      "Img": "p[align=\"center\"] img",
+      "Img": "p[align='center'] img",
       "Next": "div#pages a",
       "Album": "div.title-info a"
     },
@@ -72,7 +83,7 @@
     },
     {
       "Site": "whtaotu.com",
-      "Img": "p[align=\"center\"] img",
+      "Img": "p[align='center'] img",
       "Next": "div.pagelist a",
       "Album": "div.title a"
     },
@@ -124,7 +135,7 @@
     },
     {
       "Site": "mmm.red,mmm999.red",
-      "Img": "div[data-fancybox=\"gallery\"] img",
+      "Img": "div[data-fancybox='gallery'] img",
       "Album": "a.item-link div"
     },
     {
@@ -185,9 +196,9 @@
       "Next": "div.pagelist a"
     },
     {
-      "Site": "shxiaowu.com",
+      "Site": "yuleba.org",
       "Img": "div.main img",
-      "Next": "div.paging a"
+      "Next": "div.paging > a:has-text('下一页')"
     },
     {
       "Site": "umeitu.com",
@@ -348,7 +359,7 @@
     },
     {
       "Site": "hotgirl2024.com",
-      "Img": "a[data-fancybox=\"gallery\"][href]",
+      "Img": "a[data-fancybox='gallery'][href]",
       "Next": "div.pagination a",
       "Album": "div.articles-grid__title a"
     },
@@ -556,7 +567,7 @@
     {
       "Site": "heisiwu.net",
       "Img": "img.block",
-      "Next": "a[rel=\"next\"]",
+      "Next": "a[rel='next']",
       "Album": "a > h2.font-semibold"
     },
     {
@@ -588,7 +599,7 @@
     },
     {
       "Site": "3w8n.com",
-      "Img": "div[align=\"center\"] > img",
+      "Img": "div[align='center'] > img",
       "Next": "div#page a.next",
       "Album": "ul.list > li > a"
     },
@@ -712,30 +723,27 @@
   ],
   "Series": [
     ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
-    ["秀人集", "div.logo > a > img[alt=\"秀人集\"]", "quanjixiu.com"],
-    ["秀人美女", "div.logo > a > img[alt=\"秀人美女\"]", "xrmnw.com"],
-    ["妹子图", "div.logo > a[title=\"妹子图-美女图库\"]", "dzdmr.com"],
-    ["尤物秀", "h1.logo > a[title=\"尤物秀\"]", "pornclub.cc"],
-    ["爱美女", "h1.logo > a[title=\"爱美女网\"] > img[src]", "imn5.top"],
-    ["我为人人", "a[href=\"/2048\"] > img[src]", "hjd2048.com"],
+    ["秀人集", "div.logo > a > img[alt='秀人集']", "quanjixiu.com"],
+    ["秀人美女", "div.logo > a > img[alt='秀人美女']", "xrmnw.com"],
+    ["妹子图", "div.logo > a[title='妹子图-美女图库']", "dzdmr.com"],
+    ["尤物秀", "h1.logo > a[title='尤物秀']", "pornclub.cc"],
+    ["爱美女", "h1.logo > a[title='爱美女网'] > img[src]", "imn5.top"],
+    ["我为人人", "a[href='/2048'] > img[src]", "hjd2048.com"],
     ["蜜丝社", "a.navbar-brand > img.img-fluid", "oorpg.com"],
     ["小黄书 xChina", "div.logo > a > img[alt]", "xchina.co"],
     ["资讯热线", "div.logo > a > img[alt][title]", "shzx.org"],
     ["秀人妹子", "div.nt > a > span", "656g.com"],
     ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],
+    ["娱乐吧", "div.banner > a > img[alt][title]", "yuleba.org"],
     [
       "极品性感美女",
-      "h1.logo > a[title] > img[alt=\"性感美女网\"]",
+      "h1.logo > a[title] > img[alt='性感美女网']",
       "jpxgmn.com"
     ],
     ["秀人图 ", "div.logo-wrapper img.tap-logo", "ikxiuren.com"],
-    [
-      "深度学堂",
-      "div.logo-wrapper > a[href] > img[alt=\"深度学堂\"]",
-      "sdxt.de"
-    ],
+    ["深度学堂", "div.logo-wrapper > a[href] > img[alt='深度学堂']", "sdxt.de"],
     ["爱看美女", "div.logo.fl > a[title] > img[alt]", "ligui.org"],
-    ["V2PH,", "a.logo > img[alt=\"V2PH\"]", "v2ph.com"],
+    ["V2PH,", "a.logo > img[alt='V2PH']", "v2ph.com"],
     ["Leg Baby", "div.navbar-header > a.navbar-brand", "legbabe.com"],
     [
       "Girl-Atlas",

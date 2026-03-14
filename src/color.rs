@@ -1,31 +1,163 @@
-use {std::*, util::*};
+use std::*;
 mod util;
+static TEXT: &str = "The quick brown fox jumps over the lazy dog.";
 
-fn main() -> io::Result<()> {
-    if env::args().len() > if cfg!(test) { 5 + 3 } else { 5 } {
-        exit()
+#[repr(u8)]
+#[derive(Clone, Copy)]
+pub enum Basic {
+    Reset = 0,
+    Bold = 1,
+    Faint = 2,
+    Italic = 3,
+    Underline = 4,
+    SlowBlink = 5,
+    RapidBlink = 6,
+    ReverseVideo = 7,
+    Conceal = 8,
+    Strikethrough = 9,
+
+    NormalIntensity = 22,
+    ItalicOff = 23,
+    UnderlineOff = 24,
+    BlinkOff = 25,
+    ReverseOff = 27,
+    Reveal = 28,
+    StrikethroughOff = 29,
+
+    Black = 30,
+    Red = 31,
+    Green = 32,
+    Yellow = 33,
+    Blue = 34,
+    Magenta = 35,
+    Cyan = 36,
+    White = 37,
+
+    BlackBg = 40,
+    RedBg = 41,
+    GreenBg = 42,
+    YellowBg = 43,
+    BlueBg = 44,
+    MagentaBg = 45,
+    CyanBg = 46,
+    WhiteBg = 47,
+
+    BrightBlack = 90,
+    BrightRed = 91,
+    BrightGreen = 92,
+    BrightYellow = 93,
+    BrightBlue = 94,
+    BrightMagenta = 95,
+    BrightCyan = 96,
+    BrightWhite = 97,
+
+    BrightBlackBg = 100,
+    BrightRedBg = 101,
+    BrightGreenBg = 102,
+    BrightYellowBg = 103,
+    BrightBlueBg = 104,
+    BrightMagentaBg = 105,
+    BrightCyanBg = 106,
+    BrightWhiteBg = 107,
+}
+impl Basic {
+    #[allow(unused)]
+    fn code(&self) -> u8 {
+        *self as u8
     }
 
-    let args: [_; 4] = array::from_fn(|i| {
-        if cfg!(test) {
-            env::args().skip(3).nth(i + 1)
-        } else {
-            env::args().nth(i + 1)
-        }
-    });
-
-    analyze_args(array::from_fn(|i| args[i].as_deref()))
+    fn from(c: u8) -> Self {
+        unsafe { mem::transmute(c) }
+    }
+}
+impl fmt::Display for Basic {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "\x1b[{}m", self.code())
+    }
+}
+impl fmt::Debug for Basic {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "\"\\x1b[{0}m\": - \x1b[{0}m{TEXT}{1}\n",
+            self.code(),
+            Self::Reset
+        )
+    }
 }
 
-fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
-    match args {
-        [None, None, None, None] => {
-            color8(TEXT)?;
-            color(Range::_256(0), TEXT, Kind::Both, true)
+pub enum Color {
+    Basic(Basic),
+    FG(u8),
+    BG(u8),
+    RGBfg(u8, u8, u8),
+    RGBbg(u8, u8, u8),
+}
+
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Basic(c) => write!(f, "{}", c),
+            Self::FG(c) => write!(f, "\x1b[38;5;{c}m"),
+            Self::BG(c) => write!(f, "\x1b[48;5;{c}m"),
+            Self::RGBfg(r, g, b) => write!(f, "\x1b[38;2;{r};{g};{b}m"),
+            Self::RGBbg(r, g, b) => write!(f, "\x1b[48;2;{r};{g};{b}m"),
         }
-        [Some(v), None, None, None] if v.parse::<u8>() == Ok(8) => color8(TEXT),
+    }
+}
+
+impl fmt::Debug for Color {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Basic(c) => write!(f, "{:?}", c),
+            Self::FG(c) => write!(
+                f,
+                "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m{TEXT}{}\n",
+                Basic::Reset
+            ),
+            Self::BG(c) => write!(
+                f,
+                "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m{TEXT}{}\n",
+                Basic::Reset
+            ),
+            Self::RGBfg(r, g, b) => {
+                write!(
+                    f,
+                    "\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m{TEXT}{}\n",
+                    Basic::Reset
+                )
+            }
+            Self::RGBbg(r, g, b) => {
+                write!(
+                    f,
+                    "\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m{TEXT}{}\n",
+                    Basic::Reset
+                )
+            }
+        }
+    }
+}
+
+fn main() {
+    let args = env::args();
+    if args.len() > cfg_select! {test=>{5+3} _=>{5}} {
+        exit()
+    }
+    let mut args = cfg_select! {
+        test => {args.skip(4)}
+        _ => {args.skip(1)}
+    };
+    let args: [_; 4] = array::from_fn(|_| args.next());
+    analyze_args(array::from_fn(|i| args[i].as_deref()));
+}
+
+fn analyze_args(args: [Option<&str>; 4]) {
+    match args {
+        [None, None, None, None] => color8(),
+        [Some(v), None, None, None] if v.parse::<u8>() == Ok(8) => color8(),
         [Some(v), None, None, None] if v.parse::<u16>() == Ok(256) => {
-            color(Range::_256(0), TEXT, Kind::Both, true)
+            (0u8..=255).for_each(|c| println!("{:?}", Color::FG(c)));
+            (0u8..=255).for_each(|c| println!("{:?}", Color::BG(c)));
         }
         [Some(v1), Some(v2), None, None] => match (
             v1.parse::<u16>().as_ref(),
@@ -33,48 +165,49 @@ fn analyze_args(args: [Option<&str>; 4]) -> io::Result<()> {
                 .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16)),
         ) {
             (Ok(256), Ok(c)) => {
-                color(Range::_256(c), TEXT, Kind::FG, false)?;
-                color(Range::_256(c), TEXT, Kind::BG, false)
+                println!("{:?}", Color::FG(c));
+                println!("{:?}", Color::BG(c));
             }
             (Ok(256), _) => match v2 {
-                "fg" => color(Range::_256(0), TEXT, Kind::FG, true),
-                "bg" => color(Range::_256(0), TEXT, Kind::BG, true),
-                _ => {
-                    exit();
-                    Ok(())
-                }
+                "fg" => (0u8..=255).for_each(|c| println!("{:?}", Color::FG(c))),
+                "bg" => (0u8..=255).for_each(|c| println!("{:?}", Color::BG(c))),
+                _ => exit(),
             },
             _ => {
                 exit();
-                Ok(())
             }
         },
-        [Some("rgb") | Some("RGB"), Some(r), Some(g), Some(b)] => {
+        [Some(c), Some(r), Some(g), Some(b)] if c.to_ascii_lowercase() == "rgb" => {
             match [r, g, b].map(|v| {
                 v.parse::<u8>()
                     .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
             }) {
                 [Ok(r), Ok(g), Ok(b)] => {
-                    color(Range::_RGB(r, g, b), TEXT, Kind::FG, false)?;
-                    color(Range::_RGB(r, g, b), TEXT, Kind::BG, false)
+                    println!("{:?}", Color::RGBfg(r, g, b));
+                    println!("{:?}", Color::RGBbg(r, g, b));
                 }
                 _ => {
                     exit();
-                    Ok(())
                 }
             }
         }
         _ => {
             exit();
-            Ok(())
         }
     }
 }
 
 fn exit() {
     println!(
-        "Usage: Color {NL}`8|256` {NL}`256 {B}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {B}{R}r {G}g {BLUE}b{N} [0-255]{{3}}` \n options.",
+        "Usage: Color {NL}`8|256` {NL}`256 {Bold}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {Bold}{R}r {G}g {B}b{N} [0-255]{{3}}` \n\toptions.",
         NL = "\n\t",
+        Bold = Basic::Bold,
+        N = Basic::Reset,
+        FG = Basic::BrightWhite,
+        BG = Basic::BrightBlackBg,
+        R = Basic::BrightRed,
+        G = Basic::BrightGreen,
+        B = Basic::BrightBlue
     );
     process::exit(0);
 }
@@ -84,109 +217,42 @@ mod color {
     use super::*;
 
     #[test]
-    fn run() -> io::Result<()> {
-        main()
+    fn color() {
+        println!(
+            "{:?}{:?}{:?}{:?}",
+            Basic::Magenta,
+            Color::FG(Basic::BrightGreen.code()),
+            Color::BG(Basic::BrightBlue.code()),
+            Color::RGBbg(100, 200, 220)
+        );
     }
-
     #[test]
-    fn show() -> io::Result<()> {
-        color8(TEXT)?;
-        color(Range::_256(0), TEXT, Kind::Both, true)?;
-        Ok(())
+    fn run() {
+        main();
     }
 }
 
-use io::*;
-
-fn color8(text: &str) -> Result<()> {
-    let mut bf = BufWriter::new(stdout());
-    (0u8..10)
-        .chain(21..=21)
+fn color8() {
+    fn section(s: &str) {
+        println!("\n{}{}{s}:{}", Basic::Bold, Basic::Underline, Basic::Reset)
+    }
+    (0u8..=9)
+        .chain(22..=25)
+        .chain(27..=29)
         .chain(30..=37)
         .chain(40..=47)
         .chain(90..=97)
         .chain(100..=107)
         .for_each(|c| {
-            _ = match c {
-                0 => writeln!(bf, "\n{B}{U}Basic Style:{N}"),
-                30 => writeln!(bf, "\n{B}{U}8-color regular foreground:{N}"),
-                40 => writeln!(bf, "\n{B}{U}8-color regular background:{N}"),
-                90 => writeln!(bf, "\n{B}{U}8-color bright foreground:{N}"),
-                100 => writeln!(bf, "\n{B}{U}8-color bright background:{N}"),
-                _ => Ok(()),
+            match c {
+                0 => section("Basic Style"),
+                22 => section("Advanced Style"),
+                30 => section("8-color regular foreground"),
+                40 => section("8-color regular background"),
+                90 => section("8-color bright foreground"),
+                100 => section("8-color bright background"),
+                _ => (),
             };
-            _ = writeln!(bf, "\"\\x1b[{c}m\": - \x1b[{c}m {text} {N}");
+            println!("{:?}", Basic::from(c));
         });
-    bf.flush()
-}
-
-enum Range {
-    _256(u8),
-    _RGB(u8, u8, u8),
-}
-
-enum Kind {
-    FG,
-    BG,
-    Both,
-}
-
-fn color(r: Range, text: &str, k: Kind, full: bool) -> Result<()> {
-    let mut bf = BufWriter::new(stdout());
-    match k {
-        Kind::Both => {
-            color(Range::_256(0), text, Kind::FG, true)?;
-            color(Range::_256(0), text, Kind::BG, true)?;
-            return Ok(());
-        }
-        _ => writeln!(
-            bf,
-            "\n{B}{U}{}-color {}:{N}",
-            match r {
-                Range::_256(_) => "256",
-                Range::_RGB(..) => "RGB",
-            },
-            match k {
-                Kind::FG => "foreground",
-                Kind::BG => "background",
-                Kind::Both => unreachable!(),
-            }
-        )?,
-    }
-
-    let fb: u8 = match k {
-        Kind::FG => 38,
-        Kind::BG => 48,
-        _ => unreachable!(),
-    };
-
-    if full {
-        match r {
-            Range::_256(_) => (0u8..=255).for_each(|c| {
-                _ = writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}");
-            }),
-            Range::_RGB(..) => (0u8..=255).for_each(|r| {
-                (0u8..=255).for_each(|g| {
-                    (0u8..=255).for_each(|b| {
-                        _ = writeln!(
-                            bf,
-                            "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}"
-                        );
-                    });
-                    _ = bf.flush();
-                    pause()
-                });
-            }),
-        }
-    } else {
-        match r {
-            Range::_256(c) => writeln!(bf, "\"\\x1b[{fb};5;{c}m\": - \x1b[{fb};5;{c}m {text} {N}")?,
-            Range::_RGB(r, g, b) => writeln!(
-                bf,
-                "\"\\x1b[{fb};2;{r};{g};{b}m\": - \x1b[{fb};2;{r};{g};{b}m {text} {N}"
-            )?,
-        }
-    }
-
-    bf.flush()
 }

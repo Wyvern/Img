@@ -11,14 +11,14 @@ embed = ["dep:base64"]
 [[example]]
 name = "color"
 path = "src/color.rs"
-test = false
+test = true
 
 [dependencies]
-arcdom = { path = "arcdom" }
 serde_json = "*"
 percent-encoding = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 base64 = { version = "*", default-features = false, optional = true }
+dom_query = {version = "*", default-features = false}
 
 [target.'cfg(unix)'.dependencies]
 termion = "*"
@@ -34,6 +34,3 @@ cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 
 [dev-dependencies]
 # bincode-next = "*"
-
-[workspace]
-members = ["arcdom"]
