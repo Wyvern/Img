@@ -96,8 +96,6 @@ jobs:
           # cargo install fortanix-sgx-tools sgxs-tools -q
           # sudo snap install zig --classic --beta
 
-          cargo b -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size,backtrace --target aarch64-unknown-fuchsia
-          exit
           targets=(
             aarch64-unknown-hermit
             riscv64gc-unknown-hermit
@@ -119,7 +117,7 @@ jobs:
             x86_64-unknown-fuchsia
           )
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo b -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size,backtrace --target $target
           done
 
           targets=(
