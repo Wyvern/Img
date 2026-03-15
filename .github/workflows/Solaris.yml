@@ -110,8 +110,9 @@ jobs:
           mv .cargo/config.toml .cargo/hermit.toml
           mv .cargo/config.toml.bak .cargo/config.toml
 
+          time cargo s x86_64-fortanix-unknown-sgx
+
           targets=(
-            x86_64-fortanix-unknown-sgx
             aarch64-unknown-fuchsia
             riscv64gc-unknown-fuchsia
             x86_64-unknown-fuchsia
