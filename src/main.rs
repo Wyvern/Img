@@ -2,7 +2,6 @@
 use hermit as _;
 
 mod util;
-
 use dom_query::{self as dom, NodeIdProver};
 use {std::*, sync::atomic::*, util::*};
 

@@ -3,6 +3,11 @@ use std::*;
 fn main() {
     println!("cargo::rerun-if-changed=src/web.json");
 
+    let target_env = std::env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default();
+    if target_env.starts_with("musl") {
+        println!("cargo::rustc-link-lib=m");
+    }
+
     use fs::*;
     use io::*;
 
