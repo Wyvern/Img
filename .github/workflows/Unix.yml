@@ -48,8 +48,6 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
           sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
-          clang --version
-          lld --version
 
       - name: Build Release
         run: |
