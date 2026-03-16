@@ -44,10 +44,13 @@ jobs:
 
       - name: Install LLVM
         run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22 noble --install clang lld
-          sudo update-alternatives --set clang /usr/bin/clang-22
-          sudo update-alternatives --set clang++ /usr/bin/clang++-22
-          sudo update-alternatives --set lld /usr/bin/lld-22
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 100
+          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 100
+          sudo update-alternatives --config clang
+          sudo update-alternatives --config clang++
+          sudo update-alternatives --config lld
           clang --version
           lld --version
 
