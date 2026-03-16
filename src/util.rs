@@ -8,7 +8,7 @@ macro_rules! Color {
 
 macro_rules! STATIC {
             ($v:vis $t:ty; $($i:ident = $e:expr),+) => {
-                $(#[allow(dead_code)] $v static $i: $t = $e;)+
+                $(#[allow(unused)] $v static $i: $t = $e;)+
             }
         }
 
