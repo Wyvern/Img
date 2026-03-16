@@ -440,9 +440,7 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 linker = "wrt/bin/mips64-openwrt-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
 
-[target.'cfg(target_os="fuchsia")']
-linker = "clang"
-rustflags = ["-Clink-arg=-fuse-ld=lld"]
+
 [target.aarch64-unknown-fuchsia]
 rustflags = [
   "-Clink-arg=--target=aarch64--fuchsia",
