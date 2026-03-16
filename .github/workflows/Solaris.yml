@@ -56,6 +56,13 @@ jobs:
           # sudo apt install -y protobuf-compiler
           # sudo apt install -y zfsutils-linux
 
+      - name: Install LLVM
+        run: |
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
+          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
+
       # - name: Cache Illumos/Solaris
       #   uses: actions/cache@v5
       #   with:
