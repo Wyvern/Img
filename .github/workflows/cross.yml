@@ -49,6 +49,13 @@ jobs:
           key: Fuchsia
           restore-keys: Fuchsia
 
+      - name: Install LLVM
+        run: |
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
+          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
+
       - name: Build Release
         continue-on-error: true
         run: |
@@ -144,6 +151,13 @@ jobs:
           path: /home/runner/unix
           key: Unix
           restore-keys: Unix
+
+      - name: Install LLVM
+        run: |
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
+          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
 
       - name: Build Release
         run: |
