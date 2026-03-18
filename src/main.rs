@@ -813,6 +813,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let opts = [
         "-e",
         &format!("https://{host}"),
+        "--retry",
+        "3",
         "-Z",
         "--parallel-immediate",
         "-C-",
