@@ -95,8 +95,9 @@
     },
     {
       "Site": "xiuren.biz",
-      "Img": "div.content-inner img.alignnone.size-full",
-      "Album": "h3.jeg_post_title a"
+      "Img": "img.alignnone.size-full",
+      "Album": "h3.jeg_post_title a",
+      "Page": "div.jeg_block_navigation a.next"
     },
     {
       "Site": "nudegirls4u.com",
