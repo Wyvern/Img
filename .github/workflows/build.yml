@@ -122,7 +122,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu ,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,x86_64-unknown-redox
+          targets: x86_64-linux-android,aarch64-linux-android,armv7-linux-androideabi,thumbv7neon-linux-androideabi,powerpc64-unknown-linux-gnu,powerpc64-unknown-linux-musl, ,aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,x86_64-unknown-redox
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -207,6 +207,7 @@ jobs:
             thumbv7neon-linux-androideabi
             x86_64-linux-android
             powerpc64-unknown-linux-gnu
+            powerpc64-unknown-linux-musl
           )
 
           for target in ${targets[@]}; do
@@ -238,6 +239,7 @@ jobs:
                   "armv7-linux-androideabi Android-armv7"
                   "thumbv7neon-linux-androideabi Android-thumbv7neon"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
+                  "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
                   "aarch64-unknown-linux-ohos Android-aarch64-ohos"
                   "armv7-unknown-linux-ohos Android-armv7-ohos"
                   "x86_64-unknown-linux-ohos Android-x86_64-ohos"
@@ -268,7 +270,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -306,6 +308,9 @@ jobs:
             aarch64-apple-darwin
             aarch64-apple-ios
             x86_64-apple-darwin
+            aarch64-apple-tvos
+            aarch64-apple-visionos
+            aarch64-apple-watchos
             wasm32-wasip2
           )
           for target in ${targets[@]}; do
@@ -338,6 +343,9 @@ jobs:
                   "x86_64-apple-darwin Apple-macOS-x86_64"
                   "aarch64-apple-darwin Apple-macOS-aarch64"
                   "aarch64-apple-ios Apple-iOS-aarch64"
+                  "aarch64-apple-tvos Apple-tvOS"
+                  "aarch64-apple-visionos Apple-visionOS"
+                  "aarch64-apple-watchos Apple-watchOS"
                   "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe"
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
                   "wasm32-wasip2 wasm32-wasip2.wasm"
