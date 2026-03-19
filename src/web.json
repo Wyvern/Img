@@ -95,7 +95,7 @@
     },
     {
       "Site": "xiuren.biz",
-      "Img": "img.alignnone.size-full",
+      "Img": "div.content-inner img",
       "Album": "h3.jeg_post_title a",
       "Page": "div.jeg_block_navigation a.next"
     },
@@ -377,8 +377,8 @@
     },
     {
       "Site": "jrants.com",
-      "Img": "div.bialty-container p img",
-      "Next": "div.pgntn-page-pagination-block a",
+      "Img": "div.entry-content img",
+      "Next": "div.pgntn-page-pagination-block > a:has-text('Next')",
       "Album": "header.entry-header h2 a"
     },
     {
@@ -513,7 +513,7 @@
     {
       "Site": "meitulu.me",
       "Img": "div.container-inner-fix-m img",
-      "Next": "ul.pagination a",
+      "Next": "ul.pagination a[href]:has-text('下一頁')",
       "Album": "div.my-card-title"
     },
     {
