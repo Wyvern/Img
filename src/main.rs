@@ -914,10 +914,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         .unwrap_or("href");
     let set_next = |tags: &[dom::Node]| {
         let tag = tags.iter().find(|e| {
-            e.node_name().unwrap().as_ref() == "a"
+            e.node_name().is_some_and(|n| n.as_ref() == "a")
                 || e.children()
                     .first()
-                    .is_some_and(|c| c.node_name().unwrap().as_ref() == "a")
+                    .is_some_and(|c| c.node_name().is_some_and(|n| n.as_ref() == "a"))
         });
 
         tag.filter(|e| e.is_nonempty_text() || !e.children().is_empty())
@@ -927,6 +927,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             })
             .unwrap_or_default()
     };
+
     let mut nexts = page.select(nxt).nodes().to_vec();
     nexts.sort_by_key(|x| x.attr(attr));
     nexts.dedup_by_key(|x| x.attr(attr));
@@ -935,22 +936,17 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         tdbg!(nxt);
     } else if nexts.len() == 1 {
         let element = nexts[0];
-        if element.node_name().unwrap().as_ref() == "span" || element.attr(attr).is_none() {
+        if element.node_name().is_some_and(|n| n.as_ref() == "span") || element.attr(attr).is_none()
+        {
             let items = element.parent().unwrap().children();
             let tags = items
-                .split(|e| {
-                    (&element).node_id() == e.node_id()
-                    // ptr::eq(
-                    //     element.element_ref().unwrap().deref(),
-                    //     e.element_ref().unwrap().deref(),
-                    // )
-                })
+                .split(|e| (&element).node_id() == e.node_id())
                 .next_back()
                 .unwrap();
             if !tags.is_empty() {
                 next_link = set_next(tags);
             }
-        } else if element.node_name().unwrap().as_ref() == "i" {
+        } else if element.node_name().is_some_and(|n| n.as_ref() == "i") {
             next_link = element.parent().unwrap().attr(attr).unwrap();
         } else {
             next_link = element.attr(attr).unwrap();
