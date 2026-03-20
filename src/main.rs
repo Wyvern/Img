@@ -947,8 +947,9 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                 })
                 .next_back()
                 .unwrap();
-            debug_assert!(!tags.is_empty() && tags.len() < items.len());
-            next_link = set_next(tags);
+            if !tags.is_empty() {
+                next_link = set_next(tags);
+            }
         } else if element.node_name().unwrap().as_ref() == "i" {
             next_link = element.parent().unwrap().attr(attr).unwrap();
         } else {
