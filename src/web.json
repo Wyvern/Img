@@ -177,8 +177,9 @@
     {
       "Site": "ligui.org",
       "Img": "div.info-imtg-box img",
-      "Next": "div.pagebar a",
-      "Album": "span.img-box h3 a"
+      "Next": "div.pagebar > a:has-text('下页')",
+      "Album": "span.img-modbox h3 a",
+      "Page": "div.pagebar > a:has-text('后页')"
     },
     {
       "Site": "nsphb.com",

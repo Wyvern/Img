@@ -1,4 +1,5 @@
 use std::*;
+
 mod util;
 static TEXT: &str = "The quick brown fox jumps over the lazy dog.";
 
@@ -66,7 +67,7 @@ pub enum Color {
 }
 impl Color {
     const fn code(&self) -> u8 {
-        unsafe { *(&raw const *self).cast() }
+        unsafe { *(self as *const Self).cast() }
     }
 }
 impl From<u8> for Color {
