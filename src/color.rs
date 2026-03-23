@@ -3,8 +3,7 @@ mod util;
 static TEXT: &str = "The quick brown fox jumps over the lazy dog.";
 
 #[repr(u8)]
-#[derive(Clone, Copy)]
-pub enum Basic {
+pub enum Color {
     Reset = 0,
     Bold = 1,
     Faint = 2,
@@ -59,81 +58,71 @@ pub enum Basic {
     BrightMagentaBg = 105,
     BrightCyanBg = 106,
     BrightWhiteBg = 107,
-}
-impl Basic {
-    #[allow(unused)]
-    fn code(&self) -> u8 {
-        *self as u8
-    }
 
-    fn from(c: u8) -> Self {
-        unsafe { mem::transmute(c) }
-    }
-}
-impl fmt::Display for Basic {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "\x1b[{}m", self.code())
-    }
-}
-impl fmt::Debug for Basic {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "\"\\x1b[{0}m\": - \x1b[{0}m{TEXT}{1}\n",
-            self.code(),
-            Self::Reset
-        )
-    }
-}
-
-pub enum Color {
-    Basic(Basic),
     FG(u8),
     BG(u8),
     RGBfg(u8, u8, u8),
     RGBbg(u8, u8, u8),
 }
-
+impl Color {
+    const fn code(&self) -> u8 {
+        unsafe { *(&raw const *self).cast() }
+    }
+}
+impl From<u8> for Color {
+    fn from(value: u8) -> Self {
+        match value {
+            0..=9 | 22..=25 | 27..=29 | 30..=37 | 40..=47 | 90..=97 | 100..=107 => unsafe {
+                mem::transmute(value as u32)
+            },
+            _ => panic!("Out of range of value for Color enum."),
+        }
+    }
+}
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Basic(c) => write!(f, "{}", c),
             Self::FG(c) => write!(f, "\x1b[38;5;{c}m"),
             Self::BG(c) => write!(f, "\x1b[48;5;{c}m"),
             Self::RGBfg(r, g, b) => write!(f, "\x1b[38;2;{r};{g};{b}m"),
             Self::RGBbg(r, g, b) => write!(f, "\x1b[48;2;{r};{g};{b}m"),
+            _ => write!(f, "\x1b[{}m", self.code()),
         }
     }
 }
-
 impl fmt::Debug for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Basic(c) => write!(f, "{:?}", c),
-            Self::FG(c) => write!(
+            Self::FG(c) => writeln!(
                 f,
-                "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m{TEXT}{}\n",
-                Basic::Reset
+                "\"\\x1b[38;5;{c}m\": - \x1b[38;5;{c}m{TEXT}{}",
+                Self::Reset
             ),
-            Self::BG(c) => write!(
+            Self::BG(c) => writeln!(
                 f,
-                "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m{TEXT}{}\n",
-                Basic::Reset
+                "\"\\x1b[48;5;{c}m\": - \x1b[48;5;{c}m{TEXT}{}",
+                Self::Reset
             ),
             Self::RGBfg(r, g, b) => {
-                write!(
+                writeln!(
                     f,
-                    "\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m{TEXT}{}\n",
-                    Basic::Reset
+                    "\"\\x1b[38;2;{r};{g};{b}m\": - \x1b[38;2;{r};{g};{b}m{TEXT}{}",
+                    Self::Reset
                 )
             }
             Self::RGBbg(r, g, b) => {
-                write!(
+                writeln!(
                     f,
-                    "\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m{TEXT}{}\n",
-                    Basic::Reset
+                    "\"\\x1b[48;2;{r};{g};{b}m\": - \x1b[48;2;{r};{g};{b}m{TEXT}{}",
+                    Self::Reset
                 )
             }
+            _ => writeln!(
+                f,
+                "\"\\x1b[{0}m\": - \x1b[{0}m{TEXT}{1}",
+                self.code(),
+                Self::Reset
+            ),
         }
     }
 }
@@ -177,7 +166,7 @@ fn analyze_args(args: [Option<&str>; 4]) {
                 exit();
             }
         },
-        [Some(c), Some(r), Some(g), Some(b)] if c.to_ascii_lowercase() == "rgb" => {
+        [Some(c), Some(r), Some(g), Some(b)] if c.eq_ignore_ascii_case("rgb") => {
             match [r, g, b].map(|v| {
                 v.parse::<u8>()
                     .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
@@ -201,13 +190,13 @@ fn exit() {
     println!(
         "Usage: Color {NL}`8|256` {NL}`256 {Bold}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {Bold}{R}r {G}g {B}b{N} [0-255]{{3}}` \n\toptions.",
         NL = "\n\t",
-        Bold = Basic::Bold,
-        N = Basic::Reset,
-        FG = Basic::BrightWhite,
-        BG = Basic::BrightBlackBg,
-        R = Basic::BrightRed,
-        G = Basic::BrightGreen,
-        B = Basic::BrightBlue
+        Bold = Color::Bold,
+        N = Color::Reset,
+        FG = Color::BrightWhite,
+        BG = Color::BrightBlackBg,
+        R = Color::BrightRed,
+        G = Color::BrightGreen,
+        B = Color::BrightBlue
     );
     process::exit(0);
 }
@@ -220,9 +209,9 @@ mod color {
     fn color() {
         println!(
             "{:?}{:?}{:?}{:?}",
-            Basic::Magenta,
-            Color::FG(Basic::BrightGreen.code()),
-            Color::BG(Basic::BrightBlue.code()),
+            Color::Magenta,
+            Color::FG(Color::BrightGreen.code()),
+            Color::BG(Color::BrightBlue.code()),
             Color::RGBbg(100, 200, 220)
         );
     }
@@ -234,7 +223,7 @@ mod color {
 
 fn color8() {
     fn section(s: &str) {
-        println!("\n{}{}{s}:{}", Basic::Bold, Basic::Underline, Basic::Reset)
+        println!("\n{}{}{s}:{}", Color::Bold, Color::Underline, Color::Reset)
     }
     (0u8..=9)
         .chain(22..=25)
@@ -253,6 +242,6 @@ fn color8() {
                 100 => section("8-color bright background"),
                 _ => (),
             };
-            println!("{:?}", Basic::from(c));
+            println!("{:?}", Color::from(c));
         });
 }

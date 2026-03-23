@@ -1,6 +1,11 @@
 {
   "Sites": [
     {
+      "Site": "tvv.tw",
+      "Img": "div.blog-details-text img",
+      "Album": "div.blog-title > a"
+    },
+    {
       "Site": "mmrgb.com",
       "Img": "img[zoomfile]",
       "Album": "div.card-figure p"
