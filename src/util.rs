@@ -106,10 +106,10 @@ mod macros {
 }
 }
 
-#[allow(dead_code)]
-pub trait AsBytes: Copy + Sized {
+#[allow(unused)]
+pub trait AsBytes: Sized {
     fn from_bytes(bytes: &[u8]) -> &Self {
-        assert_eq!(bytes.len(), mem::size_of::<Self>(), "slice size mismatch");
+        assert_eq!(bytes.len(), mem::size_of::<Self>(), "slice size mismatch.");
         unsafe { &*(bytes.as_ptr() as *const Self) }
     }
     fn as_bytes(&self) -> &[u8] {
@@ -119,9 +119,9 @@ pub trait AsBytes: Copy + Sized {
         self.as_bytes() == other.as_bytes()
     }
 }
-impl<T: Copy + Sized> AsBytes for T {}
+impl<T: Sized> AsBytes for T {}
 
-#[allow(dead_code)]
+#[allow(unused)]
 pub trait Dbg: fmt::Debug {
     fn dbg(&self) {
         crate::tdbg!(self);
@@ -132,7 +132,7 @@ pub trait Dbg: fmt::Debug {
 }
 impl<T: fmt::Debug> Dbg for T {}
 
-#[allow(dead_code)]
+#[allow(unused)]
 pub fn pause() {
     use io::*;
     #[cfg(target_family = "unix")]
