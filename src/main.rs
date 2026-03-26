@@ -196,7 +196,7 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-    let mut doc;
+    let doc;
     let query = page_sel.is_some_and(|p| p.starts_with("https://"));
     if sel.is_some_and(|s| s.starts_with("json:")) {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
@@ -226,6 +226,7 @@ fn parse(addr: &str) -> String {
                     }
                     doc = dom::Document::from(jv.as_str().unwrap());
                     html_img = doc.select("img[src]");
+                    break;
                 }
             } else {
                 let urls = t.split(name).skip(1);
