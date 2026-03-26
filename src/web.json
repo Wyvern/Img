@@ -734,7 +734,7 @@
     }
   ],
   "Series": [
-    ["Blogger", "link[href*='www.blogger.com']", "blogger.com"],
+    ["Blogger", "meta[name='generator'][content='blogger']", "blogger.com"],
     ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
     ["秀人集", "div.logo > a > img[alt*='秀人集']", "quanjixiu.com"],
     ["秀人美女", "div.logo > a > img[alt*='秀人美女']", "xrmnw.com"],
