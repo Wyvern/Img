@@ -196,46 +196,72 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-
+    let mut doc;
+    let query = page_sel.is_some_and(|p| p.starts_with("https://"));
     if sel.is_some_and(|s| s.starts_with("json:")) {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
         let name = sels.map(|(_, r)| r).unwrap().trim();
         let script = page.select("script");
-        for s in script.iter().filter(|s| !s.text().is_empty()) {
-            let t = s.text();
-            let urls = t.split(name).skip(1);
-            for u in urls {
-                match kind {
-                    "key" => {
-                        let url = u
-                            .split('"')
-                            .nth(1)
-                            .map(|u| u.replace(r"\u002F", "/"))
-                            .unwrap();
-                        json_img.insert(url);
+        for s in script.iter().filter(|s| !s.immediate_text().is_empty()) {
+            let t = s.immediate_text();
+            if query {
+                let api = page_sel.unwrap();
+                let mut query = api.to_owned();
+                let keys = api
+                    .split('{')
+                    .skip(1)
+                    .filter_map(|part| part.split('}').next());
+                keys.for_each(|k| {
+                    t.split_once(&format!("'{k}': '"))
+                        .map(|(_, r)| &r[..r.find('\'').unwrap()])
+                        .iter()
+                        .for_each(|v| query = query.replace(&format!("{{{k}}}"), v));
+                });
+                if !query.contains('{') {
+                    let (data, pos) = get_html(&query);
+                    let json = &data[..pos];
+                    let mut jv: &serde_json::Value = &serde_json::from_str(json).unwrap();
+                    for path in name.split_ascii_whitespace() {
+                        jv = jv.get(path.trim()).unwrap();
                     }
-                    "array" => {
-                        u.split(['[', ']'])
-                            .nth(1)
-                            .unwrap()
-                            .split(',')
-                            .map(|s| s.trim().trim_matches('"').replace(r"\u002F", "/"))
-                            .for_each(|url| {
-                                json_img.insert(url);
-                            });
+                    doc = dom::Document::from(jv.as_str().unwrap());
+                    html_img = doc.select("img[src]");
+                }
+            } else {
+                let urls = t.split(name).skip(1);
+                for u in urls {
+                    match kind {
+                        "key" => {
+                            let url = u
+                                .split('"')
+                                .nth(1)
+                                .map(|u| u.replace(r"\u002F", "/"))
+                                .unwrap();
+                            json_img.insert(url);
+                        }
+                        "array" => {
+                            u.split(['[', ']'])
+                                .nth(1)
+                                .unwrap()
+                                .split(',')
+                                .map(|s| s.trim().trim_matches('"').replace(r"\u002F", "/"))
+                                .for_each(|url| {
+                                    json_img.insert(url);
+                                });
+                        }
+                        "var" => {
+                            u.split('\'')
+                                .nth(1)
+                                .unwrap()
+                                .split("https://")
+                                .skip(1)
+                                .for_each(|url| {
+                                    json_img.insert(format!("https://{url}"));
+                                });
+                            break;
+                        }
+                        _ => (),
                     }
-                    "var" => {
-                        u.split('\'')
-                            .nth(1)
-                            .unwrap()
-                            .split("https://")
-                            .skip(1)
-                            .for_each(|url| {
-                                json_img.insert(format!("https://{url}"));
-                            });
-                        break;
-                    }
-                    _ => (),
                 }
             }
         }
@@ -390,6 +416,7 @@ fn parse(addr: &str) -> String {
                         embed += 1;
                     }
                 };
+
                 match value {
                     Some(val) => {
                         if attr == "style" {
@@ -490,7 +517,6 @@ fn parse(addr: &str) -> String {
                     _ => (),
                 }
             }
-
             // tdbg!(&urls, &css_img, &json_img);
             download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
@@ -644,7 +670,15 @@ fn parse(addr: &str) -> String {
     }
 
     next_sel.map_or_else(
-        || page_sel.map_or_else(<_>::default, |p| check_next(p, addr, &page)),
+        || {
+            page_sel.map_or_else(<_>::default, |p| {
+                if !query {
+                    check_next(p, addr, &page)
+                } else {
+                    String::default()
+                }
+            })
+        },
         |n| {
             if n == "<script>" {
                 if json_len == 0 {
@@ -699,7 +733,7 @@ fn canonicalize(url: &str, addr: &str) -> String {
 ///replace os specific special/reversed chars in path name
 fn sanitize_path(name: &str) -> String {
     cfg_select! {
-        target_os = "macos"=> {name.replace("/", ":")}
+        target_os = "macos"=> {name.replace(":", "|")}
         any(all(unix, not(target_os = "macos")), target_family = "wasm")=>{name.replace("/", "_")}
         target_family = "windows"=>{name.chars()
             .map(|c| match c {

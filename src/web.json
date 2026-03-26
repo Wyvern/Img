@@ -1,6 +1,11 @@
 {
   "Sites": [
     {
+      "Site": "blogger.com",
+      "Page": "https://www.blogger.com/feeds/{blogId}/posts/default/{postId}?alt=json",
+      "Img": "json: key | entry content $t"
+    },
+    {
       "Site": "tvv.tw",
       "Img": "div.blog-details-text img",
       "Album": "div.blog-title > a"
@@ -729,6 +734,7 @@
     }
   ],
   "Series": [
+    ["Blogger", "link[href*='www.blogger.com']", "blogger.com"],
     ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
     ["秀人集", "div.logo > a > img[alt*='秀人集']", "quanjixiu.com"],
     ["秀人美女", "div.logo > a > img[alt*='秀人美女']", "xrmnw.com"],
