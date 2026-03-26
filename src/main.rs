@@ -207,16 +207,15 @@ fn parse(addr: &str) -> String {
             if query {
                 let api = page_sel.unwrap();
                 let mut query = api.to_owned();
-                let keys = api
-                    .split('{')
+                api.split('{')
                     .skip(1)
-                    .filter_map(|part| part.split('}').next());
-                keys.for_each(|k| {
-                    t.split_once(&format!("'{k}': '"))
-                        .map(|(_, r)| &r[..r.find('\'').unwrap()])
-                        .iter()
-                        .for_each(|v| query = query.replace(&format!("{{{k}}}"), v));
-                });
+                    .filter_map(|part| part.split('}').next())
+                    .for_each(|k| {
+                        t.split_once(&format!("'{k}': '"))
+                            .and_then(|(_, r)| r.split_once('\''))
+                            .into_iter()
+                            .for_each(|(v, _)| query = query.replace(&format!("{{{k}}}"), v));
+                    });
                 if !query.contains('{') {
                     let (data, pos) = get_html(&query);
                     let json = &data[..pos];
