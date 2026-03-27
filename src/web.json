@@ -256,7 +256,8 @@
     {
       "Site": "taotu.org",
       "Img": "div.piclist > a[href]",
-      "Album": "div.piclist > div img"
+      "Album": "div.piclist > div img",
+      "Page": "div#MainContent_HeaderPrev > a:contains('<<')"
     },
     {
       "Site": "xiurenwang.me",
