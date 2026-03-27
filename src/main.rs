@@ -85,12 +85,9 @@ fn check_host(addr: &str) -> &str {
 
 ///Get `host` info and Generate `img/next/album` selector data
 fn host_info(host: &str) -> [Option<&str>; 5] {
-    let site = JSON
-        .get_or_init(website)
-        .as_object()
-        .expect("`web.json` file parse error!")["Sites"]
+    let site = JSON.get_or_init(website)["Sites"]
         .as_array()
-        .expect("Parse `Sites` in `web.json` key error!")
+        .unwrap()
         .iter()
         .find(|&site| {
             site["Site"].as_str().is_some_and(|s| {
@@ -105,7 +102,6 @@ fn host_info(host: &str) -> [Option<&str>; 5] {
                 })
             })
         });
-
     site.map_or([None; 5], |s| {
         ["Img", "Next", "Album", "Title", "Page"].map(|key| s[key].as_str().map(|v| v.trim()))
     })
@@ -161,12 +157,7 @@ fn parse(addr: &str) -> String {
     let page = dom::Document::from(&html[..ll]);
 
     if img.is_none() {
-        let cat = JSON
-            .get_or_init(website)
-            .as_object()
-            .expect("`web.json` file parse error!")["Series"]
-            .as_array()
-            .expect("Parse `Series` in `web.json` key error!");
+        let cat = JSON.get_or_init(website)["Series"].as_array().unwrap();
         if let Some(series) = cat.iter().find_map(|v| {
             let arr = v
                 .as_array()
@@ -174,7 +165,6 @@ fn parse(addr: &str) -> String {
                 .iter()
                 .map(|v| v.as_str().unwrap())
                 .collect::<Vec<_>>();
-
             if !page.select(arr[1]).is_empty() {
                 Some(arr)
             } else {

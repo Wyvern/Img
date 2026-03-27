@@ -595,12 +595,12 @@
       "Album": "h1.entry-title > a"
     },
     {
-      "Site": "inewgirl.com,nshens.com,lovestatic.com,ijjiao.com",
+      "Site": "nshens.com",
       "Img": "json: key | photourl",
       "Next": "<script>"
     },
     {
-      "Site": "chottie.org,chottie.net,chottie.com,chinesehottie.com",
+      "Site": "chottie.com",
       "Img": "json: array | imgList",
       "Next": "<script>"
     },
@@ -735,6 +735,8 @@
     }
   ],
   "Series": [
+    ["Chinese Hottie", "title:has-text('Chinese Hottie')", "chottie.com"],
+    ["女神社", "title:has-text('女神社')", "nshens.com"],
     ["Blogger", "meta[name='generator'][content='blogger']", "blogger.com"],
     ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
     ["秀人集", "div.logo > a > img[alt*='秀人集']", "quanjixiu.com"],
