@@ -325,7 +325,11 @@ fn parse(addr: &str) -> String {
                 page_title()
             } else {
                 if jsontitle.is_empty() {
-                    page.select_single(t).immediate_text()
+                    if query {
+                        page_title()
+                    } else {
+                        page.select_single(t).immediate_text()
+                    }
                 } else {
                     jsontitle.into()
                 }
