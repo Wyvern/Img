@@ -177,7 +177,7 @@ fn parse(addr: &str) -> String {
     }
 
     let sels = img.and_then(|i| i.split_once(SEP));
-    let sel = sels.map(|(l, _)| l).or(img);
+    let sel = sels.map(|(l, _)| l.trim()).or(img);
 
     let mut json_img = collections::HashSet::new();
     let mut html_img = dom::Selection::default();
@@ -208,6 +208,7 @@ fn parse(addr: &str) -> String {
                             .for_each(|(v, _)| query = query.replace(&format!("{{{k}}}"), v));
                     });
                 if !query.contains('{') {
+                    tdbg!(&query);
                     let (data, pos) = get_html(&query);
                     let json = &data[..pos];
                     let jv: &serde_json::Value = &serde_json::from_str(json).unwrap();
@@ -692,6 +693,7 @@ fn parse(addr: &str) -> String {
         || {
             page_sel.map_or_else(<_>::default, |p| {
                 if !query {
+                    pause();
                     check_next(p, addr, &page)
                 } else {
                     String::default()
