@@ -194,6 +194,7 @@ jobs:
                   mips64-openwrt-linux-musl
                   hexagon-unknown-linux-musl
                   x86_64-unknown-hurd-gnu
+                  x86_64-unknown-motor
                   x86_64-unknown-redox
                   aarch64-unknown-redox
                   riscv64gc-unknown-redox
