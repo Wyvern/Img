@@ -141,6 +141,7 @@ jobs:
           ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/x86_64-linux-musl hexagon
 
           targets=(
+            x86_64-unknown-motor
             hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos

@@ -445,7 +445,7 @@ fn parse(addr: &str) -> String {
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
                                         handle_embed(u);
-                                    } else if u.is_empty() || !urls.insert(canonicalize(&u, addr)) {
+                                    } else if u.is_empty() || !urls.insert(normarlize(&u, addr)) {
                                         if !u.is_empty() {
                                             dup += 1;
                                         } else {
@@ -463,7 +463,7 @@ fn parse(addr: &str) -> String {
                                 val.to_string()
                             };
                             // tdbg!(&url;);
-                            if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
+                            if url.is_empty() || !urls.insert(normarlize(&url, addr)) {
                                 if !url.is_empty() {
                                     dup += 1;
                                 } else {
@@ -528,7 +528,7 @@ fn parse(addr: &str) -> String {
                                     }
                                 })
                             });
-                            let cano = || canonicalize(&src, addr);
+                            let cano = || normarlize(&src, addr);
                             urls.insert(
                                 title_alt.map_or_else(cano, |x| format!("{}{SEP}{x}", cano())),
                             );
@@ -564,7 +564,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize(&href, addr);
+                        let album_url = normarlize(&href, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -726,8 +726,8 @@ fn parse(addr: &str) -> String {
     )
 }
 
-///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: &str, addr: &str) -> String {
+///Normalize `img/next` link `url` in `addr`
+fn normarlize(url: &str, addr: &str) -> String {
     if url.is_empty() {
         return String::default();
     }
@@ -1071,7 +1071,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     let mut ret = String::default();
     if !next_link.is_empty() {
         ret = ns.map_or_else(
-            || canonicalize(next_link.as_ref(), cur),
+            || normarlize(next_link.as_ref(), cur),
             |(_, r)| {
                 let count = r.matches('/').count();
                 format!(
@@ -1273,7 +1273,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(&u, addr));
+                        images.insert(normarlize(&u, addr));
                     }
                 }
             }
