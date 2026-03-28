@@ -1,9 +1,15 @@
 {
   "Sites": [
     {
+      "Site": "jkforum.net",
+      "Page": "https://jkforum.net/api/jkf-forum/v1/ArticleThread/{/thread-}",
+      "Img": "json: pointer | /content/content -> https://jkforum.net/attachment/{?}",
+      "Title": "json: pointer | /content/title"
+    },
+    {
       "Site": "blogger.com",
-      "Page": "https://www.blogger.com/feeds/{blogId}/posts/default/{postId}?alt=json",
-      "Img": "json: key | entry content $t"
+      "Page": "https://www.blogger.com/feeds/{'blogId': '}/posts/default/{'postId': '}?alt=json",
+      "Img": "json: pointer | /entry/content/$t"
     },
     {
       "Site": "tvv.tw",

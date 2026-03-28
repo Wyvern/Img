@@ -187,6 +187,7 @@ fn parse(addr: &str) -> String {
         collections::HashSet::new()
     };
     let doc;
+    let mut jsontitle = String::default();
     let query = page_sel.is_some_and(|p| p.starts_with("https://"));
     if sel.is_some_and(|s| s.starts_with("json:")) {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
@@ -201,20 +202,40 @@ fn parse(addr: &str) -> String {
                     .skip(1)
                     .filter_map(|part| part.split('}').next())
                     .for_each(|k| {
-                        t.split_once(&format!("'{k}': '"))
-                            .and_then(|(_, r)| r.split_once('\''))
+                        t.split_once(k)
+                            .and_then(|(_, r)| r.split_once(k.chars().last().unwrap()))
                             .into_iter()
                             .for_each(|(v, _)| query = query.replace(&format!("{{{k}}}"), v));
                     });
                 if !query.contains('{') {
                     let (data, pos) = get_html(&query);
                     let json = &data[..pos];
-                    let mut jv: &serde_json::Value = &serde_json::from_str(json).unwrap();
-                    for path in name.split_ascii_whitespace() {
-                        jv = jv.get(path.trim()).unwrap();
+                    let jv: &serde_json::Value = &serde_json::from_str(json).unwrap();
+                    if let Some(t) = title_sel {
+                        let sel = t.split_once(SEP).unwrap().1.trim();
+                        jsontitle = jv.pointer(sel).unwrap().as_str().unwrap().into();
                     }
-                    doc = dom::Document::from(jv.as_str().unwrap());
+
+                    let pat = name.split_once("->");
+                    let data = jv
+                        .pointer(pat.map(|(p, _)| p).unwrap_or(name).trim())
+                        .unwrap()
+                        .as_str()
+                        .unwrap();
+                    doc = dom::Document::from(data);
                     html_img = doc.select("img[src]");
+                    if html_img.is_empty() {
+                        data.split("[img]")
+                            .skip(1)
+                            .filter_map(|x| x.split("[/img]").next())
+                            .for_each(|v| {
+                                if let Some((_, sub)) = pat {
+                                    json_img.insert(sub.trim().replace("{?}", v));
+                                } else {
+                                    json_img.insert(v.into());
+                                }
+                            });
+                    }
                     break;
                 }
             } else {
@@ -303,7 +324,11 @@ fn parse(addr: &str) -> String {
             if has_album {
                 page_title()
             } else {
-                page.select_single(t).immediate_text()
+                if jsontitle.is_empty() {
+                    page.select_single(t).immediate_text()
+                } else {
+                    jsontitle.into()
+                }
             }
         },
     );
