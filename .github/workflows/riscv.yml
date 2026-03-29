@@ -1,4 +1,4 @@
-name: Riscv
+name: Risc-V
 
 on:
   push:
@@ -14,7 +14,7 @@ env:
 jobs:
   Linux:
     name: Risc-V
-    runs-on: ubuntu-24.04-riscv
+    runs-on: ubuntu-24.04-riscv-rvv
 
     steps:
       - name: Checkout
@@ -31,8 +31,8 @@ jobs:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
 
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+      # - name: Run sccache-cache
+      #   uses: mozilla-actions/sccache-action@main
 
       - name: Ubuntu apt update and install
         run: sudo apt install musl-tools -qy
