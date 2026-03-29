@@ -75,9 +75,8 @@ jobs:
             curl -LsSf https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/xtensa-esp-elf-15.2.0_20251204-aarch64-apple-darwin.tar.xz | tar -xf - -C ~/esp-idf
           fi
 
-          ln -sf ~/esp-idf/riscv32-esp-elf-15.2.0_20251204 espidf-riscv
-          ln -sf ~/esp-idf/xtensa-esp-elf-15.2.0_20251204 espidf-xtensa
-          ls -al ~/esp-idf/**/bin/*
+          ln -sf ~/esp-idf/riscv32-esp-elf espidf-riscv
+          ln -sf ~/esp-idf/xtensa-esp-elf espidf-xtensa
 
           targets=(
             riscv32imafc-esp-espidf
