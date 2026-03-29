@@ -57,6 +57,13 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
+      - name: Cache esp-idf
+        uses: actions/cache@v5
+        with:
+          path: /home/runner/esp-idf
+          key: ${{ runner.os }}-esp-idf
+          restore-keys: ${{ runner.os }}-esp-idf
+
       - name: Build Release
         run: |
           cargo update
@@ -65,13 +72,16 @@ jobs:
           if [ ! -d /home/runner/esp-idf ]; then
             mkdir -p /home/runner/esp-idf
             curl -LsSf https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/riscv32-esp-elf-15.2.0_20251204-aarch64-apple-darwin.tar.xz | tar -xf - -C /home/runner/esp-idf/
+            curl -LsSf https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/xtensa-esp-elf-15.2.0_20251204-aarch64-apple-darwin.tar.xz | tar -xf - -C /home/runner/esp-idf/
           fi
 
-          ln -sf /home/runner/esp-idf/riscv32-esp-elf-15.2.0_20251204 espidf
-          ls -al espidf/bin/*
+          ln -sf /home/runner/esp-idf/riscv32-esp-elf-15.2.0_20251204-aarch64-apple-darwin espidf-riscv
+          ln -sf /home/runner/esp-idf/xtensa-esp-elf-15.2.0_20251204-aarch64-apple-darwin espidf-xtensa
+          ls -al espidf-*/bin/*
 
           targets=(
             riscv32imafc-esp-espidf
+            xtensa-esp32s3-espidf
             riscv32imac-unknown-xous-elf
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
