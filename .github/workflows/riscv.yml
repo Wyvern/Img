@@ -68,38 +68,38 @@ jobs:
             !target/**/*.d
           if-no-files-found: ignore
 
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
-              riscv32imac-unknown-xous-elf
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi rest <<< "$target"
-            if [[ -n "$abi" ]]; then
-                if [[ "$vendor" == "openwrt" ]]; then
-                    name="${vendor^}-${arch}-${abi}"
-                else
-                    if [[ "$abi" == "ohos" ]]; then
-                        name="Android-${arch}-${abi}"
-                    else
-                        name="${os^}-${arch}-${abi}"
-                    fi
-                fi
-            else
-                if [[ "$os" == "androideabi" ]]; then
-                    name="Android-${arch}"
-                else
-                    name="${os^}-${arch}"
-                fi
-            fi
-            echo "Uploading $name..."
-            for d in src redox; do
-                if [ -d "target/$target/$d" ]; then
-                  mv target/$target/$d/img target/$target/$d/$name || true
-                  gh release upload Nightly target/$target/$d/$name --clobber || true
-                  break
-                fi
-            done
-          done
+      # - name: Upload binaries to a GitHub release
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #   run: |
+      #     targets=(
+      #         riscv32imac-unknown-xous-elf
+      #     )
+      #     for target in "${targets[@]}"; do
+      #       IFS='-' read -r arch vendor os abi rest <<< "$target"
+      #       if [[ -n "$abi" ]]; then
+      #           if [[ "$vendor" == "openwrt" ]]; then
+      #               name="${vendor^}-${arch}-${abi}"
+      #           else
+      #               if [[ "$abi" == "ohos" ]]; then
+      #                   name="Android-${arch}-${abi}"
+      #               else
+      #                   name="${os^}-${arch}-${abi}"
+      #               fi
+      #           fi
+      #       else
+      #           if [[ "$os" == "androideabi" ]]; then
+      #               name="Android-${arch}"
+      #           else
+      #               name="${os^}-${arch}"
+      #           fi
+      #       fi
+      #       echo "Uploading $name..."
+      #       for d in src redox; do
+      #           if [ -d "target/$target/$d" ]; then
+      #             mv target/$target/$d/img target/$target/$d/$name || true
+      #             gh release upload Nightly target/$target/$d/$name --clobber || true
+      #             break
+      #           fi
+      #       done
+      #     done
