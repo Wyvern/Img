@@ -13,8 +13,8 @@ env:
 
 jobs:
   Linux:
-    name: Riscv
-    runs-on: ubuntu-26.04-riscv-rvv
+    name: Risc-V
+    runs-on: ubuntu-24.04-riscv
 
     steps:
       - name: Checkout
