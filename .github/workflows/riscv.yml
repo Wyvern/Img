@@ -1,0 +1,105 @@
+name: Riscv
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Riscv
+    runs-on: ubuntu-26.04-riscv-rvv
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Ubuntu apt update and install
+        run: sudo apt install musl-tools -qy
+
+      - name: Build Release
+        run: |
+          # sudo snap install zig --classic --beta
+          # pipx install cargo-zigbuild
+
+          cargo update
+          set +e -x
+
+          targets=(
+            riscv32imac-unknown-xous-elf
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+              riscv32imac-unknown-xous-elf
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$vendor" == "openwrt" ]]; then
+                    name="${vendor^}-${arch}-${abi}"
+                else
+                    if [[ "$abi" == "ohos" ]]; then
+                        name="Android-${arch}-${abi}"
+                    else
+                        name="${os^}-${arch}-${abi}"
+                    fi
+                fi
+            else
+                if [[ "$os" == "androideabi" ]]; then
+                    name="Android-${arch}"
+                else
+                    name="${os^}-${arch}"
+                fi
+            fi
+            echo "Uploading $name..."
+            for d in src redox; do
+                if [ -d "target/$target/$d" ]; then
+                  mv target/$target/$d/img target/$target/$d/$name || true
+                  gh release upload Nightly target/$target/$d/$name --clobber || true
+                  break
+                fi
+            done
+          done
