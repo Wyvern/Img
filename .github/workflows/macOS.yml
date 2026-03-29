@@ -57,33 +57,21 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
-      # - name: Get latest successful build run
-      #   id: latest
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #   run: |
-      #     run_id=$(gh run list \
-      #           --workflow macOS.yml \
-      #           --status success \
-      #           --limit 1 \
-      #           --json databaseId \
-      #           --jq '.[0].databaseId')
-      #     echo "run_id=$run_id" >> $GITHUB_OUTPUT
-      #     echo "Latest run_id = $run_id"
-
-      # - uses: actions/download-artifact@v8
-      #   continue-on-error: true
-      #   with:
-      #     name: build-output
-      #     run-id: ${{ steps.latest.outputs.run_id }}
-      #     path: target/
-
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
+          if [ ! -d /home/runner/esp-idf ]; then
+            mkdir -p /home/runner/esp-idf
+            curl -LsSf https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/riscv32-esp-elf-15.2.0_20251204-aarch64-apple-darwin.tar.xz | tar -xf - -C /home/runner/esp-idf/
+          fi
+
+          ln -sf /home/runner/esp-idf/riscv32-esp-elf-15.2.0_20251204 espidf
+          ls -al espidf/bin/*
+
           targets=(
+            riscv32imafc-esp-espidf
             riscv32imac-unknown-xous-elf
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm

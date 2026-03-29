@@ -543,3 +543,10 @@ rustflags = [
   "-Clink-arg=--sysroot=fuchsia/arch/riscv64/sysroot",
   "-Lnative=fuchsia/arch/riscv64/lib",
 ]
+
+[target.'cfg(target_os="espidf")']
+linker = "espidf/bin/riscv32-esp-elf-gcc"
+rustflags = [
+  "-Clink-arg=--target=riscv64gc--fuchsia",
+  "-Clink-arg=--sysroot=espidf",
+]
