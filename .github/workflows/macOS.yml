@@ -71,8 +71,8 @@ jobs:
 
           curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin -o espup
           chmod +x espup
-
-          ESPUP_USE_GITHUB_API=0 ./espup install -t esp32s3,esp32h2
+          export GITHUB_TOKEN=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
+          ./espup install -t esp32s3,esp32h2
 
           targets=(
             riscv32imafc-esp-espidf
