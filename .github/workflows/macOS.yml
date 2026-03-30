@@ -80,7 +80,7 @@ jobs:
 
           targets=(
             riscv32imafc-esp-espidf
-            xtensa-esp32s3-espidf
+            xtensa-esp32s2-espidf
             riscv32imac-unknown-xous-elf
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
