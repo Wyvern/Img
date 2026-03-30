@@ -944,7 +944,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Infer file type through magic number
-#[cfg(unix)]
+#[cfg(all(unix, not(target_os = "espidf")))]
 fn magic_number_type(pb: path::PathBuf) {
     use file_format::*;
     let t = FileFormat::from_file(&pb);
