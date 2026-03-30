@@ -75,9 +75,9 @@ jobs:
             curl -LsSf https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/xtensa-esp-elf-15.2.0_20251204-aarch64-apple-darwin.tar.xz | tar -xf - -C ~/esp-idf
           fi
 
-          ln -sf ~/esp-idf/riscv32-esp-elf espidf-riscv
-          ln -sf ~/esp-idf/xtensa-esp-elf espidf-xtensa
-          ls espidf-riscv/bin/riscv32-esp-elf-gcc
+          ln -sf $HOME/esp-idf/riscv32-esp-elf espidf-riscv
+          ln -sf $HOME/esp-idf/xtensa-esp-elf espidf-xtensa
+
           targets=(
             riscv32imafc-esp-espidf
             riscv32imac-unknown-xous-elf
@@ -135,6 +135,7 @@ jobs:
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
                   "wasm32-wasip2 wasm32-wasip2.wasm"
                   "riscv32imac-unknown-xous-elf Xous-riscv32imac"
+                  "riscv32imafc-esp-espidf Espidf-Riscv32imafc"
           )
 
           for target in "${targets[@]}"; do
