@@ -785,9 +785,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     curl.current_dir(path);
 
     let mut no_ext = collections::HashMap::new();
-    #[cfg(not(unix))]
+    #[cfg(not(all(unix, not(target_os = "espidf"))))]
     let mut no_ext_curl = process::Command::new("curl");
-    #[cfg(not(unix))]
+    #[cfg(not(all(unix, not(target_os = "espidf"))))]
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
