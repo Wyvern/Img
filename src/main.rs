@@ -612,7 +612,7 @@ fn parse(addr: &str) -> String {
                     );
                     _ = stdout.flush();
 
-                    #[cfg(target_family = "unix")]
+                    #[cfg(all(unix, not(target_os = "espidf")))]
                     {
                         use termion::event::Key;
                         use termion::input::TermRead;
@@ -648,7 +648,7 @@ fn parse(addr: &str) -> String {
                             }
                         }
                     }
-                    #[cfg(not(target_family = "unix"))]
+                    #[cfg(not(all(unix, not(target_os = "espidf"))))]
                     {
                         let mut input = String::new();
                         stdin.read_line(&mut input).unwrap_or_else(|e| {
