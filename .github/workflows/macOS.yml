@@ -71,7 +71,7 @@ jobs:
 
           curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin -o espup
           chmod +x espup
-          export GITHUB_TOKEN=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
+
           ./espup install --toolchain-version nightly -t esp32s3,esp32h2
 
           targets=(
