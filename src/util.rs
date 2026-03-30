@@ -135,7 +135,7 @@ impl<T: fmt::Debug> Dbg for T {}
 #[allow(unused)]
 pub fn pause() {
     use io::*;
-    #[cfg(all(unix, not(target_os = "espidf")))]
+    #[cfg(unix)]
     {
         use termion::event::Key;
         use termion::input::TermRead;
@@ -156,7 +156,7 @@ pub fn pause() {
             o.flush().unwrap();
         }
     }
-    #[cfg(not(all(unix, not(target_os = "espidf"))))]
+    #[cfg(not(unix))]
     {
         let mut o = stdout().lock();
         write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();

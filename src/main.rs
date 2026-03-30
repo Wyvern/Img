@@ -612,7 +612,7 @@ fn parse(addr: &str) -> String {
                     );
                     _ = stdout.flush();
 
-                    #[cfg(all(unix, not(target_os = "espidf")))]
+                    #[cfg(unix)]
                     {
                         use termion::event::Key;
                         use termion::input::TermRead;
@@ -648,7 +648,7 @@ fn parse(addr: &str) -> String {
                             }
                         }
                     }
-                    #[cfg(not(all(unix, not(target_os = "espidf"))))]
+                    #[cfg(not(unix))]
                     {
                         let mut input = String::new();
                         stdin.read_line(&mut input).unwrap_or_else(|e| {
@@ -785,9 +785,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     curl.current_dir(path);
 
     let mut no_ext = collections::HashMap::new();
-    #[cfg(not(all(unix, not(target_os = "espidf"))))]
+    #[cfg(not(unix))]
     let mut no_ext_curl = process::Command::new("curl");
-    #[cfg(not(all(unix, not(target_os = "espidf"))))]
+    #[cfg(not(unix))]
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
@@ -884,7 +884,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         create_dir();
         curl = process::Command::new("curl");
         curl.current_dir(path);
-        #[cfg(all(unix, not(target_os = "espidf")))]
+        #[cfg(unix)]
         {
             use fork::*;
             match fork() {
@@ -903,7 +903,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 _ => (),
             }
         }
-        #[cfg(not(all(unix, not(target_os = "espidf"))))]
+        #[cfg(not(unix))]
         {
             no_ext_curl.output().map_or_else(
                 |e| pl!("Query content-type info failed: {}", e),
@@ -944,7 +944,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Infer file type through magic number
-#[cfg(all(unix, not(target_os = "espidf")))]
+#[cfg(unix)]
 fn magic_number_type(pb: path::PathBuf) {
     use file_format::*;
     let t = FileFormat::from_file(&pb);

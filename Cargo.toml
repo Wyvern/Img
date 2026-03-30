@@ -22,8 +22,6 @@ dom_query = { version = "*", default-features = false }
 
 [target.'cfg(unix)'.dependencies]
 file-format = "*"
-
-[target.'cfg(all(unix,not(target_os="espidf")))'.dependencies]
 fork = "*"
 termion = "*"
 
