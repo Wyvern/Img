@@ -77,8 +77,7 @@ jobs:
 
           ln -sf ~/esp-idf/riscv32-esp-elf espidf-riscv
           ln -sf ~/esp-idf/xtensa-esp-elf espidf-xtensa
-          ls -a espidf-riscv/bin/*
-          ls -a ~/esp-idf/riscv32-esp-elf/bin/*
+          ls espidf-riscv/bin/riscv32-esp-elf-gcc
           targets=(
             riscv32imafc-esp-espidf
             riscv32imac-unknown-xous-elf
