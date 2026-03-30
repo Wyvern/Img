@@ -10,7 +10,6 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
-  GITHUB_TOKEN: "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"
 
 jobs:
   macOS:
@@ -72,7 +71,7 @@ jobs:
 
           curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin -o espup
           chmod +x espup
-
+          export GITHUB_TOKEN=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
           ./espup install -t esp32s3,esp32h2
 
           targets=(
