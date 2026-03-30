@@ -57,15 +57,24 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
-      - name: Install espup
-        run: cargo install espup --locked
+      - name: Cache espup
+        uses: actions/cache@v5
+        with:
+          path: ~/.espressif
+          key: ${{ runner.os }}-espressif
+          restore-keys: ${{ runner.os }}-espressif
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          espup install -t esp32s3,esp32h2
+          curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin
+
+          chmod +x espup-aarch64-apple-darwin
+          mv espup-aarch64-apple-darwin espup
+
+          espup install --toolchain-version nightly -t esp32s3,esp32h2
 
           targets=(
             riscv32imafc-esp-espidf
