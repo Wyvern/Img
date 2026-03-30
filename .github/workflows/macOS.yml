@@ -69,12 +69,11 @@ jobs:
           cargo update
           set +e -x
 
-          curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin
+          curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin -o espup
 
-          chmod +x espup-aarch64-apple-darwin
-          mv espup-aarch64-apple-darwin espup
+          chmod +x espup
 
-          espup install --toolchain-version nightly -t esp32s3,esp32h2
+          ./espup install --toolchain-version nightly -t esp32s3,esp32h2
 
           targets=(
             riscv32imafc-esp-espidf
