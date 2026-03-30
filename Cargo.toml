@@ -21,10 +21,10 @@ base64 = { version = "*", default-features = false, optional = true }
 dom_query = { version = "*", default-features = false }
 
 [target.'cfg(unix)'.dependencies]
-fork = "*"
 file-format = "*"
 
 [target.'cfg(all(unix,not(target_os="espidf")))'.dependencies]
+fork = "*"
 termion = "*"
 
 [target.'cfg(target_os = "hermit")'.dependencies]

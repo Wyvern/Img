@@ -884,7 +884,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         create_dir();
         curl = process::Command::new("curl");
         curl.current_dir(path);
-        #[cfg(unix)]
+        #[cfg(all(unix, not(target_os = "espidf")))]
         {
             use fork::*;
             match fork() {
@@ -903,7 +903,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 _ => (),
             }
         }
-        #[cfg(not(unix))]
+        #[cfg(not(all(unix, not(target_os = "espidf"))))]
         {
             no_ext_curl.output().map_or_else(
                 |e| pl!("Query content-type info failed: {}", e),
