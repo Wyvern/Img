@@ -57,29 +57,19 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
-      - name: Cache esp-idf
-        uses: actions/cache@v5
-        with:
-          path: ~/esp-idf
-          key: ${{ runner.os }}-esp-idf
-          restore-keys: ${{ runner.os }}-esp-idf
+      - name: Install espup
+        run: cargo install espup --locked
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          if [ ! -d ~/esp-idf ]; then
-            mkdir -p ~/esp-idf
-            curl -LsSf https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/riscv32-esp-elf-15.2.0_20251204-aarch64-apple-darwin.tar.xz | tar -xf - -C ~/esp-idf
-            curl -LsSf https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/xtensa-esp-elf-15.2.0_20251204-aarch64-apple-darwin.tar.xz | tar -xf - -C ~/esp-idf
-          fi
-          echo $(pwd)
-          ln -sf $(pwd)/esp-idf/riscv32-esp-elf espidf-riscv
-          ln -sf $(pwd)/esp-idf/xtensa-esp-elf espidf-xtensa
+          espup install -t esp32s3,esp32h2
 
           targets=(
             riscv32imafc-esp-espidf
+            xtensa-esp32s3-espidf
             riscv32imac-unknown-xous-elf
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm

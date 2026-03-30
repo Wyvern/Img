@@ -543,11 +543,3 @@ rustflags = [
   "-Clink-arg=--sysroot=fuchsia/arch/riscv64/sysroot",
   "-Lnative=fuchsia/arch/riscv64/lib",
 ]
-
-[target.'cfg(all(target_os="espidf"),target_arch="riscv32")']
-linker = "espidf-riscv/bin/riscv32-esp-elf-gcc"
-rustflags = ["-Clink-arg=--sysroot=espidf-riscv"]
-
-[target.'cfg(all(target_os="espidf"),target_arch="xtensa")']
-linker = "espidf-xtensa/bin/xtensa-esp-elf-gcc"
-rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
