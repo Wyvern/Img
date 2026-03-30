@@ -73,12 +73,12 @@ jobs:
           curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin -o espup
           chmod +x espup
 
-          ./espup install -t xtensa-esp32s3-espidf,riscv32imafc-esp-espidf
+          ./espup install -t xtensa-esp32s2-espidf,riscv32imafc-esp-espidf
           . /Users/runner/export-esp.sh
 
           targets=(
             riscv32imafc-esp-espidf
-            xtensa-esp32s3-espidf
+            xtensa-esp32s2-espidf
             riscv32imac-unknown-xous-elf
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
