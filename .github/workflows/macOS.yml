@@ -65,13 +65,14 @@ jobs:
           restore-keys: ${{ runner.os }}-espressif
 
       - name: Build Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           cargo update
           set +e -x
 
           curl -LsSf https://github.com/esp-rs/espup/releases/download/v0.16.0/espup-aarch64-apple-darwin -o espup
           chmod +x espup
-          export GITHUB_TOKEN=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
 
           ./espup install --toolchain-version nightly -t esp32s3,esp32h2
 
