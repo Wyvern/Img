@@ -692,7 +692,7 @@ fn parse(addr: &str) -> String {
     next_sel.map_or_else(
         || {
             page_sel.map_or_else(<_>::default, |p| {
-                if !query {
+                if !query && !has_album {
                     pause();
                     check_next(p, addr, &page)
                 } else {
