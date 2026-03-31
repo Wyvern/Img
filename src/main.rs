@@ -297,7 +297,7 @@ fn parse(addr: &str) -> String {
     });
 
     let mut albums = album.map(|a| page.select(a));
-    let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
+    let has_album = albums.as_ref().is_some_and(|a| !a.is_empty());
     let page_title = || titles.first().immediate_text();
     let title = title_sel.map_or_else(
         || {
@@ -688,10 +688,11 @@ fn parse(addr: &str) -> String {
         }
         (false, false) => (),
     }
+
     next_sel.map_or_else(
         || {
             page_sel.map_or_else(<_>::default, |p| {
-                if !query && albums.is_none() {
+                if !query && albums.is_none_or(|a| a.is_empty()) {
                     pause();
                     check_next(p, addr, &page)
                 } else {
