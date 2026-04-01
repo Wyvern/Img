@@ -76,7 +76,8 @@ jobs:
           fi
 
           ln -sf hexagon-toolchain/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/aarch64-macos hexagon
-          find /Users/runner/work/Img/Img/hexagon-toolchain -name "libclang-cpp*"
+          export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
+
           targets=(
             hexagon-unknown-linux-musl
             riscv32imac-unknown-xous-elf
