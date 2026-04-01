@@ -60,13 +60,6 @@ jobs:
           key: openwrt-25.12.0
           restore-keys: openwrt-25.12.0
 
-      - name: Cache hexagon
-        uses: actions/cache@v5
-        with:
-          path: /home/runner/hexagon
-          key: hexagon-22.1.0
-          restore-keys: hexagon-22.1.0
-
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
 
@@ -133,16 +126,8 @@ jobs:
 
           ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.0-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
-          if [ ! -d /home/runner/hexagon ]; then
-            mkdir -p /home/runner/hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
-          fi
-
-          ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/x86_64-linux-musl hexagon
-
           targets=(
             x86_64-unknown-motor
-            hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
@@ -192,7 +177,6 @@ jobs:
                   armv7-unknown-linux-ohos
                   x86_64-unknown-linux-ohos
                   mips64-openwrt-linux-musl
-                  hexagon-unknown-linux-musl
                   x86_64-unknown-hurd-gnu
                   x86_64-unknown-motor
                   x86_64-unknown-redox
