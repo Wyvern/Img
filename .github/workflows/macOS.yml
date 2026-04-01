@@ -61,7 +61,7 @@ jobs:
       - name: Cache hexagon
         uses: actions/cache@v5
         with:
-          path: /home/runner/hexagon
+          path: hexagon
           key: hexagon-22.1.0-macos
           restore-keys: hexagon-22.1.0-macos
 
@@ -70,13 +70,13 @@ jobs:
           cargo update
           set +e -x
 
-          if [ ! -d /home/runner/hexagon ]; then
-            mkdir -p /home/runner/hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_aarch64-macos.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
+          if [ ! -d hexagon ]; then
+            mkdir -p hexagon
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_aarch64-macos.tar.zst | tar --zstd -xf - -C hexagon
           fi
 
-          ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/aarch64-macos hexagon
-          ls /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/**/bin/*clang*
+          ln -sf hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/aarch64-macos hexagon
+
           targets=(
             hexagon-unknown-linux-musl
             riscv32imac-unknown-xous-elf
