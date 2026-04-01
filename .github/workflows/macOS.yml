@@ -76,7 +76,7 @@ jobs:
           fi
 
           ln -sf /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/aarch64-macos hexagon
-
+          ls /home/runner/hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/**/bin/*clang*
           targets=(
             hexagon-unknown-linux-musl
             riscv32imac-unknown-xous-elf
