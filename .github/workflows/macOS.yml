@@ -61,7 +61,7 @@ jobs:
       - name: Cache hexagon
         uses: actions/cache@v5
         with:
-          path: hexagon
+          path: hexagon-toolchain
           key: hexagon-22.1.0-macos
           restore-keys: hexagon-22.1.0-macos
 
@@ -71,11 +71,11 @@ jobs:
           set +e -x
 
           if [ ! -d hexagon ]; then
-            mkdir -p hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_aarch64-macos.tar.zst | tar --zstd -xf - -C hexagon
+            mkdir -p hexagon-toolchain
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.0_/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl_aarch64-macos.tar.zst | tar --zstd -xf - -C hexagon-toolchain
           fi
 
-          ln -sf hexagon/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/aarch64-macos hexagon
+          ln -sf hexagon-toolchain/clang+llvm-22.1.0-cross-hexagon-unknown-linux-musl/aarch64-macos hexagon
 
           targets=(
             hexagon-unknown-linux-musl
