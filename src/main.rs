@@ -7,9 +7,9 @@ use {std::*, sync::atomic::*, util::*};
 
 static SPINNER: AtomicBool = AtomicBool::new(false);
 static SEP: &str = " | ";
-static CSS: [&str; 3] = ["url(", "image(", "image-set("];
+static CSS: &[&str] = &["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; cfg_select! {debug_assertions=>7,_=>6}] = [
+static CURL: &[&str] = &[
     "--compressed",
     "-kfsL",
     "-A",
@@ -20,7 +20,7 @@ static CURL: [&str; cfg_select! {debug_assertions=>7,_=>6}] = [
     "-S",
     // "-OJ",
 ];
-static IMGS: [&str; 18] = [
+static IMGS: &[&str] = &[
     ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif", ".svg",
     ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
 ];
@@ -1256,7 +1256,7 @@ fn url_image(content: &str) -> Option<String> {
 ///Get `page` css style `url(),image(),image-set()`
 fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
-    _ = CSS.map(|s| {
+    _ = CSS.iter().map(|&s| {
         let segments = html.split(s);
         if s == "image-set(" {
             for seg in segments.skip(1) {
