@@ -93,7 +93,7 @@ jobs:
               mkdir -p sysroot/netbsd/$arch
               for file in "${files[@]}"; do
                 for ext in tar.xz tgz; do
-                        url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-11.0_RC2/$arch/binary/sets/$file.$ext"
+                        url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-11.0_RC3/$arch/binary/sets/$file.$ext"
                         out="sysroot/netbsd/$arch"
                         if curl -fsSI "$url" &>/dev/null; then
                             echo "→ Fetching $file.$ext"
