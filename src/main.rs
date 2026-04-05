@@ -22,7 +22,7 @@ static CURL: &[&str] = &[
 ];
 static IMGS: &[&str] = &[
     ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif", ".svg",
-    ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
+    ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx", ".jfif",
 ];
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 
@@ -400,8 +400,13 @@ fn parse(addr: &str) -> String {
         (false, true) => pl!("{prefix} <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
-
-    t = if t.to_ascii_lowercase().contains(" page") || t.contains('页') {
+    fn contains_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
+        haystack
+            .as_bytes()
+            .windows(needle.len())
+            .any(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
+    }
+    t = if contains_ignore_ascii_case(t, " page") || t.contains('页') {
         t[..t
             .to_ascii_lowercase()
             .rfind(" page")
@@ -1240,9 +1245,10 @@ fn url_image(content: &str) -> Option<String> {
             || url == "undefined"
             || url.starts_with(['{', '$'])
             || url.contains('#')
-            || IMGS
-                .iter()
-                .all(|&ext| !url.to_ascii_lowercase().ends_with(ext))
+            || IMGS.iter().all(|&ext| {
+                !url.rfind('.')
+                    .is_some_and(|dot| url[dot..].eq_ignore_ascii_case(ext))
+            })
         {
             None
         } else {
