@@ -400,22 +400,20 @@ fn parse(addr: &str) -> String {
         (false, true) => pl!("{prefix} <{imgs_len}: {htj}> 🏞️  in 📄:{term_title}"),
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
-    fn contains_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
-        haystack
-            .as_bytes()
-            .windows(needle.len())
-            .any(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
+
+    if let Some(p) = t
+        .as_bytes()
+        .windows(" page".len())
+        .rposition(|w| w.eq_ignore_ascii_case(" page".as_bytes()))
+    {
+        t = &t[..p];
     }
-    t = if contains_ignore_ascii_case(t, " page") || t.contains('页') {
-        t[..t
-            .to_ascii_lowercase()
-            .rfind(" page")
-            .or_else(|| t.rfind('第'))
-            .unwrap_or(t.len())]
-            .trim()
+    t = if t.contains('页') {
+        &t[..t.rfind('第').unwrap_or(t.len())]
     } else {
-        t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
-    };
+        &t[..t.rfind(['(', ',']).unwrap_or(t.len())]
+    }
+    .trim();
 
     match (has_album, imgs_len > 0) {
         (_, true) => {
