@@ -401,19 +401,20 @@ fn parse(addr: &str) -> String {
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
-    if let Some(p) = t
+    t = if let Some(p) = t
         .as_bytes()
         .windows(" page".len())
         .rposition(|w| w.eq_ignore_ascii_case(" page".as_bytes()))
     {
-        t = &t[..p];
-    }
-    t = if t.contains('页') {
-        &t[..t.rfind('第').unwrap_or(t.len())]
+        &t[..p]
     } else {
-        &t[..t.rfind(['(', ',']).unwrap_or(t.len())]
-    }
-    .trim();
+        if t.contains('页') {
+            &t[..t.rfind('第').unwrap_or(t.len())]
+        } else {
+            &t[..t.rfind(['(', ',']).unwrap_or(t.len())]
+        }
+        .trim()
+    };
 
     match (has_album, imgs_len > 0) {
         (_, true) => {
