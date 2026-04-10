@@ -53,7 +53,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt-get update && sudo apt install -y libguestfs-tools
+          # sudo apt-get update && sudo apt install -y libguestfs-tools
           # sudo apt install -y zfsutils-linux
 
       - name: Install LLVM
@@ -63,39 +63,39 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
           sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
 
-      - name: Cache Illumos/Solaris
-        uses: actions/cache@v5
-        with:
-          path: /home/runner/Illumos
-          key: Illomos-${{ runner.os }}-${{ runner.arch }}
-          restore-keys: Illomos-${{ runner.os }}-${{ runner.arch }}
+      # - name: Cache Illumos/Solaris
+      #   uses: actions/cache@v5
+      #   with:
+      #     path: /home/runner/Illumos
+      #     key: Illomos-${{ runner.os }}-${{ runner.arch }}
+      #     restore-keys: Illomos-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          mkdir -p /home/runner/Illumos
-          ln -sfn /home/runner/Illumos Illumos
+          # mkdir -p /home/runner/Illumos
+          # ln -sfn /home/runner/Illumos Illumos
 
-          if [ ! -f Illumos/omnios-r151056.cloud.raw ]; then
-            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.cloud.raw.zst | zstd -d > Illumos/omnios-r151056.cloud.raw
-          fi
+          # if [ ! -f Illumos/omnios-r151056.cloud.raw ]; then
+          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.cloud.raw.zst | zstd -d > Illumos/omnios-r151056.cloud.raw
+          # fi
 
-          sudo mkdir -p /mnt/illumos
-          sudo guestmount -a Illumos/omnios-r151056.cloud.raw -m /dev/sda1 /mnt/illumos
-          mkdir -p illumos
-          sudo rsync -a /mnt/illumos/{lib,usr} illumos/
+          # sudo mkdir -p /mnt/illumos
+          # sudo guestmount -a Illumos/omnios-r151056.cloud.raw -m /dev/sda1 /mnt/illumos
+          # mkdir -p illumos
+          # sudo rsync -a /mnt/illumos/{lib,usr} illumos/
 
-          targets=(
-            x86_64-unknown-illumos
-          )
+          # targets=(
+          #   x86_64-unknown-illumos
+          # )
 
-          for target in ${targets[@]}; do
-            time cargo s $target
-          done
+          # for target in ${targets[@]}; do
+          #   time cargo s $target
+          # done
 
-          exit
+          # exit
 
           if [ ! -d /home/runner/Fuchsia ]; then
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
@@ -132,7 +132,7 @@ jobs:
             x86_64-unknown-fuchsia
           )
           for target in ${targets[@]}; do
-            time cargo b -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size,backtrace --target $target
+            time cargo b -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
           targets=(
