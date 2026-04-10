@@ -83,7 +83,8 @@ jobs:
           fi
 
           sudo mkdir -p /mnt/illumos
-          sudo guestmount -a Illumos/omnios-r151056.cloud.raw --all --long
+          virt-filesystems -a Illumos/omnios-r151056.cloud.raw --all --long
+          sudo guestmount -a Illumos/omnios-r151056.cloud.raw -m /dev/sda1 /mnt/illumos
           ln -sf /mnt/illumos illumos
 
           targets=(
