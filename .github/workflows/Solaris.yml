@@ -78,24 +78,17 @@ jobs:
           # mkdir -p /home/runner/Illumos
           # ln -sfn /home/runner/Illumos Illumos
 
-          # if [ ! -f Illumos/omnios-r151056.cloud.raw ]; then
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.cloud.raw.zst | zstd -d > Illumos/omnios-r151056.cloud.raw
+          # if [ ! -f Illumos/omnios-r151056.zfs ]; then
+          #   mkdir -p Illumos/omnios
+          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > Illumos/omnios-r151056.zfs
           # fi
 
-          # sudo mkdir -p /mnt/illumos
-          # sudo guestmount -a Illumos/omnios-r151056.cloud.raw -m /dev/sda1 /mnt/illumos
-          # mkdir -p illumos
-          # sudo rsync -a /mnt/illumos/{lib,usr} illumos/
+          # sudo truncate -s 1G /tmp/omnios.img
+          # sudo zpool create -f solaris /tmp/omnios.img
+          # sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
 
-          # targets=(
-          #   x86_64-unknown-illumos
-          # )
-
-          # for target in ${targets[@]}; do
-          #   time cargo s $target
-          # done
-
-          # exit
+          # zpool status
+          # zfs list
 
           if [ ! -d /home/runner/Fuchsia ]; then
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
@@ -137,7 +130,6 @@ jobs:
 
           targets=(
             x86_64-unknown-illumos
-            x86_64-sun-solaris
             x86_64-pc-solaris
             sparcv9-sun-solaris
           )
@@ -147,7 +139,9 @@ jobs:
             time cross build -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
-          # sudo guestunmount /mnt
+          # sudo zfs destroy -r solaris/omnios
+          # sudo zpool destroy solaris
+
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
