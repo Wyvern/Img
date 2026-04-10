@@ -84,8 +84,8 @@ jobs:
 
           sudo mkdir -p /mnt/illumos
           sudo guestmount -a Illumos/omnios-r151056.cloud.raw -m /dev/sda1 /mnt/illumos
-          ln -sf /mnt/illumos illumos
-          sudo chmod -R u+rwX illumos
+          mkdir -p illumos
+          sudo rsync -a /mnt/illumos/{lib,usr} illumos/
 
           targets=(
             x86_64-unknown-illumos
