@@ -53,7 +53,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install -y libguestfs-tools
+          sudo apt-get update && sudo apt install -y libguestfs-tools
           # sudo apt install -y zfsutils-linux
 
       - name: Install LLVM
