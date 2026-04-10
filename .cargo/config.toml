@@ -512,9 +512,9 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 [target.x86_64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
-[target.'cfg(target_os="solaris")']
+[target.'cfg(any(target_os="solaris",target_os="illumos"))']
 # linker = "./zig-cc.sh"
-# rustflags = []
+rustflags = ["-Clink-arg=--sysroot=illumos/"]
 
 [target.mips64-openwrt-linux-musl]
 linker = "wrt/bin/mips64-openwrt-linux-gcc"
