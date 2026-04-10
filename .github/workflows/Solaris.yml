@@ -83,9 +83,9 @@ jobs:
           fi
 
           sudo mkdir -p /mnt/illumos
-          virt-filesystems -a Illumos/omnios-r151056.cloud.raw --all --long
           sudo guestmount -a Illumos/omnios-r151056.cloud.raw -m /dev/sda1 /mnt/illumos
           ln -sf /mnt/illumos illumos
+          chmod -R u+rwX illumos
 
           targets=(
             x86_64-unknown-illumos
