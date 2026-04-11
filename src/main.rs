@@ -355,8 +355,9 @@ fn parse(addr: &str) -> String {
         html_img.length() + css_img.len() + json_img.len(),
         json_img.len(),
     ];
-    unsafe {
-        if has_album && imgs_len == 0 {
+
+    if has_album && imgs_len == 0 {
+        unsafe {
             INALBUM = true;
         }
     }
@@ -698,8 +699,8 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
-    unsafe {
-        if has_album && imgs_len == 0 {
+    if has_album && imgs_len == 0 {
+        unsafe {
             INALBUM = false;
         }
     }
