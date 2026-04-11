@@ -25,6 +25,7 @@ static IMGS: &[&str] = &[
     ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx", ".jfif",
 ];
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
+static mut INALBUM: bool = false;
 
 fn check_args() -> [String; 2] {
     let mut args = cfg_select! {
@@ -298,6 +299,11 @@ fn parse(addr: &str) -> String {
 
     let mut albums = album.map(|a| page.select(a));
     let has_album = albums.as_ref().is_some_and(|a| !a.is_empty());
+    unsafe {
+        if has_album {
+            INALBUM = true;
+        }
+    }
     let page_title = || titles.first().immediate_text();
     let title = title_sel.map_or_else(
         || {
@@ -693,10 +699,16 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
+    unsafe {
+        if albums_len > 0 {
+            INALBUM = false;
+        }
+    }
+
     next_sel.map_or_else(
         || {
             page_sel.map_or_else(<_>::default, |p| {
-                if !query && albums.is_none_or(|a| a.is_empty()) {
+                if !query && albums.is_none_or(|a| a.is_empty()) && unsafe { !INALBUM } {
                     pause();
                     check_next(p, addr, &page)
                 } else {
