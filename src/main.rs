@@ -299,11 +299,6 @@ fn parse(addr: &str) -> String {
 
     let mut albums = album.map(|a| page.select(a));
     let has_album = albums.as_ref().is_some_and(|a| !a.is_empty());
-    unsafe {
-        if has_album {
-            INALBUM = true;
-        }
-    }
     let page_title = || titles.first().immediate_text();
     let title = title_sel.map_or_else(
         || {
@@ -360,7 +355,11 @@ fn parse(addr: &str) -> String {
         html_img.length() + css_img.len() + json_img.len(),
         json_img.len(),
     ];
-
+    unsafe {
+        if has_album && imgs_len == 0 {
+            INALBUM = true;
+        }
+    }
     let term_title = if *TERM.get_or_init(|| {
         std::env::var("TERM").is_ok_and(|o| {
             ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
@@ -700,7 +699,7 @@ fn parse(addr: &str) -> String {
     }
 
     unsafe {
-        if albums_len > 0 {
+        if has_album && imgs_len == 0 {
             INALBUM = false;
         }
     }
