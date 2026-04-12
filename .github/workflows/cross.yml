@@ -87,7 +87,7 @@ jobs:
           )
           for target in ${targets[@]}; do
             export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
-            time cross build -q --config 'build.rustc-wrapper=""' --profile lto --target $target
+            time cross build -q --profile lto --target $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
