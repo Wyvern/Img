@@ -51,7 +51,7 @@ jobs:
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
         with:
-          version: "6.0.0.1"
+          version: "6.1"
 
       - name: Cache openwrt
         uses: actions/cache@v5
