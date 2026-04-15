@@ -1362,15 +1362,14 @@ mod img {
 
     #[test]
     fn run() {
-        // https://bisipic.online/portal.php?page=2
-
-        if let Some(arg) = env::args().nth(4) {
+        let editor = std::env::args().any(|a| a == "--include-ignored");
+        if let Some(arg) = env::args().nth(if editor { 5 } else { 4 }) {
             parse(&arg);
         } else {
             [
-                "https://xiutaku.com",
+                "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://meitu9.com/",
+                "https://goddess247.com/category/china/xiaoyu/page/18",
             ]
             .into_iter()
             .for_each(|u| {
