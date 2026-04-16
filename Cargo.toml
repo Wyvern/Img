@@ -7,11 +7,13 @@ edition = "2024"
 default = []
 download = []
 embed = ["dep:base64"]
+color = []
 
 [[example]]
 name = "color"
 path = "src/color.rs"
 test = false
+required-features = ["color"]
 
 [dependencies]
 serde_json = "*"

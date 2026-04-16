@@ -1369,7 +1369,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://goddess247.com/category/china/xiaoyu/page/18",
+                "https://goddess247.com/category/china/xiaoyu/page/16",
             ]
             .into_iter()
             .for_each(|u| {
