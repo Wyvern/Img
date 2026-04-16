@@ -1,6 +1,22 @@
 {
   "Sites": [
     {
+      "Site": "jkforum.net",
+      "Page": "https://jkforum.net/api/jkf-forum/v1/ArticleThread/{/thread-}",
+      "Img": "json: pointer | /content/content -> https://jkforum.net/attachment/{?}",
+      "Title": "json: pointer | /content/title"
+    },
+    {
+      "Site": "blogger.com",
+      "Page": "https://www.blogger.com/feeds/{'blogId': '}/posts/default/{'postId': '}?alt=json",
+      "Img": "json: pointer | /entry/content/$t"
+    },
+    {
+      "Site": "tvv.tw",
+      "Img": "div.blog-details-text img",
+      "Album": "div.blog-title > a"
+    },
+    {
       "Site": "mmrgb.com",
       "Img": "img[zoomfile]",
       "Album": "div.card-figure p"
@@ -95,8 +111,9 @@
     },
     {
       "Site": "xiuren.biz",
-      "Img": "div.content-inner img.alignnone.size-full",
-      "Album": "h3.jeg_post_title a"
+      "Img": "div.content-inner a > img",
+      "Album": "h3.jeg_post_title a",
+      "Page": "div.jeg_block_navigation a.next"
     },
     {
       "Site": "nudegirls4u.com",
@@ -171,8 +188,9 @@
     {
       "Site": "ligui.org",
       "Img": "div.info-imtg-box img",
-      "Next": "div.pagebar a",
-      "Album": "span.img-box h3 a"
+      "Next": "div.pagebar > a:has-text('下页')",
+      "Album": "span.img-modbox h3 a",
+      "Page": "div.pagebar > a:has-text('后页')"
     },
     {
       "Site": "nsphb.com",
@@ -244,7 +262,8 @@
     {
       "Site": "taotu.org",
       "Img": "div.piclist > a[href]",
-      "Album": "div.piclist > div img"
+      "Album": "div.piclist > div img",
+      "Page": "div#MainContent_HeaderPrev > a:contains('<<')"
     },
     {
       "Site": "xiurenwang.me",
@@ -376,8 +395,8 @@
     },
     {
       "Site": "jrants.com",
-      "Img": "div.bialty-container p img",
-      "Next": "div.pgntn-page-pagination-block a",
+      "Img": "div.entry-content img",
+      "Next": "div.pgntn-page-pagination-block > a:has-text('Next')",
       "Album": "header.entry-header h2 a"
     },
     {
@@ -512,7 +531,7 @@
     {
       "Site": "meitulu.me",
       "Img": "div.container-inner-fix-m img",
-      "Next": "ul.pagination a",
+      "Next": "ul.pagination a[href]:has-text('下一頁')",
       "Album": "div.my-card-title"
     },
     {
@@ -582,12 +601,12 @@
       "Album": "h1.entry-title > a"
     },
     {
-      "Site": "inewgirl.com,nshens.com,lovestatic.com,ijjiao.com",
+      "Site": "nshens.com",
       "Img": "json: key | photourl",
       "Next": "<script>"
     },
     {
-      "Site": "chottie.org,chottie.net,chottie.com,chinesehottie.com",
+      "Site": "chottie.com",
       "Img": "json: array | imgList",
       "Next": "<script>"
     },
@@ -722,27 +741,26 @@
     }
   ],
   "Series": [
+    ["Chinese Hottie", "title:has-text('Chinese Hottie')", "chottie.com"],
+    ["女神社", "title:has-text('女神社')", "nshens.com"],
+    ["Blogger", "meta[name='generator'][content='blogger']", "blogger.com"],
     ["九天美图", "div.logo > a > img.logo-pc[alt]", "meitu9.com"],
-    ["秀人集", "div.logo > a > img[alt='秀人集']", "quanjixiu.com"],
-    ["秀人美女", "div.logo > a > img[alt='秀人美女']", "xrmnw.com"],
-    ["妹子图", "div.logo > a[title='妹子图-美女图库']", "dzdmr.com"],
-    ["尤物秀", "h1.logo > a[title='尤物秀']", "pornclub.cc"],
-    ["爱美女", "h1.logo > a[title='爱美女网'] > img[src]", "imn5.top"],
+    ["秀人集", "div.logo > a > img[alt*='秀人集']", "quanjixiu.com"],
+    ["秀人美女", "div.logo > a > img[alt*='秀人美女']", "xrmnw.com"],
+    ["妹子图", "div.logo > a[title*='妹子图']", "dzdmr.com"],
+    ["尤物秀", "h1.logo > a[title*='尤物秀']", "pornclub.cc"],
+    ["爱美女", "h1.logo > a[title*='爱美女网'] > img[src]", "imn5.top"],
     ["我为人人", "a[href='/2048'] > img[src]", "hjd2048.com"],
     ["蜜丝社", "a.navbar-brand > img.img-fluid", "oorpg.com"],
-    ["小黄书 xChina", "div.logo > a > img[alt]", "xchina.co"],
+    ["米兔妹妹", "div.logo.fl > a[title] > img[alt*='米兔妹妹']", "ligui.org"],
     ["资讯热线", "div.logo > a > img[alt][title]", "shzx.org"],
+    ["小黄书 xChina", "div.logo > a > img[alt*='小黄书']", "xchina.co"],
     ["秀人妹子", "div.nt > a > span", "656g.com"],
     ["心动美图", "div.site-title > h1 > a[href]", "zei77.com"],
     ["娱乐吧", "div.banner > a > img[alt][title]", "yuleba.org"],
-    [
-      "极品性感美女",
-      "h1.logo > a[title] > img[alt='性感美女网']",
-      "jpxgmn.com"
-    ],
+    ["极品性感美女", "h1.logo > a[title] > img[alt*='性感美女']", "jpxgmn.com"],
     ["秀人图 ", "div.logo-wrapper img.tap-logo", "ikxiuren.com"],
     ["深度学堂", "div.logo-wrapper > a[href] > img[alt='深度学堂']", "sdxt.de"],
-    ["爱看美女", "div.logo.fl > a[title] > img[alt]", "ligui.org"],
     ["V2PH,", "a.logo > img[alt='V2PH']", "v2ph.com"],
     ["Leg Baby", "div.navbar-header > a.navbar-brand", "legbabe.com"],
     [

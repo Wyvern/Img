@@ -7,23 +7,25 @@ edition = "2024"
 default = []
 download = []
 embed = ["dep:base64"]
+color = []
 
 [[example]]
 name = "color"
 path = "src/color.rs"
-test = true
+test = false
+required-features = ["color"]
 
 [dependencies]
 serde_json = "*"
 percent-encoding = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 base64 = { version = "*", default-features = false, optional = true }
-dom_query = {version = "*", default-features = false}
+dom_query = { version = "*", default-features = false }
 
 [target.'cfg(unix)'.dependencies]
-termion = "*"
-fork = "*"
 file-format = "*"
+fork = "*"
+termion = "*"
 
 [target.'cfg(target_os = "hermit")'.dependencies]
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }

@@ -7,9 +7,9 @@ use {std::*, sync::atomic::*, util::*};
 
 static SPINNER: AtomicBool = AtomicBool::new(false);
 static SEP: &str = " | ";
-static CSS: [&str; 3] = ["url(", "image(", "image-set("];
+static CSS: &[&str] = &["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: [&str; cfg_select! {debug_assertions=>7,_=>6}] = [
+static CURL: &[&str] = &[
     "--compressed",
     "-kfsL",
     "-A",
@@ -20,11 +20,12 @@ static CURL: [&str; cfg_select! {debug_assertions=>7,_=>6}] = [
     "-S",
     // "-OJ",
 ];
-static IMGS: [&str; 18] = [
+static IMGS: &[&str] = &[
     ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif", ".svg",
-    ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx",
+    ".svgz", ".avif", ".heif", ".heic", ".jp2", ".j2k", ".jpx", ".jfif",
 ];
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
+static mut INALBUM: bool = false;
 
 fn check_args() -> [String; 2] {
     let mut args = cfg_select! {
@@ -85,12 +86,9 @@ fn check_host(addr: &str) -> &str {
 
 ///Get `host` info and Generate `img/next/album` selector data
 fn host_info(host: &str) -> [Option<&str>; 5] {
-    let site = JSON
-        .get_or_init(website)
-        .as_object()
-        .expect("`web.json` file parse error!")["Sites"]
+    let site = JSON.get_or_init(website)["Sites"]
         .as_array()
-        .expect("Parse `Sites` in `web.json` key error!")
+        .unwrap()
         .iter()
         .find(|&site| {
             site["Site"].as_str().is_some_and(|s| {
@@ -105,7 +103,6 @@ fn host_info(host: &str) -> [Option<&str>; 5] {
                 })
             })
         });
-
     site.map_or([None; 5], |s| {
         ["Img", "Next", "Album", "Title", "Page"].map(|key| s[key].as_str().map(|v| v.trim()))
     })
@@ -161,12 +158,7 @@ fn parse(addr: &str) -> String {
     let page = dom::Document::from(&html[..ll]);
 
     if img.is_none() {
-        let cat = JSON
-            .get_or_init(website)
-            .as_object()
-            .expect("`web.json` file parse error!")["Series"]
-            .as_array()
-            .expect("Parse `Series` in `web.json` key error!");
+        let cat = JSON.get_or_init(website)["Series"].as_array().unwrap();
         if let Some(series) = cat.iter().find_map(|v| {
             let arr = v
                 .as_array()
@@ -174,7 +166,6 @@ fn parse(addr: &str) -> String {
                 .iter()
                 .map(|v| v.as_str().unwrap())
                 .collect::<Vec<_>>();
-
             if !page.select(arr[1]).is_empty() {
                 Some(arr)
             } else {
@@ -187,7 +178,7 @@ fn parse(addr: &str) -> String {
     }
 
     let sels = img.and_then(|i| i.split_once(SEP));
-    let sel = sels.map(|(l, _)| l).or(img);
+    let sel = sels.map(|(l, _)| l.trim()).or(img);
 
     let mut json_img = collections::HashSet::new();
     let mut html_img = dom::Selection::default();
@@ -196,46 +187,94 @@ fn parse(addr: &str) -> String {
     } else {
         collections::HashSet::new()
     };
-
+    let doc;
+    let mut jsontitle = String::default();
+    let query = page_sel.is_some_and(|p| p.starts_with("https://"));
     if sel.is_some_and(|s| s.starts_with("json:")) {
         let kind = sel.unwrap().trim_start_matches("json:").trim();
         let name = sels.map(|(_, r)| r).unwrap().trim();
         let script = page.select("script");
-        for s in script.iter().filter(|s| !s.text().is_empty()) {
-            let t = s.text();
-            let urls = t.split(name).skip(1);
-            for u in urls {
-                match kind {
-                    "key" => {
-                        let url = u
-                            .split('"')
-                            .nth(1)
-                            .map(|u| u.replace(r"\u002F", "/"))
-                            .unwrap();
-                        json_img.insert(url);
+        for s in script.iter().filter(|s| !s.immediate_text().is_empty()) {
+            let t = s.immediate_text();
+            if query {
+                let api = page_sel.unwrap();
+                let mut query = api.to_owned();
+                api.split('{')
+                    .skip(1)
+                    .filter_map(|part| part.split('}').next())
+                    .for_each(|k| {
+                        t.split_once(k)
+                            .and_then(|(_, r)| r.split_once(k.chars().last().unwrap()))
+                            .into_iter()
+                            .for_each(|(v, _)| query = query.replace(&format!("{{{k}}}"), v));
+                    });
+                if !query.contains('{') {
+                    tdbg!(&query);
+                    let (data, pos) = get_html(&query);
+                    let json = &data[..pos];
+                    let jv: &serde_json::Value = &serde_json::from_str(json).unwrap();
+                    if let Some(t) = title_sel {
+                        let sel = t.split_once(SEP).unwrap().1.trim();
+                        jsontitle = jv.pointer(sel).unwrap().as_str().unwrap().into();
                     }
-                    "array" => {
-                        u.split(['[', ']'])
-                            .nth(1)
-                            .unwrap()
-                            .split(',')
-                            .map(|s| s.trim().trim_matches('"').replace(r"\u002F", "/"))
-                            .for_each(|url| {
-                                json_img.insert(url);
-                            });
-                    }
-                    "var" => {
-                        u.split('\'')
-                            .nth(1)
-                            .unwrap()
-                            .split("https://")
+
+                    let pat = name.split_once("->");
+                    let data = jv
+                        .pointer(pat.map(|(p, _)| p).unwrap_or(name).trim())
+                        .unwrap()
+                        .as_str()
+                        .unwrap();
+                    doc = dom::Document::from(data);
+                    html_img = doc.select("img[src]");
+                    if html_img.is_empty() {
+                        data.split("[img]")
                             .skip(1)
-                            .for_each(|url| {
-                                json_img.insert(format!("https://{url}"));
+                            .filter_map(|x| x.split("[/img]").next())
+                            .for_each(|v| {
+                                if let Some((_, sub)) = pat {
+                                    json_img.insert(sub.trim().replace("{?}", v));
+                                } else {
+                                    json_img.insert(v.into());
+                                }
                             });
-                        break;
                     }
-                    _ => (),
+                    break;
+                }
+            } else {
+                let urls = t.split(name).skip(1);
+                for u in urls {
+                    match kind {
+                        "key" => {
+                            let url = u
+                                .split('"')
+                                .nth(1)
+                                .map(|u| u.replace(r"\u002F", "/"))
+                                .unwrap();
+                            json_img.insert(url);
+                        }
+                        "array" => {
+                            u.split(['[', ']'])
+                                .nth(1)
+                                .unwrap()
+                                .split(',')
+                                .map(|s| s.trim().trim_matches('"').replace(r"\u002F", "/"))
+                                .for_each(|url| {
+                                    json_img.insert(url);
+                                });
+                        }
+                        "var" => {
+                            u.split('\'')
+                                .nth(1)
+                                .unwrap()
+                                .split("https://")
+                                .skip(1)
+                                .for_each(|url| {
+                                    json_img.insert(format!("https://{url}"));
+                                });
+                            break;
+                        }
+                        _ => (),
+                    }
                 }
             }
         }
@@ -258,8 +297,8 @@ fn parse(addr: &str) -> String {
         "title"
     });
 
-    let albums = album.map(|a| page.select(a));
-    let has_album = album.is_some() && !albums.as_ref().unwrap().is_empty();
+    let mut albums = album.map(|a| page.select(a));
+    let has_album = albums.as_ref().is_some_and(|a| !a.is_empty());
     let page_title = || titles.first().immediate_text();
     let title = title_sel.map_or_else(
         || {
@@ -287,7 +326,15 @@ fn parse(addr: &str) -> String {
             if has_album {
                 page_title()
             } else {
-                page.select_single(t).immediate_text()
+                if jsontitle.is_empty() {
+                    if query {
+                        page_title()
+                    } else {
+                        page.select_single(t).immediate_text()
+                    }
+                } else {
+                    jsontitle.into()
+                }
             }
         },
     );
@@ -309,6 +356,11 @@ fn parse(addr: &str) -> String {
         json_img.len(),
     ];
 
+    if has_album && imgs_len == 0 {
+        unsafe {
+            INALBUM = true;
+        }
+    }
     let term_title = if *TERM.get_or_init(|| {
         std::env::var("TERM").is_ok_and(|o| {
             ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
@@ -355,15 +407,19 @@ fn parse(addr: &str) -> String {
         (false, false) => quit!("∅ 🏞️  found in 📄:{term_title}"),
     }
 
-    t = if t.to_ascii_lowercase().contains(" page") || t.contains('页') {
-        t[..t
-            .to_ascii_lowercase()
-            .rfind(" page")
-            .or_else(|| t.rfind('第'))
-            .unwrap_or(t.len())]
-            .trim()
+    t = if let Some(p) = t
+        .as_bytes()
+        .windows(" page".len())
+        .rposition(|w| w.eq_ignore_ascii_case(" page".as_bytes()))
+    {
+        &t[..p]
     } else {
-        t[..t.rfind(['(', ',']).unwrap_or(t.len())].trim()
+        if t.contains('页') {
+            &t[..t.rfind('第').unwrap_or(t.len())]
+        } else {
+            &t[..t.rfind(['(', ',']).unwrap_or(t.len())]
+        }
+        .trim()
     };
 
     match (has_album, imgs_len > 0) {
@@ -390,6 +446,7 @@ fn parse(addr: &str) -> String {
                         embed += 1;
                     }
                 };
+
                 match value {
                     Some(val) => {
                         if attr == "style" {
@@ -398,7 +455,7 @@ fn parse(addr: &str) -> String {
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
                                         handle_embed(u);
-                                    } else if u.is_empty() || !urls.insert(canonicalize(&u, addr)) {
+                                    } else if u.is_empty() || !urls.insert(normarlize(&u, addr)) {
                                         if !u.is_empty() {
                                             dup += 1;
                                         } else {
@@ -416,7 +473,7 @@ fn parse(addr: &str) -> String {
                                 val.to_string()
                             };
                             // tdbg!(&url;);
-                            if url.is_empty() || !urls.insert(canonicalize(&url, addr)) {
+                            if url.is_empty() || !urls.insert(normarlize(&url, addr)) {
                                 if !url.is_empty() {
                                     dup += 1;
                                 } else {
@@ -481,7 +538,7 @@ fn parse(addr: &str) -> String {
                                     }
                                 })
                             });
-                            let cano = || canonicalize(&src, addr);
+                            let cano = || normarlize(&src, addr);
                             urls.insert(
                                 title_alt.map_or_else(cano, |x| format!("{}{SEP}{x}", cano())),
                             );
@@ -490,14 +547,13 @@ fn parse(addr: &str) -> String {
                     _ => (),
                 }
             }
-
             // tdbg!(&urls, &css_img, &json_img);
             download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
         (true, false) => {
             let mut all = false;
 
-            for (i, alb) in albums.unwrap().iter().enumerate() {
+            for (i, alb) in albums.take().unwrap().iter().enumerate() {
                 let parse_album = || {
                     let href = alb.attr("href").unwrap_or_else(|| {
                         let mut p = alb.parent();
@@ -518,7 +574,7 @@ fn parse(addr: &str) -> String {
                     });
 
                     if !href.is_empty() {
-                        let album_url = canonicalize(&href, addr);
+                        let album_url = normarlize(&href, addr);
                         let mut next_page = parse(&album_url);
                         if cfg!(not(test)) {
                             while !next_page.is_empty() {
@@ -566,7 +622,7 @@ fn parse(addr: &str) -> String {
                     );
                     _ = stdout.flush();
 
-                    #[cfg(target_family = "unix")]
+                    #[cfg(unix)]
                     {
                         use termion::event::Key;
                         use termion::input::TermRead;
@@ -602,7 +658,7 @@ fn parse(addr: &str) -> String {
                             }
                         }
                     }
-                    #[cfg(not(target_family = "unix"))]
+                    #[cfg(not(unix))]
                     {
                         let mut input = String::new();
                         stdin.read_line(&mut input).unwrap_or_else(|e| {
@@ -643,8 +699,23 @@ fn parse(addr: &str) -> String {
         (false, false) => (),
     }
 
+    if has_album && imgs_len == 0 {
+        unsafe {
+            INALBUM = false;
+        }
+    }
+
     next_sel.map_or_else(
-        || page_sel.map_or_else(<_>::default, |p| check_next(p, addr, &page)),
+        || {
+            page_sel.map_or_else(<_>::default, |p| {
+                if !query && albums.is_none_or(|a| a.is_empty()) && unsafe { !INALBUM } {
+                    pause();
+                    check_next(p, addr, &page)
+                } else {
+                    String::default()
+                }
+            })
+        },
         |n| {
             if n == "<script>" {
                 if json_len == 0 {
@@ -671,8 +742,8 @@ fn parse(addr: &str) -> String {
     )
 }
 
-///Canonicalize `img/next` link `url` in `addr`
-fn canonicalize(url: &str, addr: &str) -> String {
+///Normalize `img/next` link `url` in `addr`
+fn normarlize(url: &str, addr: &str) -> String {
     if url.is_empty() {
         return String::default();
     }
@@ -699,7 +770,7 @@ fn canonicalize(url: &str, addr: &str) -> String {
 ///replace os specific special/reversed chars in path name
 fn sanitize_path(name: &str) -> String {
     cfg_select! {
-        target_os = "macos"=> {name.replace("/", ":")}
+        target_os = "macos"=> {name.replace(":", "|")}
         any(all(unix, not(target_os = "macos")), target_family = "wasm")=>{name.replace("/", "_")}
         target_family = "windows"=>{name.chars()
             .map(|c| match c {
@@ -813,6 +884,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     let opts = [
         "-e",
         &format!("https://{host}"),
+        "--retry",
+        "3",
         "-Z",
         "--parallel-immediate",
         "-C-",
@@ -912,10 +985,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         .unwrap_or("href");
     let set_next = |tags: &[dom::Node]| {
         let tag = tags.iter().find(|e| {
-            e.node_name().unwrap().as_ref() == "a"
+            e.node_name().is_some_and(|n| n.as_ref() == "a")
                 || e.children()
                     .first()
-                    .is_some_and(|c| c.node_name().unwrap().as_ref() == "a")
+                    .is_some_and(|c| c.node_name().is_some_and(|n| n.as_ref() == "a"))
         });
 
         tag.filter(|e| e.is_nonempty_text() || !e.children().is_empty())
@@ -925,6 +998,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             })
             .unwrap_or_default()
     };
+
     let mut nexts = page.select(nxt).nodes().to_vec();
     nexts.sort_by_key(|x| x.attr(attr));
     nexts.dedup_by_key(|x| x.attr(attr));
@@ -933,21 +1007,17 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         tdbg!(nxt);
     } else if nexts.len() == 1 {
         let element = nexts[0];
-        if element.node_name().unwrap().as_ref() == "span" || element.attr(attr).is_none() {
+        if element.node_name().is_some_and(|n| n.as_ref() == "span") || element.attr(attr).is_none()
+        {
             let items = element.parent().unwrap().children();
             let tags = items
-                .split(|e| {
-                    (&element).node_id() == e.node_id()
-                    // ptr::eq(
-                    //     element.element_ref().unwrap().deref(),
-                    //     e.element_ref().unwrap().deref(),
-                    // )
-                })
+                .split(|e| (&element).node_id() == e.node_id())
                 .next_back()
                 .unwrap();
-            debug_assert!(!tags.is_empty() && tags.len() < items.len());
-            next_link = set_next(tags);
-        } else if element.node_name().unwrap().as_ref() == "i" {
+            if !tags.is_empty() {
+                next_link = set_next(tags);
+            }
+        } else if element.node_name().is_some_and(|n| n.as_ref() == "i") {
             next_link = element.parent().unwrap().attr(attr).unwrap();
         } else {
             next_link = element.attr(attr).unwrap();
@@ -1017,7 +1087,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     let mut ret = String::default();
     if !next_link.is_empty() {
         ret = ns.map_or_else(
-            || canonicalize(next_link.as_ref(), cur),
+            || normarlize(next_link.as_ref(), cur),
             |(_, r)| {
                 let count = r.matches('/').count();
                 format!(
@@ -1186,9 +1256,10 @@ fn url_image(content: &str) -> Option<String> {
             || url == "undefined"
             || url.starts_with(['{', '$'])
             || url.contains('#')
-            || IMGS
-                .iter()
-                .all(|&ext| !url.to_ascii_lowercase().ends_with(ext))
+            || IMGS.iter().all(|&ext| {
+                !url.rfind('.')
+                    .is_some_and(|dot| url[dot..].eq_ignore_ascii_case(ext))
+            })
         {
             None
         } else {
@@ -1202,7 +1273,7 @@ fn url_image(content: &str) -> Option<String> {
 ///Get `page` css style `url(),image(),image-set()`
 fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
-    _ = CSS.map(|s| {
+    _ = CSS.iter().map(|&s| {
         let segments = html.split(s);
         if s == "image-set(" {
             for seg in segments.skip(1) {
@@ -1219,7 +1290,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                             images.insert(u);
                         }
                     } else {
-                        images.insert(canonicalize(&u, addr));
+                        images.insert(normarlize(&u, addr));
                     }
                 }
             }
@@ -1291,15 +1362,14 @@ mod img {
 
     #[test]
     fn run() {
-        // https://bisipic.online/portal.php?page=2
-
-        if let Some(arg) = env::args().nth(4) {
+        let editor = std::env::args().any(|a| a == "--include-ignored");
+        if let Some(arg) = env::args().nth(if editor { 5 } else { 4 }) {
             parse(&arg);
         } else {
             [
-                "https://xiutaku.com",
+                "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://meitu9.com/",
+                "https://goddess247.com/category/china/xiaoyu/page/16",
             ]
             .into_iter()
             .for_each(|u| {
