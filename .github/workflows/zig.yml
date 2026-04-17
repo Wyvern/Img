@@ -1,4 +1,4 @@
-name: Zig build
+name: Zig
 
 on:
   push:
