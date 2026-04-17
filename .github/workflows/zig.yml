@@ -14,7 +14,7 @@ env:
 
 jobs:
   macOS:
-    name: Zig-Linker
+    name: Zig
     runs-on: macos-26
 
     steps:
