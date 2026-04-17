@@ -84,7 +84,6 @@ jobs:
             "mipsel-unknown-netbsd Netbsd-mipsel"
             "powerpc-unknown-netbsd Netbsd-powerpc"
             "armv7-unknown-netbsd-eabihf Netbsd-armv7"
-            "sparc64-unknown-netbsd Netbsd-sparc64"
           )
 
           for target in "${targets[@]}"; do

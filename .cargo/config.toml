@@ -558,10 +558,10 @@ rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
 
 [target.mipsel-unknown-netbsd]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
+rustflags = ["-Clink-arg=--target=mipsel-netbsd","-Clinker-plugin-lto=no"]
 [target.powerpc-unknown-netbsd]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-netbsd"]
+rustflags = ["-Clink-arg=--target=powerpc-netbsd","-Clinker-plugin-lto=no"]
 [target.armv7-unknown-netbsd-eabihf]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=arm-netbsd"]
+rustflags = ["-Clink-arg=--target=arm-netbsd","-Clinker-plugin-lto=no"]
