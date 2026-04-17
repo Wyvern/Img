@@ -1,0 +1,104 @@
+name: Zig build
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  macOS:
+    name: Zig-Linker
+    runs-on: macos-26
+
+    steps:
+      - name: Disable macos spotlight index
+        run: |
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
+          sudo pmset -a powernap 0
+          sudo pmset -a sleep 0
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Zig toolchain install
+        usee: https://codeberg.org/mlugg/setup-zig@v2
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+            mipsel-unknown-netbsd
+            powerpc-unknown-netbsd
+            armv7-unknown-netbsd-eabihf
+            sparc64-unknown-netbsd
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          find ./target -iname img -o -type f | xargs ls -hl
+          sw_vers
+          hostinfo
+          sysctl -n machdep.cpu.brand_string
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            "mipsel-unknown-netbsd Netbsd-mipsel"
+            "powerpc-unknown-netbsd Netbsd-powerpc"
+            "armv7-unknown-netbsd-eabihf Netbsd-armv7"
+            "sparc64-unknown-netbsd Netbsd-sparc64"
+          )
+
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            for f in img img.exe img.wasm; do
+                if [ -f "target/$arch/src/$f" ]; then
+                  mv target/$arch/src/$f target/$arch/src/$name || true
+                  gh release upload Nightly target/$arch/src/$name --clobber || true
+                  break
+                fi
+            done
+          done
+
+          echo "Uploading Apple-macOS-universal..."
+          gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
