@@ -558,10 +558,10 @@ rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
 
 [target.mipsel-unknown-netbsd]
 linker = "cc"
-# rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
+rustflags = ["-Clink-arg=--target=mipsel-netbsd","-Clink-arg=-fuse-ld=ld"]
 [target.powerpc-unknown-netbsd]
 linker = "cc"
-# rustflags = ["-Clink-arg=--target=powerpc-netbsd"]
+rustflags = ["-Clink-arg=--target=powerpc-netbsd","-Clink-arg=-fuse-ld=ld"]
 [target.armv7-unknown-netbsd-eabihf]
 linker = "cc"
-# rustflags = ["-Clink-arg=--target=arm-netbsd"]
+rustflags = ["-Clink-arg=--target=arm-netbsd","-Clink-arg=-fuse-ld=ld"]

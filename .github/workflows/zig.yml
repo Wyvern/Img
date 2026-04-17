@@ -50,14 +50,17 @@ jobs:
           cargo update
           set +e -x
 
-          CC="zig cc -target mipsel-netbsd"
-          time cargo s mipsel-unknown-netbsd
+          CC="zig cc"
 
-          CC="zig cc -target powerpc-netbsd"
-          time cargo s powerpc-unknown-netbsd
+          targets=(
+            mipsel-unknown-netbsd
+            powerpc-unknown-netbsd
+            armv7-unknown-netbsd-eabihf
+          )
 
-          CC="zig cc -target arm-netbsd"
-          time cargo s armv7-unknown-netbsd-eabihf
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
 
           find ./target -iname img -o -type f | xargs ls -hl
           sw_vers
