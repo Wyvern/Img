@@ -556,12 +556,12 @@ rustflags = ["-Clink-arg=--sysroot=espidf-riscv"]
 linker = "espidf-xtensa/bin/xtensa-esp-elf-gcc"
 rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
 
-# [target.mipsel-unknown-netbsd]
-# linker = "./zig-cc.sh"
+[target.mipsel-unknown-netbsd]
+linker = "cc"
 # rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
-# [target.powerpc-unknown-netbsd]
-# linker = "./zig-cc.sh"
+[target.powerpc-unknown-netbsd]
+linker = "cc"
 # rustflags = ["-Clink-arg=--target=powerpc-netbsd"]
-# [target.armv7-unknown-netbsd-eabihf]
-# linker = "./zig-cc.sh"
+[target.armv7-unknown-netbsd-eabihf]
+linker = "cc"
 # rustflags = ["-Clink-arg=--target=arm-netbsd"]
