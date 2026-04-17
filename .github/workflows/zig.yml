@@ -50,8 +50,6 @@ jobs:
           cargo update
           set +e -x
 
-          CC="zig cc"
-
           targets=(
             mipsel-unknown-netbsd
             powerpc-unknown-netbsd

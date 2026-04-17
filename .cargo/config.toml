@@ -557,11 +557,11 @@ linker = "espidf-xtensa/bin/xtensa-esp-elf-gcc"
 rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
 
 [target.mipsel-unknown-netbsd]
-linker = "cc"
-rustflags = ["-Clink-arg=--target=mipsel-netbsd","-Clink-arg=-fuse-ld=ld"]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
 [target.powerpc-unknown-netbsd]
-linker = "cc"
-rustflags = ["-Clink-arg=--target=powerpc-netbsd","-Clink-arg=-fuse-ld=ld"]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=powerpc-netbsd"]
 [target.armv7-unknown-netbsd-eabihf]
-linker = "cc"
-rustflags = ["-Clink-arg=--target=arm-netbsd","-Clink-arg=-fuse-ld=ld"]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-netbsd"]
