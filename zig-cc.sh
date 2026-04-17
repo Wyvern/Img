@@ -4,7 +4,6 @@
 set -e
 
 filtered=()
-skip_next=0
 
 for a in "$@"; do
   case "$a" in
