@@ -565,6 +565,3 @@ rustflags = ["-Clink-arg=--target=powerpc-netbsd"]
 [target.armv7-unknown-netbsd-eabihf]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-netbsd"]
-[target.sparc64-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=sparc64-netbsd"]
