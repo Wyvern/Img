@@ -252,7 +252,7 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros=y",
   "-Zoffload=Device",
-  "-Zllvm-writable",
+  # "-Zllvm-writable",
   # "-Zbuild-sdylib-interface",
 
   "-Dclippy::redundant_clone",
