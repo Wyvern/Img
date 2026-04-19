@@ -33,8 +33,19 @@ fn main() {
         .name("img")
         .version("1.0.0")
         .description("<img> fetcher/cralwer across various web pages")
-        .positional(Pos::new("url").desc("the url of web page").required())
-        .positional(Pos::new("dir").desc("the dir where album folder stored"))
+        .positional(Pos::new("url").desc("- the url of web page").required())
+        .positional(
+            Pos::new("dir")
+                .desc("- the dir where album folder stored")
+                .validate(Validator::with_hint("is-dir", |x| {
+                    let p = path::Path::new(x);
+                    if p.exists() && p.is_dir() {
+                        Ok(())
+                    } else {
+                        Err("Path must be an existed directory.".into())
+                    }
+                })),
+        )
         .build()
         .unwrap();
 
@@ -55,16 +66,6 @@ fn main() {
             quit!("")
         }
     };
-
-    if let Some(dir) = args.dir {
-        let path = path::Path::new(&dir);
-        if path.exists() && path.is_dir() {
-            env::set_current_dir(path)
-                .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
-        } else {
-            quit!("The path {} is invalid!", &dir)
-        }
-    }
 
     check_host(&args.url);
 
