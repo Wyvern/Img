@@ -21,6 +21,7 @@ percent-encoding = "*"
 cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 base64 = { version = "*", default-features = false, optional = true }
 dom_query = { version = "*", default-features = false }
+nanoargs = "*"
 
 [target.'cfg(unix)'.dependencies]
 file-format = "*"

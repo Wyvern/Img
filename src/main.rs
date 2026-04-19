@@ -28,23 +28,41 @@ static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
 
 fn check_args() -> [String; 2] {
-    let mut args = cfg_select! {
-        test=>{env::args().skip(3)}
-        _=>{env::args()}
+    use nanoargs::*;
+    let parser = ArgBuilder::new()
+        .name("img")
+        .version("1.0.0")
+        .description("<img> fetcher/cralwer across various web pages")
+        .positional(Pos::new("url").desc("the url of web page").required())
+        .positional(Pos::new("dir").desc("the dir where album folder stored"))
+        .build()
+        .unwrap();
+    let args = cfg_select! {
+        test=>{env::args().skip(4)}
+        _=>{env::args().skip(1)}
     };
-    if args.len() > 3 {
-        quit!("Too many arguments.\nUsage: {}", "Img <url> [dir]");
+    match parser.parse(args.collect::<Vec<_>>()) {
+        Ok(res) => {
+            let opts = extract!(res,
+                {
+                url:String as @pos,
+                dir:Option<String> as @pos
+            })
+            .unwrap();
+            return [opts.url, opts.dir.unwrap_or_default()];
+        }
+        Err(ParseError::HelpRequested(text) | ParseError::VersionRequested(text)) => {
+            print!("{text}");
+        }
+        Err(e) => {
+            eprintln!("error: {e}");
+        }
     }
-    let url = args.nth(1).unwrap_or_else(|| {
-        quit!("Please input <url> argument.");
-    });
-    let dir = args.next().unwrap_or_default();
-    [url, dir]
+    quit!("")
 }
 
 fn main() {
     let [url, dir] = check_args();
-
     if !dir.is_empty() {
         let path = path::Path::new(&dir);
         if path.exists() && path.is_dir() {
@@ -1493,38 +1511,5 @@ mod img {
         let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
         #[cfg(feature = "embed")]
         save_to_file(data);
-    }
-
-    #[test]
-    fn batch() {
-        if cfg!(not(feature = "download")) {
-            return;
-        }
-        let mut skip3 = env::args().skip(3);
-        let addr = skip3
-            .nth(1)
-            .unwrap_or("https://girldreamy.com/category/china/xiuren/page/30".into());
-        let count = skip3
-            .nth(2)
-            .unwrap_or("1".into())
-            .parse::<u16>()
-            .unwrap_or_else(|x| {
-                println!("Invalid batch count: {x}");
-                0
-            });
-        tdbg!(&addr, count);
-
-        let num = &addr[addr.rfind('/').unwrap() + 1..]
-            .parse::<u16>()
-            .expect("Parse page number failed.");
-
-        (0..count).map(|i| num - i).for_each(|p| {
-            let mut idx = format!("{}{p}", &addr[..=addr.rfind('/').unwrap()]);
-            tdbg!(&idx);
-            idx = parse(&idx);
-            while !idx.is_empty() {
-                idx = parse(&idx);
-            }
-        });
     }
 }
