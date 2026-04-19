@@ -129,77 +129,126 @@ impl fmt::Debug for Color {
 }
 
 fn main() {
-    let args = env::args();
-    if args.len() > cfg_select! {test=>{5+3} _=>{5}} {
-        exit()
-    }
-    let mut args = cfg_select! {
-        test => {args.skip(4)}
-        _ => {args.skip(1)}
-    };
-    let args: [_; 4] = array::from_fn(|_| args.next());
-    analyze_args(array::from_fn(|i| args[i].as_deref()));
-}
+    use nanoargs::*;
+    let parser = ArgBuilder::new()
+        .name("color")
+        .version("1.0.0")
+        .description("show various colors in terminal.")
+        .subcommand(
+            "fg",
+            "- Foreground color",
+            ArgBuilder::new()
+                .positional(
+                    Pos::new("color")
+                        .desc("foreground color")
+                        .validate(range(0, 255)),
+                )
+                .build()
+                .unwrap(),
+        )
+        .subcommand(
+            "bg",
+            "- Background color",
+            ArgBuilder::new()
+                .positional(
+                    Pos::new("color")
+                        .desc("backtround color")
+                        .validate(range(0, 255)),
+                )
+                .build()
+                .unwrap(),
+        )
+        .subcommand(
+            "rgb",
+            "- r g b color mode",
+            ArgBuilder::new()
+                .positional(
+                    Pos::new("Red")
+                        .desc("Red color")
+                        .validate(range(0, 255))
+                        .required(),
+                )
+                .positional(
+                    Pos::new("Green")
+                        .desc("Green color")
+                        .validate(range(0, 255))
+                        .required(),
+                )
+                .positional(
+                    Pos::new("Blue")
+                        .desc("Blue color")
+                        .validate(range(0, 255))
+                        .required(),
+                )
+                .build()
+                .unwrap(),
+        )
+        .build()
+        .unwrap();
 
-fn analyze_args(args: [Option<&str>; 4]) {
-    match args {
-        [None, None, None, None] => color8(),
-        [Some(v), None, None, None] if v.parse::<u8>() == Ok(8) => color8(),
-        [Some(v), None, None, None] if v.parse::<u16>() == Ok(256) => {
-            (0u8..=255).for_each(|c| println!("{:?}", Color::FG(c)));
-            (0u8..=255).for_each(|c| println!("{:?}", Color::BG(c)));
-        }
-        [Some(v1), Some(v2), None, None] => match (
-            v1.parse::<u16>().as_ref(),
-            v2.parse::<u8>()
-                .or_else(|_| u8::from_str_radix(v2.strip_prefix("0x").unwrap_or(v2), 16)),
-        ) {
-            (Ok(256), Ok(c)) => {
-                println!("{:?}", Color::FG(c));
-                println!("{:?}", Color::BG(c));
+    match parser.parse_env() {
+        Ok(res) => match res.subcommand() {
+            fb @ Some("fg" | "bg") => {
+                let r = res.subcommand_result().unwrap();
+                let pos = r.get_positionals();
+                if pos.is_empty() {
+                    (0u8..=255).for_each(|c| {
+                        println!(
+                            "{:?}",
+                            if let Some("fg") = fb {
+                                Color::FG(c)
+                            } else {
+                                Color::BG(c)
+                            }
+                        )
+                    });
+                } else {
+                    println!(
+                        "{:?}",
+                        if let Some("fg") = fb {
+                            Color::FG(pos[0].parse::<u8>().unwrap())
+                        } else {
+                            Color::BG(pos[0].parse::<u8>().unwrap())
+                        }
+                    );
+                }
             }
-            (Ok(256), _) => match v2 {
-                "fg" => (0u8..=255).for_each(|c| println!("{:?}", Color::FG(c))),
-                "bg" => (0u8..=255).for_each(|c| println!("{:?}", Color::BG(c))),
-                _ => exit(),
-            },
-            _ => {
-                exit();
+            Some("rgb") => {
+                let r = res.subcommand_result().unwrap();
+                let mut rgb = r
+                    .get_positionals()
+                    .iter()
+                    .take(3)
+                    .map(|c| c.parse::<u8>().unwrap());
+                let [r, g, b] = [
+                    rgb.next().unwrap(),
+                    rgb.next().unwrap(),
+                    rgb.next().unwrap(),
+                ];
+                println!("{:?}", Color::RGBfg(r, g, b));
+                println!("{:?}", Color::RGBbg(r, g, b));
             }
+            _ => {}
         },
-        [Some(c), Some(r), Some(g), Some(b)] if c.eq_ignore_ascii_case("rgb") => {
-            match [r, g, b].map(|v| {
-                v.parse::<u8>()
-                    .or_else(|_| u8::from_str_radix(v.trim_start_matches("0x"), 16))
-            }) {
-                [Ok(r), Ok(g), Ok(b)] => {
-                    println!("{:?}", Color::RGBfg(r, g, b));
-                    println!("{:?}", Color::RGBbg(r, g, b));
-                }
-                _ => {
-                    exit();
-                }
+        Err(ParseError::HelpRequested(text) | ParseError::VersionRequested(text)) => {
+            print!("{text}");
+        }
+        Err(ParseError::NoSubcommand(_)) => color8(),
+        Err(ParseError::UnknownSubcommand(x)) => {
+            let c = x
+                .parse::<u8>()
+                .or_else(|_| u8::from_str_radix(x.strip_prefix("0x").unwrap_or(&x), 16));
+            if let Ok(v) = c {
+                println!("{:?}", Color::FG(v));
+                println!("{:?}", Color::BG(v));
+            } else {
+                print!("{}", parser.help_text());
             }
         }
-        _ => {
-            exit();
+        Err(e) => {
+            eprintln!("error: {e}");
         }
-    }
-}
-
-fn exit() {
-    println!(
-        "Usage: Color {NL}`8|256` {NL}`256 {Bold}<color>{N} [0-255]` {NL}`256 {{{B}{FG}fg,{BG}bg{N}}}` {NL}`RGB {Bold}{R}r {G}g {B}b{N} [0-255]{{3}}` \n\toptions.",
-        NL = "\n\t",
-        Bold = Color::Bold,
-        N = Color::Reset,
-        FG = Color::BrightWhite,
-        BG = Color::BrightBlackBg,
-        R = Color::BrightRed,
-        G = Color::BrightGreen,
-        B = Color::BrightBlue
-    );
-    process::exit(0);
+    };
 }
 
 #[cfg(test)]

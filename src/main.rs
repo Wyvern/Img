@@ -32,11 +32,11 @@ fn main() {
     let parser = ArgBuilder::new()
         .name("img")
         .version("1.0.0")
-        .description("<img> fetcher/cralwer across various web pages")
+        .description("<img> fetcher/cralwer across various web pages.")
         .positional(Pos::new("url").desc("- the url of web page").required())
         .positional(
             Pos::new("dir")
-                .desc("- the dir where album folder stored")
+                .desc("- the dir where album folder stored in")
                 .validate(Validator::with_hint("is-dir", |x| {
                     let p = path::Path::new(x);
                     if p.exists() && p.is_dir() {
@@ -66,6 +66,11 @@ fn main() {
             quit!("")
         }
     };
+
+    if let Some(dir) = args.dir {
+        env::set_current_dir(&dir)
+            .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
+    }
 
     check_host(&args.url);
 

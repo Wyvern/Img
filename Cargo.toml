@@ -13,7 +13,7 @@ color = []
 name = "color"
 path = "src/color.rs"
 test = false
-required-features = ["color"]
+# required-features = ["color"]
 
 [dependencies]
 serde_json = "*"
