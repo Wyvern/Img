@@ -27,7 +27,7 @@ static IMGS: &[&str] = &[
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
 
-fn check_args() -> [String; 2] {
+fn main() {
     use nanoargs::*;
     let parser = ArgBuilder::new()
         .name("img")
@@ -37,33 +37,26 @@ fn check_args() -> [String; 2] {
         .positional(Pos::new("dir").desc("the dir where album folder stored"))
         .build()
         .unwrap();
-    let args = cfg_select! {
-        test=>{env::args().skip(4)}
-        _=>{env::args().skip(1)}
-    };
-    match parser.parse(args.collect::<Vec<_>>()) {
-        Ok(res) => {
-            let opts = extract!(res,
-                {
-                url:String as @pos,
-                dir:Option<String> as @pos
-            })
-            .unwrap();
-            return [opts.url, opts.dir.unwrap_or_default()];
-        }
+
+    let args = match parser.parse_env() {
+        Ok(res) => extract!(res,
+            {
+            url:String as @pos,
+            dir:Option<String> as @pos,
+            }
+        )
+        .unwrap(),
         Err(ParseError::HelpRequested(text) | ParseError::VersionRequested(text)) => {
             print!("{text}");
+            quit!("")
         }
         Err(e) => {
             eprintln!("error: {e}");
+            quit!("")
         }
-    }
-    quit!("")
-}
+    };
 
-fn main() {
-    let [url, dir] = check_args();
-    if !dir.is_empty() {
+    if let Some(dir) = args.dir {
         let path = path::Path::new(&dir);
         if path.exists() && path.is_dir() {
             env::set_current_dir(path)
@@ -73,9 +66,9 @@ fn main() {
         }
     }
 
-    check_host(&url);
+    check_host(&args.url);
 
-    let mut _next_page = parse(&url);
+    let mut _next_page = parse(&args.url);
     #[cfg(not(test))]
     {
         while !_next_page.is_empty() {
