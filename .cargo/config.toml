@@ -180,7 +180,6 @@ panic-immediate-abort = true
 rustc-unicode = true
 fine-grain-locking = true
 any-build-script-metadata = true
-lockfile-path = true
 json-target-spec = true
 
 # build-std = [
