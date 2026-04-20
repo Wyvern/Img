@@ -136,50 +136,25 @@ fn main() {
         .description("show various colors in terminal.")
         .subcommand(
             "fg",
-            "- Foreground color",
+            "- [value] Foreground color",
             ArgBuilder::new()
-                .positional(
-                    Pos::new("color")
-                        .desc("foreground color")
-                        .validate(range(0, 255)),
-                )
+                .positional(Pos::new("color").validate(range(0, 255)))
                 .build()
                 .unwrap(),
         )
         .subcommand(
             "bg",
-            "- Background color",
+            "- [value] Background color",
             ArgBuilder::new()
-                .positional(
-                    Pos::new("color")
-                        .desc("backtround color")
-                        .validate(range(0, 255)),
-                )
+                .positional(Pos::new("color").validate(range(0, 255)))
                 .build()
                 .unwrap(),
         )
         .subcommand(
             "rgb",
-            "- r g b color mode",
+            "- r g b 24-bit full color mode",
             ArgBuilder::new()
-                .positional(
-                    Pos::new("Red")
-                        .desc("Red color")
-                        .validate(range(0, 255))
-                        .required(),
-                )
-                .positional(
-                    Pos::new("Green")
-                        .desc("Green color")
-                        .validate(range(0, 255))
-                        .required(),
-                )
-                .positional(
-                    Pos::new("Blue")
-                        .desc("Blue color")
-                        .validate(range(0, 255))
-                        .required(),
-                )
+                .positional(Pos::new("code").multi())
                 .build()
                 .unwrap(),
         )
@@ -215,18 +190,26 @@ fn main() {
             }
             Some("rgb") => {
                 let r = res.subcommand_result().unwrap();
-                let mut rgb = r
-                    .get_positionals()
-                    .iter()
-                    .take(3)
-                    .map(|c| c.parse::<u8>().unwrap());
-                let [r, g, b] = [
+                let rgb = r.get_positionals();
+                if rgb.len() != 3 {
+                    print!("{}", parser.help_text());
+                    process::exit(0);
+                }
+                let mut rgb = rgb.iter().map(|c| {
+                    c.parse::<u8>()
+                        .or_else(|_| u8::from_str_radix(c.trim_start_matches("0x"), 16))
+                });
+
+                if let [Ok(r), Ok(g), Ok(b)] = [
                     rgb.next().unwrap(),
                     rgb.next().unwrap(),
                     rgb.next().unwrap(),
-                ];
-                println!("{:?}", Color::RGBfg(r, g, b));
-                println!("{:?}", Color::RGBbg(r, g, b));
+                ] {
+                    println!("{:?}", Color::RGBfg(r, g, b));
+                    println!("{:?}", Color::RGBbg(r, g, b));
+                } else {
+                    println!("r, g, b should be in range of [0..255] / 0x[00..ff]");
+                }
             }
             _ => {}
         },
@@ -237,7 +220,7 @@ fn main() {
         Err(ParseError::UnknownSubcommand(x)) => {
             let c = x
                 .parse::<u8>()
-                .or_else(|_| u8::from_str_radix(x.strip_prefix("0x").unwrap_or(&x), 16));
+                .or_else(|_| u8::from_str_radix(x.trim_start_matches("0x"), 16));
             if let Ok(v) = c {
                 println!("{:?}", Color::FG(v));
                 println!("{:?}", Color::BG(v));
