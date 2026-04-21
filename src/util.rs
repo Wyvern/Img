@@ -56,7 +56,7 @@ mod macros {
         () => {{
             fn f() {}
             let name = any::type_name_of_val(&f);
-            &name[..name.len() - "::f".len()]
+            &name[..name.len() - 3]
         }};
     }
 

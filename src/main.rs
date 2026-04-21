@@ -1377,7 +1377,7 @@ mod img {
     fn arg(f: &str) -> Option<String> {
         env::args()
             .skip(1)
-            .rfind(|a| !a.starts_with("--") && !f.ends_with(a))
+            .find(|a| !a.starts_with("--") && !f.ends_with(a))
     }
 
     #[test]
