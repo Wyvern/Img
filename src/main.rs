@@ -1320,23 +1320,20 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
 mod img {
     use super::*;
 
-    #[inline]
-    fn arg(default: &str) -> String {
-        let arg = env::args().nth(4);
-        arg.unwrap_or(String::from(default))
-    }
-
     #[test]
     fn html() {
-        let html = get_html(&arg("mmm.red"));
+        let arg = arg(current_fn!());
+        let addr = arg.as_deref().unwrap_or_else(|| "mmm.red");
+        let html = get_html(addr);
         dbg!(&html);
     }
 
     #[test]
     fn htmlq() {
-        let addr = arg("https://bisipic.online/");
-        let host = check_host(&addr);
-        let (html, ll) = get_html(&addr);
+        let arg = arg(current_fn!());
+        let addr = arg.as_deref().unwrap_or_else(|| "https://bisipic.online/");
+        let host = check_host(addr);
+        let (html, ll) = get_html(addr);
         let [img, _, album, ..] = host_info(host);
         use io::*;
 
@@ -1377,10 +1374,15 @@ mod img {
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
 
+    fn arg(f: &str) -> Option<String> {
+        env::args()
+            .skip(1)
+            .rfind(|a| !a.starts_with("--") && !f.ends_with(a))
+    }
+
     #[test]
     fn run() {
-        let editor = std::env::args().any(|a| a == "--include-ignored");
-        if let Some(arg) = env::args().nth(if editor { 5 } else { 4 }) {
+        if let Some(arg) = arg(current_fn!()) {
             parse(&arg);
         } else {
             [
@@ -1418,9 +1420,10 @@ mod img {
 
     #[test]
     fn css_img() {
-        let addr = arg("autodesk.com");
-        let (html, ll) = get_html(&addr);
-        let r = css_image(&html[..ll], &addr);
+        let arg = arg(current_fn!());
+        let addr = arg.as_deref().unwrap_or_else(|| "autodesk.com");
+        let (html, ll) = get_html(addr);
+        let r = css_image(&html[..ll], addr);
         tdbg!(&r, r.len());
     }
 

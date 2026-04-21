@@ -52,6 +52,15 @@ mod macros {
     }
 
     #[macro_export]
+    macro_rules! current_fn {
+        () => {{
+            fn f() {}
+            let name = any::type_name_of_val(&f);
+            &name[..name.len() - "::f".len()]
+        }};
+    }
+
+    #[macro_export]
     macro_rules! mv {
         ($var:ident = $val:expr) => {
             unsafe {
