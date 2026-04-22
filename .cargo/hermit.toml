@@ -247,8 +247,8 @@ rustflags = [
   "-Ztyping-mode-borrowck=y",
   "-Zexperimental-default-bounds=y",
   "-Zhigher-ranked-assumptions",
-  # "-Zcache-proc-macros=y",
-  # "-Zoffload=Device",
+  "-Zcache-proc-macros=y",
+  "-Zoffload=Device",
   # "-Zbuild-sdylib-interface",
 
   "-Dclippy::redundant_clone",
