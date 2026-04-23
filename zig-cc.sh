@@ -26,6 +26,4 @@ for a in "$@"; do
   esac
 done
 
-echo "${filtered[@]}"
-
 exec zig cc "${filtered[@]}"
