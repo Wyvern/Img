@@ -77,6 +77,10 @@ jobs:
           # sudo snap install zig --classic --beta
           # pipx install cargo-zigbuild
 
+          cargo s aarch64-unknown-teeos
+          cargo s loongarch64--linux-ohos
+          exit
+
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk-$ver
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
