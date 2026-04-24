@@ -513,8 +513,8 @@ rustflags = ["-Clink-arg=--target=loongarch64--linux-ohos"]
 rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
 [target.aarch64-unknown-teeos]
-linker = "aarch64-linux-gnu-gcc"
-rustflags = ["-Clink-arg=--target=aarch64--linux-gnu"]
+linker = "rust-lld"
+rustflags = ["-Clink-arg=-flavor=gnu"]
 
 # [target.'cfg(any(target_os="solaris",target_os="illumos"))']
 # linker = "clang"
