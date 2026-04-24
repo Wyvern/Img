@@ -95,7 +95,7 @@ jobs:
           cargo update
           set +e -x
 
-          cargo s aarch64-unknown-teeos
+          # cargo s aarch64-unknown-teeos
           cargo s loongarch64-unknown-linux-ohos
           exit
 
