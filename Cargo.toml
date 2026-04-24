@@ -3,36 +3,37 @@ name = "img"
 version = "1.0.0"
 edition = "2024"
 
-[features]
-default = []
-download = []
-embed = ["dep:base64"]
-color = []
-
 [[example]]
 name = "color"
 path = "src/color.rs"
 test = false
-required-features = ["color"]
+# required-features = ["color"]
 
 [dependencies]
-serde_json = "*"
-percent-encoding = "*"
-cbor4ii = { version = "*", features = ["use_std", "serde1"] }
 base64 = { version = "*", default-features = false, optional = true }
+cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 dom_query = { version = "*", default-features = false }
+nanoargs = "*"
+percent-encoding = "*"
+serde_json = "*"
+
+[dev-dependencies]
+# bincode-next = "*"
+
+[build-dependencies]
+cbor4ii = { version = "*", features = ["serde1", "use_std"] }
+serde_json = "*"
+
+[target.'cfg(target_os = "hermit")'.dependencies]
+hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 
 [target.'cfg(unix)'.dependencies]
 file-format = "*"
 fork = "*"
 termion = "*"
 
-[target.'cfg(target_os = "hermit")'.dependencies]
-hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
-
-[build-dependencies]
-serde_json = "*"
-cbor4ii = { version = "*", features = ["use_std", "serde1"] }
-
-[dev-dependencies]
-# bincode-next = "*"
+[features]
+default = []
+color = []
+download = []
+embed = ["dep:base64"]

@@ -27,37 +27,54 @@ static IMGS: &[&str] = &[
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
 
-fn check_args() -> [String; 2] {
-    let mut args = cfg_select! {
-        test=>{env::args().skip(3)}
-        _=>{env::args()}
-    };
-    if args.len() > 3 {
-        quit!("Too many arguments.\nUsage: {}", "Img <url> [dir]");
-    }
-    let url = args.nth(1).unwrap_or_else(|| {
-        quit!("Please input <url> argument.");
-    });
-    let dir = args.next().unwrap_or_default();
-    [url, dir]
-}
-
 fn main() {
-    let [url, dir] = check_args();
+    use nanoargs::*;
+    let parser = ArgBuilder::new()
+        .name("img")
+        .version("1.0.0")
+        .description("<img> fetcher/cralwer across various web pages.")
+        .positional(Pos::new("url").desc("- the url of web page").required())
+        .positional(
+            Pos::new("dir")
+                .desc("- the dir where album folder stored in")
+                .validate(Validator::with_hint("is-dir", |x| {
+                    let p = path::Path::new(x);
+                    if p.exists() && p.is_dir() {
+                        Ok(())
+                    } else {
+                        Err("Path must be an existed directory.".into())
+                    }
+                })),
+        )
+        .build()
+        .unwrap();
 
-    if !dir.is_empty() {
-        let path = path::Path::new(&dir);
-        if path.exists() && path.is_dir() {
-            env::set_current_dir(path)
-                .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
-        } else {
-            quit!("The path {} is invalid!", &dir)
+    let args = match parser.parse_env() {
+        Ok(res) => extract!(res,
+            {
+            url:String as @pos,
+            dir:Option<String> as @pos,
+            }
+        )
+        .unwrap(),
+        Err(ParseError::HelpRequested(text) | ParseError::VersionRequested(text)) => {
+            print!("{text}");
+            quit!("")
         }
+        Err(e) => {
+            eprintln!("error: {e}");
+            quit!("")
+        }
+    };
+
+    if let Some(dir) = args.dir {
+        env::set_current_dir(&dir)
+            .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
     }
 
-    check_host(&url);
+    check_host(&args.url);
 
-    let mut _next_page = parse(&url);
+    let mut _next_page = parse(&args.url);
     #[cfg(not(test))]
     {
         while !_next_page.is_empty() {
@@ -1303,23 +1320,20 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
 mod img {
     use super::*;
 
-    #[inline]
-    fn arg(default: &str) -> String {
-        let arg = env::args().nth(4);
-        arg.unwrap_or(String::from(default))
-    }
-
     #[test]
     fn html() {
-        let html = get_html(&arg("mmm.red"));
+        let arg = arg(current_fn!());
+        let addr = arg.as_deref().unwrap_or_else(|| "mmm.red");
+        let html = get_html(addr);
         dbg!(&html);
     }
 
     #[test]
     fn htmlq() {
-        let addr = arg("https://bisipic.online/");
-        let host = check_host(&addr);
-        let (html, ll) = get_html(&addr);
+        let arg = arg(current_fn!());
+        let addr = arg.as_deref().unwrap_or_else(|| "https://bisipic.online/");
+        let host = check_host(addr);
+        let (html, ll) = get_html(addr);
         let [img, _, album, ..] = host_info(host);
         use io::*;
 
@@ -1360,16 +1374,21 @@ mod img {
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
 
+    fn arg(f: &str) -> Option<String> {
+        env::args()
+            .skip(1)
+            .find(|a| !a.starts_with("--") && !f.ends_with(a))
+    }
+
     #[test]
     fn run() {
-        let editor = std::env::args().any(|a| a == "--include-ignored");
-        if let Some(arg) = env::args().nth(if editor { 5 } else { 4 }) {
+        if let Some(arg) = arg(current_fn!()) {
             parse(&arg);
         } else {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://goddess247.com/category/china/xiaoyu/page/16",
+                "https://goddess247.com/category/china/xiaoyu/page/9",
             ]
             .into_iter()
             .for_each(|u| {
@@ -1401,9 +1420,10 @@ mod img {
 
     #[test]
     fn css_img() {
-        let addr = arg("autodesk.com");
-        let (html, ll) = get_html(&addr);
-        let r = css_image(&html[..ll], &addr);
+        let arg = arg(current_fn!());
+        let addr = arg.as_deref().unwrap_or_else(|| "autodesk.com");
+        let (html, ll) = get_html(addr);
+        let r = css_image(&html[..ll], addr);
         tdbg!(&r, r.len());
     }
 
@@ -1493,38 +1513,5 @@ mod img {
         let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
         #[cfg(feature = "embed")]
         save_to_file(data);
-    }
-
-    #[test]
-    fn batch() {
-        if cfg!(not(feature = "download")) {
-            return;
-        }
-        let mut skip3 = env::args().skip(3);
-        let addr = skip3
-            .nth(1)
-            .unwrap_or("https://girldreamy.com/category/china/xiuren/page/30".into());
-        let count = skip3
-            .nth(2)
-            .unwrap_or("1".into())
-            .parse::<u16>()
-            .unwrap_or_else(|x| {
-                println!("Invalid batch count: {x}");
-                0
-            });
-        tdbg!(&addr, count);
-
-        let num = &addr[addr.rfind('/').unwrap() + 1..]
-            .parse::<u16>()
-            .expect("Parse page number failed.");
-
-        (0..count).map(|i| num - i).for_each(|p| {
-            let mut idx = format!("{}{p}", &addr[..=addr.rfind('/').unwrap()]);
-            tdbg!(&idx);
-            idx = parse(&idx);
-            while !idx.is_empty() {
-                idx = parse(&idx);
-            }
-        });
     }
 }
