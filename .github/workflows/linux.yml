@@ -57,8 +57,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: /home/runner/openwrt
-          key: openwrt-25.12.0
-          restore-keys: openwrt-25.12.0
+          key: openwrt-25.12.2
+          restore-keys: openwrt-25.12.2
 
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
@@ -121,14 +121,15 @@ jobs:
 
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
-            curl -LsSf https://downloads.openwrt.org/releases/25.12.0/targets/octeon/generic/openwrt-toolchain-25.12.0-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
+            curl -LsSf https://downloads.openwrt.org/releases/25.12.2/targets/octeon/generic/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
           fi
 
-          ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.0-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
+          ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
           targets=(
             x86_64-unknown-motor
             mips64-openwrt-linux-musl
+            aarch64-unknown-teeos
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
             x86_64-unknown-linux-ohos
@@ -176,6 +177,7 @@ jobs:
                   aarch64-unknown-linux-ohos
                   armv7-unknown-linux-ohos
                   x86_64-unknown-linux-ohos
+                  aarch64-unknown-teeos
                   mips64-openwrt-linux-musl
                   x86_64-unknown-hurd-gnu
                   x86_64-unknown-motor
