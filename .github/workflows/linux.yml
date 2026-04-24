@@ -96,7 +96,7 @@ jobs:
           set +e -x
 
           cargo s aarch64-unknown-teeos
-          cargo s loongarch64--linux-ohos
+          cargo s loongarch64-unknown-linux-ohos
           exit
 
           if [ ! -f ~/.cargo/bin/redoxer ]; then
