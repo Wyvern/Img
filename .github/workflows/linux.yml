@@ -61,7 +61,7 @@ jobs:
           restore-keys: openwrt-25.12.2
 
       - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
+        run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
 
       - name: Cache Redoxer
         uses: actions/cache@v5
