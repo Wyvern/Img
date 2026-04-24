@@ -25,11 +25,11 @@ jobs:
         with:
           components: rust-src
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
+      # - name: Rust Cache
+      #   uses: Swatinem/rust-cache@v2
+      #   with:
+      #     cache-all-crates: "true"
+      #     cache-workspace-crates: "true"
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
