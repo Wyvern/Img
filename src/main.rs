@@ -308,6 +308,8 @@ fn parse(addr: &str) -> String {
             .unwrap_or("src")
     });
 
+    let source_img = page.select("source[srcset]");
+
     let titles = page.select(if !json_img.is_empty() {
         "script"
     } else {
@@ -369,7 +371,7 @@ fn parse(addr: &str) -> String {
 
     let [albums_len, imgs_len, json_len] = [
         albums.as_ref().map_or(0, |a| a.length()),
-        html_img.length() + css_img.len() + json_img.len(),
+        html_img.length() + source_img.length() + css_img.len() + json_img.len(),
         json_img.len(),
     ];
 
@@ -411,7 +413,12 @@ fn parse(addr: &str) -> String {
 
     let htj = name_count(
         ["HTML", "CSS", "JSON"].as_slice(),
-        [html_img.length(), css_img.len(), json_len].as_slice(),
+        [
+            html_img.length() + source_img.length(),
+            css_img.len(),
+            json_len,
+        ]
+        .as_slice(),
     );
     let prefix = "✔︎ Totally found";
     match (has_album, imgs_len > 0) {
@@ -441,9 +448,15 @@ fn parse(addr: &str) -> String {
 
     match (has_album, imgs_len > 0) {
         (_, true) => {
-            let mut urls = collections::HashSet::new();
+            let mut urls = collections::HashSet::<String>::new();
             let [mut empty, mut dup, mut embed] = [0usize; 3];
-
+            let mut handle_embed = |_s: &str| {
+                cfg_select! {
+                    feature = "embed" => {
+                        if !urls.insert(_s) {dup += 1;}}
+                    _ => {embed += 1;}
+                }
+            };
             for elm in html_img.iter() {
                 let value = [
                     "data-src",
@@ -454,15 +467,6 @@ fn parse(addr: &str) -> String {
                 ]
                 .into_iter()
                 .find_map(|a| elm.attr(a));
-                let mut handle_embed = |s: String| {
-                    if cfg!(feature = "embed") {
-                        if !urls.insert(s) {
-                            dup += 1;
-                        }
-                    } else {
-                        embed += 1;
-                    }
-                };
 
                 match value {
                     Some(val) => {
@@ -471,18 +475,16 @@ fn parse(addr: &str) -> String {
                                 let url = url_image(frag.1);
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
-                                        handle_embed(u);
-                                    } else if u.is_empty() || !urls.insert(normarlize(&u, addr)) {
-                                        if !u.is_empty() {
-                                            dup += 1;
-                                        } else {
-                                            empty += 1;
-                                        }
+                                        handle_embed(&u);
+                                    } else if u.is_empty() {
+                                        empty += 1;
+                                    } else if !urls.insert(normarlize(&u, addr)) {
+                                        dup += 1;
                                     }
                                 }
                             }
                         } else if val.starts_with("data:image/") {
-                            handle_embed(val.to_string());
+                            handle_embed(&val);
                         } else {
                             let url = if sel == img {
                                 url_redirect_and_query_cleanup(&val)
@@ -490,12 +492,10 @@ fn parse(addr: &str) -> String {
                                 val.to_string()
                             };
                             // tdbg!(&url;);
-                            if url.is_empty() || !urls.insert(normarlize(&url, addr)) {
-                                if !url.is_empty() {
-                                    dup += 1;
-                                } else {
-                                    empty += 1;
-                                }
+                            if url.is_empty() {
+                                empty += 1;
+                            } else if !urls.insert(normarlize(&url, addr)) {
+                                dup += 1;
                             }
                         }
                     }
@@ -504,6 +504,22 @@ fn parse(addr: &str) -> String {
                     }
                 }
             }
+
+            for e in source_img.iter() {
+                let multi_urls = e.attr("srcset").unwrap();
+                let mut url = multi_urls.split(", ").max_by_key(|x| x.len()).unwrap();
+                if let Some((l, _)) = url.rsplit_once(' ') {
+                    url = l;
+                }
+                if url.starts_with("data:image/") {
+                    handle_embed(url);
+                } else if url.is_empty() {
+                    empty += 1;
+                } else if !urls.insert(normarlize(url, addr)) {
+                    dup += 1;
+                }
+            }
+
             let skip = empty + dup + embed;
             if skip > 0 {
                 let edm = name_count(
@@ -1388,7 +1404,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://goddess247.com/category/china/xiaoyu/page/16",
+                "https://goddess247.com/category/china/xiaoyu/page/9",
             ]
             .into_iter()
             .for_each(|u| {
