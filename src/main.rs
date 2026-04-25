@@ -450,7 +450,18 @@ fn parse(addr: &str) -> String {
         (_, true) => {
             let mut urls = collections::HashSet::<String>::new();
             let [mut empty, mut dup, mut _embed] = [0usize; 3];
-
+            let mut handle_embed = |s: &str| {
+                if s.starts_with("data:image/") {
+                    cfg_select! {
+                        feature = "embed" => {if !urls.insert(s.into()) {dup += 1;}}
+                        _ => {_embed += 1;}
+                    }
+                } else if s.is_empty() {
+                    empty += 1;
+                } else if !urls.insert(normarlize(s, addr)) {
+                    dup += 1;
+                }
+            };
             for elm in html_img.iter() {
                 let value = [
                     "data-src",
@@ -462,47 +473,21 @@ fn parse(addr: &str) -> String {
                 .into_iter()
                 .find_map(|a| elm.attr(a));
 
-                match value {
-                    Some(val) => {
-                        if attr == "style" {
-                            if let Some(frag) = CSS.iter().find_map(|&s| val.trim().split_once(s)) {
-                                let url = url_image(frag.1);
-                                if let Some(u) = url {
-                                    if u.starts_with("data:image/") {
-                                        cfg_select! {
-                                            feature = "embed" => {if !urls.insert(u) {dup += 1;}}
-                                            _ => {_embed += 1;}
-                                        }
-                                    } else if u.is_empty() {
-                                        empty += 1;
-                                    } else if !urls.insert(normarlize(&u, addr)) {
-                                        dup += 1;
-                                    }
-                                }
-                            }
-                        } else if val.starts_with("data:image/") {
-                            cfg_select! {
-                                feature = "embed" => {if !urls.insert(val.into()) {dup += 1;}}
-                                _ => {_embed += 1;}
-                            }
-                        } else {
-                            let url = if sel == img {
-                                url_redirect_and_query_cleanup(&val)
-                            } else {
-                                val.to_string()
-                            };
-                            // tdbg!(&url;);
-                            if url.is_empty() {
-                                empty += 1;
-                            } else if !urls.insert(normarlize(&url, addr)) {
-                                dup += 1;
-                            }
-                        }
+                let s = value.map_or_else(String::default, |val| {
+                    if attr == "style" {
+                        CSS.iter()
+                            .find_map(|&s| val.trim().split_once(s))
+                            .and_then(|frag| url_image(frag.1))
+                            .unwrap_or_default()
+                    } else if val.starts_with("data:image/") {
+                        val.into()
+                    } else if sel == img {
+                        url_redirect_and_query_cleanup(&val)
+                    } else {
+                        val.into()
                     }
-                    None => {
-                        empty += 1;
-                    }
-                }
+                });
+                handle_embed(&s);
             }
 
             for e in source_img.iter() {
@@ -511,16 +496,7 @@ fn parse(addr: &str) -> String {
                 if let Some((l, _)) = url.rsplit_once(' ') {
                     url = l;
                 }
-                if url.starts_with("data:image/") {
-                    cfg_select! {
-                        feature = "embed" => {if !urls.insert(url.into()) {dup += 1;}}
-                        _ => {_embed += 1;}
-                    }
-                } else if url.is_empty() {
-                    empty += 1;
-                } else if !urls.insert(normarlize(url, addr)) {
-                    dup += 1;
-                }
+                handle_embed(url);
             }
 
             let skip = empty + dup + _embed;
@@ -1407,7 +1383,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://goddess247.com/category/china/xiaoyu/page/9",
+                "https://goddess247.com/category/china/xiaoyu/page/5",
             ]
             .into_iter()
             .for_each(|u| {
