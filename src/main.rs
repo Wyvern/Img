@@ -36,7 +36,7 @@ fn main() {
         .positional(Pos::new("url").desc("- the url of web page").required())
         .positional(
             Pos::new("dir")
-                .desc("- the dir where album folder stored in")
+                .desc("- the location where album folder stored in")
                 .validate(Validator::with_hint("is-dir", |x| {
                     let p = path::Path::new(x);
                     if p.exists() && p.is_dir() {

@@ -64,8 +64,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: /home/runner/armv7-eabihf--uclibc
-          key: uclibc
-          restore-keys: uclibc
+          key: uclibc-2025.08
+          restore-keys: uclibc-2025.08
 
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
@@ -135,7 +135,7 @@ jobs:
 
           if [ ! -d /home/runner/armv7-eabihf--uclibc ]; then
             mkdir -p /home/runner/armv7-eabihf--uclibc
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-2025.08-1.tar.xz | tar -xf - -C /home/runner/armv7-eabihf--uclibc
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-2025.08-1.tar.xz | tar -xJ - -C /home/runner/armv7-eabihf--uclibc
           fi
 
           ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
