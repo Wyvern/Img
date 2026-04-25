@@ -344,6 +344,7 @@ linker = "powerpc64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
+rustflags = ["-Ctarget-feature=+d"]
 
 [target.'cfg(all(target_arch="sparc64",target_os="linux"))']
 linker = "sparc64-linux-gnu-gcc"
