@@ -567,7 +567,7 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-netbsd"]
 
 [target.armv7-unknown-linux-uclibceabihf]
-linker = "uclibc/bin/toolchain-wrapper"
+linker = "uclibc/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
 rustflags = [
   "-Clink-arg=--target=armv7--linux-uclibceabihf",
   "-Clink-arg=--sysroot=uclibc",
