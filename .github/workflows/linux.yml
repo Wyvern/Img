@@ -60,6 +60,13 @@ jobs:
           key: openwrt-25.12.2
           restore-keys: openwrt-25.12.2
 
+      - name: Cache uclibc
+        uses: actions/cache@v5
+        with:
+          path: /home/runner/armv7-eabihf--uclibc
+          key: uclibc
+          restore-keys: uclibc
+
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
 
@@ -126,7 +133,16 @@ jobs:
 
           ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
+          if [ ! -d /home/runner/armv7-eabihf--uclibc ]; then
+            mkdir -p /home/runner/armv7-eabihf--uclibc
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-2025.08-1.tar.xz | tar -xf - -C /home/runner/armv7-eabihf--uclibc
+          fi
+
+          ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
+
+
           targets=(
+            armv7-unknown-linux-uclibceabihf
             x86_64-unknown-motor
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
@@ -166,6 +182,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  armv7-unknown-linux-uclibceabihf
                   riscv64-linux-android
                   aarch64-linux-android
                   armv7-linux-androideabi
