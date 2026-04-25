@@ -135,7 +135,7 @@ jobs:
 
           if [ ! -d /home/runner/armv7-eabihf--uclibc ]; then
             mkdir -p /home/runner/armv7-eabihf--uclibc
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-2025.08-1.tar.xz | tar -xJ - -C /home/runner/armv7-eabihf--uclibc
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-2025.08-1.tar.xz | tar -xJ -C /home/runner/armv7-eabihf--uclibc
           fi
 
           ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
