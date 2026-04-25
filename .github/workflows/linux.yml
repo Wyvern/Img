@@ -133,10 +133,10 @@ jobs:
 
           ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
-          if [ ! -d /home/runner/armv7-eabihf--uclibc ]; then
+          # if [ ! -d /home/runner/armv7-eabihf--uclibc ]; then
             mkdir -p /home/runner/armv7-eabihf--uclibc
             curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-2025.08-1.tar.xz | tar -xJ -C /home/runner/armv7-eabihf--uclibc
-          fi
+          # fi
 
           ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
 
