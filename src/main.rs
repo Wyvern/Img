@@ -479,8 +479,6 @@ fn parse(addr: &str) -> String {
                             .find_map(|&s| val.trim().split_once(s))
                             .and_then(|frag| url_image(frag.1))
                             .unwrap_or_default()
-                    } else if val.starts_with("data:image/") {
-                        val.into()
                     } else if sel == img {
                         url_redirect_and_query_cleanup(&val)
                     } else {
