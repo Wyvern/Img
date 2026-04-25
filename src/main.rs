@@ -449,14 +449,8 @@ fn parse(addr: &str) -> String {
     match (has_album, imgs_len > 0) {
         (_, true) => {
             let mut urls = collections::HashSet::<String>::new();
-            let [mut empty, mut dup, mut embed] = [0usize; 3];
-            let mut handle_embed = |_s: &str| {
-                cfg_select! {
-                    feature = "embed" => {
-                        if !urls.insert(_s) {dup += 1;}}
-                    _ => {embed += 1;}
-                }
-            };
+            let [mut empty, mut dup, mut _embed] = [0usize; 3];
+
             for elm in html_img.iter() {
                 let value = [
                     "data-src",
@@ -475,7 +469,10 @@ fn parse(addr: &str) -> String {
                                 let url = url_image(frag.1);
                                 if let Some(u) = url {
                                     if u.starts_with("data:image/") {
-                                        handle_embed(&u);
+                                        cfg_select! {
+                                            feature = "embed" => {if !urls.insert(u) {dup += 1;}}
+                                            _ => {_embed += 1;}
+                                        }
                                     } else if u.is_empty() {
                                         empty += 1;
                                     } else if !urls.insert(normarlize(&u, addr)) {
@@ -484,7 +481,10 @@ fn parse(addr: &str) -> String {
                                 }
                             }
                         } else if val.starts_with("data:image/") {
-                            handle_embed(&val);
+                            cfg_select! {
+                                feature = "embed" => {if !urls.insert(val.into()) {dup += 1;}}
+                                _ => {_embed += 1;}
+                            }
                         } else {
                             let url = if sel == img {
                                 url_redirect_and_query_cleanup(&val)
@@ -512,7 +512,10 @@ fn parse(addr: &str) -> String {
                     url = l;
                 }
                 if url.starts_with("data:image/") {
-                    handle_embed(url);
+                    cfg_select! {
+                        feature = "embed" => {if !urls.insert(url.into()) {dup += 1;}}
+                        _ => {_embed += 1;}
+                    }
                 } else if url.is_empty() {
                     empty += 1;
                 } else if !urls.insert(normarlize(url, addr)) {
@@ -520,11 +523,11 @@ fn parse(addr: &str) -> String {
                 }
             }
 
-            let skip = empty + dup + embed;
+            let skip = empty + dup + _embed;
             if skip > 0 {
                 let edm = name_count(
                     ["Empty", "Duplicated", "Embed"].as_slice(),
-                    [empty, dup, embed].as_slice(),
+                    [empty, dup, _embed].as_slice(),
                 );
                 pl!("Skipped <{skip}: {edm}> 🏞️");
             }
