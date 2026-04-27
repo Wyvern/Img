@@ -493,7 +493,11 @@ fn parse(addr: &str) -> String {
 
             for e in source_img.iter() {
                 let multi_urls = e.attr("srcset").unwrap();
-                let mut url = multi_urls.split(",").max_by_key(|x| x.len()).unwrap();
+                let mut url = multi_urls
+                    .split(",")
+                    .max_by_key(|x| x.len())
+                    .unwrap()
+                    .trim();
                 if let Some((l, _)) = url.rsplit_once(' ') {
                     url = l;
                 }
