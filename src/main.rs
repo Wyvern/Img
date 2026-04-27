@@ -472,20 +472,23 @@ fn parse(addr: &str) -> String {
                 ]
                 .into_iter()
                 .find_map(|a| elm.attr(a));
-
-                let s = value.map_or_else(String::default, |val| {
-                    if attr == "style" {
-                        CSS.iter()
-                            .find_map(|&s| val.trim().split_once(s))
-                            .and_then(|frag| url_image(frag.1))
-                            .unwrap_or_default()
-                    } else if sel == img {
-                        url_redirect_and_query_cleanup(&val)
-                    } else {
-                        val.into()
+                match value {
+                    Some(val) => {
+                        if attr == "style" {
+                            let x = CSS
+                                .iter()
+                                .find_map(|&s| val.trim().split_once(s))
+                                .and_then(|frag| url_image(frag.1))
+                                .unwrap_or_default();
+                            handle_embed(x.as_ref());
+                        } else if sel == img {
+                            handle_embed(url_redirect_and_query_cleanup(&val).as_ref());
+                        } else {
+                            handle_embed(&val);
+                        }
                     }
-                });
-                handle_embed(&s);
+                    None => handle_embed(""),
+                }
             }
 
             for e in source_img.iter() {
@@ -1229,39 +1232,51 @@ fn circle_indicator() {
 }
 
 ///cleanup url
-fn url_redirect_and_query_cleanup(url: &str) -> String {
-    use percent_encoding::*;
+fn url_redirect_and_query_cleanup<'a>(url: &'a str) -> borrow::Cow<'a, str> {
+    use {borrow::Cow, percent_encoding::*};
     let dec_url = percent_decode_str(url).decode_utf8_lossy();
-    let mut cleanup = &dec_url[dec_url.rfind("?url=").map_or(0, |p| p + 5)..];
-    cleanup = &cleanup[..cleanup
-        .find('?')
-        .and_then(|q| cleanup[q..].find('&').map(|a| a + q))
-        .or_else(|| {
-            cleanup.rfind('/').and_then(|slash| {
-                cleanup[slash..].rfind('.').and_then(|dot| {
-                    cleanup[slash + dot..]
-                        .find(['&', '='])
-                        .map(|amp| amp + dot + slash)
+    fn cleanup(s: &str) -> &str {
+        let c = &s[s.rfind("?url=").map_or(0, |p| p + 5)..];
+        &c[..c
+            .find('?')
+            .and_then(|q| c[q..].find('&').map(|a| a + q))
+            .or_else(|| {
+                c.rfind('/').and_then(|slash| {
+                    c[slash..].rfind('.').and_then(|dot| {
+                        c[slash + dot..]
+                            .find(['&', '='])
+                            .map(|amp| amp + dot + slash)
+                    })
                 })
             })
-        })
-        .unwrap_or(cleanup.len())];
-    cleanup.into()
+            .unwrap_or(c.len())]
+    }
+    match dec_url {
+        Cow::Borrowed(s) => Cow::Borrowed(cleanup(s)),
+        Cow::Owned(s) => Cow::Owned(cleanup(&s).into()),
+    }
 }
 
 ///Parse inline `url(),image()`
-fn url_image(content: &str) -> Option<String> {
-    if let Some(rp) = content.find(')') {
-        let mut url = &content[..rp];
-        _ = ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
-        url = url.trim_matches(['\'', '"']).trim();
-        _ = ["&#39;", "&apos;", "&#34;", "&quot;"]
-            .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
-        if url.starts_with("data:image/") {
-            return Some(url.into());
-        }
-        let dec = url_redirect_and_query_cleanup(url);
-        url = &dec[..dec.rfind("#xywh").unwrap_or(dec.len())];
+fn url_image<'a>(content: &'a str) -> Option<borrow::Cow<'a, str>> {
+    let rp = content.find(')')?;
+    let mut url = &content[..rp];
+    for x in ["ltr ", "rtl "] {
+        url = url.trim_start_matches(x);
+    }
+    url = url.trim_matches(['\'', '"']).trim();
+    for x in ["&#39;", "&apos;", "&#34;", "&quot;"] {
+        url = url.trim_start_matches(x).trim_end_matches(x).trim();
+    }
+
+    use borrow::Cow;
+    if url.starts_with("data:image/") {
+        return Some(Cow::Borrowed(url));
+    }
+
+    let dec = url_redirect_and_query_cleanup(url);
+    fn validate_url(mut url: &str) -> Option<&str> {
+        url = url[..url.rfind("#xywh").unwrap_or(url.len())].trim();
         if url.is_empty()
             || url == "undefined"
             || url.starts_with(['{', '$'])
@@ -1273,10 +1288,12 @@ fn url_image(content: &str) -> Option<String> {
         {
             None
         } else {
-            Some(url.trim().into())
+            Some(url)
         }
-    } else {
-        None
+    }
+    match dec {
+        Cow::Borrowed(s) => validate_url(s).map(Cow::Borrowed),
+        Cow::Owned(s) => validate_url(&s).map(|v| Cow::Owned(v.into())),
     }
 }
 
@@ -1297,7 +1314,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                 if let Some(u) = url_image(seg) {
                     if u.starts_with("data:image/") {
                         if cfg!(feature = "embed") {
-                            images.insert(u);
+                            images.insert(u.into());
                         }
                     } else {
                         images.insert(normarlize(&u, addr));
@@ -1381,7 +1398,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://goddess247.com/category/china/xiaoyu/page/5",
+                "https://bestgirlsexy.com/category/china/xiaoyu/page/5/",
             ]
             .into_iter()
             .for_each(|u| {
