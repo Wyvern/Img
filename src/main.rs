@@ -493,11 +493,11 @@ fn parse(addr: &str) -> String {
 
             for e in source_img.iter() {
                 let multi_urls = e.attr("srcset").unwrap();
-                let mut url = multi_urls.split(", ").max_by_key(|x| x.len()).unwrap();
+                let mut url = multi_urls.split(",").max_by_key(|x| x.len()).unwrap();
                 if let Some((l, _)) = url.rsplit_once(' ') {
                     url = l;
                 }
-                handle_embed(url);
+                handle_embed(url_redirect_and_query_cleanup(url).as_ref());
             }
 
             let skip = empty + dup + _embed;
