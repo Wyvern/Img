@@ -26,6 +26,7 @@ static IMGS: &[&str] = &[
 ];
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
+static mut SUB_DIR: bool = true;
 
 fn main() {
     use nanoargs::*;
@@ -33,11 +34,16 @@ fn main() {
         .name("img")
         .version("1.0.0")
         .description("<img> fetcher/cralwer across various web pages.")
-        .positional(Pos::new("url").desc("- the url of web page").required())
+        .flag(
+            Flag::new("files")
+                .desc("Save files directly without create a folder.")
+                .short('f'),
+        )
+        .positional(Pos::new("url").desc("- the url of web page.").required())
         .positional(
             Pos::new("dir")
-                .desc("- the location where album folder stored in")
-                .validate(Validator::with_hint("is-dir", |x| {
+                .desc("- the location where album folder stored in.")
+                .validate(Validator::with_hint("must be existed dir", |x| {
                     let p = path::Path::new(x);
                     if p.exists() && p.is_dir() {
                         Ok(())
@@ -54,6 +60,7 @@ fn main() {
             {
             url:String as @pos,
             dir:Option<String> as @pos,
+            files:bool,
             }
         )
         .unwrap(),
@@ -73,7 +80,9 @@ fn main() {
     }
 
     check_host(&args.url);
-
+    unsafe {
+        SUB_DIR = !args.files;
+    }
     let mut _next_page = parse(&args.url);
     #[cfg(not(test))]
     {
@@ -462,6 +471,7 @@ fn parse(addr: &str) -> String {
                     dup += 1;
                 }
             };
+
             for elm in html_img.iter() {
                 let value = [
                     "data-src",
@@ -472,6 +482,7 @@ fn parse(addr: &str) -> String {
                 ]
                 .into_iter()
                 .find_map(|a| elm.attr(a));
+
                 match value {
                     Some(val) => {
                         if attr == "style" {
@@ -804,10 +815,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         return;
     }
 
-    let slash2colon = sanitize_path(dir);
-    let path = path::Path::new(&slash2colon);
+    let os_path = sanitize_path(dir);
+    let path = path::Path::new(&os_path);
     let create_dir = || {
-        if !path.exists() {
+        if unsafe { SUB_DIR } && !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
                 quit!("Create Dir Error: {}", e);
             });
@@ -815,7 +826,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     };
 
     let mut curl = process::Command::new("curl");
-    curl.current_dir(path);
+    if unsafe { SUB_DIR } {
+        curl.current_dir(path);
+    }
 
     let mut no_ext = collections::HashMap::new();
     #[cfg(not(unix))]
@@ -847,11 +860,15 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             #[cfg(feature = "embed")]
             {
                 if let Ok(cur) = env::current_dir() {
-                    create_dir();
-                    _ = env::set_current_dir(path);
+                    if unsafe { SUB_DIR } {
+                        create_dir();
+                        env::set_current_dir(path).unwrap();
+                    }
 
                     save_to_file(url.as_str());
-                    _ = env::set_current_dir(cur);
+                    if unsafe { SUB_DIR } {
+                        env::set_current_dir(cur).unwrap();
+                    }
                 }
             }
             continue;
@@ -916,7 +933,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if !no_ext.is_empty() {
         create_dir();
         curl = process::Command::new("curl");
-        curl.current_dir(path);
+        if unsafe { SUB_DIR } {
+            curl.current_dir(path);
+        }
+
         #[cfg(unix)]
         {
             use fork::*;
