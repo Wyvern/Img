@@ -80,9 +80,12 @@ fn main() {
     }
 
     check_host(&args.url);
-    unsafe {
-        SUB_DIR = !args.files;
+    if args.files {
+        unsafe {
+            SUB_DIR = !args.files;
+        }
     }
+
     let mut _next_page = parse(&args.url);
     #[cfg(not(test))]
     {
