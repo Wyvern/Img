@@ -132,11 +132,23 @@ impl<T: Sized> AsBytes for T {}
 
 #[allow(unused)]
 pub trait Dbg: fmt::Debug {
-    fn dbg(&self) {
-        crate::tdbg!(self);
+    fn dbgr(&self) -> &Self {
+        crate::tdbg!(self)
     }
-    fn dbg_pause(&self) {
-        crate::tdbg!(self;);
+    fn dbg(self) -> Self
+    where
+        Self: Sized,
+    {
+        crate::tdbg!(self)
+    }
+    fn dbgr_pause(&self) -> &Self {
+        crate::tdbg!(self;)
+    }
+    fn dbg_pause(self) -> Self
+    where
+        Self: Sized,
+    {
+        crate::tdbg!(self;)
     }
 }
 impl<T: fmt::Debug> Dbg for T {}
