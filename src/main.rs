@@ -75,7 +75,7 @@ fn main() {
         }
     };
 
-    if let Some(dir) = args.dir.dbg_pause() {
+    if let Some(dir) = args.dir {
         env::set_current_dir(&dir)
             .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
     }
