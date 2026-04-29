@@ -40,8 +40,9 @@ fn main() {
                 .short('f'),
         )
         .positional(Pos::new("url").desc("- the url of web page.").required())
-        .positional(
-            Pos::new("dir")
+        .option(
+            Opt::new("dir")
+                .short('o')
                 .desc("- the location where album folder stored in.")
                 .validate(Validator::with_hint("must be existed dir", |x| {
                     let p = path::Path::new(x);
@@ -59,7 +60,7 @@ fn main() {
         Ok(res) => extract!(res,
             {
             url:String as @pos,
-            dir:Option<String> as @pos,
+            dir:Option<String>,
             files:bool,
             }
         )
@@ -74,7 +75,7 @@ fn main() {
         }
     };
 
-    if let Some(dir) = args.dir {
+    if let Some(dir) = args.dir.dbg_pause() {
         env::set_current_dir(&dir)
             .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
     }
