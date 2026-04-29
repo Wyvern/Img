@@ -320,7 +320,11 @@ fn parse(addr: &str) -> String {
             .unwrap_or("src")
     });
 
-    let source_img = page.select("source[srcset]");
+    let mut source_img = dom::Selection::default();
+    if img.is_none() {
+        html_img = html_img.add("image[src]");
+        source_img = page.select("source[srcset]");
+    }
 
     let titles = page.select(if !json_img.is_empty() {
         "script"
@@ -484,7 +488,7 @@ fn parse(addr: &str) -> String {
                     attr,
                 ]
                 .into_iter()
-                .find_map(|a| elm.attr(a));
+                .find(|a| elm.has_attr(a));
 
                 match value {
                     Some(val) => {
@@ -496,9 +500,9 @@ fn parse(addr: &str) -> String {
                                 .unwrap_or_default();
                             handle_embed(x.as_ref());
                         } else if sel == img {
-                            handle_embed(url_redirect_and_query_cleanup(&val).as_ref());
+                            handle_embed(url_redirect_and_query_cleanup(val).as_ref());
                         } else {
-                            handle_embed(&val);
+                            handle_embed(val);
                         }
                     }
                     None => handle_embed(""),
