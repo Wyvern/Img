@@ -488,7 +488,7 @@ fn parse(addr: &str) -> String {
                     attr,
                 ]
                 .into_iter()
-                .find(|a| elm.has_attr(a));
+                .find_map(|a| elm.attr(a));
 
                 match value {
                     Some(val) => {
@@ -500,9 +500,9 @@ fn parse(addr: &str) -> String {
                                 .unwrap_or_default();
                             handle_embed(x.as_ref());
                         } else if sel == img {
-                            handle_embed(url_redirect_and_query_cleanup(val).as_ref());
+                            handle_embed(url_redirect_and_query_cleanup(&val).as_ref());
                         } else {
-                            handle_embed(val);
+                            handle_embed(&val);
                         }
                     }
                     None => handle_embed(""),
