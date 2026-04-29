@@ -43,7 +43,7 @@ fn main() {
         .option(
             Opt::new("dir")
                 .short('o')
-                .desc("- the location where album folder stored in.")
+                .desc("Location where album folder stored in.")
                 .validate(Validator::with_hint("must be existed dir", |x| {
                     let p = path::Path::new(x);
                     if p.exists() && p.is_dir() {
