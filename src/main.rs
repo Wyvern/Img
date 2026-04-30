@@ -335,7 +335,10 @@ fn parse(addr: &str) -> String {
 
     let mut source_img = dom::Selection::default();
     if img.is_none() {
-        html_img = html_img.add("image");
+        html_img = html_img
+            .add("image")
+            .add("video[poster]")
+            .add("input[type='image']");
         if unsafe { EMBED } {
             html_img = html_img.add("svg");
         }
@@ -512,6 +515,8 @@ fn parse(addr: &str) -> String {
                     "data-lazy",
                     "data-lazy-src",
                     "data-original",
+                    "data-url",
+                    "poster",
                     "href",
                     attr,
                 ]
@@ -1361,9 +1366,9 @@ fn url_image<'a>(content: &'a str) -> Option<borrow::Cow<'a, str>> {
 ///Get `page` css style `url(),image(),image-set()`
 fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
-    _ = CSS.iter().map(|&s| {
-        let segments = html.split(s);
-        if s == "image-set(" {
+    for &style in CSS {
+        let segments = html.split(style);
+        if style == "image-set(" {
             for seg in segments.skip(1) {
                 images = images
                     .union(&css_image(seg, addr))
@@ -1383,7 +1388,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
                 }
             }
         }
-    });
+    }
     images
 }
 
