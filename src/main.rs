@@ -27,6 +27,7 @@ static IMGS: &[&str] = &[
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
 static mut SUB_DIR: bool = true;
+static mut EMBED: bool = false;
 
 fn main() {
     use nanoargs::*;
@@ -38,6 +39,11 @@ fn main() {
             Flag::new("files")
                 .desc("Save files directly without create a folder.")
                 .short('f'),
+        )
+        .flag(
+            Flag::new("embed")
+                .desc("Save embed/inline <svg> and data:image as files.")
+                .short('e'),
         )
         .positional(Pos::new("url").desc("- the url of web page.").required())
         .option(
@@ -62,6 +68,7 @@ fn main() {
             url:String as @pos,
             dir:Option<String>,
             files:bool,
+            embed:bool
             }
         )
         .unwrap(),
@@ -83,7 +90,12 @@ fn main() {
     check_host(&args.url);
     if args.files {
         unsafe {
-            SUB_DIR = !args.files;
+            SUB_DIR = false;
+        }
+    }
+    if args.embed {
+        unsafe {
+            EMBED = true;
         }
     }
 
@@ -324,6 +336,9 @@ fn parse(addr: &str) -> String {
     let mut source_img = dom::Selection::default();
     if img.is_none() {
         html_img = html_img.add("image");
+        if unsafe { EMBED } {
+            html_img = html_img.add("svg");
+        }
         source_img = page.select("source[srcset]");
     }
 
@@ -468,10 +483,13 @@ fn parse(addr: &str) -> String {
             let mut urls = collections::HashSet::<String>::new();
             let [mut empty, mut dup, mut _embed] = [0usize; 3];
             let mut handle_embed = |s: &str| {
-                if s.starts_with("data:image/") {
-                    cfg_select! {
-                        feature = "embed" => {if !urls.insert(s.into()) {dup += 1;}}
-                        _ => {_embed += 1;}
+                if s.starts_with("data:image/") || s.starts_with("<svg ") {
+                    if unsafe { EMBED } {
+                        if !urls.insert(s.into()) {
+                            dup += 1;
+                        }
+                    } else {
+                        _embed += 1;
                     }
                 } else if s.is_empty() {
                     empty += 1;
@@ -480,7 +498,15 @@ fn parse(addr: &str) -> String {
                 }
             };
 
-            for elm in html_img.iter() {
+            for elm in html_img.nodes() {
+                if elm.node_name().is_some_and(|n| n.as_ref() == "svg") {
+                    if !elm.has_attr("xmlns") && !elm.has_attr("xmlns:xlink") {
+                        elm.set_attr("xmlns", "http://www.w3.org/2000/svg");
+                    }
+                    let text = elm.html();
+                    handle_embed(text.as_ref());
+                    continue;
+                }
                 let value = [
                     "data-src",
                     "data-lazy",
@@ -511,7 +537,7 @@ fn parse(addr: &str) -> String {
                 }
             }
 
-            for e in source_img.iter() {
+            for e in source_img.nodes() {
                 let multi_urls = e.attr("srcset").unwrap();
                 let mut url = multi_urls
                     .split(",")
@@ -557,7 +583,7 @@ fn parse(addr: &str) -> String {
                         let page = dom::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
-                        for e in html_img.iter() {
+                        for e in html_img.nodes() {
                             let src = e.attr("src").unwrap();
                             let title_alt = ["title", "alt"].iter().find_map(|a| {
                                 e.attr(a).and_then(|x| {
@@ -865,8 +891,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         ascii
     });
     for url in urls {
-        if url.starts_with("data:image/") {
-            #[cfg(feature = "embed")]
+        if unsafe { EMBED } && (url.starts_with("data:image/") || url.starts_with("<svg ")) {
             {
                 if let Ok(cur) = env::current_dir() {
                     if unsafe { SUB_DIR } {
@@ -875,6 +900,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     }
 
                     save_to_file(url.as_str());
+
                     if unsafe { SUB_DIR } {
                         env::set_current_dir(cur).unwrap();
                     }
@@ -1192,50 +1218,56 @@ fn website() -> serde_json::Value {
     })
 }
 
-///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` content to file.
-#[cfg(feature = "embed")]
+///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` or <svg> content to file.
 fn save_to_file(data: &str) {
-    if cfg!(not(feature = "embed")) {
-        return;
-    }
-
-    let ctx = &data["data:image/".len()..data.find(',').unwrap()];
-    let ext = &ctx[..['+', ';']
-        .iter()
-        .find_map(|&x| ctx.find(x))
-        .unwrap_or(ctx.len())];
-
-    let generate_name = || -> String {
+    let generate_name = |ext: &str| -> String {
         let t = format!("{:?}", time::Instant::now());
         let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
         format!("{name}.{ext}")
     };
-    let mut full_name = generate_name();
-    //Prevent overwriting other images with the same file name.
-    while path::Path::new(&full_name).exists() {
-        full_name = generate_name();
-    }
 
-    let content = &data[data.find(',').unwrap() + 1..];
-    use base64::*;
-    {
-        if ctx.contains(";base64") {
-            let mut buf = vec![0; content.len()];
-            let size = engine::general_purpose::STANDARD
-                .decode_slice(content, &mut buf)
-                .unwrap_or_else(|e| quit!("{e}"));
-            buf.truncate(size);
-            fs::write(&full_name, buf)
-        } else {
-            fs::write(
-                &full_name,
-                percent_encoding::percent_decode_str(content)
-                    .decode_utf8_lossy()
-                    .as_ref(),
-            )
+    if data.starts_with("<svg ") {
+        let mut full_name = generate_name("svg");
+        //Prevent overwriting other images with the same file name.
+        while path::Path::new(&full_name).exists() {
+            full_name = generate_name("svg");
         }
+        fs::write(&full_name, data)
+            .unwrap_or_else(|e| quit!("Write <svg> to file {full_name} failed: {}", e));
+    } else {
+        let ctx = &data["data:image/".len()..data.find(',').unwrap()];
+        let ext = &ctx[..['+', ';']
+            .iter()
+            .find_map(|&x| ctx.find(x))
+            .unwrap_or(ctx.len())];
+
+        let mut full_name = generate_name(ext);
+        //Prevent overwriting other images with the same file name.
+        while path::Path::new(&full_name).exists() {
+            full_name = generate_name(ext);
+        }
+
+        let content = &data[data.find(',').unwrap() + 1..];
+        use base64::*;
+        {
+            if ctx.contains(";base64") {
+                let mut buf = vec![0; content.len()];
+                let size = engine::general_purpose::STANDARD
+                    .decode_slice(content, &mut buf)
+                    .unwrap_or_else(|e| quit!("{e}"));
+                buf.truncate(size);
+                fs::write(&full_name, buf)
+            } else {
+                fs::write(
+                    &full_name,
+                    percent_encoding::percent_decode_str(content)
+                        .decode_utf8_lossy()
+                        .as_ref(),
+                )
+            }
+        }
+        .unwrap_or_else(|e| quit!("Write {ctx} to file {full_name} failed: {}", e));
     }
-    .unwrap_or_else(|e| quit!("Write {ctx} to file {full_name} failed: {}", e));
 }
 
 ///Show `circle` progress indicator
@@ -1346,7 +1378,7 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
             for seg in segments.skip(1) {
                 if let Some(u) = url_image(seg) {
                     if u.starts_with("data:image/") {
-                        if cfg!(feature = "embed") {
+                        if unsafe { EMBED } {
                             images.insert(u.into());
                         }
                     } else {
@@ -1550,11 +1582,9 @@ mod img {
         }
     }
 
-    #[cfg(feature = "embed")]
     #[test]
     fn embed() {
         let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
-        #[cfg(feature = "embed")]
         save_to_file(data);
     }
 }
