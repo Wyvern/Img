@@ -323,7 +323,7 @@ fn parse(addr: &str) -> String {
 
     let mut source_img = dom::Selection::default();
     if img.is_none() {
-        html_img = html_img.add("image[src]");
+        html_img = html_img.add("image");
         source_img = page.select("source[srcset]");
     }
 
@@ -486,6 +486,7 @@ fn parse(addr: &str) -> String {
                     "data-lazy",
                     "data-lazy-src",
                     "data-original",
+                    "href",
                     attr,
                 ]
                 .into_iter()
