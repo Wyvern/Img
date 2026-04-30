@@ -1325,8 +1325,7 @@ fn url_redirect_and_query_cleanup<'a>(url: &'a str) -> borrow::Cow<'a, str> {
 
 ///Parse inline `url(),image()`
 fn url_image<'a>(content: &'a str) -> Option<borrow::Cow<'a, str>> {
-    let rp = content.find(')')?;
-    let mut url = &content[..rp];
+    let mut url = content;
     for x in ["ltr ", "rtl "] {
         url = url.trim_start_matches(x);
     }
@@ -1366,26 +1365,35 @@ fn url_image<'a>(content: &'a str) -> Option<borrow::Cow<'a, str>> {
 ///Get `page` css style `url(),image(),image-set()`
 fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
+    let mut add_image = |seg: &str| {
+        if let Some(u) = url_image(seg) {
+            if u.starts_with("data:image/") {
+                if unsafe { EMBED } {
+                    images.insert(u.into());
+                }
+            } else {
+                images.insert(normarlize(&u, addr));
+            }
+        }
+    };
     for &style in CSS {
         let segments = html.split(style);
-        if style == "image-set(" {
-            for seg in segments.skip(1) {
-                images = images
-                    .union(&css_image(seg, addr))
-                    .map(Into::into)
-                    .collect();
+        if style == "image(" || style == "image-set(" {
+            for mut seg in segments.skip(1) {
+                let end = seg.find(')').unwrap();
+                seg = seg[..end].trim();
+                for s in seg.split(",") {
+                    if let Some(url) = s.trim().split(' ').next()
+                        && !url.starts_with("url(") {
+                            add_image(url);
+                        }
+                }
             }
         } else {
-            for seg in segments.skip(1) {
-                if let Some(u) = url_image(seg) {
-                    if u.starts_with("data:image/") {
-                        if unsafe { EMBED } {
-                            images.insert(u.into());
-                        }
-                    } else {
-                        images.insert(normarlize(&u, addr));
-                    }
-                }
+            for mut seg in segments.skip(1) {
+                let end = seg.find(')').unwrap();
+                seg = seg[..end].trim();
+                add_image(seg);
             }
         }
     }
