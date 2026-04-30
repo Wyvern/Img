@@ -1220,11 +1220,7 @@ fn website() -> serde_json::Value {
 
 ///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` or <svg> content to file.
 fn save_to_file(data: &str) {
-    let generate_name = |ext: &str| -> String {
-        let t = format!("{:?}", time::Instant::now());
-        let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
-        format!("{name}.{ext}")
-    };
+    let generate_name = |ext: &str| -> String { format!("{}.{ext}", fastrand::u32(..)) };
 
     if data.starts_with("<svg ") {
         let mut full_name = generate_name("svg");
