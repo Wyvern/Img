@@ -1402,7 +1402,10 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
             for mut seg in segments.skip(1) {
                 seg = balanced_extract(seg);
                 for s in seg.split(",") {
-                    if let Some(url) = s.trim().split_ascii_whitespace().next()
+                    if let Some(url) = s
+                        .trim()
+                        .split_ascii_whitespace()
+                        .find(|u| !u.trim_matches(['\'', '"']).trim().is_empty())
                         && !url.starts_with("url(")
                     {
                         add_image(url);
@@ -1523,7 +1526,7 @@ mod img {
 
     #[test]
     fn css() {
-        let s = r#"image('b.jxl' 3x ,url("a(b.png") type("image/png"), url( 'c.png') 1x, 'c)d(.png' 2x , url( x.png )  ,  url(' ok.jpg") )"#;
+        let s = r#"image('b.jxl' 3x ,url("a(b.png") type("image/png"), url( 'c.png') 1x, '   c)d(.png     ' 2x , url( x.png )  ,  url(' ok.jpg") )"#;
         css_image(s, "demo.com").dbg();
     }
 
