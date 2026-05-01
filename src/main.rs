@@ -615,7 +615,7 @@ fn parse(addr: &str) -> String {
                     _ => (),
                 }
             }
-            // tdbg!(&urls, &css_img, &json_img);
+            // tdbg!(&urls, &css_img, &json_img;);
             download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
         (true, false) => {
@@ -1376,23 +1376,42 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
             }
         }
     };
+    fn balanced_extract(s: &str) -> &str {
+        let mut bp = 1;
+        let mut inq = false;
+        for (i, c) in s.char_indices() {
+            match c {
+                '\'' | '"' => inq = !inq,
+                '(' if !inq => bp += 1,
+                ')' => {
+                    if !inq {
+                        bp -= 1;
+                    }
+                    if bp == 0 {
+                        return s[..i].trim();
+                    }
+                }
+                _ => (),
+            }
+        }
+        s
+    }
     for &style in CSS {
         let segments = html.split(style);
         if style == "image(" || style == "image-set(" {
             for mut seg in segments.skip(1) {
-                let end = seg.find(')').unwrap();
-                seg = seg[..end].trim();
+                seg = balanced_extract(seg);
                 for s in seg.split(",") {
-                    if let Some(url) = s.trim().split(' ').next()
-                        && !url.starts_with("url(") {
-                            add_image(url);
-                        }
+                    if let Some(url) = s.trim().split_ascii_whitespace().next()
+                        && !url.starts_with("url(")
+                    {
+                        add_image(url);
+                    }
                 }
             }
         } else {
             for mut seg in segments.skip(1) {
-                let end = seg.find(')').unwrap();
-                seg = seg[..end].trim();
+                seg = balanced_extract(seg);
                 add_image(seg);
             }
         }
@@ -1503,12 +1522,9 @@ mod img {
     }
 
     #[test]
-    fn css_img() {
-        let arg = arg(current_fn!());
-        let addr = arg.as_deref().unwrap_or_else(|| "autodesk.com");
-        let (html, ll) = get_html(addr);
-        let r = css_image(&html[..ll], addr);
-        tdbg!(&r, r.len());
+    fn css() {
+        let s = r#"image('b.jxl' 3x ,url("a(b.png") type("image/png"), url( 'c.png') 1x, 'c)d(.png' 2x , url( x.png )  ,  url(' ok.jpg") )"#;
+        css_image(s, "demo.com").dbg();
     }
 
     #[test]
