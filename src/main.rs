@@ -1381,7 +1381,9 @@ fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
         let mut inq = false;
         for (i, c) in s.char_indices() {
             match c {
-                '\'' | '"' => inq = !inq,
+                '\'' | '"' if !s[..i].ends_with('\\') => {
+                    inq = !inq;
+                }
                 '(' if !inq => bp += 1,
                 ')' => {
                     if !inq {
@@ -1526,7 +1528,7 @@ mod img {
 
     #[test]
     fn css() {
-        let s = r#"image('b.jxl' 3x ,url("a(b.png") type("image/png"), url( 'c.png') 1x, '   c)d(.png     ' 2x , url( x.png )  ,  url(' ok.jpg") )"#;
+        let s = r#"dumy text image('b'".jxl' 3x ,url("a(b.png") type("image/png"), url( 'c.png') 1x, '   c)'d"(.png     ' 2x , url( x.png )  ,  url(' ok.jpg ") )"#;
         css_image(s, "demo.com").dbg();
     }
 
