@@ -1068,7 +1068,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                     .is_some_and(|c| c.node_name().is_some_and(|n| n.as_ref() == "a"))
         });
 
-        tag.filter(|e| !e.immediate_text().is_empty() || !e.children().is_empty())
+        tag.filter(|e| !e.is_empty_element())
             .and_then(|e| {
                 e.attr("href")
                     .or_else(|| e.children().first().and_then(|c| c.attr("href")))
