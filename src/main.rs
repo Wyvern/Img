@@ -1071,7 +1071,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         tag.filter(|e| !e.is_empty_element())
             .and_then(|e| {
                 e.attr("href")
-                    .or_else(|| e.children().first().and_then(|c| c.attr("href")))
+                    .or_else(|| e.children().iter().find_map(|c| c.attr("href")))
             })
             .unwrap_or_default()
     };
