@@ -248,13 +248,13 @@ rustflags = [
   "-Ztyping-mode-borrowck=y",
   "-Zexperimental-default-bounds=y",
   "-Zhigher-ranked-assumptions",
-  # "-Zcache-proc-macros=y",
-  # "-Zoffload=Device",
+  "-Zcache-proc-macros=y",
+  "-Zoffload=Device",
   # "-Zbuild-sdylib-interface",
 
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
-  "-Wlinker_messages",
+  # "-Wlinker_messages",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", all(target_arch="powerpc64",target_endian = "big")))))']
