@@ -1064,8 +1064,9 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         let tag = tags.iter().find(|e| {
             e.node_name().is_some_and(|n| n.as_ref() == "a")
                 || e.children()
-                    .first()
-                    .is_some_and(|c| c.node_name().is_some_and(|n| n.as_ref() == "a"))
+                    .iter()
+                    .find_map(|c| c.node_name())
+                    .is_some_and(|n| n.as_ref() == "a")
         });
 
         tag.filter(|e| !e.is_empty_element())
@@ -1118,12 +1119,9 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                         if span.is_empty() {
                             return false;
                         }
-                        let t = span.first().immediate_text();
-                        if !t.is_empty() {
-                            next_下(t.as_ref())
-                        } else {
-                            false
-                        }
+                        span.iter()
+                            .find(|s| !s.immediate_text().is_empty())
+                            .is_some_and(|s| next_下(s.immediate_text().as_ref()))
                     }
                 }
             }
