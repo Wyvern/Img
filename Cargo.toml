@@ -10,9 +10,10 @@ test = false
 # required-features = ["color"]
 
 [dependencies]
-base64 = { version = "*", default-features = false, optional = true }
+base64 = { version = "*", default-features = false }
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 dom_query = { version = "*", default-features = false }
+fastrand = "*"
 nanoargs = "*"
 percent-encoding = "*"
 serde_json = "*"
@@ -36,4 +37,3 @@ termion = "*"
 default = []
 color = []
 download = []
-embed = ["dep:base64"]

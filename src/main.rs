@@ -26,6 +26,8 @@ static IMGS: &[&str] = &[
 ];
 static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
+static mut SUB_DIR: bool = true;
+static mut EMBED: bool = false;
 
 fn main() {
     use nanoargs::*;
@@ -33,11 +35,22 @@ fn main() {
         .name("img")
         .version("1.0.0")
         .description("<img> fetcher/cralwer across various web pages.")
-        .positional(Pos::new("url").desc("- the url of web page").required())
-        .positional(
-            Pos::new("dir")
-                .desc("- the dir where album folder stored in")
-                .validate(Validator::with_hint("is-dir", |x| {
+        .flag(
+            Flag::new("files")
+                .desc("Save files directly without create a folder.")
+                .short('f'),
+        )
+        .flag(
+            Flag::new("embed")
+                .desc("Save embed/inline <svg> and data:image as files.")
+                .short('e'),
+        )
+        .positional(Pos::new("url").desc("- the url of web page.").required())
+        .option(
+            Opt::new("dir")
+                .short('o')
+                .desc("Location where album folder stored in.")
+                .validate(Validator::with_hint("must be existed dir", |x| {
                     let p = path::Path::new(x);
                     if p.exists() && p.is_dir() {
                         Ok(())
@@ -53,7 +66,9 @@ fn main() {
         Ok(res) => extract!(res,
             {
             url:String as @pos,
-            dir:Option<String> as @pos,
+            dir:Option<String>,
+            files:bool,
+            embed:bool
             }
         )
         .unwrap(),
@@ -73,6 +88,16 @@ fn main() {
     }
 
     check_host(&args.url);
+    if args.files {
+        unsafe {
+            SUB_DIR = false;
+        }
+    }
+    if args.embed {
+        unsafe {
+            EMBED = true;
+        }
+    }
 
     let mut _next_page = parse(&args.url);
     #[cfg(not(test))]
@@ -308,6 +333,18 @@ fn parse(addr: &str) -> String {
             .unwrap_or("src")
     });
 
+    let mut source_img = dom::Selection::default();
+    if img.is_none() {
+        html_img = html_img
+            .add("image")
+            .add("video[poster]")
+            .add("input[type='image']");
+        if unsafe { EMBED } {
+            html_img = html_img.add("svg");
+        }
+        source_img = page.select("source[srcset]");
+    }
+
     let titles = page.select(if !json_img.is_empty() {
         "script"
     } else {
@@ -369,7 +406,7 @@ fn parse(addr: &str) -> String {
 
     let [albums_len, imgs_len, json_len] = [
         albums.as_ref().map_or(0, |a| a.length()),
-        html_img.length() + css_img.len() + json_img.len(),
+        html_img.length() + source_img.length() + css_img.len() + json_img.len(),
         json_img.len(),
     ];
 
@@ -411,7 +448,12 @@ fn parse(addr: &str) -> String {
 
     let htj = name_count(
         ["HTML", "CSS", "JSON"].as_slice(),
-        [html_img.length(), css_img.len(), json_len].as_slice(),
+        [
+            html_img.length() + source_img.length(),
+            css_img.len(),
+            json_len,
+        ]
+        .as_slice(),
     );
     let prefix = "✔︎ Totally found";
     match (has_album, imgs_len > 0) {
@@ -441,74 +483,83 @@ fn parse(addr: &str) -> String {
 
     match (has_album, imgs_len > 0) {
         (_, true) => {
-            let mut urls = collections::HashSet::new();
-            let [mut empty, mut dup, mut embed] = [0usize; 3];
+            let mut urls = collections::HashSet::<String>::new();
+            let [mut empty, mut dup, mut _embed] = [0usize; 3];
+            let mut handle_embed = |s: &str| {
+                if s.starts_with("data:image/") || s.starts_with("<svg ") {
+                    if unsafe { EMBED } {
+                        if !urls.insert(s.into()) {
+                            dup += 1;
+                        }
+                    } else {
+                        _embed += 1;
+                    }
+                } else if s.is_empty() {
+                    empty += 1;
+                } else if !urls.insert(normarlize(s, addr)) {
+                    dup += 1;
+                }
+            };
 
-            for elm in html_img.iter() {
+            for elm in html_img.nodes() {
+                if elm.node_name().is_some_and(|n| n.as_ref() == "svg") {
+                    if !elm.has_attr("xmlns") && !elm.has_attr("xmlns:xlink") {
+                        elm.set_attr("xmlns", "http://www.w3.org/2000/svg");
+                    }
+                    let text = elm.html();
+                    handle_embed(text.as_ref());
+                    continue;
+                }
                 let value = [
                     "data-src",
                     "data-lazy",
                     "data-lazy-src",
                     "data-original",
+                    "data-url",
+                    "poster",
+                    "href",
                     attr,
                 ]
                 .into_iter()
                 .find_map(|a| elm.attr(a));
-                let mut handle_embed = |s: String| {
-                    if cfg!(feature = "embed") {
-                        if !urls.insert(s) {
-                            dup += 1;
-                        }
-                    } else {
-                        embed += 1;
-                    }
-                };
 
                 match value {
                     Some(val) => {
                         if attr == "style" {
-                            if let Some(frag) = CSS.iter().find_map(|&s| val.trim().split_once(s)) {
-                                let url = url_image(frag.1);
-                                if let Some(u) = url {
-                                    if u.starts_with("data:image/") {
-                                        handle_embed(u);
-                                    } else if u.is_empty() || !urls.insert(normarlize(&u, addr)) {
-                                        if !u.is_empty() {
-                                            dup += 1;
-                                        } else {
-                                            empty += 1;
-                                        }
-                                    }
-                                }
-                            }
-                        } else if val.starts_with("data:image/") {
-                            handle_embed(val.to_string());
+                            let x = CSS
+                                .iter()
+                                .find_map(|&s| val.trim().split_once(s))
+                                .and_then(|frag| url_image(frag.1))
+                                .unwrap_or_default();
+                            handle_embed(x.as_ref());
+                        } else if sel == img {
+                            handle_embed(url_redirect_and_query_cleanup(&val).as_ref());
                         } else {
-                            let url = if sel == img {
-                                url_redirect_and_query_cleanup(&val)
-                            } else {
-                                val.to_string()
-                            };
-                            // tdbg!(&url;);
-                            if url.is_empty() || !urls.insert(normarlize(&url, addr)) {
-                                if !url.is_empty() {
-                                    dup += 1;
-                                } else {
-                                    empty += 1;
-                                }
-                            }
+                            handle_embed(&val);
                         }
                     }
-                    None => {
-                        empty += 1;
-                    }
+                    None => handle_embed(""),
                 }
             }
-            let skip = empty + dup + embed;
+
+            for e in source_img.nodes() {
+                let multi_urls = e.attr("srcset").unwrap();
+                let mut url = multi_urls
+                    .split(",")
+                    .max_by_key(|x| x.len())
+                    .unwrap()
+                    .trim();
+                if let Some((l, _)) = url.rsplit_once(' ') {
+                    url = l;
+                }
+                handle_embed(url_redirect_and_query_cleanup(url).as_ref());
+            }
+
+            let skip = empty + dup + _embed;
             if skip > 0 {
                 let edm = name_count(
                     ["Empty", "Duplicated", "Embed"].as_slice(),
-                    [empty, dup, embed].as_slice(),
+                    [empty, dup, _embed].as_slice(),
                 );
                 pl!("Skipped <{skip}: {edm}> 🏞️");
             }
@@ -537,7 +588,7 @@ fn parse(addr: &str) -> String {
                         let page = dom::Document::from(html.as_ref());
                         let html_img = page.select(r);
                         urls.clear();
-                        for e in html_img.iter() {
+                        for e in html_img.nodes() {
                             let src = e.attr("src").unwrap();
                             let title_alt = ["title", "alt"].iter().find_map(|a| {
                                 e.attr(a).and_then(|x| {
@@ -564,7 +615,7 @@ fn parse(addr: &str) -> String {
                     _ => (),
                 }
             }
-            // tdbg!(&urls, &css_img, &json_img);
+            // tdbg!(&urls, &css_img, &json_img;);
             download(t, urls.into_iter().chain(css_img).chain(json_img), host)
         }
         (true, false) => {
@@ -804,10 +855,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         return;
     }
 
-    let slash2colon = sanitize_path(dir);
-    let path = path::Path::new(&slash2colon);
+    let os_path = sanitize_path(dir);
+    let path = path::Path::new(&os_path);
     let create_dir = || {
-        if !path.exists() {
+        if unsafe { SUB_DIR } && !path.exists() {
             fs::create_dir(path).unwrap_or_else(|e| {
                 quit!("Create Dir Error: {}", e);
             });
@@ -815,7 +866,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     };
 
     let mut curl = process::Command::new("curl");
-    curl.current_dir(path);
+    if unsafe { SUB_DIR } {
+        curl.current_dir(path);
+    }
 
     let mut no_ext = collections::HashMap::new();
     #[cfg(not(unix))]
@@ -843,15 +896,19 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         ascii
     });
     for url in urls {
-        if url.starts_with("data:image/") {
-            #[cfg(feature = "embed")]
+        if unsafe { EMBED } && (url.starts_with("data:image/") || url.starts_with("<svg ")) {
             {
                 if let Ok(cur) = env::current_dir() {
-                    create_dir();
-                    _ = env::set_current_dir(path);
+                    if unsafe { SUB_DIR } {
+                        create_dir();
+                        env::set_current_dir(path).unwrap();
+                    }
 
                     save_to_file(url.as_str());
-                    _ = env::set_current_dir(cur);
+
+                    if unsafe { SUB_DIR } {
+                        env::set_current_dir(cur).unwrap();
+                    }
                 }
             }
             continue;
@@ -916,7 +973,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     if !no_ext.is_empty() {
         create_dir();
         curl = process::Command::new("curl");
-        curl.current_dir(path);
+        if unsafe { SUB_DIR } {
+            curl.current_dir(path);
+        }
+
         #[cfg(unix)]
         {
             use fork::*;
@@ -1000,7 +1060,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         .rsplit(['[', ']'])
         .nth(1)
         .unwrap_or("href");
-    let set_next = |tags: &[dom::Node]| {
+    let set_next = |tags: &[dom::NodeRef]| {
         let tag = tags.iter().find(|e| {
             e.node_name().is_some_and(|n| n.as_ref() == "a")
                 || e.children()
@@ -1008,10 +1068,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                     .is_some_and(|c| c.node_name().is_some_and(|n| n.as_ref() == "a"))
         });
 
-        tag.filter(|e| e.is_nonempty_text() || !e.children().is_empty())
+        tag.filter(|e| !e.is_empty_element())
             .and_then(|e| {
-                e.attr(attr)
-                    .or_else(|| e.children().first().and_then(|c| c.attr(attr)))
+                e.attr("href")
+                    .or_else(|| e.children().iter().find_map(|c| c.attr("href")))
             })
             .unwrap_or_default()
     };
@@ -1163,50 +1223,52 @@ fn website() -> serde_json::Value {
     })
 }
 
-///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` content to file.
-#[cfg(feature = "embed")]
+///Save inline/embed `data:image/..+..;base64,...` or `base64/url-escaped` or <svg> content to file.
 fn save_to_file(data: &str) {
-    if cfg!(not(feature = "embed")) {
-        return;
-    }
+    let generate_name = |ext: &str| -> String { format!("{}.{ext}", fastrand::u32(..)) };
 
-    let ctx = &data["data:image/".len()..data.find(',').unwrap()];
-    let ext = &ctx[..['+', ';']
-        .iter()
-        .find_map(|&x| ctx.find(x))
-        .unwrap_or(ctx.len())];
-
-    let generate_name = || -> String {
-        let t = format!("{:?}", time::Instant::now());
-        let name = &t[t.rfind(':').unwrap() + 2..t.len() - 2];
-        format!("{name}.{ext}")
-    };
-    let mut full_name = generate_name();
-    //Prevent overwriting other images with the same file name.
-    while path::Path::new(&full_name).exists() {
-        full_name = generate_name();
-    }
-
-    let content = &data[data.find(',').unwrap() + 1..];
-    use base64::*;
-    {
-        if ctx.contains(";base64") {
-            let mut buf = vec![0; content.len()];
-            let size = engine::general_purpose::STANDARD
-                .decode_slice(content, &mut buf)
-                .unwrap_or_else(|e| quit!("{e}"));
-            buf.truncate(size);
-            fs::write(&full_name, buf)
-        } else {
-            fs::write(
-                &full_name,
-                percent_encoding::percent_decode_str(content)
-                    .decode_utf8_lossy()
-                    .as_ref(),
-            )
+    if data.starts_with("<svg ") {
+        let mut full_name = generate_name("svg");
+        //Prevent overwriting other images with the same file name.
+        while path::Path::new(&full_name).exists() {
+            full_name = generate_name("svg");
         }
+        fs::write(&full_name, data)
+            .unwrap_or_else(|e| quit!("Write <svg> to file {full_name} failed: {}", e));
+    } else {
+        let ctx = &data["data:image/".len()..data.find(',').unwrap()];
+        let ext = &ctx[..['+', ';']
+            .iter()
+            .find_map(|&x| ctx.find(x))
+            .unwrap_or(ctx.len())];
+
+        let mut full_name = generate_name(ext);
+        //Prevent overwriting other images with the same file name.
+        while path::Path::new(&full_name).exists() {
+            full_name = generate_name(ext);
+        }
+
+        let content = &data[data.find(',').unwrap() + 1..];
+        use base64::*;
+        {
+            if ctx.contains(";base64") {
+                let mut buf = vec![0; content.len()];
+                let size = engine::general_purpose::STANDARD
+                    .decode_slice(content, &mut buf)
+                    .unwrap_or_else(|e| quit!("{e}"));
+                buf.truncate(size);
+                fs::write(&full_name, buf)
+            } else {
+                fs::write(
+                    &full_name,
+                    percent_encoding::percent_decode_str(content)
+                        .decode_utf8_lossy()
+                        .as_ref(),
+                )
+            }
+        }
+        .unwrap_or_else(|e| quit!("Write {ctx} to file {full_name} failed: {}", e));
     }
-    .unwrap_or_else(|e| quit!("Write {ctx} to file {full_name} failed: {}", e));
 }
 
 ///Show `circle` progress indicator
@@ -1236,39 +1298,50 @@ fn circle_indicator() {
 }
 
 ///cleanup url
-fn url_redirect_and_query_cleanup(url: &str) -> String {
-    use percent_encoding::*;
+fn url_redirect_and_query_cleanup<'a>(url: &'a str) -> borrow::Cow<'a, str> {
+    use {borrow::Cow, percent_encoding::*};
     let dec_url = percent_decode_str(url).decode_utf8_lossy();
-    let mut cleanup = &dec_url[dec_url.rfind("?url=").map_or(0, |p| p + 5)..];
-    cleanup = &cleanup[..cleanup
-        .find('?')
-        .and_then(|q| cleanup[q..].find('&').map(|a| a + q))
-        .or_else(|| {
-            cleanup.rfind('/').and_then(|slash| {
-                cleanup[slash..].rfind('.').and_then(|dot| {
-                    cleanup[slash + dot..]
-                        .find(['&', '='])
-                        .map(|amp| amp + dot + slash)
+    fn cleanup(s: &str) -> &str {
+        let c = &s[s.rfind("?url=").map_or(0, |p| p + 5)..];
+        &c[..c
+            .find('?')
+            .and_then(|q| c[q..].find('&').map(|a| a + q))
+            .or_else(|| {
+                c.rfind('/').and_then(|slash| {
+                    c[slash..].rfind('.').and_then(|dot| {
+                        c[slash + dot..]
+                            .find(['&', '='])
+                            .map(|amp| amp + dot + slash)
+                    })
                 })
             })
-        })
-        .unwrap_or(cleanup.len())];
-    cleanup.into()
+            .unwrap_or(c.len())]
+    }
+    match dec_url {
+        Cow::Borrowed(s) => Cow::Borrowed(cleanup(s)),
+        Cow::Owned(s) => Cow::Owned(cleanup(&s).into()),
+    }
 }
 
 ///Parse inline `url(),image()`
-fn url_image(content: &str) -> Option<String> {
-    if let Some(rp) = content.find(')') {
-        let mut url = &content[..rp];
-        _ = ["ltr ", "rtl "].map(|x| url = url.trim_start_matches(x));
-        url = url.trim_matches(['\'', '"']).trim();
-        _ = ["&#39;", "&apos;", "&#34;", "&quot;"]
-            .map(|x| url = url.trim_start_matches(x).trim_end_matches(x).trim());
-        if url.starts_with("data:image/") {
-            return Some(url.into());
-        }
-        let dec = url_redirect_and_query_cleanup(url);
-        url = &dec[..dec.rfind("#xywh").unwrap_or(dec.len())];
+fn url_image<'a>(content: &'a str) -> Option<borrow::Cow<'a, str>> {
+    let mut url = content;
+    for x in ["ltr ", "rtl "] {
+        url = url.trim_start_matches(x);
+    }
+    url = url.trim_matches(['\'', '"']).trim();
+    for x in ["&#39;", "&apos;", "&#34;", "&quot;"] {
+        url = url.trim_start_matches(x).trim_end_matches(x).trim();
+    }
+
+    use borrow::Cow;
+    if url.starts_with("data:image/") {
+        return Some(Cow::Borrowed(url));
+    }
+
+    let dec = url_redirect_and_query_cleanup(url);
+    fn validate_url(mut url: &str) -> Option<&str> {
+        url = url[..url.rfind("#xywh").unwrap_or(url.len())].trim();
         if url.is_empty()
             || url == "undefined"
             || url.starts_with(['{', '$'])
@@ -1280,39 +1353,74 @@ fn url_image(content: &str) -> Option<String> {
         {
             None
         } else {
-            Some(url.trim().into())
+            Some(url)
         }
-    } else {
-        None
+    }
+    match dec {
+        Cow::Borrowed(s) => validate_url(s).map(Cow::Borrowed),
+        Cow::Owned(s) => validate_url(&s).map(|v| Cow::Owned(v.into())),
     }
 }
 
 ///Get `page` css style `url(),image(),image-set()`
 fn css_image(html: &str, addr: &str) -> collections::HashSet<String> {
     let mut images = collections::HashSet::new();
-    _ = CSS.iter().map(|&s| {
-        let segments = html.split(s);
-        if s == "image-set(" {
-            for seg in segments.skip(1) {
-                images = images
-                    .union(&css_image(seg, addr))
-                    .map(Into::into)
-                    .collect();
+    let mut add_image = |seg: &str| {
+        if let Some(u) = url_image(seg) {
+            if u.starts_with("data:image/") {
+                if unsafe { EMBED } {
+                    images.insert(u.into());
+                }
+            } else {
+                images.insert(normarlize(&u, addr));
             }
-        } else {
-            for seg in segments.skip(1) {
-                if let Some(u) = url_image(seg) {
-                    if u.starts_with("data:image/") {
-                        if cfg!(feature = "embed") {
-                            images.insert(u);
-                        }
-                    } else {
-                        images.insert(normarlize(&u, addr));
+        }
+    };
+    fn balanced_extract(s: &str) -> &str {
+        let mut bp = 1;
+        let mut inq = false;
+        for (i, c) in s.char_indices() {
+            match c {
+                '\'' | '"' if !s[..i].ends_with('\\') => {
+                    inq = !inq;
+                }
+                '(' if !inq => bp += 1,
+                ')' => {
+                    if !inq {
+                        bp -= 1;
+                    }
+                    if bp == 0 {
+                        return s[..i].trim();
+                    }
+                }
+                _ => (),
+            }
+        }
+        s
+    }
+    for &style in CSS {
+        let segments = html.split(style);
+        if style == "image(" || style == "image-set(" {
+            for mut seg in segments.skip(1) {
+                seg = balanced_extract(seg);
+                for s in seg.split(",") {
+                    if let Some(url) = s
+                        .trim()
+                        .split_ascii_whitespace()
+                        .find(|u| !u.trim_matches(['\'', '"']).trim().is_empty())
+                        && !url.starts_with("url(")
+                    {
+                        add_image(url);
                     }
                 }
             }
+        } else {
+            for mut seg in segments.skip(1) {
+                seg = balanced_extract(seg);
+                add_image(seg);
+            }
         }
-    });
+    }
     images
 }
 
@@ -1388,7 +1496,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://goddess247.com/category/china/xiaoyu/page/9",
+                "https://bestgirlsexy.com/category/china/imiss/",
             ]
             .into_iter()
             .for_each(|u| {
@@ -1419,12 +1527,9 @@ mod img {
     }
 
     #[test]
-    fn css_img() {
-        let arg = arg(current_fn!());
-        let addr = arg.as_deref().unwrap_or_else(|| "autodesk.com");
-        let (html, ll) = get_html(addr);
-        let r = css_image(&html[..ll], addr);
-        tdbg!(&r, r.len());
+    fn css() {
+        let s = r#"dumy text image('b'".jxl' 3x ,url("a(b.png") type("image/png"), url( 'c.png') 1x, '   c)'d"(.png     ' 2x , url( x.png )  ,  url(' ok.jpg ") )"#;
+        css_image(s, "demo.com").dbg();
     }
 
     #[test]
@@ -1507,11 +1612,9 @@ mod img {
         }
     }
 
-    #[cfg(feature = "embed")]
     #[test]
     fn embed() {
         let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
-        #[cfg(feature = "embed")]
         save_to_file(data);
     }
 }
