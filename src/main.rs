@@ -1060,7 +1060,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         .rsplit(['[', ']'])
         .nth(1)
         .unwrap_or("href");
-    let set_next = |tags: &[dom::Node]| {
+    let set_next = |tags: &[dom::NodeRef]| {
         let tag = tags.iter().find(|e| {
             e.node_name().is_some_and(|n| n.as_ref() == "a")
                 || e.children()
@@ -1068,10 +1068,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                     .is_some_and(|c| c.node_name().is_some_and(|n| n.as_ref() == "a"))
         });
 
-        tag.filter(|e| e.is_nonempty_text() || !e.children().is_empty())
+        tag.filter(|e| !e.immediate_text().is_empty() || !e.children().is_empty())
             .and_then(|e| {
-                e.attr(attr)
-                    .or_else(|| e.children().first().and_then(|c| c.attr(attr)))
+                e.attr("href")
+                    .or_else(|| e.children().first().and_then(|c| c.attr("href")))
             })
             .unwrap_or_default()
     };
@@ -1496,7 +1496,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://bestgirlsexy.com/category/china/xiaoyu/page/5/",
+                "https://bestgirlsexy.com/category/china/imiss/",
             ]
             .into_iter()
             .for_each(|u| {
