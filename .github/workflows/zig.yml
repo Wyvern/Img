@@ -58,9 +58,9 @@ jobs:
             armv7-unknown-netbsd-eabihf
           )
 
-          # for target in ${targets[@]}; do
-          #   time cargo s $target
-          # done
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
 
           find ./target -iname img -o -type f | xargs ls -hl
           sw_vers
