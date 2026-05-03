@@ -259,7 +259,7 @@ rustflags = [
   # "-Wlinker_messages",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64",target_arch="aarch64_be",all(target_arch="powerpc64",target_endian = "big")))))']
+[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64",all(target_arch="aarch64",target_endian="big"),all(target_arch="powerpc64",target_endian = "big")))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -269,7 +269,7 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="aarch64_be"))))']
+[target.'cfg(all(target_os="linux",not(any(target_family="wasm",all(target_arch="aarch64",target_endian="big")))))']
 rustflags = [
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,-z,norelro",
@@ -367,7 +367,7 @@ linker = "mipsisa32r6-linux-gnu-gcc"
 linker = "mipsisa32r6el-linux-gnu-gcc"
 
 
-[target.'cfg(any(target_os="linux",target_os="android",not(target_arch="aarch64_be")))']
+[target.'cfg(any(target_os="linux",target_os="android",not(all(target_arch="aarch64",target_endian="big"))))']
 rustflags = [
   "-Zrelax-elf-relocations",
   "-Clink-arg=-Wl,-z,pack-relative-relocs",
