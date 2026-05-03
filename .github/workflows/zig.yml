@@ -1,4 +1,4 @@
-name: Zig-BSD build
+name: Zig-build
 
 on:
   push:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   macOS:
-    name: Zig linker for BSD
+    name: Zig linker
     runs-on: macos-26
 
     steps:
@@ -53,6 +53,8 @@ jobs:
           set +e -x
 
           targets=(
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
@@ -83,6 +85,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf

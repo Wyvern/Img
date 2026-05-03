@@ -58,8 +58,6 @@ jobs:
             x86_64-unknown-linux-musl
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
             sparc64-unknown-linux-gnu
             mips64-unknown-linux-gnuabi64
             mips64-unknown-linux-muslabi64
@@ -111,8 +109,6 @@ jobs:
             x86_64-unknown-linux-musl
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
             sparc64-unknown-linux-gnu
             mips64-unknown-linux-gnuabi64
             mips64-unknown-linux-muslabi64

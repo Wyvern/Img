@@ -355,7 +355,7 @@ linker = "loongarch64-linux-gnu-gcc-14"
 linker = "mips64-linux-gnuabi64-gcc"
 [target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "little"))']
 linker = "mips64el-linux-gnuabi64-gcc"
-[target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6"),target_os="linux"))']
+[target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6"),target_os="linux"))']
 rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 [target.'cfg(all(target_arch="mips64r6",target_os="linux",target_endian = "big"))']
 linker = "mipsisa64r6-linux-gnuabi64-gcc"
@@ -570,6 +570,13 @@ rustflags = ["-Clink-arg=--target=arm-netbsd"]
 [target.powerpc-unknown-openbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc-openbsd"]
+
+[target.aarch64_be-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=aarch64_be-linux-gnu"]
+[target.aarch64_be-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
 
 [target.armv7-unknown-linux-uclibceabihf]
 linker = "uclibc/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
