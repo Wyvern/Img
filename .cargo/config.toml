@@ -367,7 +367,7 @@ linker = "mipsisa32r6-linux-gnu-gcc"
 linker = "mipsisa32r6el-linux-gnu-gcc"
 
 
-[target.'cfg(any(target_os="linux",target_os="android"))']
+[target.'cfg(any(target_os="linux",target_os="android",not(target_arch="aarch64_be")))']
 rustflags = [
   "-Zrelax-elf-relocations",
   "-Clink-arg=-Wl,-z,pack-relative-relocs",
