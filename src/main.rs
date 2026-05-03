@@ -1494,7 +1494,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://bestgirlsexy.com/category/china/imiss/",
+                "https://bestgirlsexy.com/category/china/imiss/page/2/",
             ]
             .into_iter()
             .for_each(|u| {
