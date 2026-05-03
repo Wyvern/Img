@@ -55,6 +55,7 @@ jobs:
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
+            armv7-unknown-freebsd
             powerpc-unknown-openbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
@@ -87,6 +88,7 @@ jobs:
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
+            armv7-unknown-freebsd
             powerpc-unknown-openbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf

@@ -440,13 +440,6 @@ rustflags = [
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
 
-[target.powerpc-unknown-netbsd]
-rustflags = [
-  "-Clink-arg=--sysroot=sysroot/netbsd/evbppc",
-  "-Clink-arg=--target=powerpc--netbsd",
-]
-
-
 [target.'cfg(target_os = "openbsd")']
 rustflags = ["-Ctarget-feature=+crt-static"]
 
@@ -565,6 +558,12 @@ rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
 [target.mipsel-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
+[target.powerpc-unknown-netbsd]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=powerpc-netbsd"]
+[target.armv7-unknown-freebsd]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-freebsd"]
 [target.sparc64-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=sparc64-netbsd"]
@@ -584,6 +583,4 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
 
 [target.armv7-unknown-linux-uclibceabihf]
 linker = "uclibc/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=uclibc/arm-buildroot-linux-uclibcgnueabihf/sysroot",
-]
+rustflags = ["-Clink-arg=--sysroot=uclibc/arm-buildroot-linux-uclibcgnueabihf/sysroot"]
