@@ -54,7 +54,6 @@ jobs:
 
           targets=(
             powerpc-unknown-openbsd
-            powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
           )
@@ -80,23 +79,22 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload binaries to a GitHub release
+        shell: zsh {0}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
             powerpc-unknown-openbsd
-            powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
           )
 
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
-            os_cap="$(printf '%s' "$os" | sed 's/^./\U&/')"
             if [[ -n "$abi" ]]; then
-                name="${os_cap}-${arch}-${abi}"
+                name="${os^}-${arch}-${abi}"
             else
-                name="${os_cap}-${arch}"
+                name="${os^}-${arch}"
             fi
             echo "Uploading $name..."
             mv target/$target/src/img target/$target/src/$name || true
