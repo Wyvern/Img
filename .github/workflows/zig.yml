@@ -62,7 +62,7 @@ jobs:
             time cargo s $target
           done
 
-          ls -lh ./target/**/img
+          find ./target -type f -name "img" -exec ls -hl {} \;
           sw_vers
           hostinfo
           sysctl -n machdep.cpu.brand_string
