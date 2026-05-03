@@ -20,6 +20,8 @@ for a in "$@"; do
       ;;
     -Wl,-plugin-opt*)
       ;;
+    -Wl,-z,pack-relative-relocs)
+    ;;
     *)
       filtered+=("$a")
       ;;
