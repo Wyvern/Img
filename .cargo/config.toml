@@ -269,7 +269,7 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_family="wasm"))))']
+[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="aarch64_be"))))']
 rustflags = [
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,-z,norelro",
