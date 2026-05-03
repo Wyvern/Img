@@ -86,7 +86,7 @@ jobs:
             fi
           done
 
-          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
+          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64 evbppc)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
             if [ ! -d sysroot/netbsd/$arch ]; then
@@ -115,6 +115,9 @@ jobs:
 
           wait
           chmod -R u+rwX sysroot
+
+          cargo s powerpc-unknown-netbsd
+          exit
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
