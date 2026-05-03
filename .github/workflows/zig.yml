@@ -62,7 +62,7 @@ jobs:
             time cargo s $target
           done
 
-          find ./target -iname img -o -type f | xargs ls -hl
+          ls -lh ./target/**/img
           sw_vers
           hostinfo
           sysctl -n machdep.cpu.brand_string
@@ -79,7 +79,6 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload binaries to a GitHub release
-        shell: zsh {0}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -91,10 +90,13 @@ jobs:
 
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
+            first="$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')"
+            rest="${os#?}"
+            os_cap="${first}${rest}"
             if [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
+                name="${os_cap}-${arch}-${abi}"
             else
-                name="${os^}-${arch}"
+                name="${os_cap}-${arch}"
             fi
             echo "Uploading $name..."
             mv target/$target/src/img target/$target/src/$name || true
