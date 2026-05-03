@@ -393,6 +393,12 @@ rustflags = [
 ]
 runner = "qemu-aarch64 -L sysroot/freebsd/arm64"
 
+[target.armv7-unknown-freebsd]
+rustflags = [
+  "-Clink-arg=--sysroot=sysroot/freebsd/arm",
+  "-Clink-arg=--target=armv7--freebsd",
+]
+
 [target.riscv64gc-unknown-freebsd]
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/freebsd/riscv",
@@ -561,9 +567,6 @@ rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
 [target.powerpc-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc-netbsd"]
-[target.armv7-unknown-freebsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=arm-freebsd"]
 [target.sparc64-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=sparc64-netbsd"]
