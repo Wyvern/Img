@@ -73,7 +73,7 @@ jobs:
       - name: Cache hexagon
         uses: actions/cache@v5
         with:
-          path: hexagon-toolchain
+          path: /home/runner/hexagon
           key: hexagon-22.1.4
           restore-keys: hexagon-22.1.4
 
@@ -114,14 +114,13 @@ jobs:
 
           ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
 
-          if [ ! -d hexagon ]; then
-            mkdir -p hexagon-toolchain
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C hexagon-toolchain
+          if [ ! -d /home/runner/hexagon ]; then
+            mkdir -p /home/runner/hexagon
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
+          ls -hl /home/runner/hexagon
+          ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/ hexagon
 
-          ls -hl hexagon-toolchain/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/
-
-          ln -sf hexagon-toolchain/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/ hexagon
           # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
           cargo s hexagon-unknown-linux-musl
           exit
