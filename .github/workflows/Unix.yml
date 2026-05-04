@@ -124,7 +124,7 @@ jobs:
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
           sudo apt install -y libguestfs-tools
-          sudo guestmount -a sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img -i --ro sysroot/freebsd/arm
+          sudo guestmount -a sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img -m /dev/sda2 --ro sysroot/freebsd/arm
 
           targets=(
             x86_64-unknown-dragonfly
