@@ -57,7 +57,7 @@ jobs:
           mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
 
-          freebsd=(amd64 arm64 arm riscv)
+          freebsd=(amd64 arm64 riscv)
           for arch in "${freebsd[@]}"; do
             if [ ! -d sysroot/freebsd/$arch ]; then
                 mkdir -p sysroot/freebsd/$arch
@@ -113,10 +113,18 @@ jobs:
             mkdir -p sysroot/dfly
           fi
 
+          if [ ! -f sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img ]; then
+            curl -fsSL https://download.freebsd.org/ftp/releases/arm/armv7/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img.xz | xz -dc > sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img &
+            mkdir sysroot/freebsd/arm
+          fi
+
           wait
           chmod -R u+rwX sysroot
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
+
+          LOOPDEV=$(sudo losetup -f --show -P "sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img")
+          sudo mount -o ro "${LOOPDEV}p2" sysroot/freebsd/arm
 
           targets=(
             x86_64-unknown-dragonfly
