@@ -68,16 +68,14 @@ jobs:
           restore-keys: uclibc-2025.08-1
 
       - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu crosshurd musl-tools libfuse3-dev -qy
+        run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu musl-tools -qy
 
-      - name: Cache Redoxer
+      - name: Cache hexagon
         uses: actions/cache@v5
         with:
-          path: |
-            ~/.redoxer
-            ~/.cargo/bin/redoxer
-          key: redoxer
-          restore-keys: redoxer
+          path: hexagon-toolchain
+          key: hexagon-22.1.4
+          restore-keys: hexagon-22.1.4
 
       - name: Build Release
         run: |
@@ -102,30 +100,6 @@ jobs:
           cargo update
           set +e -x
 
-          if [ ! -f ~/.cargo/bin/redoxer ]; then
-            cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git --locked redoxer -q --force
-          fi
-
-          mv .cargo/config.toml .cargo/config.toml.bak
-          mv .cargo/redox.toml .cargo/config.toml
-
-          targets=(
-            aarch64-unknown-redox
-            riscv64gc-unknown-redox
-            x86_64-unknown-redox
-          )
-          for target in ${targets[@]}; do
-            redoxer env TARGET=$target bash -c "
-                if [ ! -d ~/.redoxer/toolchain/$target ]; then
-                  redoxer toolchain
-                fi
-                time redoxer build -- -q --profile redox -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
-                "
-          done
-
-          mv .cargo/config.toml .cargo/redox.toml
-          mv .cargo/config.toml.bak .cargo/config.toml
-
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
             curl -LsSf https://downloads.openwrt.org/releases/25.12.2/targets/octeon/generic/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
@@ -140,10 +114,21 @@ jobs:
 
           ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
 
+          if [ ! -d hexagon ]; then
+            mkdir -p hexagon-toolchain
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C hexagon-toolchain
+          fi
+
+          ls -hl hexagon-toolchain/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/
+
+          ln -sf hexagon-toolchain/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/ hexagon
+          # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
+          cargo s hexagon-unknown-linux-musl
+          exit
 
           targets=(
+            hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
-            x86_64-unknown-motor
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
@@ -155,7 +140,6 @@ jobs:
             x86_64-linux-android
             powerpc64-unknown-linux-gnu
             ./powerpc64-unknown-linux-musl-elfv1.json
-            x86_64-unknown-hurd-gnu
           )
 
           for target in ${targets[@]}; do
@@ -182,6 +166,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  hexagon-unknown-linux-musl
                   armv7-unknown-linux-uclibceabihf
                   riscv64-linux-android
                   aarch64-linux-android
@@ -194,8 +179,6 @@ jobs:
                   armv7-unknown-linux-ohos
                   x86_64-unknown-linux-ohos
                   mips64-openwrt-linux-musl
-                  x86_64-unknown-hurd-gnu
-                  x86_64-unknown-motor
                   x86_64-unknown-redox
                   aarch64-unknown-redox
                   riscv64gc-unknown-redox
