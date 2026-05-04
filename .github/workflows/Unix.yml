@@ -113,11 +113,6 @@ jobs:
             mkdir -p sysroot/dfly
           fi
 
-          if [ ! -f sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img ]; then
-            curl -fsSL https://download.freebsd.org/ftp/releases/arm/armv7/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img.xz | xz -dc > sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img &
-            mkdir sysroot/freebsd/arm
-          fi
-
           wait
           chmod -R u+rwX sysroot
 
