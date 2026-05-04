@@ -124,7 +124,7 @@ jobs:
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
           LOOPDEV=$(sudo losetup -f --show -P "sysroot/FreeBSD-15.0-RELEASE-arm-armv7-GENERICSD.img")
-          sudo mount -o ro "${LOOPDEV}p2" sysroot/freebsd/arm
+          sudo mount -o ro "${LOOPDEV}p3" sysroot/freebsd/arm
 
           targets=(
             x86_64-unknown-dragonfly
