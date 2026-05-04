@@ -64,7 +64,6 @@ jobs:
           set +e -x
 
           targets=(
-            riscv32imac-unknown-xous-elf
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             aarch64-apple-ios
@@ -118,7 +117,6 @@ jobs:
                   "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe"
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
                   "wasm32-wasip2 wasm32-wasip2.wasm"
-                  "riscv32imac-unknown-xous-elf Xous-riscv32imac"
           )
 
           for target in "${targets[@]}"; do

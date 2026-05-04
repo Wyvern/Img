@@ -179,9 +179,6 @@ jobs:
                   armv7-unknown-linux-ohos
                   x86_64-unknown-linux-ohos
                   mips64-openwrt-linux-musl
-                  x86_64-unknown-redox
-                  aarch64-unknown-redox
-                  riscv64gc-unknown-redox
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi rest <<< "$target"
@@ -202,12 +199,7 @@ jobs:
                     name="${os^}-${arch}"
                 fi
             fi
+
             echo "Uploading $name..."
-            for d in src redox; do
-                if [ -d "target/$target/$d" ]; then
-                  mv target/$target/$d/img target/$target/$d/$name || true
-                  gh release upload Nightly target/$target/$d/$name --clobber || true
-                  break
-                fi
-            done
-          done
+            mv target/$target/src/img target/$target/src/$name || true
+            gh release upload Nightly --clobber target/$target/src/$name || true

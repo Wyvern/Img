@@ -87,6 +87,7 @@ jobs:
           targets=(
             x86_64-unknown-motor
             x86_64-unknown-hurd-gnu
+            riscv32imac-unknown-xous-elf
           )
 
           for target in ${targets[@]}; do
@@ -118,26 +119,16 @@ jobs:
               riscv64gc-unknown-redox
               x86_64-unknown-motor
               x86_64-unknown-hurd-gnu
+              riscv32imac-unknown-xous-elf
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi rest <<< "$target"
             if [[ -n "$abi" ]]; then
-                if [[ "$vendor" == "openwrt" ]]; then
-                    name="${vendor^}-${arch}-${abi}"
-                else
-                    if [[ "$abi" == "ohos" ]]; then
-                        name="Android-${arch}-${abi}"
-                    else
-                        name="${os^}-${arch}-${abi}"
-                    fi
-                fi
+                name="${os^}-${arch}-${abi}"
             else
-                if [[ "$os" == "androideabi" ]]; then
-                    name="Android-${arch}"
-                else
-                    name="${os^}-${arch}"
-                fi
+                name="${os^}-${arch}"
             fi
+
             echo "Uploading $name..."
             for d in src redox; do
                 if [ -d "target/$target/$d" ]; then
