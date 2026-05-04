@@ -118,9 +118,9 @@ jobs:
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
-          ls -ahl /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl
-          ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/ hexagon
 
+          ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/ hexagon
+          ls -hl hexagon
           # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
           cargo s hexagon-unknown-linux-musl
           exit
