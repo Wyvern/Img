@@ -67,8 +67,8 @@ jobs:
           key: hexagon-22.1.4
           restore-keys: hexagon-22.1.4
 
-      # - name: Ubuntu apt update and install
-      #   run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu musl-tools -qy
+      - name: Ubuntu apt update and install
+        run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu musl-tools -qy
 
       - name: Android and OHOS NDK
         run: |
@@ -112,10 +112,9 @@ jobs:
           cargo update
           set +e -x
 
-          # export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
-          # cargo s hexagon-unknown-linux-musl
-          # exit
-
+            # export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
+            # cargo s hexagon-unknown-linux-musl
+            # exit
           targets=(
             hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
@@ -193,3 +192,4 @@ jobs:
             echo "Uploading $name..."
             mv target/$target/src/img target/$target/src/$name || true
             gh release upload Nightly --clobber target/$target/src/$name || true
+        done
