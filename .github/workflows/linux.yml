@@ -111,8 +111,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
-          find /home/runner/work/Img/Img/hexagon -name "libclang-cpp"
+          export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
+          find hexagon -name "libclang-cpp*"
 
           targets=(
             hexagon-unknown-linux-musl
