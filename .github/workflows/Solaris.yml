@@ -78,14 +78,14 @@ jobs:
           # mkdir -p /home/runner/Illumos
           # ln -sfn /home/runner/Illumos Illumos
 
-          # if [ ! -f Illumos/omnios-r151056.zfs ]; then
+          # if [ ! -f Illumos/omnios-r151058.zfs ]; then
           #   mkdir -p Illumos/omnios
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151056.zfs.xz | xz -d > Illumos/omnios-r151056.zfs
+          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151058.zfs.xz | xz -d > Illumos/omnios-r151058.zfs
           # fi
 
           # sudo truncate -s 1G /tmp/omnios.img
           # sudo zpool create -f solaris /tmp/omnios.img
-          # sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151056.zfs
+          # sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151058.zfs
 
           # zpool status
           # zfs list
