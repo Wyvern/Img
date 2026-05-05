@@ -77,7 +77,7 @@ jobs:
           key: hexagon-22.1.4
           restore-keys: hexagon-22.1.4
 
-      - name: Build Release
+      - name: Android and OHOS NDK
         run: |
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk-$ver
@@ -94,6 +94,8 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
+      - name: Build Release
+        run: |
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
             curl -LsSf https://downloads.openwrt.org/releases/25.12.2/targets/octeon/generic/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
@@ -114,7 +116,7 @@ jobs:
           fi
 
           ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl hexagon
-
+          ls -hl /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl
           # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
           cargo s hexagon-unknown-linux-musl
           exit
