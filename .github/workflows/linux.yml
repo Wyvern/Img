@@ -113,7 +113,7 @@ jobs:
           set +e -x
 
           export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
-          find /home/runner/hexagon -type f -name "libclang*"
+          find /home/runner/hexagon -type f -name "*clang*"
           targets=(
             hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
