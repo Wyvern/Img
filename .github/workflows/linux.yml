@@ -93,27 +93,26 @@ jobs:
             mkdir -p /home/runner/openwrt
             curl -LsSf https://downloads.openwrt.org/releases/25.12.2/targets/octeon/generic/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
           fi
+          ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
           if [ ! -d /home/runner/armv7-eabihf--uclibc ]; then
             mkdir -p /home/runner/armv7-eabihf--uclibc
             curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-2025.08-1.tar.xz | tar -xJ -C /home/runner/armv7-eabihf--uclibc
           fi
+          ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
 
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
-
-          # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
+          ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl/x86_64-linux-musl hexagon
 
       - name: Build Release
         run: |
-          ln -sf /home/runner/openwrt/openwrt-toolchain-25.12.2-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
-          ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
-          ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl/x86_64-linux-musl hexagon
           cargo update
           set +e -x
-
+          ls -hl hexagon/
+          export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
           cargo s hexagon-unknown-linux-musl
           exit
 
