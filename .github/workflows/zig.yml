@@ -53,6 +53,7 @@ jobs:
           set +e -x
 
           targets=(
+            hexagon-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
@@ -85,6 +86,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+            hexagon-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd

@@ -112,10 +112,9 @@ jobs:
           cargo update
           set +e -x
 
-          export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
-          find /home/runner/hexagon -type f -name "*clang*"
+          # export LD_LIBRARY_PATH=hexagon/../lib:$LD_LIBRARY_PATH
+          # hexagon-unknown-linux-musl
           targets=(
-            hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
@@ -154,7 +153,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  hexagon-unknown-linux-musl
                   armv7-unknown-linux-uclibceabihf
                   riscv64-linux-android
                   aarch64-linux-android
