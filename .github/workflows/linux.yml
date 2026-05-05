@@ -79,9 +79,6 @@ jobs:
 
       - name: Build Release
         run: |
-          # sudo snap install zig --classic --beta
-          # pipx install cargo-zigbuild
-
           ver=${NDK_VERSION}
           export ANDROID_NDK_HOME=~/android-ndk-$ver
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
@@ -96,9 +93,6 @@ jobs:
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
-
-          cargo update
-          set +e -x
 
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
@@ -124,6 +118,9 @@ jobs:
           # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
           cargo s hexagon-unknown-linux-musl
           exit
+
+          cargo update
+          set +e -x
 
           targets=(
             hexagon-unknown-linux-musl
