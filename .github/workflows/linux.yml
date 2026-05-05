@@ -70,13 +70,6 @@ jobs:
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
 
-      - name: Install LLVM
-        run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
-
       - name: Android and OHOS NDK
         run: |
           ver=r29
@@ -119,6 +112,8 @@ jobs:
           cargo update
           set +e -x
 
+          export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
+          ls -hl hexagon/**/libclang*
           targets=(
             hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
