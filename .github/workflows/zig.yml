@@ -52,36 +52,7 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p /home/runner/unix;
-          ln -sf /home/runner/unix sysroot
-
-          netbsd=(sparc64)
-          files=(base comp etc)
-          for arch in "${netbsd[@]}"; do
-            if [ ! -d sysroot/netbsd/$arch ]; then
-              mkdir -p sysroot/netbsd/$arch
-              for file in "${files[@]}"; do
-                for ext in tar.xz tgz; do
-                        url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-11.0_RC3/$arch/binary/sets/$file.$ext"
-                        out="sysroot/netbsd/$arch"
-                        if curl -fsSI "$url" &>/dev/null; then
-                            echo "→ Fetching $file.$ext"
-                            if [ "$ext" = "tar.xz" ]; then
-                                curl -fsSL "$url" | tar -xJf - -C "$out" 2>/dev/null &
-                            else
-                                curl -fsSL "$url" | tar -xzf - -C "$out" 2>/dev/null &
-                            fi
-                        fi
-                    done
-              done
-            fi
-          done
-
-          wait
-          chmod -R u+rwX sysroot
-
           targets=(
-            sparc64-unknown-netbsd
             hexagon-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
@@ -115,7 +86,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-            sparc64-unknown-netbsd
             hexagon-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
