@@ -68,7 +68,7 @@ jobs:
           restore-keys: hexagon-22.1.4
 
       - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu musl musl-tools -qy
+        run: sudo apt install gcc-powerpc64-linux-gnu musl-tools -qy
 
       - name: Android and OHOS NDK
         run: |
@@ -111,6 +111,8 @@ jobs:
         run: |
           cargo update
           set +e -x
+
+          find /home/runner/work/Img/Img/hexagon -name "libclang-cpp"
 
           targets=(
             hexagon-unknown-linux-musl
