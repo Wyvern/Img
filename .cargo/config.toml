@@ -524,8 +524,8 @@ linker = "wrt/bin/mips64-openwrt-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
 
 [target.hexagon-unknown-linux-musl]
-linker = "hexagon/bin/clang"
-rustflags = ["-Clink-arg=--sysroot=hexagon-unknown-linux-musl"]
+linker = "hexagon/bin/hexagon-unknown-linux-musl-clang"
+rustflags = ["-Clink-arg=--sysroot=hexagon/target/hexagon-unknown-linux-musl"]
 
 
 [target.aarch64-unknown-fuchsia]
