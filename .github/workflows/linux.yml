@@ -111,7 +111,8 @@ jobs:
           fi
 
           ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl hexagon
-          ls -hl /home/runner/hexagon/
+          ls -hl /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl
+          ls -hl hexagon
           # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
 
           cargo update
