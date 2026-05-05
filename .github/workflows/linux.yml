@@ -87,7 +87,7 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
-      - name: Build Release
+      - name: Toolchain downloads
         run: |
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
@@ -103,19 +103,22 @@ jobs:
 
           ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
 
-          # if [ ! -d /home/runner/hexagon ]; then
+      - name: Build Release
+        run: |
+          if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
-          # fi
+          fi
 
           ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl hexagon
-          ls -hl /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl
+          ls -hl /home/runner/hexagon/
           # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
 
           cargo update
           set +e -x
           cargo s hexagon-unknown-linux-musl
           exit
+
           targets=(
             hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
