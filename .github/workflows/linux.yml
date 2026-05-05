@@ -60,15 +60,15 @@ jobs:
           key: uclibc-2025.08-1
           restore-keys: uclibc-2025.08-1
 
-      # - name: Ubuntu apt update and install
-      #   run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu musl-tools -qy
-
       - name: Cache hexagon
         uses: actions/cache@v5
         with:
           path: /home/runner/hexagon
           key: hexagon-22.1.4
           restore-keys: hexagon-22.1.4
+
+      # - name: Ubuntu apt update and install
+      #   run: sudo apt install gcc-powerpc64-linux-gnu gcc-aarch64-linux-gnu musl-tools -qy
 
       - name: Android and OHOS NDK
         run: |
@@ -111,7 +111,7 @@ jobs:
           fi
 
           ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl_x86_64-linux-musl/x86_64-linux-musl hexagon
-
+          ls -hl hexagon/bin
           # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
 
           cargo update
