@@ -113,7 +113,7 @@ jobs:
           set +e -x
 
           export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
-          find hexagon -name "libclang-cpp.so*"
+          find hexagon -name "libclang-cpp"
           exit
           targets=(
             hexagon-unknown-linux-musl
