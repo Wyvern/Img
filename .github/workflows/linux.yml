@@ -113,7 +113,7 @@ jobs:
           set +e -x
 
           export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
-          ls -hl /home/runner/hexagon/**/*libclang*
+          ls -hl hexagon/**/libclang* hexagon/
           targets=(
             hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
