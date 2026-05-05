@@ -111,8 +111,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-          ls -hl hexagon/
-          export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
+          ls -hl hexagon/bin/clang
+          # export DYLD_LIBRARY_PATH=hexagon/lib:$DYLD_LIBRARY_PATH
           cargo s hexagon-unknown-linux-musl
           exit
 
