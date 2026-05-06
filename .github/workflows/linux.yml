@@ -101,10 +101,10 @@ jobs:
           fi
           ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-2025.08-1 uclibc
 
-          # if [ ! -d /home/runner/hexagon ]; then
+          if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
-          # fi
+          fi
           ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
 
       - name: Build Release
@@ -113,7 +113,9 @@ jobs:
           set +e -x
 
           export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
-
+          ls -hl hexagon/**/libc++*
+          cargo s hexagon-unknown-linux-musl
+          exit
           targets=(
             hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
