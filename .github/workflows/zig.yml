@@ -51,9 +51,9 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          #hexagon-unknown-linux-musl
           targets=(
-            hexagon-unknown-linux-musl
+
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
