@@ -105,7 +105,7 @@ jobs:
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/22.1.4_/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           # fi
-          ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl hexagon
+          ln -sf /home/runner/hexagon/clang+llvm-22.1.4-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
 
       - name: Build Release
         run: |
@@ -113,7 +113,7 @@ jobs:
           set +e -x
 
           # export LD_LIBRARY_PATH=hexagon/../lib:$LD_LIBRARY_PATH
-          ls -hl hexagon/**
+          ls -hl hexagon/bin/
           cargo s hexagon-unknown-linux-musl
           exit
           targets=(
