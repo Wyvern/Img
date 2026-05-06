@@ -113,7 +113,7 @@ jobs:
           set +e -x
 
           # export LD_LIBRARY_PATH=hexagon/../lib:$LD_LIBRARY_PATH
-          ls -hl hexagon/bin/hexagon-unknown-linux-musl-clang
+          ls -hl hexagon/bin/
           cargo s hexagon-unknown-linux-musl
           exit
           targets=(
