@@ -45,13 +45,7 @@ fn main() {
                 .desc("Save embed/inline <svg> and data:image as files.")
                 .short('e'),
         )
-        .positional(Pos::new("url").desc("- the url of web page.").required())
-        .option(
-            Opt::new("urls")
-                .short('u')
-                .desc("Urls parse at the same time.")
-                .multi(),
-        )
+        .positional(Pos::new("urls").desc("- the url list of web page.").multi())
         .option(
             Opt::new("output")
                 .short('o')
@@ -71,9 +65,8 @@ fn main() {
     let args = match parser.parse_env() {
         Ok(res) => extract!(res,
             {
-            url:String as @pos,
+            urls:Vec<String> as @pos,
             output:Option<String>,
-            urls:Vec<String>,
             files:bool,
             embed:bool
             }
@@ -105,13 +98,6 @@ fn main() {
         }
     }
 
-    let mut _next_page = parse(&args.url);
-    #[cfg(not(test))]
-    {
-        while !_next_page.is_empty() {
-            _next_page = parse(&_next_page);
-        }
-    }
     for u in args.urls {
         let mut _next_page = parse(&u);
         #[cfg(not(test))]
