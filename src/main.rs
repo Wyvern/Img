@@ -81,7 +81,10 @@ fn main() {
             quit!("")
         }
     };
-
+    if args.urls.is_empty() {
+        print!("{}", parser.help_text());
+        return;
+    }
     if let Some(dir) = args.output {
         env::set_current_dir(&dir)
             .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
