@@ -112,12 +112,6 @@ jobs:
           cargo update
           set +e -x
 
-          # export LD_LIBRARY_PATH=hexagon/lib:$LD_LIBRARY_PATH
-
-          cargo s hexagon-unknown-linux-musl
-
-          exit
-
           targets=(
             hexagon-unknown-linux-musl
             armv7-unknown-linux-uclibceabihf
