@@ -53,9 +53,7 @@ jobs:
           set +e -x
 
           #hexagon-unknown-linux-musl
-          cargo s sparc64-unknown-netbsd
-          cargo s sparc64-unknown-openbsd
-          exit
+
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
@@ -63,6 +61,8 @@ jobs:
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
           )
 
           for target in ${targets[@]}; do
@@ -96,6 +96,8 @@ jobs:
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
           )
 
           for target in "${targets[@]}"; do
