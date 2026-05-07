@@ -58,6 +58,7 @@ jobs:
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
+            powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
           )
@@ -90,6 +91,7 @@ jobs:
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
+            powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
           )
