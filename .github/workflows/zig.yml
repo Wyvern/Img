@@ -96,8 +96,6 @@ jobs:
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
           )
 
           for target in "${targets[@]}"; do
