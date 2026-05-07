@@ -614,11 +614,11 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
 
 [target.sparc64-unknown-openbsd]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Crelocation-model=static"]
+rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Clink-arg=-fuse-ld=bfd","-Crelocation-model=static"]
 
 [target.sparc64-unknown-netbsd]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static"]
+rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Clink-arg=-fuse-ld=bfd","-Crelocation-model=static"]
 
 [target.armv7-unknown-linux-uclibceabihf]
 linker = "uclibc/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
