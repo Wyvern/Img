@@ -596,7 +596,7 @@ rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
 linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--target=powerpc-netbsd",
-  "-Clink-arg=-fuse-ld=bfd",
+
   "-Crelocation-model=static"
 ]
 
