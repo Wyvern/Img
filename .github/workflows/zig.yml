@@ -15,15 +15,15 @@ env:
 jobs:
   macOS:
     name: Zig linker
-    runs-on: macos-26
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Disable macos spotlight index
-        run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
-          sudo pmset -a powernap 0
-          sudo pmset -a sleep 0
+      # - name: Disable macos spotlight index
+      #   run: |
+      #     sudo mdutil -a -i off
+      #     sudo mdutil -a -d
+      #     sudo pmset -a powernap 0
+      #     sudo pmset -a sleep 0
 
       - name: Checkout
         uses: actions/checkout@v6
