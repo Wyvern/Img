@@ -62,7 +62,6 @@ jobs:
             aarch64-unknown-redox
             riscv64gc-unknown-redox
             x86_64-unknown-redox
-            i586-unknown-redox
           )
           for target in ${targets[@]}; do
             redoxer env TARGET=$target bash -c "
@@ -115,7 +114,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-              i586-unknown-redox
               x86_64-unknown-redox
               aarch64-unknown-redox
               riscv64gc-unknown-redox
