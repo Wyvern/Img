@@ -462,7 +462,7 @@ rustflags = [
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
   "-Clink-arg=--target=sparc64--netbsd",
-  "-Crelocation-model=static"
+  "-Crelocation-model=static","-Clink-arg=-fuse-ld=bfd"
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -496,7 +496,7 @@ rustflags = [
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
   "-Clink-arg=--target=sparc64--openbsd",
-  "-Crelocation-model=static"
+  "-Crelocation-model=static","-Clink-arg=-fuse-ld=bfd"
 ]
 
 [target.'cfg(target_os = "android")']
