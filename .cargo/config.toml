@@ -570,7 +570,7 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
 [target.powerpc-unknown-netbsd]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-netbsd","-Clink-arg=-mno-sdata"]
+rustflags = ["-Clink-arg=--target=powerpc-netbsd","-Clink-arg=-fuse-ld=bfd"]
 [target.armv7-unknown-netbsd-eabihf]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-netbsd"]
