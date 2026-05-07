@@ -458,11 +458,11 @@ rustflags = [
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
 
-[target.sparc64-unknown-netbsd]
-rustflags = [
-  "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
-  "-Clink-arg=--target=sparc64--netbsd",
-]
+# [target.sparc64-unknown-netbsd]
+# rustflags = [
+#   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
+#   "-Clink-arg=--target=sparc64--netbsd",
+# ]
 
 [target.'cfg(target_os = "openbsd")']
 rustflags = ["-Ctarget-feature=+crt-static"]
@@ -491,11 +491,11 @@ rustflags = [
   "-Clink-arg=--target=powerpc64--openbsd",
 ]
 
-[target.sparc64-unknown-openbsd]
-rustflags = [
-  "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
-  "-Clink-arg=--target=sparc64--openbsd",
-]
+# [target.sparc64-unknown-openbsd]
+# rustflags = [
+#   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
+#   "-Clink-arg=--target=sparc64--openbsd",
+# ]
 
 [target.'cfg(target_os = "android")']
 rustflags = ["-Clink-arg=--sysroot=ndk/sysroot"]
@@ -594,11 +594,7 @@ rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
 
 [target.powerpc-unknown-netbsd]
 linker = "./zig-cc.sh"
-rustflags = [
-  "-Clink-arg=--target=powerpc-netbsd",
-
-  "-Crelocation-model=static"
-]
+rustflags = ["-Clink-arg=--target=powerpc-netbsd", "-Crelocation-model=static"]
 
 [target.armv7-unknown-netbsd-eabihf]
 linker = "./zig-cc.sh"
@@ -615,6 +611,14 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-gnu"]
 [target.aarch64_be-unknown-linux-musl]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
+
+[target.sparc64-unknown-openbsd]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Crelocation-model=static"]
+
+[target.sparc64-unknown-netbsd]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static"]
 
 [target.armv7-unknown-linux-uclibceabihf]
 linker = "uclibc/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
