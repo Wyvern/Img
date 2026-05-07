@@ -45,11 +45,11 @@ fn main() {
                 .desc("Save embed/inline <svg> and data:image as files.")
                 .short('e'),
         )
-        .positional(Pos::new("url").desc("- the url of web page.").required())
+        .positional(Pos::new("urls").desc("- the url list of web page.").multi())
         .option(
-            Opt::new("dir")
+            Opt::new("output")
                 .short('o')
-                .desc("Location where album folder stored in.")
+                .desc("Output dir where album folder stored in.")
                 .validate(Validator::with_hint("must be existed dir", |x| {
                     let p = path::Path::new(x);
                     if p.exists() && p.is_dir() {
@@ -65,8 +65,8 @@ fn main() {
     let args = match parser.parse_env() {
         Ok(res) => extract!(res,
             {
-            url:String as @pos,
-            dir:Option<String>,
+            urls:Vec<String> as @pos,
+            output:Option<String>,
             files:bool,
             embed:bool
             }
@@ -81,13 +81,15 @@ fn main() {
             quit!("")
         }
     };
-
-    if let Some(dir) = args.dir {
+    if args.urls.is_empty() {
+        print!("{}", parser.help_text());
+        return;
+    }
+    if let Some(dir) = args.output {
         env::set_current_dir(&dir)
             .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
     }
 
-    check_host(&args.url);
     if args.files {
         unsafe {
             SUB_DIR = false;
@@ -99,11 +101,13 @@ fn main() {
         }
     }
 
-    let mut _next_page = parse(&args.url);
-    #[cfg(not(test))]
-    {
-        while !_next_page.is_empty() {
-            _next_page = parse(&_next_page);
+    for u in args.urls {
+        let mut _next_page = parse(&u);
+        #[cfg(not(test))]
+        {
+            while !_next_page.is_empty() {
+                _next_page = parse(&_next_page);
+            }
         }
     }
 }
@@ -1064,8 +1068,9 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         let tag = tags.iter().find(|e| {
             e.node_name().is_some_and(|n| n.as_ref() == "a")
                 || e.children()
-                    .first()
-                    .is_some_and(|c| c.node_name().is_some_and(|n| n.as_ref() == "a"))
+                    .iter()
+                    .find_map(|c| c.node_name())
+                    .is_some_and(|n| n.as_ref() == "a")
         });
 
         tag.filter(|e| !e.is_empty_element())
@@ -1118,12 +1123,9 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
                         if span.is_empty() {
                             return false;
                         }
-                        let t = span.first().immediate_text();
-                        if !t.is_empty() {
-                            next_下(t.as_ref())
-                        } else {
-                            false
-                        }
+                        span.iter()
+                            .find(|s| !s.immediate_text().is_empty())
+                            .is_some_and(|s| next_下(s.immediate_text().as_ref()))
                     }
                 }
             }
@@ -1496,7 +1498,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://bestgirlsexy.com/category/china/imiss/",
+                "https://bestgirlsexy.com/category/china/imiss/page/2/",
             ]
             .into_iter()
             .for_each(|u| {
@@ -1528,7 +1530,7 @@ mod img {
 
     #[test]
     fn css() {
-        let s = r#"dumy text image('b'".jxl' 3x ,url("a(b.png") type("image/png"), url( 'c.png') 1x, '   c)'d"(.png     ' 2x , url( x.png )  ,  url(' ok.jpg ") )"#;
+        let s = r#"dumy text image('b'".jxl' 3x ,url("a(b.png") type("image/png"), url( 'c\"x.png') 1x, '   c)'d"(.png     ' 2x , url( x.png )  ,  url(' o\'k.jpg ") )"#;
         css_image(s, "demo.com").dbg();
     }
 
