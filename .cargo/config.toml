@@ -270,7 +270,7 @@ rustflags = [
   # "-Wlinker_messages",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64",target_arch="hexagon",all(target_arch="powerpc64",target_endian="big"),all(target_arch="aarch64",target_endian="big")))))']
+[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64",target_arch="hexagon",target_arch="powerpc",target_arch="mips",target_arch="mipsel",all(target_arch="powerpc64",target_endian="big"),all(target_arch="aarch64",target_endian="big")))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -625,18 +625,29 @@ rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static"]
 [target.mipsel-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=mipsel-linux-gnueabihf"]
+
 [target.mipsel-unknown-linux-musl]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=mipsel-linux-musleabihf","-Ctarget-feature=-soft-float"]
+rustflags = [
+  "-Clink-arg=--target=mipsel-linux-musleabihf",
+  "-Ctarget-feature=-soft-float"
+]
+
 [target.mips-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=mips-linux-gnueabihf"]
+
 [target.mips-unknown-linux-musl]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=mips-linux-musleabihf","-Ctarget-feature=-soft-float"]
+rustflags = [
+  "-Clink-arg=--target=mips-linux-musleabihf",
+  "-Ctarget-feature=-soft-float"
+]
+
 [target.powerpc-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc-linux-gnueabihf"]
+
 [target.powerpc-unknown-linux-musl]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc-linux-musleabihf"]
