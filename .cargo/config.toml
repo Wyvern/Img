@@ -459,6 +459,7 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-netbsd]
+linker = "clang"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
   "-Clink-arg=--target=sparc64--netbsd",
@@ -495,6 +496,7 @@ rustflags = [
 ]
 
 [target.sparc64-unknown-openbsd]
+linker = "clang"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
   "-Clink-arg=--target=sparc64--openbsd",
