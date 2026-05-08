@@ -100,9 +100,7 @@ fn main() {
             EMBED = true;
         }
     }
-    let mut urls = args.urls;
-    urls.sort();
-    urls.dedup();
+    let urls = args.urls.into_iter().collect::<collections::HashSet<_>>();
     for u in urls {
         let mut _next_page = parse(&u);
         #[cfg(not(test))]
