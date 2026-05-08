@@ -466,6 +466,7 @@ rustflags = [
   "-Clink-arg=-Wl,--allow-shlib-undefined",
   "-Clinker-flavor=gnu",
   "-Clink-arg=-fuse-ld=bfd",
+  "-Zunstable-options"
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -499,7 +500,10 @@ rustflags = [
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
   "-Clink-arg=--target=sparc64--openbsd",
-  "-Crelocation-model=static"
+  "-Crelocation-model=static",
+  "-Clinker-flavor=gnu",
+  "-Clink-arg=-fuse-ld=bfd",
+  "-Zunstable-options"
 ]
 
 [target.'cfg(target_os = "android")']

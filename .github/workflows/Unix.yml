@@ -86,7 +86,7 @@ jobs:
             fi
           done
 
-          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
+          netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64 sparc64)
           files=(base comp etc)
           for arch in "${netbsd[@]}"; do
             if [ ! -d sysroot/netbsd/$arch ]; then
