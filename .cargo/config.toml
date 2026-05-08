@@ -623,7 +623,17 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static"]
 
 [target.armv7-unknown-linux-uclibceabihf]
-linker = "uclibc/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
+linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
 rustflags = [
-  "-Clink-arg=--sysroot=uclibc/arm-buildroot-linux-uclibcgnueabihf/sysroot",
+  "-Clink-arg=--sysroot=armv7/arm-buildroot-linux-uclibcgnueabihf/sysroot",
+]
+[target.mips-unknown-linux-uclibc]
+linker = "mips/bin/mips32-buildroot-linux-uclibc-gcc"
+rustflags = [
+  "-Clink-arg=--sysroot=mips/mips32-buildroot-linux-uclibc/sysroot",
+]
+[target.mipsel-unknown-linux-uclibc]
+linker = "mipsel/bin/mipsel-buildroot-linux-uclibc-gcc"
+rustflags = [
+  "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
 ]

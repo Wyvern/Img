@@ -56,7 +56,7 @@ jobs:
       - name: Cache uclibc
         uses: actions/cache@v5
         with:
-          path: /home/runner/armv7-eabihf--uclibc
+          path: /home/runner/uclibc
           key: uclibc-2025.08-1
           restore-keys: uclibc-2025.08-1
 
@@ -97,11 +97,23 @@ jobs:
           ln -sf /home/runner/openwrt/openwrt-toolchain-${ver}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
           ver=2025.08-1
-          if [ ! -d /home/runner/armv7-eabihf--uclibc ]; then
-            mkdir -p /home/runner/armv7-eabihf--uclibc
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/armv7-eabihf--uclibc
+          if [ ! -d /home/runner/uclibc/armv7 ]; then
+            mkdir -p /home/runner/uclibc/armv7
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/armv7
           fi
-          ln -sf /home/runner/armv7-eabihf--uclibc/armv7-eabihf--uclibc--bleeding-edge-${ver} uclibc
+          ln -sf /home/runner/uclibc/armv7/armv7-eabihf--uclibc--bleeding-edge-${ver} armv7
+
+          if [ ! -d /home/runner/uclibc/mips32el ]; then
+            mkdir -p /home/runner/uclibc/mips32el
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32el/tarballs/mips32el--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32el
+          fi
+          ln -sf /home/runner/uclibc/mips32el/mips32el--uclibc--bleeding-edge-${ver} mipsel
+
+          if [ ! -d /home/runner/uclibc/mips32 ]; then
+            mkdir -p /home/runner/uclibc/mips32
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32/tarballs/mips32--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32
+          fi
+          ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${ver} mips
 
           ver=22.1.4
           if [ ! -d /home/runner/hexagon ]; then
@@ -117,6 +129,8 @@ jobs:
 
           targets=(
             hexagon-unknown-linux-musl
+            mips-unknown-linux-uclibc
+            mipsel-unknown-linux-uclibc
             armv7-unknown-linux-uclibceabihf
             mips64-openwrt-linux-musl
             aarch64-unknown-linux-ohos
