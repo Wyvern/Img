@@ -170,6 +170,8 @@ jobs:
         run: |
           targets=(
                   hexagon-unknown-linux-musl
+                  mips-unknown-linux-uclibc
+                  mipsel-unknown-linux-uclibc
                   armv7-unknown-linux-uclibceabihf
                   riscv64-linux-android
                   aarch64-linux-android
