@@ -632,14 +632,14 @@ rustflags = [
 linker = "mips/bin/mips-buildroot-linux-uclibc-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=mips/mips-buildroot-linux-uclibc/sysroot",
-  "-Ctarget-feature=-soft-float",
-  "-Ctarget-feature=+fpxx"
+  "-Clink-arg=-msoft-float",
+  # "-Clink-arg=-mfpxx"
 ]
 
 [target.mipsel-unknown-linux-uclibc]
 linker = "mipsel/bin/mipsel-buildroot-linux-uclibc-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
-  "-Ctarget-feature=-soft-float",
-  "-Ctarget-feature=+fpxx"
+  "-Clink-arg=-msoft-float",
+  # "-Clink-arg=-mfpxx"
 ]
