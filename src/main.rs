@@ -62,7 +62,7 @@ fn main() {
         .build()
         .unwrap();
 
-    let mut args = match parser.parse_env() {
+    let args = match parser.parse_env() {
         Ok(res) => extract!(res,
             {
             urls:Vec<String> as @pos,
@@ -100,9 +100,10 @@ fn main() {
             EMBED = true;
         }
     }
-    args.urls.sort();
-    args.urls.dedup();
-    for u in args.urls.dbg_pause() {
+    let mut urls = args.urls;
+    urls.sort();
+    urls.dedup();
+    for u in urls {
         let mut _next_page = parse(&u);
         #[cfg(not(test))]
         {
