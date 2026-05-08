@@ -62,7 +62,7 @@ fn main() {
         .build()
         .unwrap();
 
-    let args = match parser.parse_env() {
+    let mut args = match parser.parse_env() {
         Ok(res) => extract!(res,
             {
             urls:Vec<String> as @pos,
@@ -100,8 +100,9 @@ fn main() {
             EMBED = true;
         }
     }
-
-    for u in args.urls {
+    args.urls.sort();
+    args.urls.dedup();
+    for u in args.urls.dbg_pause() {
         let mut _next_page = parse(&u);
         #[cfg(not(test))]
         {
@@ -1498,7 +1499,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://bestgirlsexy.com/category/china/imiss/page/2/",
+                "https://bestgirlsexy.com/category/china/imiss/page/7/",
             ]
             .into_iter()
             .for_each(|u| {
