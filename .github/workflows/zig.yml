@@ -57,6 +57,12 @@ jobs:
           # cargo s sparc64-unknown-openbsd
 
           targets=(
+            powerpc-unknown-linux-gnu
+            powerpc-unknown-linux-musl
+            mipsel-unknown-linux-gnu
+            mipsel-unknown-linux-musl
+            mips-unknown-linux-gnu
+            mips-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
@@ -90,6 +96,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+            powerpc-unknown-linux-gnu
+            powerpc-unknown-linux-musl
+            mipsel-unknown-linux-gnu
+            mipsel-unknown-linux-musl
+            mips-unknown-linux-gnu
+            mips-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd

@@ -622,6 +622,25 @@ rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Crelocation-model=static"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static"]
 
+[target.mipsel-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=mipsel-linux-gnueabihf"]
+[target.mipsel-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=mipsel-linux-musleabihf","-Ctarget-feature=-soft-float"]
+[target.mips-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=mips-linux-gnueabihf"]
+[target.mips-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=mips-linux-musleabihf","-Ctarget-feature=-soft-float"]
+[target.powerpc-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=powerpc-linux-gnueabihf"]
+[target.powerpc-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=powerpc-linux-musleabihf"]
+
 [target.armv7-unknown-linux-uclibceabihf]
 linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
 rustflags = [
@@ -633,8 +652,6 @@ linker = "mips/bin/mips-buildroot-linux-uclibc-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=mips/mips-buildroot-linux-uclibc/sysroot",
   "-Ctarget-feature=-soft-float",
-  # "-Clink-arg=-msoft-float",
-  # "-Clink-arg=-mfpxx"
 ]
 
 [target.mipsel-unknown-linux-uclibc]
@@ -642,6 +659,4 @@ linker = "mipsel/bin/mipsel-buildroot-linux-uclibc-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
   "-Ctarget-feature=-soft-float",
-  # "-Clink-arg=-msoft-float",
-  # "-Clink-arg=-mfpxx"
 ]
