@@ -52,10 +52,10 @@ jobs:
           cargo update
           set +e -x
 
-          #hexagon-unknown-linux-musl
-          cargo s sparc64-unknown-netbsd
-          cargo s sparc64-unknown-openbsd
-          exit
+          # hexagon-unknown-linux-musl
+          # cargo s sparc64-unknown-netbsd
+          # cargo s sparc64-unknown-openbsd
+
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl

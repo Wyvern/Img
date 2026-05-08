@@ -392,7 +392,7 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs",
 ]
 
-[target.'cfg(any(target_os="freebsd",all(target_os="netbsd",not(target_arch="sparc64")),all(target_os="openbsd",not(target_arch="sparc64")),target_os="dragonfly",target_os="fuchsia"))']
+[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clinker-plugin-lto"]
 
@@ -616,11 +616,11 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
 
 [target.sparc64-unknown-openbsd]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Crelocation-model=static","-Clink-arg=-fuse-ld=bfd"]
+rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Crelocation-model=static"]
 
 [target.sparc64-unknown-netbsd]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static","-Clink-arg=-fuse-ld=bfd"]
+rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static"]
 
 [target.armv7-unknown-linux-uclibceabihf]
 linker = "uclibc/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
