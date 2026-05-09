@@ -768,7 +768,7 @@ fn parse(addr: &str) -> String {
                 }
             }
         }
-        (false, false) => (),
+        _ => (),
     }
 
     if has_album && imgs_len == 0 {

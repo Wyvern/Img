@@ -38,8 +38,9 @@
     },
     {
       "Site": "girldreamy.com",
-      "Img": "div.elementor-widget-container > p > img",
-      "Album": "div.elementor-post__text a"
+      "Img": "div.elementor-widget-theme-post-content div.elementor-widget-container img",
+      "Album": "div.elementor-post__text a",
+      "Page": "nav.elementor-pagination a.next"
     },
     {
       "Site": "meitu131.com",
