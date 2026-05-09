@@ -1533,11 +1533,9 @@ mod img {
         let mut dup_site = vec![];
         let mut img_sel = collections::HashMap::new();
 
-        JSON.get_or_init(website)
-            .as_object()
-            .expect("`web.json` file parse error!")["Sites"]
+        JSON.get_or_init(website)["Sites"]
             .as_array()
-            .expect("Parse `Sites` in `web.json` key error!")
+            .unwrap()
             .iter()
             .for_each(|s| {
                 if let Some(v) = s["Site"].as_str() {
