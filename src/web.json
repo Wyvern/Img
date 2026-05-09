@@ -38,7 +38,7 @@
     },
     {
       "Site": "girldreamy.com",
-      "Img": "img.aligncenter.size-full",
+      "Img": "div.elementor-widget-container > p > img",
       "Album": "div.elementor-post__text a"
     },
     {
