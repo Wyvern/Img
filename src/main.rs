@@ -373,7 +373,7 @@ fn parse(addr: &str) -> String {
                     .nth(1)
                     .unwrap()
                     .split(',')
-                    .max_by_key(|&seg| seg.trim().len())
+                    .max_by_key(|&seg| seg.trim().chars().count())
                     .unwrap()
                     .into()
             } else {
@@ -403,7 +403,7 @@ fn parse(addr: &str) -> String {
         title
             .rsplitn(5, ['/', '-', '_', '|', '–'])
             .skip(1)
-            .max_by_key(|x| x.trim().len())
+            .max_by_key(|x| x.trim().chars().count())
             .unwrap_or(&title)
     }
     .trim();
@@ -662,7 +662,7 @@ fn parse(addr: &str) -> String {
                                 quit!("Album title text is empty.")
                             } else {
                                 t.lines()
-                                    .max_by_key(|l| l.trim().len())
+                                    .max_by_key(|l| l.trim().chars().count())
                                     .unwrap()
                                     .trim()
                                     .into()
