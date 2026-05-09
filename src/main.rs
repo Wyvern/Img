@@ -5,6 +5,18 @@ mod util;
 use dom_query::{self as dom, NodeIdProver};
 use {std::*, sync::atomic::*, util::*};
 
+static ATTR: &[&str] = &[
+    "data-src",
+    "data-lazy",
+    "data-lazy-src",
+    "data-original",
+    "data-url",
+    "href",
+    "src",
+    "file",
+    "zoomfile",
+    "style",
+];
 static SPINNER: AtomicBool = AtomicBool::new(false);
 static SEP: &str = " | ";
 static CSS: &[&str] = &["url(", "image(", "image-set("];
@@ -328,21 +340,9 @@ fn parse(addr: &str) -> String {
         html_img = page.select(sel.unwrap_or("img"));
     }
 
-    let attr = sel.map_or("src", |i| {
-        i.split_whitespace()
-            .next_back()
-            .unwrap()
-            .rsplit(['[', ']'])
-            .nth(1)
-            .unwrap_or("src")
-    });
-
     let mut source_img = dom::Selection::default();
     if img.is_none() {
-        html_img = html_img
-            .add("image")
-            .add("video[poster]")
-            .add("input[type='image']");
+        html_img = html_img.add("image").add("input[type='image']");
         if unsafe { EMBED } {
             html_img = html_img.add("svg");
         }
@@ -514,22 +514,11 @@ fn parse(addr: &str) -> String {
                     handle_embed(text.as_ref());
                     continue;
                 }
-                let value = [
-                    "data-src",
-                    "data-lazy",
-                    "data-lazy-src",
-                    "data-original",
-                    "data-url",
-                    "poster",
-                    "href",
-                    attr,
-                ]
-                .into_iter()
-                .find_map(|a| elm.attr(a));
+                let value = ATTR.iter().find_map(|a| elm.attr(a));
 
                 match value {
                     Some(val) => {
-                        if attr == "style" {
+                        if sel.is_some_and(|x| x.ends_with("[style]")) {
                             let x = CSS
                                 .iter()
                                 .find_map(|&s| val.trim().split_once(s))
@@ -1057,13 +1046,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     let mut next_link = dom::Document::default().text();
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
-    let attr = nxt
-        .split_whitespace()
-        .next_back()
-        .unwrap()
-        .rsplit(['[', ']'])
-        .nth(1)
-        .unwrap_or("href");
+    let attr = "href";
     let set_next = |tags: &[dom::NodeRef]| {
         let tag = tags.iter().find(|e| {
             e.node_name().is_some_and(|n| n.as_ref() == "a")
