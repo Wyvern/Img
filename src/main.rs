@@ -337,7 +337,7 @@ fn parse(addr: &str) -> String {
             }
         }
     } else {
-        html_img = page.select(sel.unwrap_or("img"));
+        html_img = page.select(sel.unwrap_or("img[src]"));
     }
 
     let mut source_img = dom::Selection::default();
@@ -1481,7 +1481,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://bestgirlsexy.com/category/china/imiss/page/7/",
+                "https://bestgirlsexy.com/category/china/imiss/page/11/",
             ]
             .into_iter()
             .for_each(|u| {
