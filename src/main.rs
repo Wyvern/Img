@@ -5,18 +5,6 @@ mod util;
 use dom_query::{self as dom, NodeIdProver};
 use {std::*, sync::atomic::*, util::*};
 
-static ATTR: &[&str] = &[
-    "data-src",
-    "data-lazy",
-    "data-lazy-src",
-    "data-original",
-    "data-url",
-    "href",
-    "file",
-    "zoomfile",
-    "src",
-    "style",
-];
 static SPINNER: AtomicBool = AtomicBool::new(false);
 static SEP: &str = " | ";
 static CSS: &[&str] = &["url(", "image(", "image-set("];
@@ -339,12 +327,18 @@ fn parse(addr: &str) -> String {
     } else {
         html_img = page.select(sel.unwrap_or("img[src]"));
     }
-
+    let attr = sel.map_or("src", |x| {
+        x.rsplit('[')
+            .next()
+            .iter()
+            .find_map(|x| x.split(']').next())
+            .unwrap_or("src")
+    });
     let mut source_img = dom::Selection::default();
     if img.is_none() {
-        html_img = html_img.add("image").add("input[type='image']");
+        html_img = html_img.add("input[type='image']");
         if unsafe { EMBED } {
-            html_img = html_img.add("svg");
+            html_img = html_img.add("svg").add("image");
         }
         source_img = page.select("source[srcset]");
     }
@@ -514,11 +508,20 @@ fn parse(addr: &str) -> String {
                     handle_embed(text.as_ref());
                     continue;
                 }
-                let value = ATTR.iter().find_map(|a| elm.attr(a));
+                let value = [
+                    "data-src",
+                    "data-lazy",
+                    "data-lazy-src",
+                    "data-original",
+                    "data-url",
+                    attr,
+                ]
+                .iter()
+                .find_map(|a| elm.attr(a));
 
                 match value {
                     Some(val) => {
-                        if sel.is_some_and(|x| x.ends_with("[style]")) {
+                        if attr == "style" {
                             let x = CSS
                                 .iter()
                                 .find_map(|&s| val.trim().split_once(s))
