@@ -12,9 +12,9 @@ static ATTR: &[&str] = &[
     "data-original",
     "data-url",
     "href",
-    "src",
     "file",
     "zoomfile",
+    "src",
     "style",
 ];
 static SPINNER: AtomicBool = AtomicBool::new(false);
