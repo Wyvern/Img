@@ -29,65 +29,61 @@ static mut INALBUM: bool = false;
 static mut SUB_DIR: bool = true;
 static mut EMBED: bool = false;
 
-fn main() {
-    use nanoargs::*;
-    let parser = ArgBuilder::new()
-        .name("img")
-        .version("1.0.0")
-        .description("<img> fetcher/cralwer across various web pages.")
-        .flag(
-            Flag::new("files")
-                .desc("Save files directly without create a folder.")
-                .short('f'),
-        )
-        .flag(
-            Flag::new("embed")
-                .desc("Save embed/inline <svg> and data:image as files.")
-                .short('e'),
-        )
-        .positional(Pos::new("urls").desc("- the url list of web page.").multi())
-        .option(
-            Opt::new("output")
-                .short('o')
-                .desc("Output dir where album folder stored in.")
-                .validate(Validator::with_hint("must be existed dir", |x| {
-                    let p = path::Path::new(x);
-                    if p.exists() && p.is_dir() {
-                        Ok(())
-                    } else {
-                        Err("Path must be an existed directory.".into())
-                    }
-                })),
-        )
-        .build()
-        .unwrap();
+#[derive(argh::FromArgs, Debug)]
+#[argh(
+    description = "<img> fetcher/cralwer across various web pages.",
+    name = "img",
+    example = "{command_name} url... -f -o dir -e"
+)]
+struct Args {
+    #[argh(
+        switch,
+        short = 'f',
+        description = "save files directly without create a folder."
+    )]
+    files: bool,
 
-    let args = match parser.parse_env() {
-        Ok(res) => extract!(res,
-            {
-            urls:Vec<String> as @pos,
-            output:Option<String>,
-            files:bool,
-            embed:bool
-            }
-        )
-        .unwrap(),
-        Err(ParseError::HelpRequested(text) | ParseError::VersionRequested(text)) => {
-            print!("{text}");
-            quit!("")
-        }
-        Err(e) => {
-            eprintln!("error: {e}");
-            quit!("")
-        }
-    };
+    #[argh(
+        switch,
+        short = 'e',
+        description = "save embed/inline <svg> and data:image as files."
+    )]
+    embed: bool,
+
+    #[argh(
+        option,
+        short = 'o',
+        from_str_fn(parse_output_dir),
+        description = "output dir where album folder stored in"
+    )]
+    output: Option<path::PathBuf>,
+
+    #[argh(positional, description = "list of urls to parse and download")]
+    urls: Vec<String>,
+}
+
+fn parse_output_dir(value: &str) -> Result<path::PathBuf, String> {
+    let p = path::PathBuf::from(value);
+    if p.exists() && p.is_dir() {
+        Ok(p)
+    } else {
+        Err("path must be an existing directory".into())
+    }
+}
+
+fn main() {
+    let args: Args = argh::from_env();
     if args.urls.is_empty() {
-        print!("{}", parser.help_text());
-        return;
+        quit!("Please input at least one url.");
     }
     if let Some(dir) = args.output {
-        env::set_current_dir(&dir)
-            .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
+        env::set_current_dir(&dir).unwrap_or_else(|x| {
+            quit!(
+                "Change working directory to {} failed: {} !",
+                dir.display(),
+                x
+            )
+        })
     }
 
     if args.files {
@@ -1617,7 +1613,7 @@ mod img {
                     .unwrap_or(x)
                     .rsplit(['[', ']'])
                     .nth(1)
-                    .dbg_pause();
+                    .dbg();
             });
     }
 }
