@@ -29,65 +29,61 @@ static mut INALBUM: bool = false;
 static mut SUB_DIR: bool = true;
 static mut EMBED: bool = false;
 
-fn main() {
-    use nanoargs::*;
-    let parser = ArgBuilder::new()
-        .name("img")
-        .version("1.0.0")
-        .description("<img> fetcher/cralwer across various web pages.")
-        .flag(
-            Flag::new("files")
-                .desc("Save files directly without create a folder.")
-                .short('f'),
-        )
-        .flag(
-            Flag::new("embed")
-                .desc("Save embed/inline <svg> and data:image as files.")
-                .short('e'),
-        )
-        .positional(Pos::new("urls").desc("- the url list of web page.").multi())
-        .option(
-            Opt::new("output")
-                .short('o')
-                .desc("Output dir where album folder stored in.")
-                .validate(Validator::with_hint("must be existed dir", |x| {
-                    let p = path::Path::new(x);
-                    if p.exists() && p.is_dir() {
-                        Ok(())
-                    } else {
-                        Err("Path must be an existed directory.".into())
-                    }
-                })),
-        )
-        .build()
-        .unwrap();
+#[derive(argh::FromArgs, Debug)]
+#[argh(
+    description = "<img> fetcher/cralwer across various web pages.",
+    name = "img",
+    example = "{command_name} url... -f -o dir -e"
+)]
+struct Args {
+    #[argh(
+        switch,
+        short = 'f',
+        description = "save files directly without create a folder."
+    )]
+    files: bool,
 
-    let args = match parser.parse_env() {
-        Ok(res) => extract!(res,
-            {
-            urls:Vec<String> as @pos,
-            output:Option<String>,
-            files:bool,
-            embed:bool
-            }
-        )
-        .unwrap(),
-        Err(ParseError::HelpRequested(text) | ParseError::VersionRequested(text)) => {
-            print!("{text}");
-            quit!("")
-        }
-        Err(e) => {
-            eprintln!("error: {e}");
-            quit!("")
-        }
-    };
+    #[argh(
+        switch,
+        short = 'e',
+        description = "save embed/inline <svg> and data:image as files."
+    )]
+    embed: bool,
+
+    #[argh(
+        option,
+        short = 'o',
+        from_str_fn(parse_output_dir),
+        description = "output dir where album folder stored in"
+    )]
+    output: Option<path::PathBuf>,
+
+    #[argh(positional, description = "list of urls to parse and download")]
+    urls: Vec<String>,
+}
+
+fn parse_output_dir(value: &str) -> Result<path::PathBuf, String> {
+    let p = path::PathBuf::from(value);
+    if p.exists() && p.is_dir() {
+        Ok(p)
+    } else {
+        Err("path must be an existing directory".into())
+    }
+}
+
+fn main() {
+    let args: Args = argh::from_env();
     if args.urls.is_empty() {
-        print!("{}", parser.help_text());
-        return;
+        quit!("Please input at least one url.");
     }
     if let Some(dir) = args.output {
-        env::set_current_dir(&dir)
-            .unwrap_or_else(|x| quit!("Change working directory to {} failed: {} !", &dir, x))
+        env::set_current_dir(&dir).unwrap_or_else(|x| {
+            quit!(
+                "Change working directory to {} failed: {} !",
+                dir.display(),
+                x
+            )
+        })
     }
 
     if args.files {
@@ -100,8 +96,8 @@ fn main() {
             EMBED = true;
         }
     }
-
-    for u in args.urls {
+    let urls = args.urls.into_iter().collect::<collections::HashSet<_>>();
+    for u in urls {
         let mut _next_page = parse(&u);
         #[cfg(not(test))]
         {
@@ -325,13 +321,12 @@ fn parse(addr: &str) -> String {
             }
         }
     } else {
-        html_img = page.select(sel.unwrap_or("img"));
+        html_img = page.select(sel.unwrap_or("img[src]"));
     }
-
-    let attr = sel.map_or("src", |i| {
-        i.split_whitespace()
-            .next_back()
-            .unwrap()
+    let attr = sel.map_or("src", |x| {
+        x.rsplit(' ')
+            .next()
+            .unwrap_or(x)
             .rsplit(['[', ']'])
             .nth(1)
             .unwrap_or("src")
@@ -339,12 +334,9 @@ fn parse(addr: &str) -> String {
 
     let mut source_img = dom::Selection::default();
     if img.is_none() {
-        html_img = html_img
-            .add("image")
-            .add("video[poster]")
-            .add("input[type='image']");
+        html_img = html_img.add("input[type='image']");
         if unsafe { EMBED } {
-            html_img = html_img.add("svg");
+            html_img = html_img.add("svg").add("image");
         }
         source_img = page.select("source[srcset]");
     }
@@ -373,7 +365,7 @@ fn parse(addr: &str) -> String {
                     .nth(1)
                     .unwrap()
                     .split(',')
-                    .max_by_key(|&seg| seg.trim().len())
+                    .max_by_key(|&seg| seg.trim().chars().count())
                     .unwrap()
                     .into()
             } else {
@@ -403,7 +395,7 @@ fn parse(addr: &str) -> String {
         title
             .rsplitn(5, ['/', '-', '_', '|', '–'])
             .skip(1)
-            .max_by_key(|x| x.trim().len())
+            .max_by_key(|x| x.trim().chars().count())
             .unwrap_or(&title)
     }
     .trim();
@@ -520,11 +512,9 @@ fn parse(addr: &str) -> String {
                     "data-lazy-src",
                     "data-original",
                     "data-url",
-                    "poster",
-                    "href",
                     attr,
                 ]
-                .into_iter()
+                .iter()
                 .find_map(|a| elm.attr(a));
 
                 match value {
@@ -673,7 +663,7 @@ fn parse(addr: &str) -> String {
                                 quit!("Album title text is empty.")
                             } else {
                                 t.lines()
-                                    .max_by_key(|l| l.trim().len())
+                                    .max_by_key(|l| l.trim().chars().count())
                                     .unwrap()
                                     .trim()
                                     .into()
@@ -768,7 +758,7 @@ fn parse(addr: &str) -> String {
                 }
             }
         }
-        (false, false) => (),
+        _ => (),
     }
 
     if has_album && imgs_len == 0 {
@@ -1057,13 +1047,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     let mut next_link = dom::Document::default().text();
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
-    let attr = nxt
-        .split_whitespace()
-        .next_back()
-        .unwrap()
-        .rsplit(['[', ']'])
-        .nth(1)
-        .unwrap_or("href");
+    let attr = "href";
     let set_next = |tags: &[dom::NodeRef]| {
         let tag = tags.iter().find(|e| {
             e.node_name().is_some_and(|n| n.as_ref() == "a")
@@ -1498,7 +1482,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://bestgirlsexy.com/category/china/imiss/page/2/",
+                "https://bestgirlsexy.com/category/china/imiss/page/11/",
             ]
             .into_iter()
             .for_each(|u| {
@@ -1550,11 +1534,9 @@ mod img {
         let mut dup_site = vec![];
         let mut img_sel = collections::HashMap::new();
 
-        JSON.get_or_init(website)
-            .as_object()
-            .expect("`web.json` file parse error!")["Sites"]
+        JSON.get_or_init(website)["Sites"]
             .as_array()
-            .expect("Parse `Sites` in `web.json` key error!")
+            .unwrap()
             .iter()
             .for_each(|s| {
                 if let Some(v) = s["Site"].as_str() {
@@ -1618,5 +1600,20 @@ mod img {
     fn embed() {
         let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
         save_to_file(data);
+    }
+
+    #[test]
+    fn get_attr() {
+        ["tag", "tag[attr]", "tag[attr3] > tag[attr][attr2] "]
+            .iter()
+            .for_each(|x| {
+                x.trim()
+                    .rsplit(' ')
+                    .next()
+                    .unwrap_or(x)
+                    .rsplit(['[', ']'])
+                    .nth(1)
+                    .dbg();
+            });
     }
 }

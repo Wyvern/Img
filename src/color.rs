@@ -128,110 +128,97 @@ impl fmt::Debug for Color {
     }
 }
 
+#[derive(argh::FromArgs, Debug)]
+#[argh(
+    description = "color example app",
+    name = "color",
+    example = "{command_name} rgb 12 34 56"
+)]
+struct Args {
+    #[argh(subcommand)]
+    cmd: Option<Command>,
+}
+
+#[derive(argh::FromArgs, Debug)]
+#[argh(subcommand)]
+enum Command {
+    Fg(FgCmd),
+    Bg(BgCmd),
+    Rgb(RgbCmd),
+}
+
+#[derive(argh::FromArgs, Debug)]
+#[argh(subcommand, name = "fg", description = "foreground color")]
+struct FgCmd {
+    #[argh(positional)]
+    color: Option<u8>,
+}
+
+#[derive(argh::FromArgs, Debug)]
+#[argh(subcommand, name = "bg", description = "background color")]
+struct BgCmd {
+    #[argh(positional)]
+    color: Option<u8>,
+}
+
+#[derive(argh::FromArgs, Debug)]
+#[argh(subcommand, name = "rgb", description = "r g b 24-bit full color mode")]
+struct RgbCmd {
+    #[argh(positional)]
+    rgb: Vec<String>,
+}
+
 fn main() {
-    use nanoargs::*;
-    let parser = ArgBuilder::new()
-        .name("color")
-        .version("1.0.0")
-        .description("show various colors in terminal.")
-        .subcommand(
-            "fg",
-            "- [value] Foreground color",
-            ArgBuilder::new()
-                .positional(Pos::new("color").validate(range(0, 255)))
-                .build()
-                .unwrap(),
-        )
-        .subcommand(
-            "bg",
-            "- [value] Background color",
-            ArgBuilder::new()
-                .positional(Pos::new("color").validate(range(0, 255)))
-                .build()
-                .unwrap(),
-        )
-        .subcommand(
-            "rgb",
-            "- r g b 24-bit full color mode",
-            ArgBuilder::new()
-                .positional(Pos::new("code").multi())
-                .build()
-                .unwrap(),
-        )
-        .build()
-        .unwrap();
-
-    match parser.parse_env() {
-        Ok(res) => match res.subcommand() {
-            fb @ Some("fg" | "bg") => {
-                let r = res.subcommand_result().unwrap();
-                let pos = r.get_positionals();
-                if pos.is_empty() {
-                    (0u8..=255).for_each(|c| {
-                        println!(
-                            "{:?}",
-                            if let Some("fg") = fb {
-                                Color::FG(c)
-                            } else {
-                                Color::BG(c)
-                            }
-                        )
-                    });
-                } else {
-                    println!(
-                        "{:?}",
-                        if let Some("fg") = fb {
-                            Color::FG(pos[0].parse::<u8>().unwrap())
-                        } else {
-                            Color::BG(pos[0].parse::<u8>().unwrap())
-                        }
-                    );
-                }
-            }
-            Some("rgb") => {
-                let r = res.subcommand_result().unwrap();
-                let rgb = r.get_positionals();
-                if rgb.len() != 3 {
-                    print!("{}", parser.help_text());
-                    process::exit(0);
-                }
-                let mut rgb = rgb.iter().map(|c| {
-                    c.parse::<u8>()
-                        .or_else(|_| u8::from_str_radix(c.trim_start_matches("0x"), 16))
-                });
-
-                if let [Ok(r), Ok(g), Ok(b)] = [
-                    rgb.next().unwrap(),
-                    rgb.next().unwrap(),
-                    rgb.next().unwrap(),
-                ] {
-                    println!("{:?}", Color::RGBfg(r, g, b));
-                    println!("{:?}", Color::RGBbg(r, g, b));
-                } else {
-                    println!("r, g, b should be in range of [0..255] / 0x[00..ff]");
-                }
-            }
-            _ => {}
-        },
-        Err(ParseError::HelpRequested(text) | ParseError::VersionRequested(text)) => {
-            print!("{text}");
-        }
-        Err(ParseError::NoSubcommand(_)) => color8(),
-        Err(ParseError::UnknownSubcommand(x)) => {
-            let c = x
-                .parse::<u8>()
-                .or_else(|_| u8::from_str_radix(x.trim_start_matches("0x"), 16));
-            if let Ok(v) = c {
-                println!("{:?}", Color::FG(v));
-                println!("{:?}", Color::BG(v));
+    let args: Args = argh::from_env();
+    match args.cmd {
+        Some(Command::Fg(cmd)) => {
+            if let Some(c) = cmd.color {
+                println!("{:?}", Color::FG(c));
             } else {
-                print!("{}", parser.help_text());
+                (0u8..=255).for_each(|c| {
+                    println!("{:?}", Color::FG(c));
+                });
             }
         }
-        Err(e) => {
-            eprintln!("error: {e}");
+
+        Some(Command::Bg(cmd)) => {
+            if let Some(c) = cmd.color {
+                println!("{:?}", Color::BG(c));
+            } else {
+                (0u8..=255).for_each(|c| {
+                    println!("{:?}", Color::BG(c));
+                });
+            }
         }
-    };
+
+        Some(Command::Rgb(cmd)) => {
+            if cmd.rgb.len() != 3 {
+                eprintln!("rgb requires exactly 3 values");
+                process::exit(1);
+            }
+            fn parse_u8(x: &str) -> Result<u8, std::num::ParseIntError> {
+                x.parse::<u8>()
+                    .or_else(|_| u8::from_str_radix(x.trim_start_matches("0x"), 16))
+            }
+            let mut rgb = cmd.rgb.iter().map(|x| parse_u8(x));
+
+            if let [Ok(r), Ok(g), Ok(b)] = [
+                rgb.next().unwrap(),
+                rgb.next().unwrap(),
+                rgb.next().unwrap(),
+            ] {
+                println!("{:?}", Color::RGBfg(r, g, b));
+                println!("{:?}", Color::RGBbg(r, g, b));
+            } else {
+                eprintln!("r, g, b should be in range [0..255] or 0x00..0xff");
+                process::exit(1);
+            }
+        }
+
+        None => {
+            color8();
+        }
+    }
 }
 
 #[cfg(test)]
