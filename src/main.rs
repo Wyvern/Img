@@ -328,12 +328,14 @@ fn parse(addr: &str) -> String {
         html_img = page.select(sel.unwrap_or("img[src]"));
     }
     let attr = sel.map_or("src", |x| {
-        x.rsplit('[')
+        x.rsplit(' ')
             .next()
-            .iter()
-            .find_map(|x| x.split(']').next())
+            .unwrap_or(x)
+            .rsplit_once('[')
+            .and_then(|(_, s)| s.split(']').next())
             .unwrap_or("src")
     });
+
     let mut source_img = dom::Selection::default();
     if img.is_none() {
         html_img = html_img.add("input[type='image']");
