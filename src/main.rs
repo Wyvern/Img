@@ -331,8 +331,8 @@ fn parse(addr: &str) -> String {
         x.rsplit(' ')
             .next()
             .unwrap_or(x)
-            .rsplit_once('[')
-            .and_then(|(_, s)| s.split(']').next())
+            .rsplit(['[', ']'])
+            .nth(1)
             .unwrap_or("src")
     });
 
@@ -1604,5 +1604,20 @@ mod img {
     fn embed() {
         let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
         save_to_file(data);
+    }
+
+    #[test]
+    fn get_attr() {
+        ["tag", "tag[attr]", "tag[attr3] > tag[attr][attr2] "]
+            .iter()
+            .for_each(|x| {
+                x.trim()
+                    .rsplit(' ')
+                    .next()
+                    .unwrap_or(x)
+                    .rsplit(['[', ']'])
+                    .nth(1)
+                    .dbg_pause();
+            });
     }
 }
