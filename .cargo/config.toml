@@ -262,6 +262,7 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros=y",
   "-Zoffload=Device",
+  "-Zassumptions-on-binders",
   # "-Zllvm-writable",
   # "-Zbuild-sdylib-interface",
 
