@@ -34,18 +34,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Android NDK cache
-        uses: actions/cache@v5
-        with:
-          path: /home/runner/android-ndk-r29
-          key: android-ndk-r29
-          restore-keys: android-ndk-r29
-
-      - name: Setup OpenHarmony SDK
-        uses: openharmony-rs/setup-ohos-sdk@main
-        with:
-          version: "6.1"
-
       - name: Cache openwrt
         uses: actions/cache@v5
         with:
@@ -69,23 +57,6 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy
-
-      - name: Android and OHOS NDK
-        run: |
-          ver=r29
-          export ANDROID_NDK_HOME=~/android-ndk-$ver
-          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
-
-          if [ ! -d ~/android-ndk-${ver} ]; then
-            mkdir -p ~/android-ndk-${ver}
-            echo "Downloading Android NDK..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ver}-linux.zip
-            echo "Unzipping Android NDK..."
-            unzip -q android-ndk-${ver}-linux.zip -d ~/
-          fi
-
-          ln -sf $OHOS_SDK_NATIVE/llvm ohos
-          ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
       - name: Toolchain downloads
         run: |
@@ -139,14 +110,6 @@ jobs:
             mipsel-unknown-linux-uclibc
             armv7-unknown-linux-uclibceabihf
             mips64-openwrt-linux-musl
-            aarch64-unknown-linux-ohos
-            armv7-unknown-linux-ohos
-            x86_64-unknown-linux-ohos
-            riscv64-linux-android
-            aarch64-linux-android
-            armv7-linux-androideabi
-            thumbv7neon-linux-androideabi
-            x86_64-linux-android
             powerpc64-unknown-linux-gnu
             ./powerpc64-unknown-linux-musl-elfv1.json
           )
@@ -183,18 +146,10 @@ jobs:
                   mipsel-unknown-linux-gnu
                   mips-unknown-linux-gnu
                   armv7-unknown-linux-uclibceabihf
-                  riscv64-linux-android
-                  aarch64-linux-android
-                  armv7-linux-androideabi
-                  thumbv7neon-linux-androideabi
-                  x86_64-linux-android
                   powerpc64-unknown-linux-gnu
                   powerpc64-unknown-linux-musl-elfv1
                   powerpc-unknown-linux-gnu
                   powerpc-unknown-linux-musl
-                  aarch64-unknown-linux-ohos
-                  armv7-unknown-linux-ohos
-                  x86_64-unknown-linux-ohos
                   mips64-openwrt-linux-musl
           )
           for target in "${targets[@]}"; do
