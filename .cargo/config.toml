@@ -356,6 +356,12 @@ linker = "powerpc64le-linux-gnu-gcc"
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
 linker = "powerpc64-linux-gnu-gcc"
 
+[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little"))']
+linker = "powerpcle-linux-gnu-gcc"
+
+[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "big"))']
+linker = "powerpc-linux-gnu-gcc"
+
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
 
@@ -370,6 +376,12 @@ linker = "mips64-linux-gnuabi64-gcc"
 
 [target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "little"))']
 linker = "mips64el-linux-gnuabi64-gcc"
+
+[target.'cfg(all(target_arch="mips",target_os="linux",target_endian = "big"))']
+linker = "mips-linux-gnu-gcc"
+
+[target.'cfg(all(target_arch="mips",target_os="linux",target_endian = "little"))']
+linker = "mipsel-linux-gnu-gcc"
 
 [target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6"),target_os="linux"))']
 rustflags = ["-Clink-arg=-Wl,-z,execstack"]
@@ -621,36 +633,6 @@ rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Crelocation-model=static"]
 [target.sparc64-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=sparc64-netbsd", "-Crelocation-model=static"]
-
-[target.mipsel-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=mipsel-linux-gnueabihf"]
-
-[target.mipsel-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = [
-  "-Clink-arg=--target=mipsel-linux-musleabihf",
-  "-Ctarget-feature=-soft-float",
-]
-
-[target.mips-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=mips-linux-gnueabihf"]
-
-[target.mips-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = [
-  "-Clink-arg=--target=mips-linux-musleabihf",
-  "-Ctarget-feature=-soft-float",
-]
-
-[target.powerpc-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-linux-gnueabihf"]
-
-[target.powerpc-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-linux-musleabihf"]
 
 [target.armv7-unknown-linux-uclibceabihf]
 linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"

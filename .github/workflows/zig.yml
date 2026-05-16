@@ -45,7 +45,7 @@ jobs:
       - name: Zig toolchain install
         uses: mlugg/setup-zig@v2
         with:
-          version: 0.16.0
+          version: master
 
       - name: Build Release
         run: |
@@ -55,14 +55,9 @@ jobs:
           # hexagon-unknown-linux-musl
           # cargo s sparc64-unknown-netbsd
           # cargo s sparc64-unknown-openbsd
+          # exit
 
           targets=(
-            powerpc-unknown-linux-gnu
-            powerpc-unknown-linux-musl
-            mipsel-unknown-linux-gnu
-            mipsel-unknown-linux-musl
-            mips-unknown-linux-gnu
-            mips-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd
