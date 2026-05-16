@@ -383,6 +383,9 @@ linker = "mips-linux-gnu-gcc"
 [target.'cfg(all(target_arch="mips",target_os="linux",target_endian = "little"))']
 linker = "mipsel-linux-gnu-gcc"
 
+[target.'cfg(all(target_arch="mips",target_os="linux",target_env="musl"))']
+rustflags = ["-Ctarget-feature=-soft-float"]
+
 [target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6"),target_os="linux"))']
 rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 

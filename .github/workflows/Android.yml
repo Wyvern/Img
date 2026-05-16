@@ -1,0 +1,138 @@
+name: Android
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Ubuntu-24.04
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Android NDK cache
+        uses: actions/cache@v5
+        with:
+          path: /home/runner/android-ndk-r29
+          key: android-ndk-r29
+          restore-keys: android-ndk-r29
+
+      - name: Setup OpenHarmony SDK
+        uses: openharmony-rs/setup-ohos-sdk@main
+        with:
+          version: "6.1"
+
+      - name: Android and OHOS NDK
+        run: |
+          ver=r29
+          export ANDROID_NDK_HOME=~/android-ndk-$ver
+          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
+
+          if [ ! -d ~/android-ndk-${ver} ]; then
+            mkdir -p ~/android-ndk-${ver}
+            echo "Downloading Android NDK..."
+            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ver}-linux.zip
+            echo "Unzipping Android NDK..."
+            unzip -q android-ndk-${ver}-linux.zip -d ~/
+          fi
+
+          ln -sf $OHOS_SDK_NATIVE/llvm ohos
+          ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+            aarch64-unknown-linux-ohos
+            armv7-unknown-linux-ohos
+            x86_64-unknown-linux-ohos
+            riscv64-linux-android
+            aarch64-linux-android
+            armv7-linux-androideabi
+            thumbv7neon-linux-androideabi
+            x86_64-linux-android
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  riscv64-linux-android
+                  aarch64-linux-android
+                  armv7-linux-androideabi
+                  thumbv7neon-linux-androideabi
+                  x86_64-linux-android
+                  aarch64-unknown-linux-ohos
+                  armv7-unknown-linux-ohos
+                  x86_64-unknown-linux-ohos
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$vendor" == "openwrt" ]]; then
+                    name="${vendor^}-${arch}-${abi}"
+                else
+                    if [[ "$abi" == "ohos" ]]; then
+                        name="Android-${arch}-${abi}"
+                    else
+                        name="${os^}-${arch}-${abi}"
+                    fi
+                fi
+            else
+                if [[ "$os" == "androideabi" ]]; then
+                    name="Android-${arch}"
+                else
+                    name="${os^}-${arch}"
+                fi
+            fi
+
+            echo "Uploading $name..."
+            mv target/$target/src/img target/$target/src/$name || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
