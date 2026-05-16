@@ -631,7 +631,6 @@ linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--target=mipsel-linux-musleabihf",
   "-Ctarget-feature=-soft-float",
-  "-Clink-arg=-lc"
 ]
 
 [target.mips-unknown-linux-gnu]
@@ -643,7 +642,6 @@ linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--target=mips-linux-musleabihf",
   "-Ctarget-feature=-soft-float",
-  "-Clink-arg=-lc"
 ]
 
 [target.powerpc-unknown-linux-gnu]
