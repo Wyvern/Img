@@ -45,7 +45,7 @@ jobs:
       - name: Zig toolchain install
         uses: mlugg/setup-zig@v2
         with:
-          version: 0.16
+          version: 0.16.0
 
       - name: Build Release
         run: |
