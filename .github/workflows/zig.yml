@@ -55,8 +55,8 @@ jobs:
           # hexagon-unknown-linux-musl
           # cargo s sparc64-unknown-netbsd
           # cargo s sparc64-unknown-openbsd
-          cargo s x86_64-unknown-illumos
-          exit
+          # cargo s x86_64-unknown-illumos
+          # exit
 
           targets=(
             aarch64_be-unknown-linux-gnu

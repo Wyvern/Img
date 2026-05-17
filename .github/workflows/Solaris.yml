@@ -54,7 +54,7 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           # sudo apt-get update && sudo apt install -y libguestfs-tools
-          # sudo apt install -y zfsutils-linux
+          sudo apt install -y zfsutils-linux
 
       - name: Install LLVM
         run: |
@@ -70,25 +70,33 @@ jobs:
       #     key: Illomos-${{ runner.os }}-${{ runner.arch }}
       #     restore-keys: Illomos-${{ runner.os }}-${{ runner.arch }}
 
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
+
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          # mkdir -p /home/runner/Illumos
-          # ln -sfn /home/runner/Illumos Illumos
+          mkdir -p /home/runner/Illumos
+          ln -sfn /home/runner/Illumos Illumos
 
-          # if [ ! -f Illumos/omnios-r151058.zfs ]; then
-          #   mkdir -p Illumos/omnios
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151058.zfs.xz | xz -d > Illumos/omnios-r151058.zfs
-          # fi
+          if [ ! -f Illumos/omnios-r151058.zfs ]; then
+            mkdir -p Illumos/omnios
+            curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151058.zfs.xz | xz -d > Illumos/omnios-r151058.zfs
+          fi
 
-          # sudo truncate -s 1G /tmp/omnios.img
-          # sudo zpool create -f solaris /tmp/omnios.img
-          # sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151058.zfs
+          sudo truncate -s 1G /tmp/omnios.img
+          sudo zpool create -f solaris /tmp/omnios.img
+          sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151058.zfs
 
-          # zpool status
-          # zfs list
+          zpool status
+          zfs list
+
+          cargo s x86_64-unknown-illumos
+          exit
 
           if [ ! -d /home/runner/Fuchsia ]; then
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
