@@ -652,6 +652,8 @@ rustflags = [
 linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--target=x86_64-illumos",
+  "-Clink-arg=-nostdlib",
+    "-Clink-arg=-lc",
   "-Clink-arg=--sysroot=Illumos/omnios",
   "-Clink-arg=-LIllumos/omnios/usr/lib/amd64",
   "-Clink-arg=-LIllumos/omnios/lib/amd64",
