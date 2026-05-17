@@ -96,7 +96,7 @@ jobs:
           zfs list
 
           ln -sf /home/runner/Illumos/omnios illumos
-          ls -al illumos
+          ls -al illumos/*
 
           cargo s x86_64-unknown-illumos
           exit
