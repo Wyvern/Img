@@ -81,11 +81,10 @@ jobs:
           set +e -x
 
           # mkdir -p /home/runner/Illumos
-          # ln -sfn /home/runner/Illumos Illumos
 
           # if [ ! -f Illumos/omnios-r151058.zfs ]; then
-          #   mkdir -p Illumos/omnios
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151058.zfs.xz | xz -d > Illumos/omnios-r151058.zfs
+          #   mkdir -p /home/runner/Illumos/omnios
+          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151058.zfs.xz | xz -d > /home/runner/Illumos/omnios-r151058.zfs
           # fi
 
           # sudo truncate -s 1G /tmp/omnios.img
@@ -179,8 +178,6 @@ jobs:
             riscv64gc-unknown-fuchsia
             x86_64-unknown-fuchsia
             x86_64-fortanix-unknown-sgx
-            x86_64-pc-solaris
-            sparcv9-sun-solaris
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
