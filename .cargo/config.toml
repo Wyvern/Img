@@ -656,3 +656,7 @@ rustflags = [
   "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
   "-Ctarget-feature=-soft-float",
 ]
+
+[target.x86_64-unknown-illumos]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=x86_64-illumos"]
