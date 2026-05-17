@@ -95,6 +95,7 @@ jobs:
           zpool status
           zfs list
 
+          ls -al /home/runner/Illumos/omnios
           cargo s x86_64-unknown-illumos
           exit
 
