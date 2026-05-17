@@ -648,13 +648,11 @@ rustflags = [
   "-Ctarget-feature=-soft-float",
 ]
 
-[target.x86_64-unknown-illumos]
-linker = "./zig-cc.sh"
-rustflags = [
-  "-Clink-arg=--target=x86_64-illumos",
-  "-Clink-arg=-nostdlib",
-  "-Clink-arg=-lc",
-  "-Clink-arg=--sysroot=illumos/",
-  "-Clink-arg=-Lillumos/usr/lib/amd64",
-  "-Clink-arg=-Lillumos/lib/amd64",
-]
+# [target.x86_64-unknown-illumos]
+# linker = "./zig-cc.sh"
+# rustflags = [
+#   "-Clink-arg=--target=x86_64-illumos",
+#   "-Clink-arg=--sysroot=illumos/",
+#   "-Clink-arg=-Lillumos/usr/lib/amd64",
+#   "-Clink-arg=-Lillumos/lib/amd64",
+# ]

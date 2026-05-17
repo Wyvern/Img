@@ -22,8 +22,6 @@ for a in "$@"; do
       ;;
     -Wl,-z,pack-relative-relocs)
       ;;
-    -Wl,-z,ignore)
-      ;;
     *)
       filtered+=("$a")
       ;;
