@@ -1483,7 +1483,8 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://bisipic.online",
-                "https://bestgirlsexy.com/category/china/imiss/page/11/",
+                "https://bestgirlsexy.com/category/china/imiss/page/17/",
+                "https://bisipic.online/forum.php?mod=forumdisplay&fid=2&typeid=20&typeid=20&filter=typeid&page=17"
             ]
             .into_iter()
             .for_each(|u| {

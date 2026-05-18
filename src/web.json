@@ -1,6 +1,12 @@
 {
   "Sites": [
     {
+      "Site": "xiurenbox.com",
+      "Img": "div.entry-content > figure > img",
+      "Next": "div.page-click-zone > a[aria-label='下一页']",
+      "Album": "h2.info-title > a"
+    },
+    {
       "Site": "jkforum.net",
       "Page": "https://jkforum.net/api/jkf-forum/v1/ArticleThread/{/thread-}",
       "Img": "json: pointer | /content/content -> https://jkforum.net/attachment/{?}",
@@ -264,7 +270,7 @@
       "Site": "taotu.org",
       "Img": "div.piclist > a[href]",
       "Album": "div.piclist > div img",
-      "Page": "div#MainContent_HeaderPrev > a:contains('<<')"
+      "Page": "div#MainContent_HeaderNext > a:contains('>>')"
     },
     {
       "Site": "xiurenwang.me",

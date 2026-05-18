@@ -13,7 +13,7 @@ test = false
 argh = "*"
 base64 = { version = "*", default-features = false }
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
-dom_query = { git = "https://github.com/niklak/dom_query.git", branch = "main", default-features = false }
+dom_query = { version = "*", default-features = false }
 fastrand = "*"
 percent-encoding = "*"
 serde_json = "*"
