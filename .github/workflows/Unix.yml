@@ -76,12 +76,12 @@ jobs:
           done
 
           openbsd=(amd64 arm64 riscv64 powerpc64)
-          files=(base78 comp78)
+          files=(base79 comp79)
           for arch in "${openbsd[@]}"; do
             if [ ! -d sysroot/openbsd/$arch ]; then
               mkdir -p sysroot/openbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.8/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.9/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
               done
             fi
           done
