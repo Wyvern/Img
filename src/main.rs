@@ -2,7 +2,7 @@
 use hermit as _;
 
 mod util;
-use dom_query::{self as dom, NodeIdProver};
+use dom_query::{self as dom, NodeRef};
 use {std::*, sync::atomic::*, util::*};
 
 static SPINNER: AtomicBool = AtomicBool::new(false);
@@ -1049,22 +1049,6 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
     let attr = "href";
-    let set_next = |tags: &[dom::NodeRef]| {
-        let tag = tags.iter().find(|e| {
-            e.node_name().is_some_and(|n| n.as_ref() == "a")
-                || e.children()
-                    .iter()
-                    .find_map(|c| c.node_name())
-                    .is_some_and(|n| n.as_ref() == "a")
-        });
-
-        tag.filter(|e| !e.is_empty_element())
-            .and_then(|e| {
-                e.attr("href")
-                    .or_else(|| e.children().iter().find_map(|c| c.attr("href")))
-            })
-            .unwrap_or_default()
-    };
 
     let mut nexts = page.select(nxt).nodes().to_vec();
     nexts.sort_by_key(|x| x.attr(attr));
@@ -1076,13 +1060,30 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         let element = nexts[0];
         if element.node_name().is_some_and(|n| n.as_ref() == "span") || element.attr(attr).is_none()
         {
-            let items = element.parent().unwrap().children();
-            let tags = items
-                .split(|e| (&element).node_id() == e.node_id())
-                .next_back()
-                .unwrap();
-            if !tags.is_empty() {
-                next_link = set_next(tags);
+            let mut ne = element.next_element_sibling();
+            let mut set_next = |e: NodeRef| {
+                if e.node_name().unwrap().as_ref() == "a" {
+                    next_link = e.attr(attr).unwrap();
+                } else {
+                    if let Some(c) = e.first_element_child()
+                        && c.node_name().unwrap().as_ref() == "a"
+                    {
+                        next_link = c.attr(attr).unwrap();
+                    }
+                }
+            };
+            if let Some(e) = ne {
+                set_next(e);
+            } else {
+                ne = element
+                    .parent()
+                    .unwrap()
+                    .next_element_sibling()
+                    .unwrap()
+                    .first_element_child();
+                if let Some(e) = ne {
+                    set_next(e);
+                }
             }
         } else if element.node_name().is_some_and(|n| n.as_ref() == "i") {
             next_link = element.parent().unwrap().attr(attr).unwrap();

@@ -1,6 +1,12 @@
 {
   "Sites": [
     {
+      "Site": "tv-ku.com",
+      "Img": "div.text-center > img",
+      "Next": "ul.pagination span",
+      "Album": "h6.title > a"
+    },
+    {
       "Site": "xiurenbox.com",
       "Img": "div.entry-content > figure > img",
       "Next": "div.page-click-zone > a[aria-label='下一页']",
@@ -770,6 +776,7 @@
     ["深度学堂", "div.logo-wrapper > a[href] > img[alt='深度学堂']", "sdxt.de"],
     ["V2PH,", "a.logo > img[alt='V2PH']", "v2ph.com"],
     ["Leg Baby", "div.navbar-header > a.navbar-brand", "legbabe.com"],
+    ["Sex Bee", "header#site-header a.logo", "tv-ku.com"],
     [
       "Girl-Atlas",
       "div.container-xxl > a.navbar-brand > img",
