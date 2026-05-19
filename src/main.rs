@@ -1061,7 +1061,17 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
         if element.node_name().is_some_and(|n| n.as_ref() == "span") || element.attr(attr).is_none()
         {
             let mut ne = element.next_element_sibling();
-            let mut set_next = |e: NodeRef| {
+            let mut set_next = |mut e: NodeRef| {
+                while !(e.node_name().unwrap().as_ref() == "a"
+                    || e.first_element_child()
+                        .is_some_and(|f| f.node_name().unwrap().as_ref() == "a"))
+                {
+                    if let Some(n) = e.next_element_sibling() {
+                        e = n;
+                    } else {
+                        break;
+                    }
+                }
                 if e.node_name().unwrap().as_ref() == "a" {
                     next_link = e.attr(attr).unwrap();
                 } else {
