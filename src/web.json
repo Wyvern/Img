@@ -1,6 +1,18 @@
 {
   "Sites": [
     {
+      "Site": "tv-ku.com",
+      "Img": "div.text-center > img",
+      "Next": "ul.pagination span",
+      "Album": "h6.title > a"
+    },
+    {
+      "Site": "xiurenbox.com",
+      "Img": "div.entry-content > figure > img",
+      "Next": "div.page-click-zone > a[aria-label='下一页']",
+      "Album": "h2.info-title > a"
+    },
+    {
       "Site": "jkforum.net",
       "Page": "https://jkforum.net/api/jkf-forum/v1/ArticleThread/{/thread-}",
       "Img": "json: pointer | /content/content -> https://jkforum.net/attachment/{?}",
@@ -264,7 +276,7 @@
       "Site": "taotu.org",
       "Img": "div.piclist > a[href]",
       "Album": "div.piclist > div img",
-      "Page": "div#MainContent_HeaderPrev > a:contains('<<')"
+      "Page": "div#MainContent_HeaderNext > a:contains('>>')"
     },
     {
       "Site": "xiurenwang.me",
@@ -764,6 +776,7 @@
     ["深度学堂", "div.logo-wrapper > a[href] > img[alt='深度学堂']", "sdxt.de"],
     ["V2PH,", "a.logo > img[alt='V2PH']", "v2ph.com"],
     ["Leg Baby", "div.navbar-header > a.navbar-brand", "legbabe.com"],
+    ["Sex Bee", "header#site-header a.logo", "tv-ku.com"],
     [
       "Girl-Atlas",
       "div.container-xxl > a.navbar-brand > img",
