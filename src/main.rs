@@ -1180,7 +1180,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             },
         );
     }
-
+    if ret.as_str() < cur {
+        tdbg!(cur, ret);
+        ret = String::default();
+    }
     tdbg!(ret)
 }
 
