@@ -1180,7 +1180,7 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             },
         );
     }
-    if ret.as_str() < cur {
+    if alphanumeric_sort::compare_str(ret.as_str(), cur).is_lt() {
         tdbg!(cur, ret);
         ret = String::default();
     }

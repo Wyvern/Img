@@ -10,6 +10,7 @@ test = false
 # required-features = ["color"]
 
 [dependencies]
+alphanumeric-sort = "*"
 argh = "*"
 base64 = { version = "*", default-features = false }
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
