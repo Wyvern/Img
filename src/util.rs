@@ -80,8 +80,8 @@ mod macros {
     macro_rules! tdbg {
         ($($e:expr),*) => {
             cfg_select! {
-                any(test,debug_assertions)=>dbg!(($($e),*)),
-                _=>($($e),*)
+                any(test,debug_assertions)=>{dbg!(($($e),*))}
+                _=>{($($e),*)}
             }
         };
         ($($e:expr),*;) => {
@@ -92,8 +92,8 @@ mod macros {
                         let r = dbg!(($($e),*));
                         pause();
                         r
-                    },
-                    _=>($($e),*)
+                    }
+                    _=>{($($e),*)}
                 }
             }
         }
