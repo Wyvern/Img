@@ -81,7 +81,7 @@ mod macros {
         ($($e:expr),*) => {
             cfg_select! {
                 any(test,debug_assertions)=>{dbg!(($($e),*))}
-                _=>{($($e),*)}
+                _=>{#[allow(unused)]($($e),*)}
             }
         };
         ($($e:expr),*;) => {
@@ -93,7 +93,7 @@ mod macros {
                         pause();
                         r
                     }
-                    _=>{($($e),*)}
+                    _=>{#[allow(unused)]($($e),*)}
                 }
             }
         }
