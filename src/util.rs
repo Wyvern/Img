@@ -86,13 +86,15 @@ mod macros {
         };
         ($($e:expr),*;) => {
             {
-                #[cfg(any(test,debug_assertions))] {
-                    let _l = io::stdout().lock();
-                    let r = dbg!(($($e),*));
-                    pause();
-                    r
+                cfg_select! {
+                    any(test,debug_assertions)=>{
+                        let _l = io::stdout().lock();
+                        let r = dbg!(($($e),*));
+                        pause();
+                        r
+                    },
+                    _=>($($e),*)
                 }
-               #[cfg(not(any(test,debug_assertions)))] {($($e),*)}
             }
         }
     }
