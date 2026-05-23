@@ -773,7 +773,7 @@ fn parse(addr: &str) -> String {
             page_sel.map_or_else(<_>::default, |p| {
                 if !query && albums.is_none_or(|a| a.is_empty()) && unsafe { !INALBUM } {
                     pause();
-                    check_next(p, addr, &page)
+                    check_next(p, addr, &page, false)
                 } else {
                     String::default()
                 }
@@ -799,7 +799,7 @@ fn parse(addr: &str) -> String {
                     tdbg!(next_page)
                 }
             } else {
-                check_next(n, addr, &page)
+                check_next(n, addr, &page, true)
             }
         },
     )
@@ -1044,7 +1044,7 @@ fn magic_number_type(pb: path::PathBuf) {
 }
 
 /// Check `next` selector link page info
-fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
+fn check_next(next: &str, cur: &str, page: &dom::Document, album: bool) -> String {
     let mut next_link = dom::Document::default().text();
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
@@ -1180,7 +1180,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document) -> String {
             },
         );
     }
-
+    if album && !ret.is_empty() && alphanumeric_sort::compare_str(ret.as_str(), cur).is_lt() {
+        tdbg!(cur, ret);
+        ret = String::default();
+    }
     tdbg!(ret)
 }
 

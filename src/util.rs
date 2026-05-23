@@ -79,17 +79,21 @@ mod macros {
     #[macro_export]
     macro_rules! tdbg {
         ($($e:expr),*) => {
-            if cfg!(test) || cfg!(debug_assertions) {
-                dbg!(($($e),*))
-            } else {($($e),*)}
+            cfg_select! {
+                any(test,debug_assertions)=>dbg!(($($e),*)),
+                _=>($($e),*)
+            }
         };
         ($($e:expr),*;) => {
-            if cfg!(test) || cfg!(debug_assertions) {
-                let _l = io::stdout().lock();
-                let r = dbg!(($($e),*));
-                pause();
-                r
-            } else {($($e),*)}
+            {
+                #[cfg(any(test,debug_assertions))] {
+                    let _l = io::stdout().lock();
+                    let r = dbg!(($($e),*));
+                    pause();
+                    r
+                }
+               #[cfg(not(any(test,debug_assertions)))] {($($e),*)}
+            }
         }
     }
 

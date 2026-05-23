@@ -1,6 +1,12 @@
 {
   "Sites": [
     {
+      "Site": "xiuren.win",
+      "Img": "div#main > div > img",
+      "Next": "nav[role='navigation'] a[rel='next']",
+      "Album": "div.my-1 > a > h2"
+    },
+    {
       "Site": "tv-ku.com",
       "Img": "div.text-center > img",
       "Next": "ul.pagination span",
