@@ -279,7 +279,6 @@ rustflags = [
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--relax",
   "-Clink-arg=-Wl,-z,pack-relative-relocs",
-  "-Clink-arg=-Wl,--threads=0",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm"))))']
