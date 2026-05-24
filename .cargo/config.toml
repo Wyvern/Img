@@ -403,10 +403,7 @@ linker = "mipsisa32r6-linux-gnu-gcc"
 linker = "mipsisa32r6el-linux-gnu-gcc"
 
 [target.'cfg(any(target_os="linux",target_os="android"))']
-rustflags = [
-  "-Zrelax-elf-relocations",
-  "-Clink-arg=-Wl,-z,pack-relative-relocs",
-]
+rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia"))']
 linker = "clang"
