@@ -248,6 +248,7 @@ rustflags = [
   "-Zexperimental-default-bounds=y",
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros=y",
+  "-Zvalidate-mir=no",
   "-Zoffload=Device",
   # "-Zbuild-sdylib-interface",
 
@@ -263,6 +264,8 @@ rustflags = [
   "-Clinker-plugin-lto",
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--relax",
+  "-Clink-arg=-Wl,-z,pack-relative-relocs",
+  "-Clink-arg=-Wl,--threads=0",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm"))))']
@@ -274,6 +277,7 @@ rustflags = [
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
   "-Clink-arg=-Wl,--no-eh-frame-hdr",
+  "-Clink-arg=-Wl,-z,pack-relative-relocs",
 ]
 
 [target.'cfg(target_family="windows")']
