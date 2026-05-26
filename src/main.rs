@@ -1481,15 +1481,18 @@ mod img {
         use fs::*;
         use io::*;
 
-        let json_file = File::open("src/web.json").unwrap();
+        let input = "src/web.json";
+        let output = "web.cbor";
+
+        let json_file = File::open(input).unwrap();
         let reader = BufReader::new(json_file);
         let value: serde_json::Value = serde_json::from_reader(reader).unwrap();
 
-        let cbor_file = File::create("web.cbor").unwrap();
+        let cbor_file = File::create(output).unwrap();
         let writer = BufWriter::new(cbor_file);
         cbor4ii::serde::to_writer(writer, &value).unwrap();
 
-        run_cmd("gzip", &["-kf", "web.cbor"], &[]);
+        run_cmd("gzip", &["-kf", output], &[]);
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
