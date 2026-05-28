@@ -253,6 +253,7 @@ rustflags = [
   "-Clink-arg=/FILEALIGN:512",
   "-Clink-arg=/VERSION:0.0",
   "-Clink-arg=/PDB:NONE",
+  "-Clink-arg=/NOLOGO",
   # "-Clink-arg=/LTCG",
   # "-Clink-arg=/DYNAMICBASE",
   # "-Clink-arg=/NXCOMPAT",
