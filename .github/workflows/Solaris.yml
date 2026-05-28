@@ -132,7 +132,7 @@ jobs:
             x86_64-unknown-fuchsia
           )
           for target in ${targets[@]}; do
-            time cargo b -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
+            time cargo b -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size,backtrace --target $target
           done
 
           targets=(
