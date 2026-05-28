@@ -204,7 +204,7 @@ json-target-spec = true
 # build-std-features = ["compiler-builtins-mem"]
 
 [host]
-rustflags = ["-Ctarget-cpu=native", "-Ztune-cpu=native"]
+# rustflags = ["-Ctarget-cpu=native", "-Ztune-cpu=native"]
 
 [build]
 rustflags = ["-Zpanic-in-drop=abort"]
