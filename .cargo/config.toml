@@ -179,7 +179,7 @@ rustflags = [
   "-Cpanic=abort",
 
   "-Zunstable-options",
-  # "-Zembed-metadata=no",
+  "-Zembed-metadata=no",
   "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
@@ -210,8 +210,8 @@ rustflags = [
   "-Zexperimental-default-bounds",
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros=y",
+  "-Zoffload=Device",
   # "-Zcrate-attr=feature(cfg_select)",
-  # "-Zoffload=Device",
 
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",

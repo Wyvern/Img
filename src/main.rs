@@ -773,7 +773,7 @@ fn parse(addr: &str) -> String {
             page_sel.map_or_else(<_>::default, |p| {
                 if !query && albums.is_none_or(|a| a.is_empty()) && unsafe { !INALBUM } {
                     pause();
-                    check_next(p, addr, &page, false)
+                    check_next(Next::Page(p), addr, &page)
                 } else {
                     String::default()
                 }
@@ -799,7 +799,7 @@ fn parse(addr: &str) -> String {
                     tdbg!(next_page)
                 }
             } else {
-                check_next(n, addr, &page, true)
+                check_next(Next::Album(n), addr, &page)
             }
         },
     )
@@ -1043,8 +1043,16 @@ fn magic_number_type(pb: path::PathBuf) {
     .unwrap_or_else(|e| pl!("Rename {} failed: {}", pb.display(), e));
 }
 
+enum Next<'a> {
+    Page(&'a str),
+    Album(&'a str),
+}
+
 /// Check `next` selector link page info
-fn check_next(next: &str, cur: &str, page: &dom::Document, album: bool) -> String {
+fn check_next(nt: Next, cur: &str, page: &dom::Document) -> String {
+    let next = match nt {
+        Next::Album(v) | Next::Page(v) => v,
+    };
     let mut next_link = dom::Document::default().text();
     let ns = next.split_once(SEP);
     let nxt = ns.map_or(next, |(l, _)| l);
@@ -1180,7 +1188,10 @@ fn check_next(next: &str, cur: &str, page: &dom::Document, album: bool) -> Strin
             },
         );
     }
-    if album && !ret.is_empty() && alphanumeric_sort::compare_str(ret.as_str(), cur).is_lt() {
+    if let Next::Album(_) = nt
+        && !ret.is_empty()
+        && alphanumeric_sort::compare_str(ret.as_str(), cur).is_lt()
+    {
         tdbg!(cur, ret);
         ret = String::default();
     }
@@ -1470,15 +1481,18 @@ mod img {
         use fs::*;
         use io::*;
 
-        let json_file = File::open("src/web.json").unwrap();
+        let input = "src/web.json";
+        let output = "web.cbor";
+
+        let json_file = File::open(input).unwrap();
         let reader = BufReader::new(json_file);
         let value: serde_json::Value = serde_json::from_reader(reader).unwrap();
 
-        let cbor_file = File::create("web.cbor").unwrap();
+        let cbor_file = File::create(output).unwrap();
         let writer = BufWriter::new(cbor_file);
         cbor4ii::serde::to_writer(writer, &value).unwrap();
 
-        run_cmd("gzip", &["-kf", "web.cbor"], &[]);
+        run_cmd("gzip", &["-kf", output], &[]);
     }
 
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
