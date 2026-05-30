@@ -1498,9 +1498,9 @@ mod img {
     // fn(..) -> Pin<Box<impl/dyn Future<Output = Something> + '_>>
 
     fn arg(f: &str) -> Option<String> {
-        env::args()
-            .skip(1)
-            .find(|a| !a.starts_with("--") && !f.ends_with(a))
+        env::args().skip(1).find(|a| {
+            !a.starts_with("--") && f.rsplit("::").next().unwrap() != a.rsplit("::").next().unwrap()
+        })
     }
 
     #[test]

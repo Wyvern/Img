@@ -100,9 +100,9 @@ mod macros {
     }
 
     macro_rules! _demo {
-    ([$attr:meta ] $pub:vis & $lt:lifetime $name:ident : $type:ty = $l:literal | $e:expr, $s:stmt ; $pat:pat => $b:block | $p:path | $i:item | $t:tt) => {$pat $t};
+    ([$attr:meta ] $pub:vis & $lt:lifetime $pp:pat_param in $name:ident : $type:ty =$e2:expr_2021, | $l:literal | $e:expr, $s:stmt ; $pat:pat => $b:block | $p:path | $i:item | $t:tt) => {$pat $t};
 
-    ($id:ident, $b:block, $stmt:stmt, $e:expr, $pat:pat, $t:ty, $lt:lifetime, $l:literal, $p:path, $m:meta, $tt:tt, $i:item, $v:vis)=>{};
+    ($id:ident, $b:block, $stmt:stmt, $e:expr, $pat:pat, $t:ty, $lt:lifetime, $l:literal, $p:path, $m:meta, $tt:tt, $i:item, $v:vis, $e2:expr_2021, $pp:pat_param)=>{};
 
     }
 
