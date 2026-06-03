@@ -99,6 +99,8 @@ jobs:
           set +e -x
 
           targets=(
+            powerpc-unknown-linux-gnuspe
+            powerpc-unknown-linux-muslspe
             powerpc-unknown-linux-gnu
             powerpc-unknown-linux-musl
             hexagon-unknown-linux-musl
