@@ -82,18 +82,20 @@ jobs:
       - name: Emscripten Cache
         uses: actions/cache@v5
         with:
-          path: emsdk/upstream/emscripten/cache
-          key: emscripten-cache
-          restore-keys: emscripten-cache
+          path: emsdk/
+          key: emscripten
+          restore-keys: emscripten
 
       - name: Build Hurd+Motor+Xous+Emscripten
         run: |
           cargo update
           set +e -x
 
-          git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
-          ./emsdk/emsdk install latest
-          ./emsdk/emsdk activate latest
+          if [ ! -d emsdk ]; then
+            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
+            ./emsdk/emsdk install latest
+            ./emsdk/emsdk activate latest
+          fi
           source ./emsdk/emsdk_env.sh
 
           targets=(
