@@ -79,10 +79,12 @@ jobs:
           lscpu
           free -m
 
-      - uses: actions/cache@v5
+      - name: Emscripten Cache
+        uses: actions/cache@v5
         with:
           path: emsdk/upstream/emscripten/cache
           key: emscripten-cache
+          restore-keys: emscripten-cache
 
       - name: Build Hurd+Motor+Xous+Emscripten
         run: |
