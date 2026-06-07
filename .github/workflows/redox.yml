@@ -79,18 +79,26 @@ jobs:
           lscpu
           free -m
 
+      - uses: actions/cache@v5
+        with:
+          path: emsdk/upstream/emscripten/cache
+          key: emscripten-cache
+
       - name: Build Hurd+Motor+Xous
         run: |
           cargo update
           set +e -x
 
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          ./emsdk install latest
-          ./emsdk activate latest
-          source ./emsdk_env.sh
+          if [ ! -d emsdk/upstream/emscripten/cache ]; then
+            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
+            cd emsdk
+            ./emsdk install latest
+            ./emsdk activate latest
+            # source ./emsdk_env.sh
+          fi
 
           time cargo s wasm32-unknown-emscripten
+          ls -ahl target/wasm32-unknown-emscripten/*
           tar -cJf img-wasm32-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js img.html
           exit
 
