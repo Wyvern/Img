@@ -96,7 +96,7 @@ jobs:
             ./emsdk/emsdk install latest
             ./emsdk/emsdk activate latest
           fi
-          source ./emsdk/emsdk_env.sh
+          source ./emsdk/emsdk_env.sh > /dev/null
 
           targets=(
             wasm32-unknown-emscripten
