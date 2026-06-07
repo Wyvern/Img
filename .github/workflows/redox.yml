@@ -84,7 +84,7 @@ jobs:
           path: emsdk/upstream/emscripten/cache
           key: emscripten-cache
 
-      - name: Build Hurd+Motor+Xous
+      - name: Build Hurd+Motor+Xous+Emscripten
         run: |
           cargo update
           set +e -x
@@ -104,7 +104,6 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
-
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
@@ -151,5 +150,6 @@ jobs:
             done
           done
 
+          echo "Uploading img-emscripten..."
           tar -cJf img-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js
           gh release upload Nightly img-emscripten.tar.xz --clobber
