@@ -94,11 +94,8 @@ jobs:
           ./emsdk/emsdk activate latest
           source ./emsdk/emsdk_env.sh
 
-          time cargo s wasm32-unknown-emscripten
-          tar -cJf img-wasm32-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js img.html
-          exit
-
           targets=(
+            wasm32-unknown-emscripten
             x86_64-unknown-motor
             x86_64-unknown-hurd-gnu
             riscv32imac-unknown-xous-elf
@@ -153,3 +150,6 @@ jobs:
                 fi
             done
           done
+
+          tar -cJf img-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js
+          gh release upload Nightly img-emscripten.tar.xz --clobber
