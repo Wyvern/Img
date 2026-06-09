@@ -263,6 +263,7 @@ rustflags = [
   "-Zcache-proc-macros=y",
   "-Zvalidate-mir=no",
   "-Zoffload=Device",
+  "-Zstaticlib-hide-internal-symbols=y",
   # "-Zllvm-writable",
   # "-Zbuild-sdylib-interface",
 
