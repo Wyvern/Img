@@ -91,6 +91,7 @@ rustflags = [
   "-Zhint-mostly-unused",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
+  "-Zstaticlib-hide-internal-symbols=y",
   # "-Zvirtual-function-elimination",
 ]
 
@@ -119,6 +120,7 @@ rustflags = [
   "-Zforce-unstable-if-unmarked",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
+  "-Zstaticlib-hide-internal-symbols=y",
   # "-Zcross-crate-inline-threshold=yes",
 ]
 
@@ -126,6 +128,7 @@ rustflags = [
 inherits = "src"
 rustflags = [
   # "-Cprefer-dynamic",
+  "-Zstaticlib-hide-internal-symbols=y",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
 ]
@@ -134,6 +137,7 @@ rustflags = [
 inherits = "src"
 rustflags = [
   # "-Cprefer-dynamic",
+  "-Zstaticlib-hide-internal-symbols=y",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
 ]
@@ -263,7 +267,6 @@ rustflags = [
   "-Zcache-proc-macros=y",
   "-Zvalidate-mir=no",
   "-Zoffload=Device",
-  "-Zstaticlib-hide-internal-symbols=y",
   # "-Zllvm-writable",
   # "-Zbuild-sdylib-interface",
 
