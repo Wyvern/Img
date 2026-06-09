@@ -91,7 +91,6 @@ rustflags = [
   "-Zhint-mostly-unused",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
-  "-Zstaticlib-hide-internal-symbols=y",
   # "-Zvirtual-function-elimination",
 ]
 
@@ -120,7 +119,6 @@ rustflags = [
   "-Zforce-unstable-if-unmarked",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
-  "-Zstaticlib-hide-internal-symbols=y",
   # "-Zcross-crate-inline-threshold=yes",
 ]
 
@@ -128,7 +126,6 @@ rustflags = [
 inherits = "src"
 rustflags = [
   # "-Cprefer-dynamic",
-  "-Zstaticlib-hide-internal-symbols=y",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
 ]
@@ -137,7 +134,6 @@ rustflags = [
 inherits = "src"
 rustflags = [
   # "-Cprefer-dynamic",
-  "-Zstaticlib-hide-internal-symbols=y",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
 ]
@@ -261,12 +257,13 @@ rustflags = [
   "-Zshell-argfiles",
   "-Zchecksum-hash-algorithm=blake3",
   "-Zmir-strip-debuginfo=all-locals",
-  "-Ztyping-mode-borrowck=y",
-  "-Zexperimental-default-bounds=y",
+  "-Ztyping-mode-borrowck",
+  "-Zexperimental-default-bounds",
   "-Zhigher-ranked-assumptions",
-  "-Zcache-proc-macros=y",
+  "-Zcache-proc-macros",
   "-Zvalidate-mir=no",
   "-Zoffload=Device",
+  "-Zstaticlib-hide-internal-symbols",
   # "-Zllvm-writable",
   # "-Zbuild-sdylib-interface",
 
