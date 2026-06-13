@@ -61,7 +61,7 @@ jobs:
           for arch in "${freebsd[@]}"; do
             if [ ! -d sysroot/freebsd/$arch ]; then
                 mkdir -p sysroot/freebsd/$arch
-                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/15.0-RELEASE/base.txz \
+                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/15.1-RELEASE/base.txz \
             | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
             fi
           done
@@ -70,7 +70,7 @@ jobs:
           for arch in "${ppc[@]}"; do
             if [ ! -d sysroot/freebsd/$arch ]; then
               mkdir -p sysroot/freebsd/$arch
-              curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/15.0-RELEASE/base.txz \
+              curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/15.1-RELEASE/base.txz \
                 | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
             fi
           done

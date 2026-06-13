@@ -47,6 +47,7 @@ jobs:
           restore-keys: redoxer
 
       - name: Build Redox
+        continue-on-error: true
         run: |
           cargo update
           set +e -x

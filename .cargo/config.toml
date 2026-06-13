@@ -359,6 +359,9 @@ linker = "powerpc64le-linux-gnu-gcc"
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
 linker = "powerpc64-linux-gnu-gcc"
 
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big", target_abi = "elfv2"))']
+rustflags = ["-Clink-arg=-mabi=elfv2"]
+
 [target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little"))']
 linker = "powerpcle-linux-gnu-gcc"
 
