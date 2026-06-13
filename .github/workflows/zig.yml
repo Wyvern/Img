@@ -1,0 +1,108 @@
+name: Zig-build
+
+on:
+  push:
+    branches: ["stable"]
+  pull_request:
+    branches: ["stable"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  macOS:
+    name: Zig linker
+    runs-on: macos-26
+
+    steps:
+      - name: Disable macos spotlight index
+        run: |
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
+          sudo pmset -a powernap 0
+          sudo pmset -a sleep 0
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: powerpc64-unknown-linux-musl
+          # components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          # hexagon-unknown-linux-musl
+          # cargo l sparc64-unknown-netbsd
+          # cargo l sparc64-unknown-openbsd
+          # cargo l x86_64-unknown-illumos
+          # cargo l powerpc64-unknown-linux-gnuelfv2
+          # exit
+
+          targets=(
+            powerpc64-unknown-linux-musl
+          )
+
+          for target in ${targets[@]}; do
+            time cargo l $target
+          done
+
+          find ./target -type f -name "img" -exec ls -hl {} \;
+          sw_vers
+          hostinfo
+          sysctl -n machdep.cpu.brand_string
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            powerpc64-unknown-linux-musl
+          )
+
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            first="$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')"
+            rest="${os#?}"
+            os_cap="${first}${rest}"
+            if [[ -n "$abi" ]]; then
+                name="${os_cap}-${arch}-${abi}"
+            else
+                name="${os_cap}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/lto/{img,$name} || true
+            gh release upload Stable --clobber target/$target/lto/$name || true
+          done
