@@ -652,7 +652,7 @@ fn parse(addr: &str) -> String {
                 } else {
                     use io::*;
 
-                    let mut stdin = stdin();
+                    let mut _stdin = stdin();
                     let mut stdout = stdout();
 
                     let t = ["title", "alt", "aria-label"]
@@ -684,7 +684,7 @@ fn parse(addr: &str) -> String {
                         s = SEP,
                     );
                     _ = stdout.flush();
-                    let mut clear = || {
+                    let mut _clear = || {
                         write!(stdout, "{CL}").unwrap();
                         stdout.flush().unwrap();
                     };
@@ -696,21 +696,21 @@ fn parse(addr: &str) -> String {
                             let ch=unsafe { _getch() } as u8;
                             match ch {
                                 b'y' | b'Y' | b'\n' => {
-                                    clear();
+                                    _clear();
                                     parse_album()
                                 }
                                 b'n' | b'N' => {
-                                    clear();
+                                    _clear();
                                     next_sel = None;
                                     continue;
                                 }
                                 b'a' | b'A' => {
-                                    clear();
+                                    _clear();
                                     all = true;
                                     parse_album()
                                 }
                                 _ => {
-                                    clear();
+                                    _clear();
                                     pl!("⤴ Canceled all albums download.");
                                     next_sel = None;
                                     page_sel = None;
@@ -723,25 +723,25 @@ fn parse(addr: &str) -> String {
                             let old = mem::MaybeUninit::<libc::termios>::uninit();
                             begin_raw_mode(fd, old);
                             let mut key = [0u8; 1];
-                            stdin.read_exact(&mut key).unwrap();
+                            _stdin.read_exact(&mut key).unwrap();
                             end_raw_mode(fd, old);
                             match key[0] {
                                 b'y' | b'Y' | b'\n' => {
-                                    clear();
+                                    _clear();
                                     parse_album()
                                 }
                                 b'n' | b'N' => {
-                                    clear();
+                                    _clear();
                                     next_sel = None;
                                     continue;
                                 }
                                 b'a' | b'A' => {
-                                    clear();
+                                    _clear();
                                     all = true;
                                     parse_album()
                                 }
                                 _ => {
-                                    clear();
+                                    _clear();
                                     pl!("⤴ Canceled all albums download.");
                                     next_sel = None;
                                     page_sel = None;

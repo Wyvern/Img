@@ -26,10 +26,10 @@ serde_json = "*"
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 serde_json = "*"
 
-[target.'cfg(any(unix,windows))'.dependencies]
+[target.'cfg(any(all(unix,not(target_os = "emscripten")),windows))'.dependencies]
 libc = "*"
 
-[target.'cfg(any(unix,windows))'.build-dependencies]
+[target.'cfg(any(all(unix,not(target_os = "emscripten")),windows))'.build-dependencies]
 libc = "*"
 
 [target.'cfg(target_os = "hermit")'.dependencies]
