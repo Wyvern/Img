@@ -257,7 +257,7 @@ rustflags = [
   "-Zshell-argfiles",
   "-Zchecksum-hash-algorithm=blake3",
   "-Zmir-strip-debuginfo=all-locals",
-  "-Ztyping-mode-borrowck",
+  "-Ztyping-mode-post-typeck-until-borrowck",
   "-Zexperimental-default-bounds",
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros",
@@ -265,10 +265,8 @@ rustflags = [
   "-Zoffload=Device",
   # "-Zllvm-writable",
   # "-Zbuild-sdylib-interface",
-
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
-  # "-Wlinker_messages",
 ]
 
 [target.'cfg(all(target_family = "unix", crate_type = "staticlib"))']

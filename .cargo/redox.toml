@@ -255,17 +255,15 @@ rustflags = [
   "-Zshell-argfiles",
   "-Zchecksum-hash-algorithm=blake3",
   "-Zmir-strip-debuginfo=all-locals",
-  "-Ztyping-mode-borrowck=y",
-  "-Zexperimental-default-bounds=y",
+  "-Ztyping-mode-post-typeck-until-borrowck",
+  "-Zexperimental-default-bounds",
   "-Zhigher-ranked-assumptions",
   "-Zvalidate-mir=no",
-  "-Zcache-proc-macros=y",
+  "-Zcache-proc-macros",
   "-Zoffload=Device",
   # "-Zbuild-sdylib-interface",
-
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
-  # "-Wlinker_messages",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", all(target_arch="powerpc64",target_endian = "big")))))']
