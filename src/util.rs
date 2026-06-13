@@ -1,4 +1,4 @@
-use std::*;
+use std::{os::raw::c_int, *};
 
 macro_rules! Color {
             ($($i:ident = $l:literal),+) => {
@@ -36,6 +36,43 @@ Color!(
 );
 
 mod macros {
+    #[macro_export]
+    macro_rules! cdbg {
+        () => {
+            #[cfg(debug_assertions)]{
+                $crate::println!("cargo::warning=[{}:{}:{}]", $crate::file!(), $crate::line!(), $crate::column!())
+            }
+        };
+        ($val:expr) => {
+            #[cfg(debug_assertions)]{
+                match $val {
+                tmp => {
+                        $crate::println!("cargo::warning=[{}:{}:{}] {} = {:#?}",
+                            $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), &tmp);
+                        tmp
+                    }
+                }
+            }
+        };
+        ($val:expr;) => {
+            #[cfg(debug_assertions)]{
+                match $val {
+                tmp => {
+                        $crate::println!("cargo::error=[{}:{}:{}] {} = {:#?}",
+                            $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), &tmp);
+                        tmp
+                    }
+                }
+            }
+        };
+        ($($val:expr),+) => {
+            ($(cdbg!($val)),+)
+        };
+        ($($val:expr),+;) => {
+            ($(cdbg!($val;)),+)
+        };
+    }
+
     #[macro_export]
     macro_rules! quit {
         ($l:literal $(,$e:expr)*) => {{
@@ -159,48 +196,79 @@ pub trait Dbg: fmt::Debug {
 }
 impl<T: fmt::Debug> Dbg for T {}
 
+pub fn begin_raw_mode(fd: c_int, mut old: mem::MaybeUninit<libc::termios>) {
+    unsafe {
+        libc::tcgetattr(fd, old.as_mut_ptr());
+        let old = old.assume_init();
+        let mut new = old;
+        new.c_lflag &= !(libc::ICANON | libc::ECHO);
+        libc::tcsetattr(fd, libc::TCSANOW, &new);
+    }
+}
+pub fn end_raw_mode(fd: c_int, old: mem::MaybeUninit<libc::termios>) {
+    unsafe {
+        libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
+    }
+}
 #[allow(unused)]
 pub fn pause() {
     use io::*;
-    #[cfg(unix)]
-    {
-        use termion::event::Key;
-        use termion::input::TermRead;
-        use termion::raw::IntoRawMode;
-
-        let mut o = stdout().into_raw_mode().unwrap();
-        write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
-        o.flush().unwrap();
-
-        let i = stdin();
-        if let Some(Ok(Key::Char('q') | Key::Char('Q') | Key::Esc)) = i.keys().next() {
-            write!(o, "{CL}⏏!").unwrap();
-            o.flush().unwrap();
-            drop(o);
-            process::exit(0);
-        } else {
-            write!(o, "{CL}").unwrap();
-            o.flush().unwrap();
+    let mut o = stdout();
+    write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
+    o.flush().unwrap();
+    cfg_select! {
+        windows=>{
+            let ch=unsafe { libc::_getch() };
+            match ch {
+                b'q' | b'Q' | 0x1b => {
+                    write!(o, "{CL}⏏!").unwrap();
+                    o.flush().unwrap();
+                    process::exit(0);
+                }
+                _ => {
+                    write!(o, "{CL}").unwrap();
+                    o.flush().unwrap();
+                }
+            }
+            }
+        all(unix,not(target_os = "emscripten"))=>{
+            let fd = libc::STDIN_FILENO;
+            let old = mem::MaybeUninit::<libc::termios>::uninit();
+            begin_raw_mode(fd, old);
+            let mut i = stdin();
+            let mut key = [0u8; 1];
+            i.read_exact(&mut key).unwrap();
+            end_raw_mode(fd, old);
+            match key[0] {
+                b'q' | b'Q' | 0x1b => {
+                    write!(o, "{CL}⏏!").unwrap();
+                    o.flush().unwrap();
+                    process::exit(0);
+                }
+                _ => {
+                    write!(o, "{CL}").unwrap();
+                    o.flush().unwrap();
+                }
+            }
         }
-    }
-    #[cfg(not(unix))]
-    {
-        let mut o = stdout().lock();
-        write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
-        o.flush().unwrap();
-        let mut s = String::default();
-        stdin().lock().read_line(&mut s).unwrap();
-        s.make_ascii_lowercase();
-        if s.trim() == "q" {
-            write!(o, "{UP}{CL}⏏!").unwrap();
+        _=>{
+            let mut o = stdout().lock();
+            write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
             o.flush().unwrap();
-            drop(o);
-            process::exit(0);
-        } else {
-            write!(o, "{UP}{CL}").unwrap();
-            o.flush().unwrap();
+            let mut s = String::default();
+            stdin().lock().read_line(&mut s).unwrap();
+            s.make_ascii_lowercase();
+            if s.trim() == "q" {
+                write!(o, "{UP}{CL}⏏!").unwrap();
+                o.flush().unwrap();
+                drop(o);
+                process::exit(0);
+            } else {
+                write!(o, "{UP}{CL}").unwrap();
+                o.flush().unwrap();
+            }
         }
-    }
+    };
 }
 
 #[cfg(test)]

@@ -1,5 +1,8 @@
 use std::*;
 
+#[path = "src/util.rs"]
+mod util;
+
 fn main() {
     let input = "src/web.json";
     let output = "web.cbor";
@@ -41,41 +44,4 @@ fn main() {
 #[test]
 fn build() {
     main();
-}
-
-#[macro_export]
-macro_rules! cdbg {
-    () => {
-        #[cfg(debug_assertions)]{
-            $crate::println!("cargo::warning=[{}:{}:{}]", $crate::file!(), $crate::line!(), $crate::column!())
-        }
-    };
-    ($val:expr) => {
-        #[cfg(debug_assertions)]{
-            match $val {
-            tmp => {
-                    $crate::println!("cargo::warning=[{}:{}:{}] {} = {:#?}",
-                        $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), &tmp);
-                    tmp
-                }
-            }
-        }
-    };
-    ($val:expr;) => {
-        #[cfg(debug_assertions)]{
-            match $val {
-            tmp => {
-                    $crate::println!("cargo::error=[{}:{}:{}] {} = {:#?}",
-                        $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), &tmp);
-                    tmp
-                }
-            }
-        }
-    };
-    ($($val:expr),+) => {
-        ($(cdbg!($val)),+)
-    };
-    ($($val:expr),+;) => {
-        ($(cdbg!($val;)),+)
-    };
 }

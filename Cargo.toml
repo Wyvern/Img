@@ -16,6 +16,7 @@ base64 = { version = "*", default-features = false }
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 dom_query = { version = "*", default-features = false }
 fastrand = "*"
+libc = "*"
 percent-encoding = "*"
 serde_json = "*"
 
@@ -24,6 +25,7 @@ serde_json = "*"
 
 [build-dependencies]
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
+libc = "*"
 serde_json = "*"
 
 [target.'cfg(target_os = "hermit")'.dependencies]
@@ -32,7 +34,6 @@ hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 [target.'cfg(unix)'.dependencies]
 file-format = "*"
 fork = "*"
-termion = "*"
 
 [features]
 default = []
