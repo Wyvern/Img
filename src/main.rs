@@ -751,7 +751,7 @@ fn parse(addr: &str) -> String {
                         }
                         _=>{
                             let mut input = String::new();
-                            stdin.read_line(&mut input).unwrap_or_else(|e| {
+                            _stdin.read_line(&mut input).unwrap_or_else(|e| {
                                 quit!("{}", e);
                             });
                             input.make_ascii_lowercase();
