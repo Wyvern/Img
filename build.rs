@@ -22,17 +22,18 @@ fn main() {
     cbor4ii::serde::to_writer(writer, &value).unwrap();
 
     let family = std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap_or_default();
-
-    let mut cmd = if family == "windows" {
-        let mut c = process::Command::new("tar");
-        c.args(["-czf", "web.tar.gz", output]);
-        c
-    } else if family == "unix" {
-        let mut c = process::Command::new("gzip");
-        c.args(["-kf", output]);
-        c
-    } else {
-        return;
+    let mut cmd = match family.as_str() {
+        "windows" => {
+            let mut c = process::Command::new("tar");
+            c.args(["-czf", "web.tar.gz", output]);
+            c
+        }
+        "unix" => {
+            let mut c = process::Command::new("gzip");
+            c.args(["-kf", output]);
+            c
+        }
+        _ => return,
     };
     assert!(cmd.status().unwrap().success());
 }
