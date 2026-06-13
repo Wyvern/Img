@@ -56,6 +56,8 @@ jobs:
           # cargo s sparc64-unknown-netbsd
           # cargo s sparc64-unknown-openbsd
           # cargo s x86_64-unknown-illumos
+          cargo s powerpc64-unknown-linux-gnuelfv2
+          cargo s powerpc64-unknown-linux-musl
           # exit
 
           targets=(

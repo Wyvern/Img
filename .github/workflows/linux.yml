@@ -111,8 +111,6 @@ jobs:
             armv7-unknown-linux-uclibceabihf
             mips64-openwrt-linux-musl
             powerpc64-unknown-linux-gnu
-            powerpc64-unknown-linux-gnuelfv2
-            powerpc64-unknown-linux-musl
             ./powerpc64-unknown-linux-musl-elfv1.json
           )
 

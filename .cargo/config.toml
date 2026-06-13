@@ -359,10 +359,6 @@ linker = "powerpc64le-linux-gnu-gcc"
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
 linker = "powerpc64-linux-gnu-gcc"
 
-# [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big", target_abi = "elfv2"))']
-# linker = "rust-lld"
-# rustflags = ["-Clink-arg=-mabi=elfv2"]
-
 [target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little"))']
 linker = "powerpcle-linux-gnu-gcc"
 
@@ -651,6 +647,13 @@ rustflags = [
   "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
   "-Ctarget-feature=-soft-float",
 ]
+
+[target.powerpc64-unknown-linux-gnuelfv2]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=powerpc64-linux-gnu", "-Clink-arg=-mabi=elfv2"]
+[target.powerpc64-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=powerpc64-linux-musl", "-Clink-arg=-mabi=elfv2"]
 
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"
