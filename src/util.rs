@@ -196,6 +196,7 @@ pub trait Dbg: fmt::Debug {
 }
 impl<T: fmt::Debug> Dbg for T {}
 
+#[cfg(all(unix, not(target_os = "emscripten")))]
 pub fn begin_raw_mode(fd: c_int, mut old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcgetattr(fd, old.as_mut_ptr());
@@ -205,6 +206,8 @@ pub fn begin_raw_mode(fd: c_int, mut old: mem::MaybeUninit<libc::termios>) {
         libc::tcsetattr(fd, libc::TCSANOW, &new);
     }
 }
+
+#[cfg(all(unix, not(target_os = "emscripten")))]
 pub fn end_raw_mode(fd: c_int, old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
@@ -218,7 +221,10 @@ pub fn pause() {
     o.flush().unwrap();
     cfg_select! {
         windows=>{
-            let ch=unsafe { libc::_getch() };
+            unsafe extern "C" {
+                fn _getch() -> i32;
+            }
+            let ch=unsafe { _getch() };
             match ch {
                 b'q' | b'Q' | 0x1b => {
                     write!(o, "{CL}⏏!").unwrap();
