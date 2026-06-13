@@ -693,7 +693,7 @@ fn parse(addr: &str) -> String {
                             unsafe extern "C" {
                                 fn _getch() -> i32;
                             }
-                            let ch=unsafe { _getch() };
+                            let ch=unsafe { _getch() } as u8;
                             match ch {
                                 b'y' | b'Y' | b'\n' => {
                                     clear();
