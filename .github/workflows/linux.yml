@@ -111,7 +111,6 @@ jobs:
             armv7-unknown-linux-uclibceabihf
             mips64-openwrt-linux-musl
             powerpc64-unknown-linux-gnu
-            ./powerpc64-unknown-linux-musl-elfv1.json
           )
 
           for target in ${targets[@]}; do
@@ -147,8 +146,6 @@ jobs:
                   mips-unknown-linux-gnu
                   armv7-unknown-linux-uclibceabihf
                   powerpc64-unknown-linux-gnu
-                  powerpc64-unknown-linux-gnuelfv2
-                  powerpc64-unknown-linux-musl-elfv1
                   powerpc-unknown-linux-gnu
                   powerpc-unknown-linux-musl
                   mips64-openwrt-linux-musl
