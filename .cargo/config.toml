@@ -363,7 +363,7 @@ linker = "powerpc64-linux-gnu-gcc"
 # linker = "rust-lld"
 rustflags = [
   "-Clink-arg=-mabi=elfv2",
-  "-Cllvm-args=-mabi=elfv2"
+  "-Cllvm-args=--meabi=elfv2"
 ]
 
 [target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little"))']
