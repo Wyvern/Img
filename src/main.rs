@@ -690,7 +690,10 @@ fn parse(addr: &str) -> String {
                     };
                     cfg_select! {
                         windows=>{
-                            let ch=unsafe { libc::_getch() };
+                            unsafe extern "C" {
+                                fn _getch() -> i32;
+                            }
+                            let ch=unsafe { _getch() };
                             match ch {
                                 b'y' | b'Y' | b'\n' => {
                                     clear();
