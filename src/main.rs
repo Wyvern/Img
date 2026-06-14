@@ -711,7 +711,7 @@ fn parse(addr: &str) -> String {
                             _stdin.read_line(&mut input).unwrap_or_else(|e| {
                                 quit!("{}", e);
                             });
-                            input.trim().make_ascii_lowercase();
+                            input.make_ascii_lowercase();
                             Mode::Normal(input)
                         }}
                     };
@@ -739,7 +739,7 @@ fn parse(addr: &str) -> String {
                                 break;
                             }
                         },
-                        Mode::Normal(s) => match s.as_str() {
+                        Mode::Normal(s) => match s.trim() {
                             "y" | "yes" | "" => parse_album(),
                             "n" | "no" => {
                                 next_sel = None;

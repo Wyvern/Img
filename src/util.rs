@@ -245,7 +245,7 @@ pub fn pause() {
         _=>{{
             let mut s = String::default();
             stdin().lock().read_line(&mut s).unwrap();
-            s.trim().make_ascii_lowercase();
+            s.make_ascii_lowercase();
             Mode::Normal(s)
         }}
     };
@@ -265,7 +265,7 @@ pub fn pause() {
             }
             _ => (),
         },
-        Mode::Normal(s) => match s.as_str() {
+        Mode::Normal(s) => match s.trim() {
             "q" | "quit" => {
                 write!(o, "⏏!").unwrap();
                 o.flush().unwrap();
