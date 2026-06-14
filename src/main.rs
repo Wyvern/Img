@@ -684,106 +684,79 @@ fn parse(addr: &str) -> String {
                         s = SEP,
                     );
                     _ = stdout.flush();
-                    let mut _clear = || {
-                        write!(stdout, "{CL}").unwrap();
-                        stdout.flush().unwrap();
-                    };
-                    cfg_select! {
-                        windows=>{
+                    #[allow(unused)]
+                    enum Mode {
+                        Raw(u8),
+                        Normal(String),
+                    }
+                    let input = cfg_select! {
+                        windows=>{{
                             unsafe extern "C" {
                                 fn _getch() -> i32;
                             }
                             let ch=unsafe { _getch() } as u8;
-                            match ch {
-                                b'y' | b'Y' | b'\n' => {
-                                    _clear();
-                                    parse_album()
-                                }
-                                b'n' | b'N' => {
-                                    _clear();
-                                    next_sel = None;
-                                    continue;
-                                }
-                                b'a' | b'A' => {
-                                    _clear();
-                                    all = true;
-                                    parse_album()
-                                }
-                                _ => {
-                                    _clear();
-                                    pl!("⤴ Canceled all albums download.");
-                                    next_sel = None;
-                                    page_sel = None;
-                                    break;
-                                }
-                            }
-                            }
-                        all(unix,not(target_os = "emscripten"))=>{
+                            Mode::Raw(ch)
+                            }}
+                        all(unix,not(target_os = "emscripten"))=>{{
                             let fd = libc::STDIN_FILENO;
                             let old = mem::MaybeUninit::<libc::termios>::uninit();
                             begin_raw_mode(fd, old);
                             let mut key = [0u8; 1];
                             _stdin.read_exact(&mut key).unwrap();
                             end_raw_mode(fd, old);
-                            match key[0] {
-                                b'y' | b'Y' | b'\n' => {
-                                    _clear();
-                                    parse_album()
-                                }
-                                b'n' | b'N' => {
-                                    _clear();
-                                    next_sel = None;
-                                    continue;
-                                }
-                                b'a' | b'A' => {
-                                    _clear();
-                                    all = true;
-                                    parse_album()
-                                }
-                                _ => {
-                                    _clear();
-                                    pl!("⤴ Canceled all albums download.");
-                                    next_sel = None;
-                                    page_sel = None;
-                                    break;
-                                }
-                            }
-                        }
-                        _=>{
+                            Mode::Raw(key[0])
+                        }}
+                        _=>{{
                             let mut input = String::new();
                             _stdin.read_line(&mut input).unwrap_or_else(|e| {
                                 quit!("{}", e);
                             });
-                            input.make_ascii_lowercase();
-                            let mut clear = || {
-                                write!(stdout, "{UP}{CL}").unwrap();
-                                stdout.flush().unwrap();
-                            };
-                            match input.trim() {
-                                "y" | "yes" | "" => {
-                                    clear();
-                                    parse_album()
-                                }
-                                "n" | "no" => {
-                                    clear();
-                                    next_sel = None;
-                                    continue;
-                                }
-                                "a" | "all" => {
-                                    clear();
-                                    all = true;
-                                    parse_album()
-                                }
-                                _ => {
-                                    clear();
-                                    pl!("⤴ Canceled all albums download.");
-                                    next_sel = None;
-                                    page_sel = None;
-                                    break;
-                                }
-                            };
-                        }
+                            input.trim().make_ascii_lowercase();
+                            Mode::Normal(input)
+                        }}
                     };
+                    let clear = match input {
+                        Mode::Raw(_) => format_args!("{CL}"),
+                        Mode::Normal(_) => format_args!("{UP}{CL}"),
+                    };
+                    write!(stdout, "{clear}").unwrap();
+                    stdout.flush().unwrap();
+                    match input {
+                        Mode::Raw(c) => match c {
+                            b'y' | b'Y' | b'\n' => parse_album(),
+                            b'n' | b'N' => {
+                                next_sel = None;
+                                continue;
+                            }
+                            b'a' | b'A' => {
+                                all = true;
+                                parse_album()
+                            }
+                            _ => {
+                                pl!("⤴ Canceled all albums download.");
+                                next_sel = None;
+                                page_sel = None;
+                                break;
+                            }
+                        },
+                        Mode::Normal(s) => match s.as_str() {
+                            "y" | "yes" | "" => parse_album(),
+                            "n" | "no" => {
+                                next_sel = None;
+                                continue;
+                            }
+                            "a" | "all" => {
+                                all = true;
+                                parse_album()
+                            }
+                            _ => {
+                                pl!("⤴ Canceled all albums download.");
+                                next_sel = None;
+                                page_sel = None;
+                                break;
+                            }
+                        },
+                    }
                 }
             }
         }
@@ -1533,6 +1506,7 @@ mod img {
 
     #[test]
     fn run() {
+        tdbg!(123;);
         if let Some(arg) = arg(current_fn!()) {
             parse(&arg);
         } else {

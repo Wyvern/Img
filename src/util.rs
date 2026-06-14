@@ -216,28 +216,23 @@ pub fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
 #[allow(unused)]
 pub fn pause() {
     use io::*;
-    let mut o = stdout();
+    let mut o = stdout().lock();
     write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
     o.flush().unwrap();
-    cfg_select! {
-        windows=>{
+    #[allow(unused)]
+    enum Mode {
+        Raw(u8),
+        Normal(String),
+    }
+    let input = cfg_select! {
+        windows=>{{
             unsafe extern "C" {
                 fn _getch() -> i32;
             }
             let ch=unsafe { _getch() } as u8;
-            match ch {
-                b'q' | b'Q' | 0x1b => {
-                    write!(o, "{CL}⏏!").unwrap();
-                    o.flush().unwrap();
-                    process::exit(0);
-                }
-                _ => {
-                    write!(o, "{CL}").unwrap();
-                    o.flush().unwrap();
-                }
-            }
-            }
-        all(unix,not(target_os = "emscripten"))=>{
+            Mode::Raw(ch)
+            }}
+        all(unix,not(target_os = "emscripten"))=>{{
             let fd = libc::STDIN_FILENO;
             let old = mem::MaybeUninit::<libc::termios>::uninit();
             begin_raw_mode(fd, old);
@@ -245,36 +240,41 @@ pub fn pause() {
             let mut key = [0u8; 1];
             i.read_exact(&mut key).unwrap();
             end_raw_mode(fd, old);
-            match key[0] {
-                b'q' | b'Q' | 0x1b => {
-                    write!(o, "{CL}⏏!").unwrap();
-                    o.flush().unwrap();
-                    process::exit(0);
-                }
-                _ => {
-                    write!(o, "{CL}").unwrap();
-                    o.flush().unwrap();
-                }
-            }
-        }
-        _=>{
-            let mut o = stdout().lock();
-            write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
-            o.flush().unwrap();
+            Mode::Raw(key[0])
+        }}
+        _=>{{
             let mut s = String::default();
             stdin().lock().read_line(&mut s).unwrap();
-            s.make_ascii_lowercase();
-            if s.trim() == "q" {
-                write!(o, "{UP}{CL}⏏!").unwrap();
+            s.trim().make_ascii_lowercase();
+            Mode::Normal(s)
+        }}
+    };
+    let clear = match input {
+        Mode::Raw(_) => format_args!("{CL}"),
+        Mode::Normal(_) => format_args!("{UP}{CL}"),
+    };
+    write!(o, "{clear}").unwrap();
+    o.flush().unwrap();
+    match input {
+        Mode::Raw(c) => match c {
+            b'q' | b'Q' | 0x1b => {
+                write!(o, "⏏!").unwrap();
                 o.flush().unwrap();
                 drop(o);
                 process::exit(0);
-            } else {
-                write!(o, "{UP}{CL}").unwrap();
-                o.flush().unwrap();
             }
-        }
-    };
+            _ => (),
+        },
+        Mode::Normal(s) => match s.as_str() {
+            "q" | "quit" => {
+                write!(o, "⏏!").unwrap();
+                o.flush().unwrap();
+                drop(o);
+                process::exit(0);
+            }
+            _ => (),
+        },
+    }
 }
 
 #[cfg(test)]
