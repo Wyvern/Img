@@ -213,17 +213,9 @@ pub fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
         libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
     }
 }
-#[allow(unused)]
-pub fn pause() {
+pub fn terminal_input(o: &io::Stdout) -> Mode {
     use io::*;
-    let mut o = stdout().lock();
-    write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
-    o.flush().unwrap();
-    #[allow(unused)]
-    enum Mode {
-        Raw(u8),
-        Normal(String),
-    }
+    let mut o = o.lock();
     let input = cfg_select! {
         windows=>{{
             unsafe extern "C" {
@@ -236,15 +228,16 @@ pub fn pause() {
             let fd = libc::STDIN_FILENO;
             let old = mem::MaybeUninit::<libc::termios>::uninit();
             begin_raw_mode(fd, old);
-            let mut i = stdin();
             let mut key = [0u8; 1];
+            let mut i=stdin().lock();
             i.read_exact(&mut key).unwrap();
             end_raw_mode(fd, old);
             Mode::Raw(key[0])
         }}
         _=>{{
             let mut s = String::default();
-            stdin().lock().read_line(&mut s).unwrap();
+            let mut i=stdin().lock();
+            i.read_line(&mut s).unwrap();
             s.make_ascii_lowercase();
             Mode::Normal(s)
         }}
@@ -255,12 +248,27 @@ pub fn pause() {
     };
     write!(o, "{clear}").unwrap();
     o.flush().unwrap();
+    input
+}
+
+#[allow(unused)]
+pub enum Mode {
+    Raw(u8),
+    Normal(String),
+}
+
+#[allow(unused)]
+pub fn pause() {
+    use io::*;
+    let mut o = stdout();
+    write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
+    o.flush().unwrap();
+    let input = terminal_input(&o);
     match input {
         Mode::Raw(c) => match c {
             b'q' | b'Q' | 0x1b => {
                 write!(o, "⏏!").unwrap();
                 o.flush().unwrap();
-                drop(o);
                 process::exit(0);
             }
             _ => (),
@@ -269,7 +277,6 @@ pub fn pause() {
             "q" | "quit" => {
                 write!(o, "⏏!").unwrap();
                 o.flush().unwrap();
-                drop(o);
                 process::exit(0);
             }
             _ => (),

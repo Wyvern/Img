@@ -651,10 +651,7 @@ fn parse(addr: &str) -> String {
                     parse_album();
                 } else {
                     use io::*;
-
-                    let mut _stdin = stdin();
                     let mut stdout = stdout();
-
                     let t = ["title", "alt", "aria-label"]
                         .iter()
                         .find_map(|a| alb.attr(a))
@@ -683,44 +680,8 @@ fn parse(addr: &str) -> String {
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
                     );
-                    _ = stdout.flush();
-                    #[allow(unused)]
-                    enum Mode {
-                        Raw(u8),
-                        Normal(String),
-                    }
-                    let input = cfg_select! {
-                        windows=>{{
-                            unsafe extern "C" {
-                                fn _getch() -> i32;
-                            }
-                            let ch=unsafe { _getch() } as u8;
-                            Mode::Raw(ch)
-                            }}
-                        all(unix,not(target_os = "emscripten"))=>{{
-                            let fd = libc::STDIN_FILENO;
-                            let old = mem::MaybeUninit::<libc::termios>::uninit();
-                            begin_raw_mode(fd, old);
-                            let mut key = [0u8; 1];
-                            _stdin.read_exact(&mut key).unwrap();
-                            end_raw_mode(fd, old);
-                            Mode::Raw(key[0])
-                        }}
-                        _=>{{
-                            let mut input = String::new();
-                            _stdin.read_line(&mut input).unwrap_or_else(|e| {
-                                quit!("{}", e);
-                            });
-                            input.make_ascii_lowercase();
-                            Mode::Normal(input)
-                        }}
-                    };
-                    let clear = match input {
-                        Mode::Raw(_) => format_args!("{CL}"),
-                        Mode::Normal(_) => format_args!("{UP}{CL}"),
-                    };
-                    write!(stdout, "{clear}").unwrap();
                     stdout.flush().unwrap();
+                    let input = terminal_input(&stdout);
                     match input {
                         Mode::Raw(c) => match c {
                             b'y' | b'Y' | b'\n' => parse_album(),
@@ -1506,7 +1467,6 @@ mod img {
 
     #[test]
     fn run() {
-        tdbg!(123;);
         if let Some(arg) = arg(current_fn!()) {
             parse(&arg);
         } else {
