@@ -221,7 +221,9 @@ pub fn terminal_input(o: &io::Stdout) -> Mode {
             unsafe extern "C" {
                 fn _getch() -> i32;
             }
-            let ch=unsafe { _getch() } as u8;
+            let _i = stdin().lock();
+            let mut ch = unsafe { _getch() } as u8;
+            ch.make_ascii_lowercase();
             Mode::Raw(ch)
             }}
         all(unix,not(target_os = "emscripten"))=>{{
@@ -229,14 +231,15 @@ pub fn terminal_input(o: &io::Stdout) -> Mode {
             let old = mem::MaybeUninit::<libc::termios>::uninit();
             begin_raw_mode(fd, old);
             let mut key = [0u8; 1];
-            let mut i=stdin().lock();
+            let mut i = stdin().lock();
             i.read_exact(&mut key).unwrap();
             end_raw_mode(fd, old);
+            key.make_ascii_lowercase();
             Mode::Raw(key[0])
         }}
         _=>{{
             let mut s = String::default();
-            let mut i=stdin().lock();
+            let mut i = stdin().lock();
             i.read_line(&mut s).unwrap();
             s.make_ascii_lowercase();
             Mode::Normal(s)
@@ -266,7 +269,7 @@ pub fn pause() {
     let input = terminal_input(&o);
     match input {
         Mode::Raw(c) => match c {
-            b'q' | b'Q' | 0x1b => {
+            b'q' | 0x1b => {
                 write!(o, "⏏!").unwrap();
                 o.flush().unwrap();
                 process::exit(0);

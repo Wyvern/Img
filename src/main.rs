@@ -684,12 +684,12 @@ fn parse(addr: &str) -> String {
                     let input = terminal_input(&stdout);
                     match input {
                         Mode::Raw(c) => match c {
-                            b'y' | b'Y' | b'\n' => parse_album(),
-                            b'n' | b'N' => {
+                            b'y' | b'\n' => parse_album(),
+                            b'n' => {
                                 next_sel = None;
                                 continue;
                             }
-                            b'a' | b'A' => {
+                            b'a' => {
                                 all = true;
                                 parse_album()
                             }
