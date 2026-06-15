@@ -31,7 +31,7 @@ fn main() {
             c.args(["-czf", "web.tar.gz", output]);
             c
         }
-        "unix" => {
+        t if t.contains("unix") => {
             let mut c = process::Command::new("gzip");
             c.args(["-kf", output]);
             c

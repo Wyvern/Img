@@ -1182,7 +1182,7 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        all(unix,not(target_os = "emscripten"))=>{
+        unix=>{
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
         windows=>{
