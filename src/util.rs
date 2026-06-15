@@ -39,30 +39,39 @@ mod macros {
     #[macro_export]
     macro_rules! cdbg {
         () => {
-            #[cfg(debug_assertions)]{
-                $crate::println!("cargo::warning=[{}:{}:{}]", $crate::file!(), $crate::line!(), $crate::column!())
+            cfg_select! {
+                any(test,debug_assertions)=>{{
+                    $crate::println!("cargo::warning=[{}:{}:{}]", $crate::file!(), $crate::line!(), $crate::column!());
+                }}
+                _=>()
             }
         };
         ($val:expr) => {
-            #[cfg(debug_assertions)]{
-                match $val {
-                tmp => {
-                        $crate::println!("cargo::warning=[{}:{}:{}] {} = {:#?}",
-                            $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), &tmp);
-                        tmp
+            cfg_select! {
+                any(test,debug_assertions)=>{{
+                    match $val {
+                    tmp => {
+                            $crate::println!("cargo::warning=[{}:{}:{}] {} = {:#?}",
+                                $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), tmp);
+                            tmp
+                        }
                     }
-                }
+                }}
+                _=>{$val}
             }
         };
         ($val:expr;) => {
-            #[cfg(debug_assertions)]{
-                match $val {
-                tmp => {
-                        $crate::println!("cargo::error=[{}:{}:{}] {} = {:#?}",
-                            $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), &tmp);
-                        tmp
+            cfg_select! {
+                any(test,debug_assertions)=>{{
+                    match $val {
+                    tmp => {
+                            $crate::println!("cargo::error=[{}:{}:{}] {} = {:#?}",
+                                $crate::file!(), $crate::line!(), $crate::column!(), $crate::stringify!($val), tmp);
+                            tmp
+                        }
                     }
-                }
+                }}
+                _=>{$val}
             }
         };
         ($($val:expr),+) => {
