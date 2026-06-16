@@ -651,10 +651,7 @@ fn parse(addr: &str) -> String {
                     parse_album();
                 } else {
                     use io::*;
-
-                    let mut _stdin = stdin();
                     let mut stdout = stdout();
-
                     let t = ["title", "alt", "aria-label"]
                         .iter()
                         .find_map(|a| alb.attr(a))
@@ -683,107 +680,44 @@ fn parse(addr: &str) -> String {
                         u = char::from_u32(0x332).unwrap(),
                         s = SEP,
                     );
-                    _ = stdout.flush();
-                    let mut _clear = || {
-                        write!(stdout, "{CL}").unwrap();
-                        stdout.flush().unwrap();
-                    };
-                    cfg_select! {
-                        windows=>{
-                            unsafe extern "C" {
-                                fn _getch() -> i32;
+                    stdout.flush().unwrap();
+                    let input = terminal_input(&stdout);
+                    match input {
+                        Mode::Raw(c) => match c {
+                            b'y' | b'\n' => parse_album(),
+                            b'n' => {
+                                next_sel = None;
+                                continue;
                             }
-                            let ch=unsafe { _getch() } as u8;
-                            match ch {
-                                b'y' | b'Y' | b'\n' => {
-                                    _clear();
-                                    parse_album()
-                                }
-                                b'n' | b'N' => {
-                                    _clear();
-                                    next_sel = None;
-                                    continue;
-                                }
-                                b'a' | b'A' => {
-                                    _clear();
-                                    all = true;
-                                    parse_album()
-                                }
-                                _ => {
-                                    _clear();
-                                    pl!("⤴ Canceled all albums download.");
-                                    next_sel = None;
-                                    page_sel = None;
-                                    break;
-                                }
+                            b'a' => {
+                                all = true;
+                                parse_album()
                             }
+                            _ => {
+                                pl!("⤴ Canceled all albums download.");
+                                next_sel = None;
+                                page_sel = None;
+                                break;
                             }
-                        all(unix,not(target_os = "emscripten"))=>{
-                            let fd = libc::STDIN_FILENO;
-                            let old = mem::MaybeUninit::<libc::termios>::uninit();
-                            begin_raw_mode(fd, old);
-                            let mut key = [0u8; 1];
-                            _stdin.read_exact(&mut key).unwrap();
-                            end_raw_mode(fd, old);
-                            match key[0] {
-                                b'y' | b'Y' | b'\n' => {
-                                    _clear();
-                                    parse_album()
-                                }
-                                b'n' | b'N' => {
-                                    _clear();
-                                    next_sel = None;
-                                    continue;
-                                }
-                                b'a' | b'A' => {
-                                    _clear();
-                                    all = true;
-                                    parse_album()
-                                }
-                                _ => {
-                                    _clear();
-                                    pl!("⤴ Canceled all albums download.");
-                                    next_sel = None;
-                                    page_sel = None;
-                                    break;
-                                }
+                        },
+                        Mode::Normal(s) => match s.trim() {
+                            "y" | "yes" | "" => parse_album(),
+                            "n" | "no" => {
+                                next_sel = None;
+                                continue;
                             }
-                        }
-                        _=>{
-                            let mut input = String::new();
-                            _stdin.read_line(&mut input).unwrap_or_else(|e| {
-                                quit!("{}", e);
-                            });
-                            input.make_ascii_lowercase();
-                            let mut clear = || {
-                                write!(stdout, "{UP}{CL}").unwrap();
-                                stdout.flush().unwrap();
-                            };
-                            match input.trim() {
-                                "y" | "yes" | "" => {
-                                    clear();
-                                    parse_album()
-                                }
-                                "n" | "no" => {
-                                    clear();
-                                    next_sel = None;
-                                    continue;
-                                }
-                                "a" | "all" => {
-                                    clear();
-                                    all = true;
-                                    parse_album()
-                                }
-                                _ => {
-                                    clear();
-                                    pl!("⤴ Canceled all albums download.");
-                                    next_sel = None;
-                                    page_sel = None;
-                                    break;
-                                }
-                            };
-                        }
-                    };
+                            "a" | "all" => {
+                                all = true;
+                                parse_album()
+                            }
+                            _ => {
+                                pl!("⤴ Canceled all albums download.");
+                                next_sel = None;
+                                page_sel = None;
+                                break;
+                            }
+                        },
+                    }
                 }
             }
         }
@@ -1248,7 +1182,7 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        all(unix,not(target_os = "emscripten"))=>{
+        unix=>{
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
         windows=>{

@@ -26,18 +26,16 @@ serde_json = "*"
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 serde_json = "*"
 
-[target.'cfg(all(unix,not(target_os = "emscripten")))'.dependencies]
-libc = "*"
-
-[target.'cfg(all(unix,not(target_os = "emscripten")))'.build-dependencies]
-libc = "*"
-
 [target.'cfg(target_os = "hermit")'.dependencies]
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
+
+[target.'cfg(unix)'.build-dependencies]
+libc = "*"
 
 [target.'cfg(unix)'.dependencies]
 file-format = "*"
 fork = "*"
+libc = "*"
 
 [features]
 default = []
