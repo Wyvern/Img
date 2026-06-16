@@ -151,14 +151,14 @@ enum Command {
 #[argh(subcommand, name = "fg", description = "foreground color")]
 struct FgCmd {
     #[argh(positional)]
-    color: Option<u8>,
+    color: Option<String>,
 }
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "bg", description = "background color")]
 struct BgCmd {
     #[argh(positional)]
-    color: Option<u8>,
+    color: Option<String>,
 }
 
 #[derive(argh::FromArgs, Debug)]
@@ -168,12 +168,20 @@ struct RgbCmd {
     rgb: Vec<String>,
 }
 
+fn parse_u8(mut s: String) -> Result<u8, num::ParseIntError> {
+    s.make_ascii_lowercase();
+    s.parse::<u8>()
+        .or_else(|_| u8::from_str_radix(s.trim_start_matches("0x"), 16))
+}
+
 fn main() {
     let args: Args = argh::from_env();
     match args.cmd {
         Some(Command::Fg(cmd)) => {
-            if let Some(c) = cmd.color {
-                println!("{:?}", Color::FG(c));
+            if let Some(s) = cmd.color
+                && let Ok(n) = parse_u8(s)
+            {
+                println!("{:?}", Color::FG(n));
             } else {
                 (0u8..=255).for_each(|c| {
                     println!("{:?}", Color::FG(c));
@@ -182,8 +190,10 @@ fn main() {
         }
 
         Some(Command::Bg(cmd)) => {
-            if let Some(c) = cmd.color {
-                println!("{:?}", Color::BG(c));
+            if let Some(s) = cmd.color
+                && let Ok(n) = parse_u8(s)
+            {
+                println!("{:?}", Color::BG(n));
             } else {
                 (0u8..=255).for_each(|c| {
                     println!("{:?}", Color::BG(c));
@@ -196,11 +206,8 @@ fn main() {
                 eprintln!("rgb requires exactly 3 values");
                 process::exit(1);
             }
-            fn parse_u8(x: &str) -> Result<u8, std::num::ParseIntError> {
-                x.parse::<u8>()
-                    .or_else(|_| u8::from_str_radix(x.trim_start_matches("0x"), 16))
-            }
-            let mut rgb = cmd.rgb.iter().map(|x| parse_u8(x));
+
+            let mut rgb = cmd.rgb.into_iter().map(|x| parse_u8(x));
 
             if let [Ok(r), Ok(g), Ok(b)] = [
                 rgb.next().unwrap(),

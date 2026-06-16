@@ -681,7 +681,7 @@ fn parse(addr: &str) -> String {
                         s = SEP,
                     );
                     stdout.flush().unwrap();
-                    let input = terminal_input(&stdout);
+                    let input = terminal_input(&mut stdout.lock());
                     match input {
                         Mode::Raw(c) => match c {
                             b'y' | b'\n' => parse_album(),
