@@ -206,7 +206,7 @@ pub trait Dbg: fmt::Debug {
 impl<T: fmt::Debug> Dbg for T {}
 
 #[cfg(unix)]
-pub fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) {
+fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcgetattr(fd, old.as_mut_ptr());
         let old = old.assume_init();
@@ -217,7 +217,7 @@ pub fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termio
 }
 
 #[cfg(unix)]
-pub fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
+fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
     }
