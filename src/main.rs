@@ -956,7 +956,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     }
                     process::exit(0);
                 }
-                Ok(_) => {}
+                Ok(_) => (),
                 Err(e) => quit!("Fork process failed: {e}"),
             }
         }
