@@ -681,7 +681,7 @@ fn parse(addr: &str) -> String {
                         s = SEP,
                     );
                     stdout.flush().unwrap();
-                    let input = terminal_input(&stdout);
+                    let input = terminal_input(&mut stdout.lock());
                     match input {
                         Mode::Raw(c) => match c {
                             b'y' | b'\n' => parse_album(),
@@ -936,9 +936,16 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
         #[cfg(unix)]
         {
-            use fork::*;
+            fn fork() -> io::Result<libc::pid_t> {
+                let pid = unsafe { libc::fork() };
+                if pid < 0 {
+                    Err(io::Error::last_os_error())
+                } else {
+                    Ok(pid)
+                }
+            }
             match fork() {
-                Ok(Fork::Child) => {
+                Ok(0) => {
                     curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
                     curl.args(CURL).args(opts).status().unwrap();
                     for (_, f) in no_ext {
@@ -949,8 +956,8 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                     }
                     process::exit(0);
                 }
+                Ok(_) => (),
                 Err(e) => quit!("Fork process failed: {e}"),
-                _ => (),
             }
         }
         #[cfg(not(unix))]

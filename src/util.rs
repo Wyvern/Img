@@ -222,9 +222,9 @@ fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
         libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
     }
 }
-pub fn terminal_input(o: &io::Stdout) -> Mode {
+
+pub fn terminal_input(o: &mut io::StdoutLock) -> Mode {
     use io::*;
-    let mut o = o.lock();
     let input = cfg_select! {
         windows=>{{
             unsafe extern "C" {
@@ -275,22 +275,19 @@ pub fn pause() {
     let mut o = stdout();
     write!(o, "Press any key to continue, or [Q̲]uit: ").unwrap();
     o.flush().unwrap();
-    let input = terminal_input(&o);
+    let input = terminal_input(&mut o.lock());
+    let mut quit = || {
+        write!(o, "⏏!").unwrap();
+        o.flush().unwrap();
+        process::exit(0);
+    };
     match input {
         Mode::Raw(c) => match c {
-            b'q' | 0x1b => {
-                write!(o, "⏏!").unwrap();
-                o.flush().unwrap();
-                process::exit(0);
-            }
+            b'q' | 0x1b => quit(),
             _ => (),
         },
         Mode::Normal(s) => match s.trim() {
-            "q" | "quit" => {
-                write!(o, "⏏!").unwrap();
-                o.flush().unwrap();
-                process::exit(0);
-            }
+            "q" | "quit" | "\x1b" => quit(),
             _ => (),
         },
     }
