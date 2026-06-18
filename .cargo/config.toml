@@ -648,9 +648,6 @@ rustflags = [
   "-Ctarget-feature=-soft-float",
 ]
 
-[target.powerpc64-unknown-linux-gnuelfv2]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc64-linux-gnu"]
 [target.powerpc64-unknown-linux-musl]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc64-linux-musl"]

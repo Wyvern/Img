@@ -101,6 +101,7 @@ jobs:
           targets=(
             powerpc64-unknown-linux-gnuelfv2
             powerpc64-unknown-linux-gnu
+            powerpc64-unknown-linux-musl
             powerpc-unknown-linux-gnu
             powerpc-unknown-linux-musl
             hexagon-unknown-linux-musl
