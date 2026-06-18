@@ -34,7 +34,6 @@ libc = "*"
 
 [target.'cfg(unix)'.dependencies]
 file-format = "*"
-fork = "*"
 libc = "*"
 
 [features]
