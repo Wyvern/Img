@@ -136,7 +136,7 @@ fn host_info(host: &str) -> [Option<&str>; 5] {
         .find(|&site| {
             site["Site"].as_str().is_some_and(|s| {
                 s.split_terminator(',').any(|s| {
-                    let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
+                    let mut parts = host.rsplit('.').take(2).collect::<Box<[_]>>();
                     parts.reverse();
                     let r = parts.join(".").eq_ignore_ascii_case(s.trim());
                     if r {
@@ -208,7 +208,7 @@ fn parse(addr: &str) -> String {
                 .unwrap()
                 .iter()
                 .map(|v| v.as_str().unwrap())
-                .collect::<Vec<_>>();
+                .collect::<Box<[_]>>();
             if !page.select(arr[1]).is_empty() {
                 Some(arr)
             } else {
@@ -439,7 +439,7 @@ fn parse(addr: &str) -> String {
                     None
                 }
             })
-            .collect::<Vec<_>>()
+            .collect::<Box<[_]>>()
             .join(" + ")
     };
 
@@ -1167,7 +1167,7 @@ fn check_next(nt: Next, cur: &str, page: &dom::Document) -> String {
 }
 
 ///Run arbitrary command in sync mode
-fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
+fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Box<[u8]> {
     let mut child = process::Command::new(cmd)
         .args(args)
         .stdin(process::Stdio::piped())
@@ -1182,7 +1182,7 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
 
     let out = child.wait_with_output().unwrap();
     assert!(out.status.success());
-    out.stdout
+    out.stdout.into_boxed_slice()
 }
 
 ///WebSites `Json` config data
@@ -1570,7 +1570,7 @@ mod img {
                     None
                 }
             })
-            .collect::<Vec<_>>();
+            .collect::<Box<_>>();
         pl!(
             "Todally find {} Img selectors, with duplicated {} selectors.",
             img_sel.len(),
