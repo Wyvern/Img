@@ -1003,8 +1003,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 /// Infer file type through magic number
 #[cfg(unix)]
 fn magic_number_type(pb: path::PathBuf) {
-    use file_format::*;
-    let t = FileFormat::from_file(&pb);
+    let t = file_format::FileFormat::from_file(&pb);
     fs::rename(
         &pb,
         pb.with_extension(t.map_or_else(|_| "ext!".to_owned(), |ty| ty.extension().into())),
