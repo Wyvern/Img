@@ -33,7 +33,7 @@ static mut EMBED: bool = false;
 #[argh(
     description = "<img> fetcher/cralwer across various web pages.",
     name = "img",
-    example = "{command_name} url... -f -o dir -e",
+    example = "<{command_name}> url... -f -o dir -e",
     note = "version: 1.0"
 )]
 struct Args {
