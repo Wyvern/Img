@@ -68,7 +68,10 @@ fn parse_output_dir(value: &str) -> Result<path::PathBuf, String> {
     if p.exists() && p.is_dir() {
         Ok(p)
     } else {
-        Err("path must be an existing directory".into())
+        Err(format!(
+            "Path `{}` must be an existing directory",
+            p.display()
+        ))
     }
 }
 
