@@ -40,7 +40,9 @@ jobs:
       - name: Cache Yocto
         uses: actions/cache@v5
         with:
-          path: /opt/poky/6.0.1
+          path: |
+            /opt/poky/6.0.1
+            !/opt/poky/6.0.1/**/usr/bin/sudo
           key: yocto-6.0.1
           restore-keys: yocto-6.0.1
 
@@ -59,7 +61,7 @@ jobs:
             for file in ${files[@]}; do
               curl -LsSf ${url}/${file} -o /home/runner/yocto/$file
               chmod +x /home/runner/yocto/$file
-              time /home/runner/yocto/$file -y
+              /home/runner/yocto/$file -y
             done
           fi
 
@@ -77,8 +79,8 @@ jobs:
 
           sdk=/opt/poky/6.0.1
 
-          for t in "${targets[@]}"; do
-            read -r target env <<< "$t"
+          for entry in "${targets[@]}"; do
+            read -r target env <<< "$entry"
             (
               source $sdk/$env
               time cargo s $target
