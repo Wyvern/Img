@@ -81,10 +81,8 @@ jobs:
 
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
-            (
-              source $sdk/$env
-              time cargo s $target
-            )
+            source $sdk/$env
+            time cargo s $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
