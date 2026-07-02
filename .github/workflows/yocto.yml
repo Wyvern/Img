@@ -59,7 +59,7 @@ jobs:
             for file in ${files[@]}; do
               curl -LsSf ${url}/${file} -o /home/runner/yocto/$file
               chmod +x /home/runner/yocto/$file
-              /home/runner/yocto/$file -y
+              time /home/runner/yocto/$file -y
             done
           fi
 
@@ -77,10 +77,12 @@ jobs:
 
           sdk=/opt/poky/6.0.1
 
-          for t in ${targets[@]}; do
+          for t in "${targets[@]}"; do
             read -r target env <<< "$t"
-            source $sdk/$env
-            time cargo s $target
+            (
+              source $sdk/$env
+              time cargo s $target
+            )
           done
 
           find ./target -iname img -type f | xargs ls -hl
