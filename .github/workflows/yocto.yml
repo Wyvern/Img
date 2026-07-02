@@ -56,12 +56,13 @@ jobs:
           )
 
           mkdir -p /home/runner/yocto
-          for file in ${files[@]}; do
-            if [[ ! -f /home/runner/yocto/$file ]]; then
-            curl -LsSf ${url}/${file} -o /home/runner/yocto/$file
-            fi
-            chmod +x /home/runner/yocto/$file
-            /home/runner/yocto/$file -y
+
+          for file in "${files[@]}"; do
+              if [[ ! -f "/home/runner/yocto/$file" ]]; then
+                  curl -LsSf "$url/$file" -o "/home/runner/yocto/$file"
+              fi
+              chmod +x "/home/runner/yocto/$file"
+              "/home/runner/yocto/$file" -y
           done
 
       - name: Build Release
@@ -77,6 +78,7 @@ jobs:
           )
 
           sdk=/opt/poky/6.0.1
+          ln -s $sdk/sysroots sysroots
 
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
