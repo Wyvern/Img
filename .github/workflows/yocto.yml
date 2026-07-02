@@ -84,9 +84,9 @@ jobs:
             read -r target env <<< "$entry"
             (
             source $sdk/$env &>/dev/null
-            unset RUST_TARGET_PATH &>/dev/null
+            unset RUST_TARGET_PATH
             for v in ${!CARGO_TARGET_@}; do
-                unset "$v" &>/dev/null
+                unset "$v"
             done
             export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
             time cargo s $target
