@@ -83,7 +83,7 @@ jobs:
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
             (
-            source $sdk/$env
+            source $sdk/$env &>/dev/null
             unset RUST_TARGET_PATH
             for v in ${!CARGO_TARGET_@}; do
                 unset "$v"
@@ -93,7 +93,6 @@ jobs:
             )
           done
 
-          sudo chmod a+r /opt/poky/6.0.1/sysroots/*/usr/bin/sudo
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
