@@ -83,15 +83,10 @@ jobs:
             (
             source $sdk/$env
             unset RUST_TARGET_PATH
-            unset RUSTFLAGS
-            unset RUSTDOCFLAGS
-            unset RUSTC
-            unset RUSTC_WRAPPER
-            unset RUSTUP_TOOLCHAIN
-            unset CARGO_BUILD_TARGET
             for v in ${!CARGO_TARGET_@}; do
                 unset "$v"
             done
+            export PATH="$HOME/.cargo/bin:$PATH"
             time cargo s $target
             )
           done
