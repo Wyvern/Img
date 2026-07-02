@@ -1,0 +1,138 @@
+name: Yocto
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+  Linux:
+    name: Yocto/OpenEmbedded
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Ubuntu apt update and install
+        run: |
+
+      - name: Toolchain downloads
+        run: |
+          ver=6.0.1
+          url=https://downloads.yoctoproject.org/releases/yocto/yocto-${ver}/toolchain/x86_64
+          files=(
+          poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${ver}.sh
+          poky-glibc-x86_64-core-image-sato-armv8a-genericarm64-toolchain-${ver}.sh
+          poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-beaglebone-yocto-toolchain-${ver}.sh
+          poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${ver}.sh
+          )
+          if [ ! -d /home/runner/yocto ]; then
+            mkdir -p /home/runner/yocto
+            for file in ${files[@]}; do
+              curl -LsSf ${url}/${file} -o /home/runner/yocto/$file
+              chmod +x /home/runner/yocto/$file
+              /home/runner/yocto/$file
+            done
+          fi
+          ln -sf /home/runner/yocto oe
+
+      - name: Cache Yocto
+        uses: actions/cache@v5
+        with:
+          path: /home/runner/yocto
+          key: yocto-6.0.1
+          restore-keys: yocto-6.0.1
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+            aarch64-oe-linux-gnu
+            armv7-oe-linux-gnueabihf
+            riscv64-oe-linux-gnu
+            x86_64-oe-linux-gnu
+          )
+
+          source oe/environment-setup-armv8a-*-poky-linux
+          time cargo s aarch64-oe-linux-gnu
+          source oe/environment-setup-core2-64-*-poky-linux
+          time cargo s x86_64-oe-linux-gnu
+          source oe/environment-setup-cortexa8hf-*-poky-linux
+          time cargo s armv7-oe-linux-gnueabihf
+          source oe/environment-setup-riscv64imafdc-*-poky-linux
+          time cargo s riscv64-oe-linux-gnu
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  aarch64-oe-linux-gnu
+                  armv7-oe-linux-gnueabihf
+                  riscv64-oe-linux-gnu
+                  x86_64-oe-linux-gnu
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$vendor" == "openwrt" ]]; then
+                    name="${vendor^}-${arch}-${abi}"
+                elif [[ "$vendor" == "oe" ]]; then
+                    name="OpenEmbedded-${arch}-${abi}"
+                else
+                    if [[ "$abi" == "ohos" ]]; then
+                        name="Android-${arch}-${abi}"
+                    else
+                        name="${os^}-${arch}-${abi}"
+                    fi
+                fi
+            else
+                if [[ "$os" == "androideabi" ]]; then
+                    name="Android-${arch}"
+                else
+                    name="${os^}-${arch}"
+                fi
+            fi
+
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
