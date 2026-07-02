@@ -37,6 +37,13 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
 
+      - name: Cache Yocto
+        uses: actions/cache@v5
+        with:
+          path: /opt/poky/6.0.1
+          key: yocto-6.0.1
+          restore-keys: yocto-6.0.1
+
       - name: Toolchain downloads
         run: |
           ver=6.0.1
@@ -47,22 +54,14 @@ jobs:
           poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-beaglebone-yocto-toolchain-${ver}.sh
           poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${ver}.sh
           )
-          if [ ! -d /home/runner/yocto ]; then
+          if [ ! -d /opt/poky/6.0.1 ]; then
             mkdir -p /home/runner/yocto
             for file in ${files[@]}; do
               curl -LsSf ${url}/${file} -o /home/runner/yocto/$file
               chmod +x /home/runner/yocto/$file
-              /home/runner/yocto/$file
+              /home/runner/yocto/$file -y
             done
           fi
-          ln -sf /home/runner/yocto oe
-
-      - name: Cache Yocto
-        uses: actions/cache@v5
-        with:
-          path: /home/runner/yocto
-          key: yocto-6.0.1
-          restore-keys: yocto-6.0.1
 
       - name: Build Release
         run: |
@@ -70,20 +69,19 @@ jobs:
           set +e -x
 
           targets=(
-            aarch64-oe-linux-gnu
-            armv7-oe-linux-gnueabihf
-            riscv64-oe-linux-gnu
-            x86_64-oe-linux-gnu
+            "aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux"
+            "armv7-oe-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
+            "riscv64-oe-linux-gnu environment-setup-riscv64imafdc-poky-linux"
+            "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
           )
 
-          source oe/environment-setup-armv8a-*-poky-linux
-          time cargo s aarch64-oe-linux-gnu
-          source oe/environment-setup-core2-64-*-poky-linux
-          time cargo s x86_64-oe-linux-gnu
-          source oe/environment-setup-cortexa8hf-*-poky-linux
-          time cargo s armv7-oe-linux-gnueabihf
-          source oe/environment-setup-riscv64imafdc-*-poky-linux
-          time cargo s riscv64-oe-linux-gnu
+          sdk=/opt/poky/6.0.1
+
+          for t in ${targets[@]}; do
+            read -r target env <<< "$t"
+            source $sdk/$env
+            time cargo s $target
+          done
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
