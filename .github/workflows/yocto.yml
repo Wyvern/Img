@@ -40,7 +40,7 @@ jobs:
       - name: Cache Yocto
         uses: actions/cache@v5
         with:
-          path: /opt/poky/6.0.1
+          path: /home/runner/yocto
           key: yocto-6.0.1
           restore-keys: yocto-6.0.1
 
@@ -54,14 +54,15 @@ jobs:
           poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-beaglebone-yocto-toolchain-${ver}.sh
           poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${ver}.sh
           )
-          if [ ! -d /opt/poky/6.0.1 ]; then
-            mkdir -p /home/runner/yocto
-            for file in ${files[@]}; do
-              curl -LsSf ${url}/${file} -o /home/runner/yocto/$file
-              chmod +x /home/runner/yocto/$file
-              /home/runner/yocto/$file -y
-            done
-          fi
+
+          mkdir -p /home/runner/yocto
+          for file in ${files[@]}; do
+            if [[ ! -f /home/runner/yocto/$file ]]; then
+            curl -LsSf ${url}/${file} -o /home/runner/yocto/$file
+            fi
+            chmod +x /home/runner/yocto/$file
+            /home/runner/yocto/$file -y
+          done
 
       - name: Build Release
         run: |
@@ -90,6 +91,7 @@ jobs:
             read -r target env <<< "$entry"
             (
             source $sdk/$env
+            rustup component add rust-src
             time cargo s $target
             )
           done
