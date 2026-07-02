@@ -652,6 +652,14 @@ rustflags = [
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc64-linux-musl"]
 
+[target.aarch64-oe-linux-gnu]
+linker = "aarch64-poky-linux-gcc"
+[target.armv7-oe-linux-gnueabihf]
+linker = "arm-poky-linux-gnueabi-gcc"
+[target.riscv64-oe-linux-gnu]
+linker = "riscv64-poky-linux-gcc"
+[target.x86_64-oe-linux-gnu]
+linker = "x86_64-poky-linux-gcc"
 
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"

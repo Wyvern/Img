@@ -69,35 +69,35 @@ jobs:
           cargo update
           set +e -x
 
-          # targets=(
-          #   "aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux"
-          #   "armv7-oe-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
-          #   "riscv64-oe-linux-gnu environment-setup-riscv64imafdc-poky-linux"
-          #   "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
-          # )
-
-          mv .cargo/config.toml .cargo/config.toml.bak
-          mv .cargo/yocto.toml .cargo/config.toml
-
           targets=(
-            "aarch64-unknown-linux-gnu environment-setup-armv8a-poky-linux"
-            "armv7-unknown-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
-            "riscv64gc-unknown-linux-gnu environment-setup-riscv64imafdc-poky-linux"
-            "x86_64-unknown-linux-gnu environment-setup-core2-64-poky-linux"
+            "aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux"
+            "armv7-oe-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
+            "riscv64-oe-linux-gnu environment-setup-riscv64imafdc-poky-linux"
+            "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
           )
+
+          # mv .cargo/config.toml .cargo/config.toml.bak
+          # mv .cargo/yocto.toml .cargo/config.toml
+
+          # targets=(
+          #   "aarch64-unknown-linux-gnu environment-setup-armv8a-poky-linux"
+          #   "armv7-unknown-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
+          #   "riscv64gc-unknown-linux-gnu environment-setup-riscv64imafdc-poky-linux"
+          #   "x86_64-unknown-linux-gnu environment-setup-core2-64-poky-linux"
+          # )
           sdk=/opt/poky/6.0.1
 
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
             (
             source $sdk/$env
-            rustup component add rust-src
+            unset RUST_TARGET_PATH
             time cargo s $target
             )
           done
 
-          mv .cargo/config.toml .cargo/yocto.toml
-          mv .cargo/config.toml.bak .cargo/config.toml
+          # mv .cargo/config.toml .cargo/yocto.toml
+          # mv .cargo/config.toml.bak .cargo/config.toml
 
           sudo chmod a+r /opt/poky/6.0.1/sysroots/*/usr/bin/sudo
           find ./target -iname img -type f | xargs ls -hl
