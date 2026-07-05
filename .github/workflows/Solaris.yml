@@ -1,4 +1,4 @@
-name: Illumos+Fuchsia
+name: Solaris+Illumos+Fuchsia
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   Linux:
-    name: Illumos+Fuchsia
+    name: Solaris+Illumos+Fuchsia
     runs-on: ubuntu-24.04
 
     steps:
@@ -142,7 +142,7 @@ jobs:
           # x86_64-pc-solaris
 
           for target in ${targets[@]}; do
-            export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
+            export CROSS_IMAGE=ghcr.io/cross-rs/${target}:edge
             time cross build -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
