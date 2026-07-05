@@ -137,11 +137,9 @@ jobs:
 
           targets=(
             x86_64-unknown-illumos
+            sparcv9-sun-solaris
           )
           # x86_64-pc-solaris
-
-          export CROSS_TARGET_SPARCV9_SUN_SOLARIS_IMAGE=ghcr.io/cross-rs/sparcv9-sun-solaris:edge
-          time cross build -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target sparcv9-sun-solaris
 
           for target in ${targets[@]}; do
             export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
