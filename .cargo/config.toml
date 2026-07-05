@@ -467,3 +467,6 @@ rustflags = ["-Clink-arg=--target=powerpc64-linux-gnu"]
 [target.powerpc64-unknown-linux-musl]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc64-linux-musl"]
+
+[target.'cfg(target_os = "solaris")']
+rustflags = ["-Clink-arg=/compat.o"]
