@@ -665,6 +665,9 @@ rustflags = ["-Clink-arg=--sysroot=sysroots/riscv64imafdc-poky-linux"]
 linker = "x86_64-poky-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=sysroots/core2-64-poky-linux"]
 
+[target.'cfg(target_os = "solaris")']
+rustflags = ["-Clink-arg=/compat.o"]
+
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"
 # rustflags = [

@@ -142,7 +142,7 @@ jobs:
           # x86_64-pc-solaris
 
           for target in ${targets[@]}; do
-            export CROSS_IMAGE=ghcr.io/cross-rs/${target}:edge
+            export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
             time cross build -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target $target
           done
 
