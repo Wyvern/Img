@@ -137,9 +137,9 @@ jobs:
 
           targets=(
             x86_64-unknown-illumos
+            sparcv9-sun-solaris
           )
           # x86_64-pc-solaris
-          # sparcv9-sun-solaris
 
           for target in ${targets[@]}; do
             export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
@@ -178,6 +178,7 @@ jobs:
             riscv64gc-unknown-fuchsia
             x86_64-unknown-fuchsia
             x86_64-fortanix-unknown-sgx
+            sparcv9-sun-solaris
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
