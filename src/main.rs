@@ -33,7 +33,7 @@ static mut EMBED: bool = false;
 #[argh(
     description = "<img> fetcher/cralwer across various web pages.",
     name = "img",
-    example = "{command_name} url... -f -o dir -e",
+    example = "<{command_name}> url... -f -o dir -e",
     note = "version: 1.0"
 )]
 struct Args {
@@ -68,7 +68,10 @@ fn parse_output_dir(value: &str) -> Result<path::PathBuf, String> {
     if p.exists() && p.is_dir() {
         Ok(p)
     } else {
-        Err("path must be an existing directory".into())
+        Err(format!(
+            "Path `{}` must be an existing directory",
+            p.display()
+        ))
     }
 }
 
@@ -136,7 +139,7 @@ fn host_info(host: &str) -> [Option<&str>; 5] {
         .find(|&site| {
             site["Site"].as_str().is_some_and(|s| {
                 s.split_terminator(',').any(|s| {
-                    let mut parts = host.rsplit('.').take(2).collect::<Vec<_>>();
+                    let mut parts = host.rsplit('.').take(2).collect::<Box<[_]>>();
                     parts.reverse();
                     let r = parts.join(".").eq_ignore_ascii_case(s.trim());
                     if r {
@@ -208,7 +211,7 @@ fn parse(addr: &str) -> String {
                 .unwrap()
                 .iter()
                 .map(|v| v.as_str().unwrap())
-                .collect::<Vec<_>>();
+                .collect::<Box<[_]>>();
             if !page.select(arr[1]).is_empty() {
                 Some(arr)
             } else {
@@ -439,7 +442,7 @@ fn parse(addr: &str) -> String {
                     None
                 }
             })
-            .collect::<Vec<_>>()
+            .collect::<Box<[_]>>()
             .join(" + ")
     };
 
@@ -1003,8 +1006,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 /// Infer file type through magic number
 #[cfg(unix)]
 fn magic_number_type(pb: path::PathBuf) {
-    use file_format::*;
-    let t = FileFormat::from_file(&pb);
+    let t = file_format::FileFormat::from_file(&pb);
     fs::rename(
         &pb,
         pb.with_extension(t.map_or_else(|_| "ext!".to_owned(), |ty| ty.extension().into())),
@@ -1168,7 +1170,7 @@ fn check_next(nt: Next, cur: &str, page: &dom::Document) -> String {
 }
 
 ///Run arbitrary command in sync mode
-fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
+fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Box<[u8]> {
     let mut child = process::Command::new(cmd)
         .args(args)
         .stdin(process::Stdio::piped())
@@ -1183,7 +1185,7 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Vec<u8> {
 
     let out = child.wait_with_output().unwrap();
     assert!(out.status.success());
-    out.stdout
+    out.stdout.into_boxed_slice()
 }
 
 ///WebSites `Json` config data
@@ -1479,9 +1481,9 @@ mod img {
         } else {
             [
                 "https://xiuren.biz/latest-post/",
+                "https://hotgirl.biz/tag/xiuren-extra/",
                 "https://bisipic.online",
                 "https://bestgirlsexy.com/category/china/imiss/page/17/",
-                "https://bisipic.online/forum.php?mod=forumdisplay&fid=2&typeid=20&typeid=20&filter=typeid&page=17"
             ]
             .into_iter()
             .for_each(|u| {
@@ -1571,7 +1573,7 @@ mod img {
                     None
                 }
             })
-            .collect::<Vec<_>>();
+            .collect::<Box<_>>();
         pl!(
             "Todally find {} Img selectors, with duplicated {} selectors.",
             img_sel.len(),
