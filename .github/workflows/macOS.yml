@@ -76,6 +76,8 @@ jobs:
             arm64e-apple-darwin
             x86_64h-apple-darwin
             wasm32-wasip2
+            wasm32-unknown-unknown
+            wasm64-unknown-unknown
           )
 
           for target in ${targets[@]}; do
@@ -117,6 +119,8 @@ jobs:
                   "aarch64-pc-windows-gnullvm Windows-aarch64-gnullvm.exe"
                   "x86_64-pc-windows-gnullvm Windows-x86_64-gnullvm.exe"
                   "wasm32-wasip2 wasm32-wasip2.wasm"
+                  "wasm32-unknown-unknown wasm32.wasm"
+                  "wasm64-unknown-unknown wasm64.wasm"
           )
 
           for target in "${targets[@]}"; do
