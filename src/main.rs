@@ -1481,9 +1481,9 @@ mod img {
         } else {
             [
                 "https://xiuren.biz/latest-post/",
+                "https://hotgirl.biz/tag/xiuren-extra/",
                 "https://bisipic.online",
                 "https://bestgirlsexy.com/category/china/imiss/page/17/",
-                "https://bisipic.online/forum.php?mod=forumdisplay&fid=2&typeid=20&typeid=20&filter=typeid&page=17"
             ]
             .into_iter()
             .for_each(|u| {
