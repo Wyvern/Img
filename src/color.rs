@@ -16,6 +16,7 @@ pub enum Color {
     Conceal = 8,
     Strikethrough = 9,
 
+    DoubleUnderline = 21,
     BoldOff = 22,
     ItalicOff = 23,
     UnderlineOff = 24,
@@ -45,6 +46,12 @@ pub enum Color {
     WhiteBg = 47,
 
     ResetBG = 49,
+
+    Frame = 51,
+    Encircle = 52,
+    Overline = 53,
+    FrameEncircleOff = 54,
+    OverlineOff = 55,
 
     BrightBlack = 90,
     BrightRed = 91,
@@ -77,7 +84,7 @@ impl Color {
 impl From<u8> for Color {
     fn from(value: u8) -> Self {
         match value {
-            0..=9 | 22..=25 | 27..=29 | 30..=37 | 39..=47 | 49 | 90..=97 | 100..=107 => unsafe {
+            0..=9 | 21..=25 | 27..=29 | 30..=37 | 39..=47 | 49 | 51..=55 | 90..=97 | 100..=107 => unsafe {
                 mem::transmute(value as u32)
             },
             _ => panic!("Out of range of value for Color enum."),
