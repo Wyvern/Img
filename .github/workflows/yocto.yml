@@ -62,7 +62,7 @@ jobs:
                   curl -LsSf "$url/$file" -o "/home/runner/yocto/$file"
               fi
               chmod +x "/home/runner/yocto/$file"
-              yes | "/home/runner/yocto/$file"
+              echo | "/home/runner/yocto/$file"
           done
 
       - name: Build Release
