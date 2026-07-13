@@ -42,10 +42,6 @@ jobs:
           key: Unix
           restore-keys: Unix
 
-      - name: Ubuntu apt update and install
-        run: |
-          sudo apt update && sudo apt install -y clang-22 lld-22
-
       # - name: Install LLVM
       #   run: |
       #     sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
@@ -54,6 +50,10 @@ jobs:
       #     sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
 
       - name: Build Release
+        env:
+          CC: clang-22
+          CXX: clang++-22
+          LD: ld.lld-22
         run: |
           cargo update
           set +e -x
