@@ -42,6 +42,10 @@ jobs:
           key: Unix
           restore-keys: Unix
 
+      - name: Ubuntu apt update and install
+        run: |
+          sudo apt update && sudo apt install -y clang-22 lld-22
+
       # - name: Install LLVM
       #   run: |
       #     sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
