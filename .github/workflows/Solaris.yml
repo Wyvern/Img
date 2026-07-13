@@ -57,7 +57,8 @@ jobs:
       #     sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
       #     sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
       #     sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
-
+      #     sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-22 200
+      #
       # - name: Cache Illumos/Solaris
       #   uses: actions/cache@v5
       #   with:
@@ -71,11 +72,12 @@ jobs:
       #     version: master
 
       - name: Build Release
-        env:
-          CC: clang-22
-          CXX: clang++-22
-          LD: ld.lld-22
         run: |
+          sudo update-alternatives --set clang /usr/bin/clang-22
+          sudo update-alternatives --set clang++ /usr/bin/clang++-22
+          sudo update-alternatives --set lld /usr/bin/lld-22
+          sudo update-alternatives --set ld.lld /usr/bin/ld.lld-22
+
           cargo update
           set +e -x
 
