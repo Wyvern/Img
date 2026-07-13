@@ -14,7 +14,7 @@ env:
 jobs:
   Linux:
     name: Unix
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
 
     steps:
       - name: Checkout
@@ -42,12 +42,12 @@ jobs:
           key: Unix
           restore-keys: Unix
 
-      - name: Install LLVM
-        run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
+      # - name: Install LLVM
+      #   run: |
+      #     sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
+      #     sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
+      #     sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
+      #     sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
 
       - name: Build Release
         run: |

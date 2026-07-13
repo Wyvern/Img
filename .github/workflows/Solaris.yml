@@ -14,7 +14,7 @@ env:
 jobs:
   Linux:
     name: Solaris+Illumos+Fuchsia
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
@@ -56,12 +56,12 @@ jobs:
           # sudo apt-get update && sudo apt install -y libguestfs-tools
           # sudo apt install -y zfsutils-linux
 
-      - name: Install LLVM
-        run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
+      # - name: Install LLVM
+      #   run: |
+      #     sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
+      #     sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
+      #     sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
+      #     sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
 
       # - name: Cache Illumos/Solaris
       #   uses: actions/cache@v5
