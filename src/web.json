@@ -369,7 +369,7 @@
     {
       "Site": "bisipic.online,bisipic.xyz",
       "Img": "div.t_fsz img[file]",
-      "Album": "div.cacklist h2",
+      "Album": "div.case_info > a.meta-title",
       "Page": "a.nxt"
     },
     {
