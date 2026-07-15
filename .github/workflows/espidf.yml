@@ -48,6 +48,9 @@ jobs:
           cd esp-idf
           ./install.sh all
           . ./export.sh
+          which riscv32-esp-elf-gcc
+          riscv32-esp-elf-gcc --version
+          find ~/.espressif/tools -name riscv32-esp-elf-gcc
 
       - name: Build Release
         run: |
