@@ -54,7 +54,7 @@ jobs:
           set +e -x
 
           . espidf/export.sh
-          # export MCU=esp32c3
+          export MCU=ESP32-P4
 
           targets=(
             riscv32imafc-esp-espidf
