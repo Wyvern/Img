@@ -1,0 +1,102 @@
+name: ESP-IDF
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  macOS:
+    name: macOS-26
+    runs-on: macos-26
+
+    steps:
+      - name: Disable macos spotlight index
+        run: |
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
+          sudo pmset -a powernap 0
+          sudo pmset -a sleep 0
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Install ESP-IDF tools
+        run: |
+          git clone --depth=1 https://github.com/espressif/esp-idf.git
+          cd esp-idf
+          ./install.sh all
+          . ./export.sh
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+          riscv32imafc-esp-espidf
+          )
+          # xtensa-esp32-espidf
+          # xtensa-esp32s2-espidf
+          # xtensa-esp32s3-espidf
+
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          sw_vers
+          hostinfo
+          sysctl -n machdep.cpu.brand_string
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  "riscv32imafc-esp-espidf Espidf-riscv32imafc"
+          )
+
+          for target in "${targets[@]}"; do
+            read -r arch name <<< "$target"
+            echo "Uploading $name..."
+            for f in img; do
+                if [ -f "target/$arch/src/$f" ]; then
+                  mv target/$arch/src/{$f,$name} || true
+                  gh release upload Nightly target/$arch/src/$name --clobber || true
+                  break
+                fi
+            done
+          done
