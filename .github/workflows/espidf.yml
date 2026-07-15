@@ -44,16 +44,16 @@ jobs:
 
       - name: Install ESP-IDF tools
         run: |
-          # git clone -b v5.5.4 --depth=1 --recursive https://github.com/espressif/esp-idf.git espidf
-          # cd espidf
-          # ./install.sh all
+          git clone -b v6.0.2 --depth=1 --recursive https://github.com/espressif/esp-idf.git espidf
+          cd espidf
+          ./install.sh all
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          # . espidf/export.sh
+          . espidf/export.sh
           # export MCU=esp32c3
 
           targets=(
