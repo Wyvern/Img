@@ -585,7 +585,7 @@ rustflags = [
 ]
 
 [target.'cfg(all(target_os="espidf",target_arch="riscv32"))']
-rustflags = ["-Ctarget-feature=+f,+d", "-Cabi=hard"]
+rustflags = ["-Ctarget-feature=+f,+d,-soft-float"]
 
 [target.'cfg(all(target_os="espidf",target_arch="xtensa"))']
 # rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
