@@ -47,16 +47,13 @@ jobs:
           git clone --depth=1 --single-branch https://github.com/espressif/esp-idf.git
           cd esp-idf
           ./install.sh all
-          . ./export.sh
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          which riscv32-esp-elf-gcc
-          riscv32-esp-elf-gcc --version
-          find ~/.espressif/tools -name riscv32-esp-elf-gcc
+          . esp-idf/export.sh
 
           targets=(
           riscv32imafc-esp-espidf
