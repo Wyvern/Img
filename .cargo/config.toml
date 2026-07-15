@@ -20,7 +20,7 @@ l = "b -q --profile lto"
 
 h = "s x86_64h-apple-darwin"
 e = "s arm64e-apple-darwin"
-s = "b -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target"
+s = "b -q --profile src -Zbuild-std=std,panic_abort --target"
 z = "zigbuild -q --profile src -Zbuild-std=std,panic_abort -Zbuild-std-features=optimize_for_size --target"
 
 [cargo-new]
