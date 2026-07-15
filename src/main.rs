@@ -1482,7 +1482,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://hotgirl.biz/tag/xiuren-extra/",
-                "https://bisipic.online",
+                "https://bisipic.online/forum-50-1.html",
                 "https://bestgirlsexy.com/category/china/imiss/page/17/",
             ]
             .into_iter()
