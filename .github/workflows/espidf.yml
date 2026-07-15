@@ -56,7 +56,7 @@ jobs:
           . esp-idf/export.sh
 
           targets=(
-          riscv32imafc-esp-espidf
+            riscv32imafc-esp-espidf
           )
           # xtensa-esp32-espidf
           # xtensa-esp32s2-espidf
