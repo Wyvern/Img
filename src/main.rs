@@ -78,8 +78,8 @@ fn parse_output_dir(value: &str) -> Result<path::PathBuf, String> {
 }
 
 fn main() {
-    #[cfg(target_os = "espidf")]
-    esp_idf_sys::link_patches();
+    // #[cfg(target_os = "espidf")]
+    // esp_idf_sys::link_patches();
 
     let args: Args = argh::from_env();
     if args.urls.is_empty() {

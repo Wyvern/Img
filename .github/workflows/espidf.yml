@@ -64,7 +64,7 @@ jobs:
 
           # . espidf/export.sh
           # export MCU=ESP32-P4
-
+          cargo tree | grep esp-idf-sys
           targets=(
               riscv32imafc-esp-espidf
           )
