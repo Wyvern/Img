@@ -33,7 +33,7 @@ serde_json = "*"
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 
 [target.'cfg(target_os = "espidf")'.dependencies]
-esp-idf-sys = "*"
+# esp-idf-sys = "*"
 
 [target.'cfg(all(unix, not(target_os = "espidf")))'.build-dependencies]
 libc = "*"
