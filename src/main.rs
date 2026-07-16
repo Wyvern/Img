@@ -1,5 +1,5 @@
-// #[cfg(target_os = "espidf")]
-// use esp_idf_sys as _;
+#[cfg(target_os = "espidf")]
+use esp_idf_sys as _;
 #[cfg(target_os = "hermit")]
 use hermit as _;
 
