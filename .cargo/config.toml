@@ -584,12 +584,6 @@ rustflags = [
   "-Lnative=fuchsia/arch/riscv64/lib",
 ]
 
-[target.'cfg(all(target_os="espidf",target_arch="riscv32"))']
-# rustflags = []
-
-[target.'cfg(all(target_os="espidf",target_arch="xtensa"))']
-# rustflags = ["-Clink-arg=--sysroot=espidf-xtensa"]
-
 [target.armv7-unknown-freebsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-freebsd"]

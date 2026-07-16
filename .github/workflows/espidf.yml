@@ -53,13 +53,16 @@ jobs:
           cargo update
           set +e -x
 
+          curl -fsSL https://github.com/esp-rs/espup/releases/download/v0.17.1/espup-aarch64-apple-darwin -o ./espup
+          chmod +x ./espup
+          espup install
+          . ~/export-esp.sh
+
           . espidf/export.sh
           # export MCU=ESP32-P4
 
           targets=(
-              riscv32imac-esp-espidf
               riscv32imafc-esp-espidf
-              riscv32imc-esp-espidf
           )
 
 
