@@ -1,7 +1,7 @@
-#[cfg(target_os = "hermit")]
-use hermit as _;
 #[cfg(target_os = "espidf")]
 use esp_idf_sys as _;
+#[cfg(target_os = "hermit")]
+use hermit as _;
 
 mod util;
 use dom_query::{self as dom, NodeRef};
@@ -80,6 +80,7 @@ fn parse_output_dir(value: &str) -> Result<path::PathBuf, String> {
 fn main() {
     #[cfg(target_os = "espidf")]
     esp_idf_sys::link_patches();
+
     let args: Args = argh::from_env();
     if args.urls.is_empty() {
         quit!("Please input at least one url.");
