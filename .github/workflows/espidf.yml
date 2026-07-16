@@ -67,6 +67,7 @@ jobs:
 
           targets=(
               riscv32imafc-esp-espidf
+              xtensa-esp32s3-espidf
           )
 
           for target in ${targets[@]}; do
