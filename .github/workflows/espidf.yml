@@ -42,32 +42,27 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      # - name: Install ESP-IDF tools
-      #   run: |
-      #     git clone -b v6.0.2 --depth=1 https://github.com/espressif/esp-idf.git espidf
-      #     cd espidf
-      #     ./install.sh all
-
-      - name: Install ldproxy
+      - name: Install ESP-IDF tools
         run: |
-          if [[ ! -x "~/.cargo/bin/ldproxy" ]]; then
-              echo "Installing ldproxy..."
-              cargo install ldproxy -q
-          else
-              echo "ldproxy is already installed."
-          fi
+          git clone -b v6.0.2 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          cd espidf
+          ./install.sh all
+
+      # - name: Install ldproxy
+      #   run: |
+      #     cargo install ldproxy -q
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          curl -fsSL https://github.com/esp-rs/espup/releases/download/v0.17.1/espup-aarch64-apple-darwin -o ./espup
-          chmod +x ./espup
-          ./espup install
-          . ~/export-esp.sh
+          # curl -fsSL https://github.com/esp-rs/espup/releases/download/v0.17.1/espup-aarch64-apple-darwin -o ./espup
+          # chmod +x ./espup
+          # ./espup install
+          # . ~/export-esp.sh
 
-          # . espidf/export.sh
+          . espidf/export.sh
           # export MCU=ESP32-P4
 
           targets=(
