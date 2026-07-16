@@ -50,7 +50,12 @@ jobs:
 
       - name: Install ldproxy
         run: |
-          cargo install ldproxy -q
+          if [[ ! -x "~/.cargo/bin/ldproxy" ]]; then
+              echo "Installing ldproxy..."
+              cargo install ldproxy -q
+          else
+              echo "ldproxy is already installed."
+          fi
 
       - name: Build Release
         run: |
