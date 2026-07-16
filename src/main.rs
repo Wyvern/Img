@@ -1,7 +1,7 @@
 #[cfg(target_os = "hermit")]
 use hermit as _;
 #[cfg(target_os = "espidf")]
-use esp-idf-sys as _;
+use esp_idf_sys as _;
 
 mod util;
 use dom_query::{self as dom, NodeRef};
