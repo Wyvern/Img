@@ -31,7 +31,6 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: riscv32imafc-esp-espidf
           components: rust-src
 
       - name: Rust Cache
