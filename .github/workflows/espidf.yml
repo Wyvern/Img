@@ -42,11 +42,11 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      # - name: Install ESP-IDF tools
-      #   run: |
-      #     git clone -b v6.0.2 --depth=1 https://github.com/espressif/esp-idf.git espidf
-      #     cd espidf
-      #     ./install.sh all
+      - name: Install ESP-IDF tools
+        run: |
+          git clone -b v6.0.2 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          cd espidf
+          ./install.sh all
 
       - name: Build Release
         run: |
@@ -58,7 +58,7 @@ jobs:
           # ./espup install
           # . ~/export-esp.sh
 
-          # . espidf/export.sh
+          . espidf/export.sh
           # export MCU=ESP32-P4
 
           targets=(
