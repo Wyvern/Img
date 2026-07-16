@@ -31,6 +31,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
+          targets: riscv32imafc-esp-espidf
           components: rust-src
 
       - name: Rust Cache
@@ -53,10 +54,10 @@ jobs:
           cargo update
           set +e -x
 
-          curl -fsSL https://github.com/esp-rs/espup/releases/download/v0.17.1/espup-aarch64-apple-darwin -o ./espup
-          chmod +x ./espup
-          ./espup install
-          . ~/export-esp.sh
+          # curl -fsSL https://github.com/esp-rs/espup/releases/download/v0.17.1/espup-aarch64-apple-darwin -o ./espup
+          # chmod +x ./espup
+          # ./espup install
+          # . ~/export-esp.sh
 
           . espidf/export.sh
           # export MCU=ESP32-P4
