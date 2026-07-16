@@ -48,9 +48,9 @@ jobs:
           cd espidf
           ./install.sh all
 
-      # - name: Install ldproxy
-      #   run: |
-      #     cargo install ldproxy -q
+      - name: Install ldproxy
+        run: |
+          cargo install ldproxy -q
 
       - name: Build Release
         run: |
