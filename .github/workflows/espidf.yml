@@ -44,7 +44,7 @@ jobs:
 
       - name: Install ESP-IDF tools
         run: |
-          git clone -b v5.5.4 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          git clone -b v5.5.4 --recursive --depth=1 https://github.com/espressif/esp-idf.git espidf
           cd espidf
           ./install.sh all
 
@@ -63,6 +63,7 @@ jobs:
           # . ~/export-esp.sh
 
           . espidf/export.sh
+          idf.py reconfigure
           # export MCU=ESP32-P4
 
           targets=(
