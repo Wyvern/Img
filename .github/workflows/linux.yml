@@ -87,11 +87,13 @@ jobs:
           ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${ver} mips
 
           ver=22.1.8
-          # if [ ! -d /home/runner/hexagon ]; then
+          if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${ver}________/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
-          # fi
+          fi
+          find /home/runner/hexagon/ -iname hexagon-unknown-linux-musl-clang
           ln -sf /home/runner/hexagon/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
+          exit
 
       - name: Build Release
         run: |
