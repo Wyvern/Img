@@ -91,9 +91,7 @@ jobs:
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${ver}________/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
-          find /home/runner/hexagon/ -iname hexagon-unknown-linux-musl-clang
-          ln -sf /home/runner/hexagon/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
-          exit
+          ln -sf /home/runner/hexagon/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl/x86_64-ubuntu-22.04 hexagon
 
       - name: Build Release
         run: |
