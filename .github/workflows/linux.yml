@@ -52,8 +52,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: /home/runner/hexagon
-          key: hexagon-22.1.4
-          restore-keys: hexagon-22.1.4
+          key: hexagon-22.1.8
+          restore-keys: hexagon-22.1.8
 
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy
@@ -86,10 +86,10 @@ jobs:
           fi
           ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${ver} mips
 
-          ver=22.1.4
+          ver=22.1.8
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${ver}_/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${ver}________/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
           ln -sf /home/runner/hexagon/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
 
