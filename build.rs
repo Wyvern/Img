@@ -25,13 +25,14 @@ fn main() {
     cbor4ii::serde::to_writer(writer, &value).unwrap();
 
     let family = std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap_or_default();
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
     let mut cmd = match family.as_str() {
         "windows" => {
             let mut c = process::Command::new("tar");
             c.args(["-czf", "web.tar.gz", output]);
             c
         }
-        t if t.contains("unix") => {
+        t if t.contains("unix") && target_os != "espidf" => {
             let mut c = process::Command::new("gzip");
             c.args(["-kf", output]);
             c

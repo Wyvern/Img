@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -43,7 +43,7 @@ jobs:
           cross --version
 
       - name: Cache Fuchsia
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: /home/runner/Fuchsia
           key: Fuchsia
@@ -129,7 +129,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -146,7 +146,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Cache sysroot
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: /home/runner/unix
           key: Unix

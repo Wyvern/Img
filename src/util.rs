@@ -205,7 +205,7 @@ pub trait Dbg: fmt::Debug {
 }
 impl<T: fmt::Debug> Dbg for T {}
 
-#[cfg(unix)]
+#[cfg(all(unix, not(target_os = "espidf")))]
 fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcgetattr(fd, old.as_mut_ptr());
@@ -216,7 +216,7 @@ fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) 
     }
 }
 
-#[cfg(unix)]
+#[cfg(all(unix, not(target_os = "espidf")))]
 fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
@@ -235,7 +235,7 @@ pub fn terminal_input(o: &mut io::StdoutLock) -> Mode {
             ch.make_ascii_lowercase();
             Mode::Raw(ch)
             }}
-        unix=>{{
+        all(unix, not(target_os="espidf"))=>{{
             let fd = libc::STDIN_FILENO;
             let old = mem::MaybeUninit::<libc::termios>::uninit();
             begin_raw_mode(fd, old);

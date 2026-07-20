@@ -1,3 +1,5 @@
+#[cfg(target_os = "espidf")]
+use esp_idf_sys as _;
 #[cfg(target_os = "hermit")]
 use hermit as _;
 
@@ -831,9 +833,9 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     let mut no_ext = collections::HashMap::new();
-    #[cfg(not(unix))]
+    #[cfg(not(all(unix, not(target_os = "espidf"))))]
     let mut no_ext_curl = process::Command::new("curl");
-    #[cfg(not(unix))]
+    #[cfg(not(all(unix, not(target_os = "espidf"))))]
     no_ext_curl.args([
         "-Z",
         "--parallel-immediate",
@@ -889,7 +891,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         if has_ext.is_none() {
             lr.map_or_else(
                 || {
-                    #[cfg(not(unix))]
+                    #[cfg(not(all(unix, not(target_os = "espidf"))))]
                     no_ext_curl.arg(&url);
                     no_ext.insert(url.clone(), name.to_owned());
                 },
@@ -937,7 +939,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             curl.current_dir(path);
         }
 
-        #[cfg(unix)]
+        #[cfg(all(unix, not(target_os = "espidf")))]
         {
             fn fork() -> io::Result<libc::pid_t> {
                 let pid = unsafe { libc::fork() };
@@ -963,7 +965,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 Err(e) => quit!("Fork process failed: {e}"),
             }
         }
-        #[cfg(not(unix))]
+        #[cfg(not(all(unix, not(target_os = "espidf"))))]
         {
             no_ext_curl.output().map_or_else(
                 |e| pl!("Query content-type info failed: {}", e),
@@ -1004,7 +1006,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Infer file type through magic number
-#[cfg(unix)]
+#[cfg(all(unix, not(target_os = "espidf")))]
 fn magic_number_type(pb: path::PathBuf) {
     let t = file_format::FileFormat::from_file(&pb);
     fs::rename(
@@ -1191,7 +1193,7 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Box<[u8]> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        unix=>{
+        all(unix, not(target_os = "espidf"))=>{
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
         windows=>{
@@ -1482,7 +1484,7 @@ mod img {
             [
                 "https://xiuren.biz/latest-post/",
                 "https://hotgirl.biz/tag/xiuren-extra/",
-                "https://bisipic.online",
+                "https://bisipic.online/forum-50-1.html",
                 "https://bestgirlsexy.com/category/china/imiss/page/17/",
             ]
             .into_iter()

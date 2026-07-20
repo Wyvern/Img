@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -117,7 +117,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -141,7 +141,7 @@ jobs:
           echo "Latest NDK: $latest_ndk"
 
       - name: Android NDK cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/android-ndk-${{ env.NDK_VERSION }}
           key: android-ndk-${{ env.NDK_VERSION }}
@@ -156,7 +156,7 @@ jobs:
         run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
 
       - name: Cache Redoxer
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.redoxer
@@ -263,7 +263,7 @@ jobs:
           sudo pmset -a sleep 0
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -280,7 +280,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Cache llvm-mingw
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: llvm-mingw
           key: ${{ runner.os }}-llvm-mingw-${{ hashFiles('llvm-mingw/**') }}
@@ -392,7 +392,7 @@ jobs:
           Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -482,7 +482,7 @@ jobs:
           Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
