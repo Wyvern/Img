@@ -26,7 +26,7 @@ jobs:
           sudo pmset -a sleep 0
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -44,7 +44,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Cache llvm-mingw
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: llvm-mingw
           key: ${{ runner.os }}-llvm-mingw

@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -45,7 +45,7 @@ jobs:
           cross --version
 
       - name: Cache Fuchsia
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: /home/runner/Fuchsia
           key: Fuchsia
@@ -60,7 +60,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-22 200
       #
       # - name: Cache Illumos/Solaris
-      #   uses: actions/cache@v5
+      #   uses: actions/cache@v6
       #   with:
       #     path: /home/runner/Illumos
       #     key: Illomos-${{ runner.os }}-${{ runner.arch }}
