@@ -35,7 +35,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Android NDK cache
-        uses: 6
+        uses: actions/cache@v6
         with:
           path: /home/runner/android-ndk-r29
           key: android-ndk-r29
