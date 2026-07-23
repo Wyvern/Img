@@ -70,7 +70,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target -vv
           done
 
           find ./target -iname img -type f | xargs ls -hl
