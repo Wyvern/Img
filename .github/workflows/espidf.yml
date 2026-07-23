@@ -9,7 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
-  RUSTC_WRAPPER: ""
+  RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -48,9 +48,9 @@ jobs:
           cd espidf
           ./install.sh all
 
-      # - name: Install ldproxy
-      #   run: |
-      #     cargo install ldproxy -q
+      - name: Install ldproxy
+        run: |
+          cargo install ldproxy -q
 
       - name: Build Release
         run: |
@@ -70,7 +70,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo v $target
+            time cargo s $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
