@@ -9,7 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
-  RUSTC_WRAPPER: "sccache"
+  RUSTC_WRAPPER: ""
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
