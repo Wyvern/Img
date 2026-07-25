@@ -36,7 +36,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update --fix-missing && sudo apt install -q gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools -y
+          sudo apt update --fix-missing && sudo apt install -q gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu  gcc-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools libc6-x32 -y
 
       - name: Build Release
         run: |
@@ -45,7 +45,8 @@ jobs:
 
           cargo update
           set +e -x
-
+          cargo s x86_64-unknown-linux-gnux32
+          exit
           targets=(
             thumbv7neon-unknown-linux-gnueabihf
             thumbv7neon-unknown-linux-musleabihf
