@@ -37,7 +37,7 @@ jobs:
       - name: Ubuntu apt update and install
         continue-on-error: true
         run: |
-          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu gcc-arm-linux-gnueabihf musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu gcc-arm-linux-gnueabihf musl-tools -y
 
       - name: Build Release
         run: |
@@ -50,7 +50,6 @@ jobs:
             x86_64-unknown-linux-gnux32
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
-            powerpc64-unknown-linux-musl
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
             aarch64-unknown-linux-gnu
@@ -91,7 +90,6 @@ jobs:
             x86_64-unknown-linux-gnux32
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
-            powerpc64-unknown-linux-musl
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
             aarch64-unknown-linux-gnu
@@ -211,6 +209,7 @@ jobs:
             thumbv7neon-linux-androideabi
             x86_64-linux-android
             powerpc64-unknown-linux-gnu
+            powerpc64-unknown-linux-musl
           )
 
           for target in ${targets[@]}; do
@@ -242,6 +241,7 @@ jobs:
                   "armv7-linux-androideabi Android-armv7"
                   "thumbv7neon-linux-androideabi Android-thumbv7neon"
                   "powerpc64-unknown-linux-gnu Linux-powerpc64-gnu"
+                  "powerpc64-unknown-linux-musl Linux-powerpc64-musl"
                   "aarch64-unknown-linux-ohos Android-aarch64-ohos"
                   "armv7-unknown-linux-ohos Android-armv7-ohos"
                   "x86_64-unknown-linux-ohos Android-x86_64-ohos"

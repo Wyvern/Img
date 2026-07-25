@@ -218,7 +218,7 @@ rustflags = [
   "-Wlinker_messages",
 ]
 
-[target.'cfg(all(target_os="linux",not(any(target_family="wasm",target_arch="sparc64", all(target_arch="powerpc64",target_endian = "big")))))']
+[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_family="wasm",target_arch="sparc64", all(target_arch="powerpc64",target_endian = "big")))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -287,8 +287,11 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 [target.'cfg(all(target_arch="aarch64",target_os="linux",not(target_env="ohos")))']
 linker = "aarch64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_abi="x32"),not(target_env="ohos")))']
 linker = "x86_64-linux-gnu-gcc"
+
+[target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32"))']
+linker = "x86_64-linux-gnux32-gcc"
 
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
