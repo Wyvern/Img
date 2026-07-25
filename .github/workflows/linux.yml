@@ -97,8 +97,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s powerpc64-unknown-linux-gnuelfv2
-          exit
+
           targets=(
             powerpc64-unknown-linux-gnu
             powerpc-unknown-linux-gnu
