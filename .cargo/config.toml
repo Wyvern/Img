@@ -348,6 +348,9 @@ linker = "aarch64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="ohos")))']
 linker = "x86_64-linux-gnu-gcc"
 
+[target.'cfg(all(target_arch="x86_64",target_os="linux",target_env=gnux32,not(target_env="ohos")))']
+linker = "x86_64-linux-gnux32-gcc"
+
 [target.'cfg(all(target_arch="arm",target_os="linux",not(target_env="ohos")))']
 linker = "arm-linux-gnueabihf-gcc"
 
