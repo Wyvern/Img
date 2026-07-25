@@ -94,7 +94,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "riscv32imafc-esp-espidf Espidf-riscv32imafc"
+                  "riscv32imac-esp-espidf Espidf-riscv32imac"
           )
 
           for target in "${targets[@]}"; do

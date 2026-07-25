@@ -666,7 +666,7 @@ rustflags = ["-Clink-arg=/compat.o"]
 
 [target.powerpc64-unknown-linux-gnuelfv2]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc64-linux-gnu","-Clink-arg=-mabi=elfv2","-Clink-arg=-lc"]
+rustflags = ["-Clink-arg=--target=powerpc64-linux-gnu","-Clink-arg=-mabi=elfv2"]
 
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"
