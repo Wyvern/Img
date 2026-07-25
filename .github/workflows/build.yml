@@ -23,7 +23,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64le-unknown-linux-musl,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl,thumbv7neon-unknown-linux-gnueabihf
+          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-musl,x86_64-unknown-linux-gnux32,aarch64-unknown-linux-gnu,aarch64-unknown-linux-musl,riscv64gc-unknown-linux-gnu,riscv64gc-unknown-linux-musl,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc64le-unknown-linux-musl,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,loongarch64-unknown-linux-musl,thumbv7neon-unknown-linux-gnueabihf
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -37,7 +37,7 @@ jobs:
       - name: Ubuntu apt update and install
         continue-on-error: true
         run: |
-          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu gcc-arm-linux-gnueabihf musl-tools -y
+          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu gcc-arm-linux-gnueabihf musl-tools -y
 
       - name: Build Release
         run: |
@@ -47,6 +47,7 @@ jobs:
           targets=(
             x86_64-unknown-linux-gnu
             x86_64-unknown-linux-musl
+            x86_64-unknown-linux-gnux32
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
             powerpc64-unknown-linux-musl
@@ -87,6 +88,7 @@ jobs:
           targets=(
             x86_64-unknown-linux-gnu
             x86_64-unknown-linux-musl
+            x86_64-unknown-linux-gnux32
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
             powerpc64-unknown-linux-musl
