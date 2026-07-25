@@ -45,8 +45,7 @@ jobs:
 
           cargo update
           set +e -x
-          cargo s x86_64-unknown-linux-gnux32
-          exit
+
           targets=(
             thumbv7neon-unknown-linux-gnueabihf
             thumbv7neon-unknown-linux-musleabihf
