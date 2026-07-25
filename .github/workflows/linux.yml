@@ -56,7 +56,7 @@ jobs:
           restore-keys: hexagon-22.1.8
 
       - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy
+        run: sudo apt install gcc-x86-64-linux-gnux32 gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy
 
       - name: Toolchain downloads
         run: |
@@ -112,7 +112,8 @@ jobs:
             armv7-unknown-linux-uclibceabihf
             mips64-openwrt-linux-musl
           )
-
+          cargo s x86_64-unknown-linux-gnux32
+          exit
           for target in ${targets[@]}; do
             time cargo s $target
           done
