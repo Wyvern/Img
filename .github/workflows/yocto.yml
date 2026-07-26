@@ -41,12 +41,12 @@ jobs:
         uses: actions/cache@v6
         with:
           path: /home/runner/yocto
-          key: yocto-6.0.1
-          restore-keys: yocto-6.0.1
+          key: yocto-6.0.2
+          restore-keys: yocto-6.0.2
 
       - name: Toolchain downloads
         run: |
-          ver=6.0.1
+          ver=6.0.2
           url=https://downloads.yoctoproject.org/releases/yocto/yocto-${ver}/toolchain/x86_64
           files=(
           poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${ver}.sh
@@ -77,7 +77,7 @@ jobs:
             "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
           )
 
-          sdk=/opt/poky/6.0.1
+          sdk=/opt/poky/6.0.2
           ln -s $sdk/sysroots sysroots
 
           for entry in "${targets[@]}"; do
