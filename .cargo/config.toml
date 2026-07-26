@@ -671,9 +671,6 @@ rustflags = ["-Clink-arg=/compat.o"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc64-linux-gnu","-Clink-arg=-mabi=elfv2"]
 
-[target.'cfg(target_os="espidf")']
-linker = "ldproxy"
-
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"
 # rustflags = [
