@@ -678,6 +678,14 @@ rustflags = ["-Clink-arg=/compat.o"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
 
+[target.aarch64_be-unknown-linux-gnu_ilp32]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=aarch64_be-linux-gnu"]
+
+[target.aarch64-unknown-linux-gnu_ilp32]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=aarch64-linux-gnu"]
+
 [target.powerpc64-unknown-linux-gnuelfv2]
 linker = "ppc64/bin/powerpc64-buildroot-linux-gnu-gcc"
 rustflags = ["-Clink-arg=--sysroot=ppc64/powerpc64-buildroot-linux-gnu/sysroot","-Clink-arg=-mabi=elfv2"]

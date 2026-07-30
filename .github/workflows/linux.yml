@@ -103,8 +103,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-          powerpc64-buildroot-linux-gnu-gcc -v
-          readelf -h $(powerpc64-buildroot-linux-gnu-gcc -print-file-name=crt1.o)
+          ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -v
+          readelf -h $(ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -print-file-name=crt1.o)
           cargo s powerpc64-unknown-linux-gnuelfv2
           exit
           targets=(

@@ -57,7 +57,9 @@ jobs:
           # cargo s sparc64-unknown-openbsd
           # cargo s x86_64-unknown-illumos
           # cargo s powerpc64-unknown-linux-gnuelfv2
-          # exit
+          cargo s aarch64_be-unknown-linux-gnu_ilp32
+          cargo s aarch64-unknown-linux-gnu_ilp32
+          exit
 
           targets=(
             aarch64_be-unknown-linux-gnu
