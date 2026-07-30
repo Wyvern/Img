@@ -680,7 +680,7 @@ rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
 
 [target.powerpc64-unknown-linux-gnuelfv2]
 linker = "ppc64/bin/powerpc64-buildroot-linux-gnu-gcc"
-rustflags = ["-Clink-arg=--sysroot=ppc64/powerpc64-buildroot-linux-gnu/sysroot"]
+rustflags = ["-Clink-arg=--sysroot=ppc64/powerpc64-buildroot-linux-gnu/sysroot","-Clink-arg=-mabi=elfv2"]
 
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"
