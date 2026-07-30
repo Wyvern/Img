@@ -667,28 +667,16 @@ rustflags = ["-Clink-arg=--sysroot=sysroots/core2-64-poky-linux"]
 [target.'cfg(target_os = "solaris")']
 rustflags = ["-Clink-arg=/compat.o"]
 
-# [target.powerpc64-unknown-linux-gnuelfv2]
-# linker = "./zig-cc.sh"
-# rustflags = [
-#   "-Clink-arg=--target=powerpc64-linux-gnu",
-#   "-Clink-arg=-mabi=elfv2"
-# ]
+[target.powerpc64-unknown-linux-gnuelfv2]
+linker = "./zig-cc.sh"
+rustflags = [
+  "-Clink-arg=--target=powerpc64-linux-gnu",
+  "-Clink-arg=-mabi=elfv2"
+]
 
 [target.armeb-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
-
-[target.aarch64_be-unknown-linux-gnu_ilp32]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64_be-linux-gnu"]
-
-[target.aarch64-unknown-linux-gnu_ilp32]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64-linux-gnu"]
-
-[target.powerpc64-unknown-linux-gnuelfv2]
-linker = "ppc64/bin/powerpc64-buildroot-linux-gnu-gcc"
-rustflags = ["-Clink-arg=--sysroot=ppc64/powerpc64-buildroot-linux-gnu/sysroot","-Clink-arg=-mabi=elfv2"]
 
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"

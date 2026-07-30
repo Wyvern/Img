@@ -86,12 +86,6 @@ jobs:
           fi
           ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${ver} mips
 
-          if [ ! -d /home/runner/uclibc/ppc64 ]; then
-            mkdir -p /home/runner/uclibc/ppc64
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/powerpc64-power8/tarballs/powerpc64-power8--glibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/ppc64
-          fi
-          ln -sf /home/runner/uclibc/ppc64/powerpc64-power8--glibc--bleeding-edge-${ver} ppc64
-
           ver=22.1.8
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
@@ -103,10 +97,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -v
-          readelf -h $(ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -print-file-name=crt1.o)
-          cargo s powerpc64-unknown-linux-gnuelfv2
-          exit
+
           targets=(
             powerpc64-unknown-linux-gnu
             powerpc-unknown-linux-gnu
