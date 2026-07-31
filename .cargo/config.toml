@@ -482,7 +482,7 @@ linker = "clang"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
   "-Clink-arg=--target=sparc64--netbsd",
-  "-Clink-arg=-fuse-ld=bfd"
+  "-Clink-arg=-fuse-ld=lld"
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -517,7 +517,7 @@ linker = "clang"
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
   "-Clink-arg=--target=sparc64--openbsd",
-  "-Clink-arg=-fuse-ld=bfd"
+  "-Clink-arg=-fuse-ld=lld"
 ]
 
 [target.'cfg(target_os = "android")']
