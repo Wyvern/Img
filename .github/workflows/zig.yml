@@ -51,15 +51,13 @@ jobs:
         run: |
           cargo update
           set +e -x
+
           # hexagon-unknown-linux-musl
           # cargo s x86_64-unknown-illumos
           # cargo s powerpc64-unknown-linux-gnuelfv2
-          cargo s armv7-unknown-freebsd
-          exit
+          # exit
 
           targets=(
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             armeb-unknown-linux-gnueabi
@@ -68,6 +66,8 @@ jobs:
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
           )
 
           for target in ${targets[@]}; do
@@ -103,8 +103,6 @@ jobs:
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
             armv7-unknown-netbsd-eabihf
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
           )
 
           for target in "${targets[@]}"; do
