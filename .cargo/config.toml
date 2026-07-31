@@ -477,15 +477,7 @@ rustflags = [
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
 
-# [target.sparc64-unknown-netbsd]
-# linker = "clang"
-# rustflags = [
-#   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
-#   "-Clink-arg=--target=sparc64--netbsd",
-#   "-Clink-arg=-fuse-ld=lld"
-# ]
-
-[target.'cfg(target_os = "openbsd")']
+[target.'cfg(and(target_os = "openbsd",not(target_arch="sparc64")))']
 rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.x86_64-unknown-openbsd]
@@ -511,14 +503,6 @@ rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/powerpc64",
   "-Clink-arg=--target=powerpc64--openbsd",
 ]
-
-# [target.sparc64-unknown-openbsd]
-# linker = "clang"
-# rustflags = [
-#   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
-#   "-Clink-arg=--target=sparc64--openbsd",
-#   "-Clink-arg=-fuse-ld=lld"
-# ]
 
 [target.'cfg(target_os = "android")']
 rustflags = ["-Clink-arg=--sysroot=ndk/sysroot"]
@@ -629,7 +613,7 @@ rustflags = [
 linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--target=sparc64-netbsd",
-  "-Crelocation-model=static","-Clink-arg=-nostartfiles"
+  "-Crelocation-model=static"
 ]
 
 [target.armv7-unknown-linux-uclibceabihf]
