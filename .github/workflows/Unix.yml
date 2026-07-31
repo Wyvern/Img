@@ -50,6 +50,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
           sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-22 200
 
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
+
       - name: Build Release
         run: |
           cargo update
