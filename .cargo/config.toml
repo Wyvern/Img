@@ -411,9 +411,13 @@ linker = "mipsisa32r6el-linux-gnu-gcc"
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
 
-[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia"))']
+[target.'cfg(and(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia")),not(target_arch="sparc64"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clinker-plugin-lto"]
+
+[target.'cfg(and(any(target_os="freebsd",target_os="netbsd",target_os="openbsd")),target_arch="sparc64")']
+linker = "clang"
+rustflags = ["-Clink-arg=-fuse-ld=bfd"]
 
 [target.x86_64-unknown-freebsd]
 rustflags = [
@@ -481,7 +485,6 @@ rustflags = [
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/sparc64",
   "-Clink-arg=--target=sparc64--netbsd",
-  "-Clink-arg=-fuse-ld=bfd"
 ]
 
 [target.'cfg(target_os = "openbsd")']
@@ -515,7 +518,6 @@ rustflags = [
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/openbsd/sparc64",
   "-Clink-arg=--target=sparc64--openbsd",
-  "-Clink-arg=-fuse-ld=bfd"
 ]
 
 [target.'cfg(target_os = "android")']
