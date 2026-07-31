@@ -411,7 +411,7 @@ linker = "mipsisa32r6el-linux-gnu-gcc"
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
 
-[target.'cfg(and(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia")),not(target_arch="sparc64"))']
+[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clinker-plugin-lto"]
 
@@ -622,14 +622,14 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
 linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--target=sparc64-openbsd",
-  "-Clink-arg=--sysroot=sysroot/openbsd/sparc64","-Crelocation-model=static"
+  "-Crelocation-model=static"
 ]
 
 [target.sparc64-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = [
   "-Clink-arg=--target=sparc64-netbsd",
-  "-Clink-arg=--sysroot=sysroot/netbsd/sparc64","-Crelocation-model=static"
+  "-Crelocation-model=static","-Clink-arg=-nostartfiles"
 ]
 
 [target.armv7-unknown-linux-uclibceabihf]

@@ -53,11 +53,11 @@ jobs:
           set +e -x
 
           # hexagon-unknown-linux-musl
-          # cargo s sparc64-unknown-netbsd
-          # cargo s sparc64-unknown-openbsd
+          cargo s sparc64-unknown-netbsd
+          cargo s sparc64-unknown-openbsd
           # cargo s x86_64-unknown-illumos
           # cargo s powerpc64-unknown-linux-gnuelfv2
-          # exit
+          exit
 
           targets=(
             aarch64_be-unknown-linux-gnu
