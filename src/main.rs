@@ -175,6 +175,7 @@ fn get_html(addr: &str) -> (String, usize) {
         .output()
         .unwrap_or_else(|e| {
             SPINNER.store(false, Ordering::Release);
+            h.thread().unpark();
             quit!("curl: {}", e);
         });
     SPINNER.store(false, Ordering::Release);
@@ -187,7 +188,7 @@ fn get_html(addr: &str) -> (String, usize) {
     }
     let s = String::from_utf8_lossy(&out.stdout).into_owned();
     let ll = s.rfind('\n').unwrap();
-    h.join().unwrap();
+    h.thread().unpark();
     (s, ll)
 }
 
@@ -800,15 +801,16 @@ fn normarlize(url: &str, addr: &str) -> String {
 ///replace os specific special/reversed chars in path name
 fn sanitize_path(name: &str) -> String {
     cfg_select! {
-        target_os = "macos"=> {name.replace(":", "|")}
-        any(all(unix, not(target_os = "macos")), target_family = "wasm")=>{name.replace("/", "_")}
-        target_family = "windows"=>{name.chars()
+        target_os = "macos" => name.replace(":", "|"),
+        any(all(unix, not(target_os = "macos")), target_family = "wasm") => name.replace("/", "_"),
+        target_family = "windows" => name
+            .chars()
             .map(|c| match c {
                 '\\' | '/' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
                 _ => c,
             })
-            .collect()}
-        _=>{name.into()}
+            .collect(),
+        _ => name.into(),
     }
 }
 ///Perform photo download operation
@@ -1193,15 +1195,11 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Box<[u8]> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        all(unix, not(target_os = "espidf"))=>{
+        all(unix, not(target_os = "espidf")) => {
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
-        windows=>{
-            run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz"))
-        }
-        _=>{
-            *include_bytes!("../web.cbor")
-        }
+        windows => run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz")),
+        _ => *include_bytes!("../web.cbor"),
     };
     cbor4ii::serde::from_slice(&data).unwrap_or_else(|e| {
         quit!("Read `web.cbor` failed: {}", e);
@@ -1275,7 +1273,7 @@ fn circle_indicator() {
             if !SPINNER.load(Ordering::Acquire) {
                 break 'l;
             }
-            thread::sleep(time::Duration::from_millis(200));
+            thread::park_timeout(time::Duration::from_millis(200));
         }
     }
     print!("{CL}");
@@ -1523,12 +1521,13 @@ mod img {
 
     #[test]
     fn progress() {
-        thread::spawn(|| {
+        let h = thread::spawn(|| {
             SPINNER.store(true, Ordering::Release);
             circle_indicator();
         });
-        thread::sleep(time::Duration::from_secs(5));
+        thread::sleep(time::Duration::from_millis(1300));
         SPINNER.store(false, Ordering::Release);
+        h.thread().unpark();
     }
 
     #[test]
