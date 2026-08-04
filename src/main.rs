@@ -163,7 +163,7 @@ fn get_html(addr: &str) -> (String, usize) {
         SPINNER.store(true, Ordering::Release);
         circle_indicator();
     });
-    let out = process::Command::new("curl")
+    let res = process::Command::new("curl")
         .args(CURL)
         .args([
             addr,
@@ -172,24 +172,24 @@ fn get_html(addr: &str) -> (String, usize) {
             #[cfg(not(debug_assertions))]
             "-S",
         ])
-        .output()
-        .unwrap_or_else(|e| {
-            SPINNER.store(false, Ordering::Release);
-            h.thread().unpark();
-            quit!("curl: {}", e);
-        });
+        .output();
     SPINNER.store(false, Ordering::Release);
-    if !out.stderr.is_empty() {
-        quit!(
-            "Fetch {} failed : {}",
-            addr,
-            String::from_utf8_lossy(&out.stderr).trim()
-        );
-    }
-    let s = String::from_utf8_lossy(&out.stdout).into_owned();
-    let ll = s.rfind('\n').unwrap();
     h.thread().unpark();
-    (s, ll)
+    match res {
+        Ok(out) => {
+            if !out.stderr.is_empty() {
+                quit!(
+                    "Fetch {} failed : {}",
+                    addr,
+                    String::from_utf8_lossy(&out.stderr).trim()
+                );
+            }
+            let s = String::from_utf8_lossy(&out.stdout).into_owned();
+            let ll = s.rfind('\n').unwrap();
+            (s, ll)
+        }
+        Err(e) => quit!("curl: {}", e),
+    }
 }
 
 ///Parse photos in web url
