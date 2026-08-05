@@ -44,11 +44,11 @@ jobs:
 
       - name: Install LLVM
         run: |
-          # sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-22 200
+          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 23
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-23 200
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-23 200
+          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-23 200
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-23 200
 
       - name: Build Release
         run: |
