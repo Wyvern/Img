@@ -53,11 +53,11 @@ jobs:
 
       - name: Install LLVM
         run: |
-          curl https://apt.llvm.org/llvm.sh | sudo bash -s -- 23
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-23 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-23 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-23 200
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-23 200
+          # curl https://apt.llvm.org/llvm.sh | sudo bash -s -- 23
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
+          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-22 200
       #
       # - name: Cache Illumos/Solaris
       #   uses: actions/cache@v6
