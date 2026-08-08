@@ -261,7 +261,7 @@ rustflags = [
   "-Zvalidate-mir=no",
   "-Zcache-proc-macros",
   "-Zoffload=Device",
-  "-Zassumptions-on-binders",
+  # "-Zassumptions-on-binders",
   # "-Zbuild-sdylib-interface",
   "-Dclippy::redundant_clone",
   "-Dclippy::unused_io_amount",
