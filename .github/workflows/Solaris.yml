@@ -60,7 +60,8 @@ jobs:
               sudo ./llvm.sh $ver
           fi
           for x in clang clang++ lld; do
-          sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200 done
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200
+          done
           sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
       #
       # - name: Cache Illumos/Solaris
