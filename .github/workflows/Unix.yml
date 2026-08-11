@@ -50,9 +50,8 @@ jobs:
               chmod +x llvm.sh
               sudo ./llvm.sh $ver
           fi
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$ver 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$ver 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-$ver 200
+          for x in clang clang++ lld; do
+          sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200 done
           sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
 
       - name: Build Release
