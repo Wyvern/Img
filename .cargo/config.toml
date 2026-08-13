@@ -263,6 +263,7 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros",
   "-Zvalidate-mir=no",
+  "-Zwasm-proc-macros",
   # "-Zoffload=Device",
   # "-Zassumptions-on-binders",
   # "-Zllvm-writable",
