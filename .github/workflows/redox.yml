@@ -69,7 +69,6 @@ jobs:
                 if [ ! -d ~/.redoxer/toolchain/$target ]; then
                   redoxer toolchain
                 fi
-                RUSTUP_TOOLCHAIN=nightly
                 time redoxer build -- -q --profile redox -Zbuild-std=std,panic_abort --target $target
                 "
           done
