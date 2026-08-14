@@ -228,7 +228,6 @@ rustflags = [
   "-Cpanic=immediate-abort",
 
   "-Zunstable-options",
-  "-Zembed-metadata=no",
   "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
@@ -255,11 +254,13 @@ rustflags = [
   "-Zshell-argfiles",
   "-Zchecksum-hash-algorithm=blake3",
   "-Zmir-strip-debuginfo=all-locals",
-  # "-Ztyping-mode-post-typeck-until-borrowck",
   "-Zexperimental-default-bounds",
   "-Zhigher-ranked-assumptions",
   "-Zvalidate-mir=no",
   "-Zcache-proc-macros",
+  # "-Ztyping-mode-post-typeck-until-borrowck",
+  # "-Zembed-metadata=no",
+
   # "-Zoffload=Device",
   # "-Zassumptions-on-binders",
   # "-Zbuild-sdylib-interface",
