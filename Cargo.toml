@@ -3,9 +3,6 @@ name = "img"
 version = "1.0.0"
 edition = "2024"
 
-[lints.rust]
-# linker_messages = "allow"
-
 [[example]]
 name = "color"
 path = "src/color.rs"
@@ -15,7 +12,7 @@ test = false
 [dependencies]
 alphanumeric-sort = "*"
 argh = "*"
-base64 = { version = "*", default-features = false }
+base64-turbo = "*"
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 dom_query = { version = "*", default-features = false }
 fastrand = "*"
@@ -29,12 +26,6 @@ serde_json = "*"
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 serde_json = "*"
 
-[target.'cfg(target_os = "hermit")'.dependencies]
-hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
-
-[target.'cfg(target_os = "espidf")'.dependencies]
-esp-idf-sys = "*"
-
 [target.'cfg(all(unix, not(target_os = "espidf")))'.build-dependencies]
 libc = "*"
 
@@ -42,7 +33,16 @@ libc = "*"
 file-format = "*"
 libc = "*"
 
+[target.'cfg(target_os = "espidf")'.dependencies]
+esp-idf-sys = "*"
+
+[target.'cfg(target_os = "hermit")'.dependencies]
+hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
+
 [features]
 default = []
 color = []
 download = []
+
+[lints.rust]
+linker_messages = "allow"

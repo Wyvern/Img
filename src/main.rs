@@ -1232,15 +1232,12 @@ fn save_to_file(data: &str) {
         }
 
         let content = &data[data.find(',').unwrap() + 1..];
-        use base64::*;
         {
             if ctx.contains(";base64") {
-                let mut buf = vec![0; content.len()];
-                let size = engine::general_purpose::STANDARD
-                    .decode_slice(content, &mut buf)
+                let data = base64_turbo::STANDARD
+                    .decode(content)
                     .unwrap_or_else(|e| quit!("{e}"));
-                buf.truncate(size);
-                fs::write(&full_name, buf)
+                fs::write(&full_name, data)
             } else {
                 fs::write(
                     &full_name,
@@ -1480,7 +1477,7 @@ mod img {
             parse(&arg);
         } else {
             [
-                "https://xiuren.biz/latest-post/",
+                "https://xiuren.biz/category/xiuren-extra/",
                 "https://hotgirl.biz/tag/xiuren-extra/",
                 "https://bisipic.online/forum-50-1.html",
                 "https://bestgirlsexy.com/category/china/imiss/page/17/",
