@@ -43,6 +43,3 @@ hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 default = []
 color = []
 download = []
-
-[lints.rust]
-linker_messages = "allow"
