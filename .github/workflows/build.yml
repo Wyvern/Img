@@ -371,7 +371,7 @@ jobs:
 
   Windows-2025:
     name: Windows-2025
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
 
     steps:
       - name: Disable and Stop windows services
@@ -461,7 +461,7 @@ jobs:
 
   Windows-11-Arm:
     name: Windows-11-arm
-    runs-on: windows-11-arm
+    runs-on: windows-11-vs2026-arm
 
     steps:
       - name: Disable and Stop windows services

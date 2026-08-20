@@ -163,7 +163,7 @@ fn get_html(addr: &str) -> (String, usize) {
         SPINNER.store(true, Ordering::Release);
         circle_indicator();
     });
-    let out = process::Command::new("curl")
+    let res = process::Command::new("curl")
         .args(CURL)
         .args([
             addr,
@@ -172,23 +172,24 @@ fn get_html(addr: &str) -> (String, usize) {
             #[cfg(not(debug_assertions))]
             "-S",
         ])
-        .output()
-        .unwrap_or_else(|e| {
-            SPINNER.store(false, Ordering::Release);
-            quit!("curl: {}", e);
-        });
+        .output();
     SPINNER.store(false, Ordering::Release);
-    if !out.stderr.is_empty() {
-        quit!(
-            "Fetch {} failed : {}",
-            addr,
-            String::from_utf8_lossy(&out.stderr).trim()
-        );
+    h.thread().unpark();
+    match res {
+        Ok(out) => {
+            if !out.stderr.is_empty() {
+                quit!(
+                    "Fetch {} failed : {}",
+                    addr,
+                    String::from_utf8_lossy(&out.stderr).trim()
+                );
+            }
+            let s = String::from_utf8_lossy(&out.stdout).into_owned();
+            let ll = s.rfind('\n').unwrap();
+            (s, ll)
+        }
+        Err(e) => quit!("curl: {}", e),
     }
-    let s = String::from_utf8_lossy(&out.stdout).into_owned();
-    let ll = s.rfind('\n').unwrap();
-    h.join().unwrap();
-    (s, ll)
 }
 
 ///Parse photos in web url
@@ -800,15 +801,16 @@ fn normarlize(url: &str, addr: &str) -> String {
 ///replace os specific special/reversed chars in path name
 fn sanitize_path(name: &str) -> String {
     cfg_select! {
-        target_os = "macos"=> {name.replace(":", "|")}
-        any(all(unix, not(target_os = "macos")), target_family = "wasm")=>{name.replace("/", "_")}
-        target_family = "windows"=>{name.chars()
+        target_os = "macos" => name.replace(":", "|"),
+        any(all(unix, not(target_os = "macos")), target_family = "wasm") => name.replace("/", "_"),
+        target_family = "windows" => name
+            .chars()
             .map(|c| match c {
                 '\\' | '/' | ':' | '*' | '?' | '"' | '<' | '>' | '|' => '_',
                 _ => c,
             })
-            .collect()}
-        _=>{name.into()}
+            .collect(),
+        _ => name.into(),
     }
 }
 ///Perform photo download operation
@@ -1193,15 +1195,11 @@ fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Box<[u8]> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        all(unix, not(target_os = "espidf"))=>{
+        all(unix, not(target_os = "espidf")) => {
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
-        windows=>{
-            run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz"))
-        }
-        _=>{
-            *include_bytes!("../web.cbor")
-        }
+        windows => run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz")),
+        _ => *include_bytes!("../web.cbor"),
     };
     cbor4ii::serde::from_slice(&data).unwrap_or_else(|e| {
         quit!("Read `web.cbor` failed: {}", e);
@@ -1234,15 +1232,12 @@ fn save_to_file(data: &str) {
         }
 
         let content = &data[data.find(',').unwrap() + 1..];
-        use base64::*;
         {
             if ctx.contains(";base64") {
-                let mut buf = vec![0; content.len()];
-                let size = engine::general_purpose::STANDARD
-                    .decode_slice(content, &mut buf)
+                let data = base64_turbo::STANDARD
+                    .decode(content)
                     .unwrap_or_else(|e| quit!("{e}"));
-                buf.truncate(size);
-                fs::write(&full_name, buf)
+                fs::write(&full_name, data)
             } else {
                 fs::write(
                     &full_name,
@@ -1275,7 +1270,7 @@ fn circle_indicator() {
             if !SPINNER.load(Ordering::Acquire) {
                 break 'l;
             }
-            thread::sleep(time::Duration::from_millis(200));
+            thread::park_timeout(time::Duration::from_millis(200));
         }
     }
     print!("{CL}");
@@ -1482,7 +1477,7 @@ mod img {
             parse(&arg);
         } else {
             [
-                "https://xiuren.biz/latest-post/",
+                "https://xiuren.biz/category/xiuren-extra/",
                 "https://hotgirl.biz/tag/xiuren-extra/",
                 "https://bisipic.online/forum-50-1.html",
                 "https://bestgirlsexy.com/category/china/imiss/page/17/",
@@ -1523,12 +1518,13 @@ mod img {
 
     #[test]
     fn progress() {
-        thread::spawn(|| {
+        let h = thread::spawn(|| {
             SPINNER.store(true, Ordering::Release);
             circle_indicator();
         });
-        thread::sleep(time::Duration::from_secs(5));
+        thread::sleep(time::Duration::from_millis(1300));
         SPINNER.store(false, Ordering::Release);
+        h.thread().unpark();
     }
 
     #[test]
