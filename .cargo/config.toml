@@ -413,7 +413,7 @@ linker = "mipsisa32r6el-linux-gnu-gcc"
 [target.'cfg(any(target_os="linux",target_os="android"))']
 rustflags = ["-Zrelax-elf-relocations"]
 
-[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia"))']
+[target.'cfg(any(target_os="freebsd",all(target_os="netbsd",not(target_arch="powerpc"),not(target_arch="mipsel"),not(target_arch="armv7"),not(target_arch="sparc64")),all(target_os="openbsd",not(target_arch="powerpc"),not(target_arch="sparc64")),target_os="dragonfly",target_os="fuchsia"))']
 linker = "clang"
 rustflags = [
   "-Clink-arg=-fuse-ld=lld",
