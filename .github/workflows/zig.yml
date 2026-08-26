@@ -15,16 +15,9 @@ env:
 jobs:
   macOS:
     name: Zig linker
-    runs-on: macos-26
+    runs-on: ubuntu-26.04-arm
 
     steps:
-      - name: Disable macos spotlight index
-        run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
-          sudo pmset -a powernap 0
-          sudo pmset -a sleep 0
-
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -49,7 +42,16 @@ jobs:
 
       - name: Install LLVM
         run: |
-          brew install llvm@23
+          ver=23
+          if [ "$ver" = "23" ]; then
+              wget https://apt.llvm.org/llvm.sh
+              chmod +x llvm.sh
+              sudo ./llvm.sh $ver
+          fi
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
 
       - name: Build Release
         run: |
