@@ -49,10 +49,7 @@ jobs:
 
       - name: Install LLVM
         run: |
-          ver=23
-          if [ "$ver" = "23" ]; then
-            brew install llvm@23
-          fi
+          brew install llvm@23
 
       - name: Build Release
         run: |
