@@ -53,7 +53,7 @@ jobs:
 
       - name: Install LLVM
         run: |
-          ver=22
+          ver=23
           if [ "$ver" = "23" ]; then
               wget https://apt.llvm.org/llvm.sh
               chmod +x llvm.sh
