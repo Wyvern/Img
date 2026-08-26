@@ -583,6 +583,14 @@ rustflags = [
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-freebsd"]
 
+[target.armv6-unknown-freebsd]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-freebsd"]
+
+[target.powerpc-unknown-freebsd]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=powerpc-freebsd"]
+
 [target.mipsel-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
