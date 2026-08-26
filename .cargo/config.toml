@@ -595,6 +595,10 @@ rustflags = ["-Clink-arg=--target=powerpc-netbsd", "-Crelocation-model=static"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-netbsd"]
 
+[target.armv6-unknown-netbsd-eabihf]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-netbsd"]
+
 [target.powerpc-unknown-openbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=powerpc-openbsd"]
