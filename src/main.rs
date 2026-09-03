@@ -17,7 +17,7 @@ static CURL: &[&str] = &[
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
-    "--http2",
+    "--http3",
     #[cfg(debug_assertions)]
     "-S",
     // "-OJ",
@@ -1499,8 +1499,8 @@ mod img {
             f: f32,
         }
 
-        let u = IntOrFloat { f: 1.0 };
-
+        let u = IntOrFloat { f: 3.0 };
+        tdbg!(unsafe { u.i });
         unsafe {
             match u {
                 IntOrFloat { i: 10 } => println!("Found exactly ten!"),
