@@ -24,7 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: x86_64-fortanix-unknown-sgx
+          targets: x86_64-fortanix-unknown-sgx,x86_64-unknown-fuchsia
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -80,6 +80,9 @@ jobs:
         run: |
           cargo update
           set +e -x
+
+          ls -ahl /home/runner/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-fuchsia/lib/*
+          exit
 
           # mkdir -p /home/runner/Illumos
 
