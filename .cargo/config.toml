@@ -278,7 +278,7 @@ rustflags = ["-Zstaticlib-hide-internal-symbols"]
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
-  # "-Clinker-plugin-lto",
+  "-Clinker-plugin-lto",
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--relax",
   "-Clink-arg=-Wl,-z,pack-relative-relocs",
