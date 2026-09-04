@@ -31,7 +31,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          targets: wasm32-wasip2
+          targets: wasm32-wasip2,wasm32-wasip3
           components: rust-src
 
       - name: Rust Cache
@@ -62,7 +62,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          cargo s wasm32-wasip3
+          exit
           targets=(
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
@@ -76,6 +77,7 @@ jobs:
             arm64e-apple-darwin
             x86_64h-apple-darwin
             wasm32-wasip2
+            wasm32-wasip3
           )
 
           for target in ${targets[@]}; do
