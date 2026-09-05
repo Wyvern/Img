@@ -11,16 +11,14 @@ static SPINNER: AtomicBool = AtomicBool::new(false);
 static SEP: &str = " | ";
 static CSS: &[&str] = &["url(", "image(", "image-set("];
 static JSON: sync::OnceLock<serde_json::Value> = sync::OnceLock::new();
-static CURL: &[&str] = &[
+static CURL_ARGS: &[&str] = &[
     "--compressed",
     "-kfsL",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
     "--tcp-fastopen",
-    "--http3",
     #[cfg(debug_assertions)]
-    "-S",
-    // "-OJ",
+    "-S", // "-OJ"
 ];
 static IMGS: &[&str] = &[
     ".jpg", ".jpeg", ".jxl", ".png", ".webp", ".bmp", ".tif", ".tiff", ".ico", ".gif", ".svg",
@@ -30,6 +28,21 @@ static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
 static mut SUB_DIR: bool = true;
 static mut EMBED: bool = false;
+#[allow(dead_code)]
+static CURL_HTTP3: sync::OnceLock<bool> = sync::OnceLock::new();
+
+fn curl_args() -> impl Iterator<Item = &'static str> {
+    CURL_ARGS.iter().copied().chain(
+        cfg_select! {
+            target_os = "macos" => true,
+            _ => *CURL_HTTP3.get_or_init(|| {
+                let o = run_cmd("curl", &["-V"], &[]);
+                std::str::from_utf8(&o).is_ok_and(|s| s.contains("HTTP3"))
+            }),
+        }
+        .then_some("--http3"),
+    )
+}
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(
@@ -159,12 +172,13 @@ fn host_info(host: &str) -> [Option<&str>; 5] {
 ///Fetch web page generate html content
 fn get_html(addr: &str) -> (String, usize) {
     _ = io::stdout().lock();
+    let args = curl_args();
     let h = thread::spawn(|| {
         SPINNER.store(true, Ordering::Release);
         circle_indicator();
     });
     let res = process::Command::new("curl")
-        .args(CURL)
+        .args(args)
         .args([
             addr,
             "-w",
@@ -582,7 +596,7 @@ fn parse(addr: &str) -> String {
                     _ if !l.starts_with("json:") && !urls.is_empty() => {
                         let mut args: Vec<&str> = Vec::new();
                         args.extend(urls.iter().map(|s| s.as_str()));
-                        args.extend(CURL);
+                        args.extend(CURL_ARGS);
                         args.extend(["-Z", "--parallel-immediate"]);
                         let o = run_cmd("curl", &args, &[]);
                         let html = String::from_utf8_lossy(&o);
@@ -931,7 +945,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     // tdbg!(curl.get_args().len() / 3, no_ext.len(););
     if curl.get_args().len() > 0 {
         create_dir();
-        _ = curl.args(CURL).args(opts).spawn();
+        _ = curl.args(curl_args()).args(opts).spawn();
     }
 
     if !no_ext.is_empty() {
@@ -954,7 +968,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             match fork() {
                 Ok(0) => {
                     curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
-                    curl.args(CURL).args(opts).status().unwrap();
+                    curl.args(curl_args()).args(opts).status().unwrap();
                     for (_, f) in no_ext {
                         let file = path.join(&f);
                         if file.is_file() {
@@ -1001,7 +1015,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 },
             );
             if curl.get_args().len() > 0 {
-                _ = curl.args(CURL).args(opts).spawn();
+                _ = curl.args(curl_args()).args(opts).spawn();
             }
         }
     }
@@ -1174,17 +1188,17 @@ fn check_next(nt: Next, cur: &str, page: &dom::Document) -> String {
 }
 
 ///Run arbitrary command in sync mode
-fn run_cmd(cmd: &str, args: &[&str], data: &[u8]) -> Box<[u8]> {
+fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
     let mut child = process::Command::new(cmd)
         .args(args)
         .stdin(process::Stdio::piped())
         .stdout(process::Stdio::piped())
         .spawn()
-        .unwrap();
+        .unwrap_or_else(|e| quit!("Command {} error: {}", cmd, e));
 
-    if !data.is_empty() {
+    if !input.is_empty() {
         use std::io::Write;
-        child.stdin.as_mut().unwrap().write_all(data).unwrap();
+        child.stdin.as_mut().unwrap().write_all(input).unwrap();
     }
 
     let out = child.wait_with_output().unwrap();
@@ -1599,6 +1613,13 @@ mod img {
     fn embed() {
         let data = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=";
         save_to_file(data);
+    }
+
+    #[test]
+    fn http3() {
+        for arg in curl_args() {
+            tdbg!(arg);
+        }
     }
 
     #[test]
