@@ -225,34 +225,36 @@ fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
 
 pub fn terminal_input(o: &mut io::StdoutLock) -> Mode {
     use io::*;
-    let input = cfg_select! {
-        windows=>{{
-            unsafe extern "C" {
-                fn _getch() -> i32;
+    let input = {
+        cfg_select! {
+            windows => {
+                unsafe extern "C" {
+                    fn _getch() -> i32;
+                }
+                let _i = stdin().lock();
+                let mut ch = unsafe { _getch() } as u8;
+                ch.make_ascii_lowercase();
+                Mode::Raw(ch)
             }
-            let _i = stdin().lock();
-            let mut ch = unsafe { _getch() } as u8;
-            ch.make_ascii_lowercase();
-            Mode::Raw(ch)
-            }}
-        all(unix, not(target_os="espidf"))=>{{
-            let fd = libc::STDIN_FILENO;
-            let old = mem::MaybeUninit::<libc::termios>::uninit();
-            begin_raw_mode(fd, old);
-            let mut key = [0u8; 1];
-            let mut i = stdin().lock();
-            i.read_exact(&mut key).unwrap();
-            end_raw_mode(fd, old);
-            key.make_ascii_lowercase();
-            Mode::Raw(key[0])
-        }}
-        _=>{{
-            let mut s = String::default();
-            let mut i = stdin().lock();
-            i.read_line(&mut s).unwrap();
-            s.make_ascii_lowercase();
-            Mode::Normal(s)
-        }}
+            all(unix, not(target_os = "espidf")) => {
+                let fd = libc::STDIN_FILENO;
+                let old = mem::MaybeUninit::<libc::termios>::uninit();
+                let mut key = [0u8; 1];
+                let mut i = stdin().lock();
+                begin_raw_mode(fd, old);
+                i.read_exact(&mut key).unwrap();
+                end_raw_mode(fd, old);
+                key.make_ascii_lowercase();
+                Mode::Raw(key[0])
+            }
+            _ => {
+                let mut s = String::default();
+                let mut i = stdin().lock();
+                i.read_line(&mut s).unwrap();
+                s.make_ascii_lowercase();
+                Mode::Normal(s)
+            }
+        }
     };
     let clear = match input {
         Mode::Raw(_) => format_args!("{CL}"),

@@ -38,7 +38,7 @@ fn curl_args() -> impl Iterator<Item = &'static str> {
             |s| {
                 let (mut http3, mut tcp_fastopen) = (false, false);
                 for line in s.lines() {
-                    let l = line.trim();
+                    let l = line.trim_start();
                     http3 |= l.starts_with("--http3");
                     tcp_fastopen |= l.starts_with("--tcp-fastopen");
                     if http3 && tcp_fastopen {
@@ -716,7 +716,7 @@ fn parse(addr: &str) -> String {
                     let input = terminal_input(&mut stdout.lock());
                     match input {
                         Mode::Raw(c) => match c {
-                            b'y' | b'\n' => parse_album(),
+                            b'y' | b'\r' | b'\n' => parse_album(),
                             b'n' => {
                                 next_sel = None;
                                 continue;
