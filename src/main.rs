@@ -16,7 +16,6 @@ static CURL_ARGS: &[&str] = &[
     "-kfsL",
     "-A",
     "Mozilla/5.0 Firefox/Edge/Chrome",
-    "--tcp-fastopen",
     #[cfg(debug_assertions)]
     "-S", // "-OJ"
 ];
@@ -28,20 +27,33 @@ static TERM: sync::OnceLock<bool> = sync::OnceLock::new();
 static mut INALBUM: bool = false;
 static mut SUB_DIR: bool = true;
 static mut EMBED: bool = false;
-#[allow(dead_code)]
-static CURL_HTTP3: sync::OnceLock<bool> = sync::OnceLock::new();
+static CURL_EXTRA: sync::OnceLock<(bool, bool)> = sync::OnceLock::new();
 
 fn curl_args() -> impl Iterator<Item = &'static str> {
-    CURL_ARGS.iter().copied().chain(
-        cfg_select! {
-            target_os = "macos" => true,
-            _ => *CURL_HTTP3.get_or_init(|| {
-                let o = run_cmd("curl", &["-V"], &[]);
-                std::str::from_utf8(&o).is_ok_and(|s| s.contains("HTTP3"))
-            }),
-        }
-        .then_some("--http3"),
-    )
+    let o = run_cmd("curl", &["--help", "all"], &[]);
+    let str = str::from_utf8(&o);
+    let (http3, tcp_fastopen) = *CURL_EXTRA.get_or_init(|| {
+        str.map_or_else(
+            |_| (false, false),
+            |s| {
+                let mut http3 = false;
+                let mut tcp_fastopen = false;
+                for line in s.lines() {
+                    http3 |= line.contains("--http3");
+                    tcp_fastopen |= line.contains("--tcp-fastopen");
+                    if http3 && tcp_fastopen {
+                        break;
+                    }
+                }
+                (http3, tcp_fastopen)
+            },
+        )
+    });
+    CURL_ARGS
+        .iter()
+        .copied()
+        .chain(http3.then_some("--http3"))
+        .chain(tcp_fastopen.then_some("--tcp-fastopen"))
 }
 
 #[derive(argh::FromArgs, Debug)]
@@ -815,8 +827,8 @@ fn normarlize(url: &str, addr: &str) -> String {
 ///replace os specific special/reversed chars in path name
 fn sanitize_path(name: &str) -> String {
     cfg_select! {
-        target_os = "macos" => name.replace(":", "|"),
-        any(all(unix, not(target_os = "macos")), target_family = "wasm") => name.replace("/", "_"),
+        target_vendor = "apple" => name.replace(":", "|"),
+        any(all(unix, not(target_vendor = "apple")), target_family = "wasm") => name.replace("/", "_"),
         target_family = "windows" => name
             .chars()
             .map(|c| match c {
@@ -1201,9 +1213,11 @@ fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
         child.stdin.as_mut().unwrap().write_all(input).unwrap();
     }
 
-    let out = child.wait_with_output().unwrap();
-    assert!(out.status.success());
-    out.stdout.into_boxed_slice()
+    let out = child.wait_with_output();
+    out.map_or_else(
+        |e| quit!("Output of {} error: {}", cmd, e),
+        |o| o.stdout.into_boxed_slice(),
+    )
 }
 
 ///WebSites `Json` config data
