@@ -36,11 +36,11 @@ fn curl_args() -> impl Iterator<Item = &'static str> {
         str.map_or_else(
             |_| (false, false),
             |s| {
-                let mut http3 = false;
-                let mut tcp_fastopen = false;
+                let (mut http3, mut tcp_fastopen) = (false, false);
                 for line in s.lines() {
-                    http3 |= line.contains("--http3");
-                    tcp_fastopen |= line.contains("--tcp-fastopen");
+                    let l = line.trim();
+                    http3 |= l.starts_with("--http3");
+                    tcp_fastopen |= l.starts_with("--tcp-fastopen");
                     if http3 && tcp_fastopen {
                         break;
                     }
