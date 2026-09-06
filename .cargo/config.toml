@@ -44,7 +44,7 @@ rpath = true
 debug = false
 strip = true
 opt-level = "s"
-trim-paths = true
+trim-paths = "all"
 
 [profile.dev.package."*"]
 rustflags = ["-Cprefer-dynamic"]
@@ -72,7 +72,7 @@ inherits = "dev"
 [profile.release]
 rustflags = ["-Cprefer-dynamic", "-Zhint-mostly-unused"]
 rpath = true
-trim-paths = true
+trim-paths = "all"
 
 [profile.release.build-override]
 rustflags = ["-Cprefer-dynamic"]

@@ -71,7 +71,7 @@ inherits = "dev"
 [profile.release]
 rustflags = ["-Cprefer-dynamic", "-Zhint-mostly-unused"]
 rpath = true
-trim-paths = true
+trim-paths = "all"
 
 [profile.release.build-override]
 rustflags = ["-Cprefer-dynamic"]
