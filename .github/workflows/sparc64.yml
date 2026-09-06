@@ -82,6 +82,10 @@ jobs:
 
           sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
           sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
+
+          grep -n '^FROM ' docker/netbsd.Dockerfile docker/openbsd.Dockerfile
+          exit
+
           sed -i '/^FROM /a RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*' \
             docker/netbsd.Dockerfile
           sed -i '/^FROM /a RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*' \
