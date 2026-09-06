@@ -73,26 +73,52 @@ jobs:
       - name: Build toolchain
         working-directory: rust-cross-toolchain
         env:
+          IMAGE: ghcr.io/${{ github.repository }}
           NETBSD_VERSION: 11.0
           OPENBSD_VERSION: 7.9
         run: |
-          ./tools/build-docker.sh sparc64-unknown-netbsd
-          ./tools/build-docker.sh sparc64-unknown-openbsd
+          # NetBSD base image required by docker/netbsd.Dockerfile
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --load \
+            --file docker/base/netbsd.Dockerfile \
+            --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+            --build-arg HOST_ARCH=amd64 \
+            --build-arg NETBSD_VERSION="${NETBSD_VERSION%%.*}" \
+            --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd11-base-dev-amd64 \
+            docker/
+
+          # NetBSD final image
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --load \
+            --file docker/netbsd.Dockerfile \
+            --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+            --build-arg HOST_ARCH=amd64 \
+            --build-arg NETBSD_VERSION="${NETBSD_VERSION%%.*}" \
+            --tag "$IMAGE:sparc64-unknown-netbsd11.0" \
+            docker/
+
+          # OpenBSD final image
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --load \
+            --file docker/openbsd.Dockerfile \
+            --build-arg RUST_TARGET=sparc64-unknown-openbsd \
+            --build-arg HOST_ARCH=amd64 \
+            --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
+            --tag "$IMAGE:sparc64-unknown-openbsd7.9" \
+            docker/
 
       - name: Publish toolchains
         env:
-            REGISTRY: ghcr.io/${{ github.repository }}
+          IMAGE: ghcr.io/${{ github.repository }}
         run: |
-          docker tag \
-                  ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd11.0-dev-amd64 \
-                  "$REGISTRY:sparc64-unknown-netbsd11.0"
-
-          docker tag \
-                  ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-openbsd7.9-dev-amd64 \
-                  "$REGISTRY:sparc64-unknown-openbsd7.9"
-
-          docker push "$REGISTRY:sparc64-unknown-netbsd11.0"
-          docker push "$REGISTRY:sparc64-unknown-openbsd7.9"
+          docker push "$IMAGE:sparc64-unknown-netbsd11.0"
+          docker push "$IMAGE:sparc64-unknown-openbsd7.9"
 
       - name: Build Release
         run: |
