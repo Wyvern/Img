@@ -77,13 +77,12 @@ jobs:
           NETBSD_VERSION: 11.0
           OPENBSD_VERSION: 7.9
         run: |
-          git rev-parse HEAD
-          git log -1 --oneline
-          git status --short
+          cd /home/runner/work/Img/Img/rust-cross-toolchain
 
+          wc -l docker/netbsd.Dockerfile
           grep -n 'common.sh' docker/netbsd.Dockerfile || true
-          git ls-tree -r HEAD --name-only | grep 'common.sh'
-          grep -n -C 3 'common.sh' docker/netbsd.Dockerfile
+          git status --short
+          git show HEAD:docker/netbsd.Dockerfile | grep -n 'common.sh' || true
 
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
