@@ -135,26 +135,6 @@ jobs:
           docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
           docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
 
-          docker run --rm --entrypoint sh \
-            ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
-            -c '
-              echo "=== bin ==="
-              ls -la /sparc64-unknown-openbsd/bin
-              echo
-              echo "=== gcc candidates ==="
-              find /sparc64-unknown-openbsd -type f \
-                \( -name "*gcc*" -o -name "*clang*" -o -name "*ld*" \) \
-                -print
-            '
-
-          docker run --rm --entrypoint sh \
-            ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
-            -c '
-              command -v sparc64-unknown-openbsd-gcc || true
-              command -v sparc64-unknown-openbsd-ld || true
-              ls -la /sparc64-unknown-openbsd/bin/* 2>/dev/null
-            '
-
           targets=(
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd

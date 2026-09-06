@@ -619,7 +619,7 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
 
 [target.sparc64-unknown-openbsd]
-linker = "sparc64-unknown-openbsd-gcc"
+linker = "sparc64-unknown-openbsd-clang"
 # rustflags = ["-Clink-arg=--target=sparc64-openbsd", "-Crelocation-model=static"]
 
 [target.sparc64-unknown-netbsd]
