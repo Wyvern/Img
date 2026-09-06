@@ -156,15 +156,13 @@ jobs:
           docker pull "$IMAGE:sparc64-unknown-netbsd11.0"
           docker pull "$IMAGE:sparc64-unknown-openbsd7.9"
 
-          sudo update-ca-certificates
-          CARGO_HTTP_CHECK_REVOKE=false
-
           targets=(
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd
           )
 
           for target in ${targets[@]}; do
+            time cargo s $target
             time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
           done
 
