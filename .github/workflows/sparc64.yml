@@ -77,33 +77,17 @@ jobs:
           NETBSD_VERSION: 11.0
           OPENBSD_VERSION: 7.9
         run: |
-          cd /home/runner/work/Img/Img/rust-cross-toolchain
-
-          echo '=== HEAD ==='
-          git rev-parse HEAD
-
-          echo '=== netbsd.Dockerfile ==='
-          wc -l docker/netbsd.Dockerfile
-          grep -n 'common.sh\|clang-cross.sh' docker/netbsd.Dockerfile || true
-
-          echo '=== git version ==='
-          git show HEAD:docker/netbsd.Dockerfile | wc -l
-          git show HEAD:docker/netbsd.Dockerfile | grep -n 'common.sh\|clang-cross.sh' || true
-
-          echo '=== status ==='
-          git status --short
-
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
             --platform linux/amd64 \
             --provenance=false \
             --load \
-            --file docker/base/netbsd.Dockerfile \
+            --file netbsd.Dockerfile \
             --build-arg RUST_TARGET=sparc64-unknown-netbsd \
             --build-arg HOST_ARCH=amd64 \
             --build-arg NETBSD_VERSION="${NETBSD_VERSION%%.*}" \
             --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd11-base-dev-amd64 \
-            docker
+            docker/base
 
           # NetBSD final image
           docker buildx build \
