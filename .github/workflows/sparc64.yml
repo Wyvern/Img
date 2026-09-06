@@ -65,6 +65,9 @@ jobs:
           sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
           sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
 
+          sed -i '/AS builder/a ENV CFLAGS="-Wno-error=incompatible-pointer-types"' \
+            docker/base/netbsd.Dockerfile
+
           for file in docker/netbsd.Dockerfile docker/openbsd.Dockerfile; do
               sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
 
