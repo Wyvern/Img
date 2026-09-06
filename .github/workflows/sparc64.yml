@@ -162,7 +162,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cross build -vv -q --profile src -Zbuild-std=std,panic_abort --target $target
+            time cross build -vv --profile src -Zbuild-std=std,panic_abort --target $target
           done
 
           # time docker run --rm \
