@@ -16,6 +16,10 @@ jobs:
     name: Sparc64
     runs-on: ubuntu-26.04
 
+    permissions:
+          contents: read
+          packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -48,13 +52,47 @@ jobs:
           done
           sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
 
-      - uses: taiki-e/setup-cross-toolchain-action@v1
-        with:
-          target: sparc64-unknown-netbsd@10
+      # - uses: taiki-e/setup-cross-toolchain-action@v1
+      #   with:
+      #     target: sparc64-unknown-netbsd@10
 
       # - uses: taiki-e/setup-cross-toolchain-action@v1
       #   with:
       #     target: sparc64-unknown-openbsd
+
+      - name: Checkout rust-cross-toolchain
+        uses: actions/checkout@v7
+        with:
+          repository: taiki-e/rust-cross-toolchain
+          path: rust-cross-toolchain
+
+      - name: Login to GHCR
+        run: |
+          echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+
+      - name: Build toolchain
+        working-directory: rust-cross-toolchain
+        env:
+          NETBSD_VERSION: 11.0
+          OPENBSD_VERSION: 7.9
+        run: |
+          ./tools/build-docker.sh sparc64-unknown-netbsd
+          ./tools/build-docker.sh sparc64-unknown-openbsd
+
+      - name: Publish toolchains
+        env:
+            REGISTRY: ghcr.io/${{ github.repository }}
+        run: |
+          docker tag \
+                  ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd11.0-dev-amd64 \
+                  "$REGISTRY:sparc64-unknown-netbsd11.0"
+
+          docker tag \
+                  ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-openbsd7.9-dev-amd64 \
+                  "$REGISTRY:sparc64-unknown-openbsd7.9"
+
+          docker push "$REGISTRY:sparc64-unknown-netbsd11.0"
+          docker push "$REGISTRY:sparc64-unknown-openbsd7.9"
 
       - name: Build Release
         run: |
@@ -63,6 +101,7 @@ jobs:
 
           targets=(
             sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
           )
 
           for target in ${targets[@]}; do
