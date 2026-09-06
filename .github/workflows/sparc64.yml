@@ -77,17 +77,13 @@ jobs:
           NETBSD_VERSION: 11.0
           OPENBSD_VERSION: 7.9
         run: |
-          pwd
-          printf '%s\n' '--- root ---'
-          ls -la
-          printf '%s\n' '--- common.sh ---'
-          ls -lh common.sh
-          printf '%s\n' '--- docker ---'
-          ls -la docker/
-
+          git rev-parse HEAD
+          git log -1 --oneline
           git status --short
-          git ls-files | head -30
-          git ls-files common.sh
+
+          grep -n 'common.sh' docker/netbsd.Dockerfile || true
+          git ls-tree -r HEAD --name-only | grep 'common.sh'
+          grep -n -C 3 'common.sh' docker/netbsd.Dockerfile
 
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
