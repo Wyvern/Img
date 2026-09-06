@@ -87,7 +87,7 @@ jobs:
             --build-arg HOST_ARCH=amd64 \
             --build-arg NETBSD_VERSION="${NETBSD_VERSION%%.*}" \
             --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd11-base-dev-amd64 \
-            docker/
+            .
 
           # NetBSD final image
           docker buildx build \
@@ -99,7 +99,7 @@ jobs:
             --build-arg HOST_ARCH=amd64 \
             --build-arg NETBSD_VERSION="${NETBSD_VERSION%%.*}" \
             --tag "$IMAGE:sparc64-unknown-netbsd11.0" \
-            docker/
+            .
 
           # OpenBSD final image
           docker buildx build \
@@ -111,7 +111,7 @@ jobs:
             --build-arg HOST_ARCH=amd64 \
             --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
             --tag "$IMAGE:sparc64-unknown-openbsd7.9" \
-            docker/
+            .
 
       - name: Publish toolchains
         env:
