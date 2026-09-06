@@ -86,7 +86,7 @@ jobs:
             --build-arg RUST_TARGET=sparc64-unknown-netbsd \
             --build-arg HOST_ARCH=amd64 \
             --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-            --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd11.0-base-dev-amd64 \
+            --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
             docker/base
 
           # NetBSD final image
