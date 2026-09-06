@@ -161,13 +161,8 @@ jobs:
             sparc64-unknown-openbsd
           )
 
-          docker run --rm \
-            --entrypoint sh \
-            ghcr.io/wyvern/img:sparc64-unknown-netbsd11.0 \
-            -c 'command -v cc; command -v gcc; command -v clang; uname -a'
-
           for target in ${targets[@]}; do
-            time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
+            time cross build -vv -q --profile src -Zbuild-std=std,panic_abort --target $target
           done
 
           # time docker run --rm \
