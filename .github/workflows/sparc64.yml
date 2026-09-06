@@ -77,8 +77,10 @@ jobs:
           NETBSD_VERSION: 11.0
           OPENBSD_VERSION: 7.9
         run: |
-          ls -la  docker/
-          cat docker/.dockerignore
+          ls -la .dockerignore
+          [ -f .dockerignore ] && cat .dockerignore
+
+          ls -lh common.sh
 
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
