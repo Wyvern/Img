@@ -156,6 +156,9 @@ jobs:
           docker pull "$IMAGE:sparc64-unknown-netbsd11.0"
           docker pull "$IMAGE:sparc64-unknown-openbsd7.9"
 
+          sudo update-ca-certificates
+          CARGO_HTTP_CHECK_REVOKE=false
+
           targets=(
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd
