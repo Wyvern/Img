@@ -82,7 +82,7 @@ jobs:
             --platform linux/amd64 \
             --provenance=false \
             --load \
-            --file netbsd.Dockerfile \
+            --file docker/base/netbsd.Dockerfile \
             --build-arg RUST_TARGET=sparc64-unknown-netbsd \
             --build-arg HOST_ARCH=amd64 \
             --build-arg NETBSD_VERSION="${NETBSD_VERSION%%.*}" \
