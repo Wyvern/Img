@@ -79,9 +79,7 @@ jobs:
         run: |
           sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
             docker/base/netbsd.Dockerfile
-          grep -n -A8 'sparc64-\*' docker/base/netbsd.Dockerfile
-          git diff -- docker/base/netbsd.Dockerfile
-
+          IMAGE="${IMAGE,,}"
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
             --platform linux/amd64 \
@@ -118,17 +116,28 @@ jobs:
             --tag "$IMAGE:sparc64-unknown-openbsd7.9" \
             docker
 
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish toolchains
         env:
           IMAGE: ghcr.io/${{ github.repository }}
         run: |
+          IMAGE="${IMAGE,,}"
           docker push "$IMAGE:sparc64-unknown-netbsd11.0"
           docker push "$IMAGE:sparc64-unknown-openbsd7.9"
 
       - name: Build Release
+        env:
+          IMAGE: ghcr.io/${{ github.repository }}
         run: |
           cargo update
           set +e -x
+          IMAGE="${IMAGE,,}"
 
           targets=(
             sparc64-unknown-netbsd
@@ -138,6 +147,19 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
+
+          docker pull "$IMAGE:sparc64-unknown-netbsd11.0"
+          docker pull "$IMAGE:sparc64-unknown-openbsd7.9"
+          docker run --rm \
+                -v "$PWD:/src" \
+                -w /src \
+                "$IMAGE:sparc64-unknown-netbsd11.0" \
+                cargo build --target sparc64-unknown-netbsd
+          docker run --rm \
+                -v "$PWD:/src" \
+                -w /src \
+                "$IMAGE:sparc64-unknown-openbsd7.9" \
+                cargo build --target sparc64-unknown-openbsd
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
