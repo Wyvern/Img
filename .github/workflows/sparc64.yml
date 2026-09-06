@@ -87,7 +87,7 @@ jobs:
               sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
 
               sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
-              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
+              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang lld ca-certificates \&\& rm -rf /var/lib/apt/lists/*
               ' "$file"
           done
 
@@ -172,17 +172,6 @@ jobs:
           for target in ${targets[@]}; do
             time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
           done
-
-          # time docker run --rm \
-          #       -v "$PWD:/src" \
-          #       -w /src \
-          #       "$IMAGE:sparc64-unknown-netbsd11.0" \
-          #       cargo s sparc64-unknown-netbsd
-          # time docker run --rm \
-          #       -v "$PWD:/src" \
-          #       -w /src \
-          #       "$IMAGE:sparc64-unknown-openbsd7.9" \
-          #       cargo s sparc64-unknown-openbsd
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
