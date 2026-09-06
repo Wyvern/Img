@@ -136,36 +136,45 @@ jobs:
       #     docker push "$IMAGE:sparc64-unknown-netbsd11.0"
       #     docker push "$IMAGE:sparc64-unknown-openbsd7.9"
 
+      - name: Cross-rs
+        run: |
+          # cargo install cross --git https://github.com/cross-rs/cross --branch main -q
+          if [ ! -f ~/.cargo/bin/cross ]; then
+            wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+            sudo mv cross ~/.cargo/bin/
+          fi
+          cross --version
+
       - name: Build Release
         env:
           IMAGE: ghcr.io/${{ github.repository }}
         run: |
           cargo update
           set +e -x
+
           IMAGE="${IMAGE,,}"
-
-          # targets=(
-          #   sparc64-unknown-netbsd
-          #   sparc64-unknown-openbsd
-          # )
-
-          # for target in ${targets[@]}; do
-          #   time cargo s $target
-          # done
-
           docker pull "$IMAGE:sparc64-unknown-netbsd11.0"
           docker pull "$IMAGE:sparc64-unknown-openbsd7.9"
 
-          time docker run --rm \
-                -v "$PWD:/src" \
-                -w /src \
-                "$IMAGE:sparc64-unknown-netbsd11.0" \
-                cargo s sparc64-unknown-netbsd
-          time docker run --rm \
-                -v "$PWD:/src" \
-                -w /src \
-                "$IMAGE:sparc64-unknown-openbsd7.9" \
-                cargo s sparc64-unknown-openbsd
+          targets=(
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
+          )
+
+          for target in ${targets[@]}; do
+            time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
+          done
+
+          # time docker run --rm \
+          #       -v "$PWD:/src" \
+          #       -w /src \
+          #       "$IMAGE:sparc64-unknown-netbsd11.0" \
+          #       cargo s sparc64-unknown-netbsd
+          # time docker run --rm \
+          #       -v "$PWD:/src" \
+          #       -w /src \
+          #       "$IMAGE:sparc64-unknown-openbsd7.9" \
+          #       cargo s sparc64-unknown-openbsd
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
