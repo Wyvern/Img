@@ -50,11 +50,11 @@ jobs:
 
       - uses: taiki-e/setup-cross-toolchain-action@v1
         with:
-          target: sparc64-unknown-netbsd
+          target: sparc64-unknown-netbsd@10
 
-      - uses: taiki-e/setup-cross-toolchain-action@v1
-        with:
-          target: sparc64-unknown-openbsd@10
+      # - uses: taiki-e/setup-cross-toolchain-action@v1
+      #   with:
+      #     target: sparc64-unknown-openbsd
 
       - name: Build Release
         run: |
