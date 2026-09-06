@@ -47,6 +47,10 @@ jobs:
         with:
           version: master
 
+      - uses: taiki-e/setup-cross-toolchain-action@v1
+        with:
+          target: sparc64-unknown-netbsd@10,sparc64-unknown-openbsd
+
       - name: Build Release
         run: |
           cargo update
@@ -55,8 +59,9 @@ jobs:
           # hexagon-unknown-linux-musl
           # cargo s x86_64-unknown-illumos
           # cargo s powerpc64-unknown-linux-gnuelfv2
-          # sparc64-unknown-netbsd
-          # sparc64-unknown-openbsd
+
+          cargo s sparc64-unknown-netbsd
+          cargo s sparc64-unknown-openbsd
           # exit
 
           targets=(
