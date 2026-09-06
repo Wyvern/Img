@@ -74,8 +74,8 @@ jobs:
         working-directory: rust-cross-toolchain
         env:
           IMAGE: ghcr.io/${{ github.repository }}
-          NETBSD_VERSION: 11.0
-          OPENBSD_VERSION: 7.9
+          NETBSD_VERSION: "11.0"
+          OPENBSD_VERSION: "7.9"
         run: |
           echo "NETBSD_VERSION=$NETBSD_VERSION"
           test "$NETBSD_VERSION" = "11.0"
