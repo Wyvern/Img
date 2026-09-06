@@ -54,7 +54,7 @@ jobs:
 
       - uses: taiki-e/setup-cross-toolchain-action@v1
         with:
-          target: sparc64-unknown-openbsd
+          target: sparc64-unknown-openbsd@10
 
       - name: Build Release
         run: |
@@ -63,7 +63,6 @@ jobs:
 
           targets=(
             sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
           )
 
           for target in ${targets[@]}; do
