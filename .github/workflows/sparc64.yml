@@ -77,8 +77,10 @@ jobs:
           NETBSD_VERSION: "11.0"
           OPENBSD_VERSION: "7.9"
         run: |
-          echo "NETBSD_VERSION=$NETBSD_VERSION"
-          test "$NETBSD_VERSION" = "11.0"
+          sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
+            docker/base/netbsd.Dockerfile
+          grep -n -A8 'sparc64-\*' docker/base/netbsd.Dockerfile
+          git diff -- docker/base/netbsd.Dockerfile
 
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
