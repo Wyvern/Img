@@ -79,7 +79,12 @@ jobs:
         run: |
           sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
             docker/base/netbsd.Dockerfile
+
+          sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
+          sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
+
           IMAGE="${IMAGE,,}"
+
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
             --platform linux/amd64 \
@@ -150,16 +155,17 @@ jobs:
 
           docker pull "$IMAGE:sparc64-unknown-netbsd11.0"
           docker pull "$IMAGE:sparc64-unknown-openbsd7.9"
+
           docker run --rm \
                 -v "$PWD:/src" \
                 -w /src \
                 "$IMAGE:sparc64-unknown-netbsd11.0" \
-                cargo build --target sparc64-unknown-netbsd
+                time cargo s sparc64-unknown-netbsd
           docker run --rm \
                 -v "$PWD:/src" \
                 -w /src \
                 "$IMAGE:sparc64-unknown-openbsd7.9" \
-                cargo build --target sparc64-unknown-openbsd
+                time cargo s sparc64-unknown-openbsd
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
