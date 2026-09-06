@@ -77,6 +77,9 @@ jobs:
           NETBSD_VERSION: 11.0
           OPENBSD_VERSION: 7.9
         run: |
+          echo "NETBSD_VERSION=$NETBSD_VERSION"
+          test "$NETBSD_VERSION" = "11.0"
+
           # NetBSD base image required by docker/netbsd.Dockerfile
           docker buildx build \
             --platform linux/amd64 \
