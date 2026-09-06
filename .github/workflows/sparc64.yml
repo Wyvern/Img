@@ -70,56 +70,56 @@ jobs:
         run: |
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
 
-      - name: Build toolchain
-        working-directory: rust-cross-toolchain
-        env:
-          IMAGE: ghcr.io/${{ github.repository }}
-          NETBSD_VERSION: "11.0"
-          OPENBSD_VERSION: "7.9"
-        run: |
-          sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
-            docker/base/netbsd.Dockerfile
+      # - name: Build toolchain
+      #   working-directory: rust-cross-toolchain
+      #   env:
+      #     IMAGE: ghcr.io/${{ github.repository }}
+      #     NETBSD_VERSION: "11.0"
+      #     OPENBSD_VERSION: "7.9"
+      #   run: |
+      #     sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
+      #       docker/base/netbsd.Dockerfile
 
-          sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
-          sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
+      #     sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
+      #     sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
 
-          IMAGE="${IMAGE,,}"
+      #     IMAGE="${IMAGE,,}"
 
-          # NetBSD base image required by docker/netbsd.Dockerfile
-          docker buildx build \
-            --platform linux/amd64 \
-            --provenance=false \
-            --load \
-            --file docker/base/netbsd.Dockerfile \
-            --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-            --build-arg HOST_ARCH=amd64 \
-            --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-            --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
-            docker/base
+      #     # NetBSD base image required by docker/netbsd.Dockerfile
+      #     docker buildx build \
+      #       --platform linux/amd64 \
+      #       --provenance=false \
+      #       --load \
+      #       --file docker/base/netbsd.Dockerfile \
+      #       --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+      #       --build-arg HOST_ARCH=amd64 \
+      #       --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+      #       --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
+      #       docker/base
 
-          # NetBSD final image
-          docker buildx build \
-            --platform linux/amd64 \
-            --provenance=false \
-            --load \
-            --file docker/netbsd.Dockerfile \
-            --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-            --build-arg HOST_ARCH=amd64 \
-            --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-            --tag "$IMAGE:sparc64-unknown-netbsd11.0" \
-            docker
+      #     # NetBSD final image
+      #     docker buildx build \
+      #       --platform linux/amd64 \
+      #       --provenance=false \
+      #       --load \
+      #       --file docker/netbsd.Dockerfile \
+      #       --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+      #       --build-arg HOST_ARCH=amd64 \
+      #       --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+      #       --tag "$IMAGE:sparc64-unknown-netbsd11.0" \
+      #       docker
 
-          # OpenBSD final image
-          docker buildx build \
-            --platform linux/amd64 \
-            --provenance=false \
-            --load \
-            --file docker/openbsd.Dockerfile \
-            --build-arg RUST_TARGET=sparc64-unknown-openbsd \
-            --build-arg HOST_ARCH=amd64 \
-            --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
-            --tag "$IMAGE:sparc64-unknown-openbsd7.9" \
-            docker
+      #     # OpenBSD final image
+      #     docker buildx build \
+      #       --platform linux/amd64 \
+      #       --provenance=false \
+      #       --load \
+      #       --file docker/openbsd.Dockerfile \
+      #       --build-arg RUST_TARGET=sparc64-unknown-openbsd \
+      #       --build-arg HOST_ARCH=amd64 \
+      #       --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
+      #       --tag "$IMAGE:sparc64-unknown-openbsd7.9" \
+      #       docker
 
       - name: Login to GHCR
         uses: docker/login-action@v4
@@ -128,13 +128,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish toolchains
-        env:
-          IMAGE: ghcr.io/${{ github.repository }}
-        run: |
-          IMAGE="${IMAGE,,}"
-          docker push "$IMAGE:sparc64-unknown-netbsd11.0"
-          docker push "$IMAGE:sparc64-unknown-openbsd7.9"
+      # - name: Publish toolchains
+      #   env:
+      #     IMAGE: ghcr.io/${{ github.repository }}
+      #   run: |
+      #     IMAGE="${IMAGE,,}"
+      #     docker push "$IMAGE:sparc64-unknown-netbsd11.0"
+      #     docker push "$IMAGE:sparc64-unknown-openbsd7.9"
 
       - name: Build Release
         env:
@@ -144,28 +144,28 @@ jobs:
           set +e -x
           IMAGE="${IMAGE,,}"
 
-          targets=(
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
-          )
+          # targets=(
+          #   sparc64-unknown-netbsd
+          #   sparc64-unknown-openbsd
+          # )
 
-          for target in ${targets[@]}; do
-            time cargo s $target
-          done
+          # for target in ${targets[@]}; do
+          #   time cargo s $target
+          # done
 
           docker pull "$IMAGE:sparc64-unknown-netbsd11.0"
           docker pull "$IMAGE:sparc64-unknown-openbsd7.9"
 
-          docker run --rm \
+          time docker run --rm \
                 -v "$PWD:/src" \
                 -w /src \
                 "$IMAGE:sparc64-unknown-netbsd11.0" \
-                time cargo s sparc64-unknown-netbsd
-          docker run --rm \
+                cargo s sparc64-unknown-netbsd
+          time docker run --rm \
                 -v "$PWD:/src" \
                 -w /src \
                 "$IMAGE:sparc64-unknown-openbsd7.9" \
-                time cargo s sparc64-unknown-openbsd
+                cargo s sparc64-unknown-openbsd
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
