@@ -56,69 +56,69 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build toolchain
-        working-directory: rust-cross-toolchain
-        run: |
-          sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
-            docker/base/netbsd.Dockerfile
+      # - name: Build toolchain
+      #   working-directory: rust-cross-toolchain
+      #   run: |
+      #     sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
+      #       docker/base/netbsd.Dockerfile
 
-          sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
-          sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
+      #     sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
+      #     sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
 
-          for file in docker/netbsd.Dockerfile docker/openbsd.Dockerfile; do
-              sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
+      #     for file in docker/netbsd.Dockerfile docker/openbsd.Dockerfile; do
+      #         sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
 
-              sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
-              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
-              ' "$file"
-          done
+      #         sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
+      #         RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
+      #         ' "$file"
+      #     done
 
-          IMAGE="${IMAGE,,}"
+      #     IMAGE="${IMAGE,,}"
 
-          # NetBSD base image required by docker/netbsd.Dockerfile
-          docker buildx build \
-            --platform linux/amd64 \
-            --provenance=false \
-            --load \
-            --file docker/base/netbsd.Dockerfile \
-            --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-            --build-arg HOST_ARCH=amd64 \
-            --build-arg UBUNTU_VERSION=24.04 \
-            --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-            --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
-            docker/base
+      #     # NetBSD base image required by docker/netbsd.Dockerfile
+      #     docker buildx build \
+      #       --platform linux/amd64 \
+      #       --provenance=false \
+      #       --load \
+      #       --file docker/base/netbsd.Dockerfile \
+      #       --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+      #       --build-arg HOST_ARCH=amd64 \
+      #       --build-arg UBUNTU_VERSION=24.04 \
+      #       --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+      #       --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
+      #       docker/base
 
-          # NetBSD final image
-          docker buildx build \
-            --platform linux/amd64 \
-            --provenance=false \
-            --load \
-            --file docker/netbsd.Dockerfile \
-            --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-            --build-arg HOST_ARCH=amd64 \
-            --build-arg UBUNTU_VERSION=24.04 \
-            --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-            --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
-            docker
+      #     # NetBSD final image
+      #     docker buildx build \
+      #       --platform linux/amd64 \
+      #       --provenance=false \
+      #       --load \
+      #       --file docker/netbsd.Dockerfile \
+      #       --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+      #       --build-arg HOST_ARCH=amd64 \
+      #       --build-arg UBUNTU_VERSION=24.04 \
+      #       --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+      #       --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
+      #       docker
 
-          # OpenBSD final image
-          docker buildx build \
-            --platform linux/amd64 \
-            --provenance=false \
-            --load \
-            --file docker/openbsd.Dockerfile \
-            --build-arg RUST_TARGET=sparc64-unknown-openbsd \
-            --build-arg HOST_ARCH=amd64 \
-            --build-arg UBUNTU_VERSION=24.04 \
-            --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
-            --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
-            docker
+      #     # OpenBSD final image
+      #     docker buildx build \
+      #       --platform linux/amd64 \
+      #       --provenance=false \
+      #       --load \
+      #       --file docker/openbsd.Dockerfile \
+      #       --build-arg RUST_TARGET=sparc64-unknown-openbsd \
+      #       --build-arg HOST_ARCH=amd64 \
+      #       --build-arg UBUNTU_VERSION=24.04 \
+      #       --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
+      #       --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
+      #       docker
 
-      - name: Publish toolchains
-        run: |
-          IMAGE="${IMAGE,,}"
-          docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
-          docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
+      # - name: Publish toolchains
+      #   run: |
+      #     IMAGE="${IMAGE,,}"
+      #     docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
+      #     docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
 
       - name: Cross-rs
         run: |
@@ -137,6 +137,35 @@ jobs:
           IMAGE="${IMAGE,,}"
           docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
           docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
+
+          docker run --rm --entrypoint sh \
+            ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
+            -c '
+              for f in \
+                /sparc64-unknown-openbsd/sparc64-unknown-openbsd/usr/lib/*.a \
+                /sparc64-unknown-openbsd/sparc64-unknown-openbsd/usr/lib/*.so*; do
+                nm -A "$f" 2>/dev/null | grep -E "[[:space:]]ldexp$" && echo "$f"
+              done
+            '
+            docker run --rm --entrypoint sh \
+              ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
+              -c '
+                nm -A /sparc64-unknown-openbsd/sparc64-unknown-openbsd/usr/lib/libm.a |
+                  grep -E "(ldexp|s_scalbn)"
+              '
+
+              docker run --rm --entrypoint sh \
+                ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
+                -c '
+              cat >/tmp/test.c <<EOF
+              #include <math.h>
+              int main(void) {
+                  return ldexp(1.0, 2) != 4.0;
+              }
+              EOF
+
+              sparc64-unknown-openbsd-clang -v /tmp/test.c -o /tmp/test
+              '
 
           targets=(
             sparc64-unknown-netbsd
