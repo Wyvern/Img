@@ -20,6 +20,11 @@ jobs:
           contents: read
           packages: write
 
+    env:
+          IMAGE: ghcr.io/${{ github.repository }}
+          NETBSD_VERSION: "11.0"
+          OPENBSD_VERSION: "7.9"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -39,27 +44,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Install LLVM
-        run: |
-          ver=23
-          if [ "$ver" = "23" ]; then
-              wget https://apt.llvm.org/llvm.sh
-              chmod +x llvm.sh
-              sudo ./llvm.sh $ver
-          fi
-          for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200
-          done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
-
-      # - uses: taiki-e/setup-cross-toolchain-action@v1
-      #   with:
-      #     target: sparc64-unknown-netbsd@10
-
-      # - uses: taiki-e/setup-cross-toolchain-action@v1
-      #   with:
-      #     target: sparc64-unknown-openbsd
-
       - name: Checkout rust-cross-toolchain
         uses: actions/checkout@v7
         with:
@@ -72,10 +56,6 @@ jobs:
 
       - name: Build toolchain
         working-directory: rust-cross-toolchain
-        env:
-          IMAGE: ghcr.io/${{ github.repository }}
-          NETBSD_VERSION: "11.0"
-          OPENBSD_VERSION: "7.9"
         run: |
           sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
             docker/base/netbsd.Dockerfile
@@ -87,7 +67,7 @@ jobs:
               sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
 
               sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
-              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang lld ca-certificates \&\& rm -rf /var/lib/apt/lists/*
+              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
               ' "$file"
           done
 
@@ -114,7 +94,7 @@ jobs:
             --build-arg RUST_TARGET=sparc64-unknown-netbsd \
             --build-arg HOST_ARCH=amd64 \
             --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-            --tag "$IMAGE:sparc64-unknown-netbsd11.0" \
+            --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
             docker
 
           # OpenBSD final image
@@ -126,7 +106,7 @@ jobs:
             --build-arg RUST_TARGET=sparc64-unknown-openbsd \
             --build-arg HOST_ARCH=amd64 \
             --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
-            --tag "$IMAGE:sparc64-unknown-openbsd7.9" \
+            --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
             docker
 
       - name: Login to GHCR
@@ -137,12 +117,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish toolchains
-        env:
-          IMAGE: ghcr.io/${{ github.repository }}
         run: |
           IMAGE="${IMAGE,,}"
-          docker push "$IMAGE:sparc64-unknown-netbsd11.0"
-          docker push "$IMAGE:sparc64-unknown-openbsd7.9"
+          docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
+          docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
 
       - name: Cross-rs
         run: |
@@ -154,15 +132,13 @@ jobs:
           cross --version
 
       - name: Build Release
-        env:
-          IMAGE: ghcr.io/${{ github.repository }}
         run: |
           cargo update
           set +e -x
 
           IMAGE="${IMAGE,,}"
-          docker pull "$IMAGE:sparc64-unknown-netbsd11.0"
-          docker pull "$IMAGE:sparc64-unknown-openbsd7.9"
+          docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
+          docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
 
           targets=(
             sparc64-unknown-netbsd
