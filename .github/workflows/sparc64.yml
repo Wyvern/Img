@@ -33,7 +33,6 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          # toolchain: nightly-2026-02-09
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -51,8 +50,11 @@ jobs:
           path: rust-cross-toolchain
 
       - name: Login to GHCR
-        run: |
-          echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Build toolchain
       #   working-directory: rust-cross-toolchain
@@ -108,13 +110,6 @@ jobs:
       #       --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
       #       --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
       #       docker
-
-      - name: Login to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Publish toolchains
       #   run: |
