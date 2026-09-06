@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-26.04
 
     permissions:
-          contents: read
+          contents: write
           packages: write
 
     env:
@@ -138,9 +138,21 @@ jobs:
           docker run --rm --entrypoint sh \
             ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
             -c '
-              echo PATH=$PATH
+              echo "=== bin ==="
+              ls -la /sparc64-unknown-openbsd/bin
+              echo
+              echo "=== gcc candidates ==="
+              find /sparc64-unknown-openbsd -type f \
+                \( -name "*gcc*" -o -name "*clang*" -o -name "*ld*" \) \
+                -print
+            '
+
+          docker run --rm --entrypoint sh \
+            ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
+            -c '
               command -v sparc64-unknown-openbsd-gcc || true
-              find /usr /opt -type f -name "sparc64-unknown-openbsd-*" 2>/dev/null
+              command -v sparc64-unknown-openbsd-ld || true
+              ls -la /sparc64-unknown-openbsd/bin/* 2>/dev/null
             '
 
           targets=(
