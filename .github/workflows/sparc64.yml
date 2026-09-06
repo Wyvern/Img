@@ -65,9 +65,6 @@ jobs:
           sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
           sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
 
-          sed -i '/AS builder/a ENV CFLAGS="-Wno-error=incompatible-pointer-types"' \
-            docker/base/netbsd.Dockerfile
-
           for file in docker/netbsd.Dockerfile docker/openbsd.Dockerfile; do
               sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
 
@@ -86,7 +83,7 @@ jobs:
             --file docker/base/netbsd.Dockerfile \
             --build-arg RUST_TARGET=sparc64-unknown-netbsd \
             --build-arg HOST_ARCH=amd64 \
-            --build-arg UBUNTU_VERSION=26.04 \
+            --build-arg UBUNTU_VERSION=24.04 \
             --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
             --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
             docker/base
@@ -99,7 +96,7 @@ jobs:
             --file docker/netbsd.Dockerfile \
             --build-arg RUST_TARGET=sparc64-unknown-netbsd \
             --build-arg HOST_ARCH=amd64 \
-            --build-arg UBUNTU_VERSION=26.04 \
+            --build-arg UBUNTU_VERSION=24.04 \
             --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
             --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
             docker
@@ -112,7 +109,7 @@ jobs:
             --file docker/openbsd.Dockerfile \
             --build-arg RUST_TARGET=sparc64-unknown-openbsd \
             --build-arg HOST_ARCH=amd64 \
-            --build-arg UBUNTU_VERSION=26.04 \
+            --build-arg UBUNTU_VERSION=24.04 \
             --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
             --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
             docker
