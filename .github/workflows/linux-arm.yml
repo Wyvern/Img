@@ -8,8 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SCCACHE_GHA_ENABLED: "on"
-  RUSTC_WRAPPER: "sccache"
+  # SCCACHE_GHA_ENABLED: "on"
+  # RUSTC_WRAPPER: "sccache"
 
 jobs:
   Linux:
@@ -45,6 +45,15 @@ jobs:
 
           cargo update
           set +e -x
+          tests=(
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            mipsisa32r6-unknown-linux-gnu
+            mipsisa32r6el-unknown-linux-gnu
+          )
+          for target in ${tests[@]}; do
+            time cargo s $target
+          done
 
           targets=(
             thumbv7neon-unknown-linux-gnueabihf
