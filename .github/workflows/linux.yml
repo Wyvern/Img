@@ -13,8 +13,8 @@ env:
 
 jobs:
   Linux:
-    name: Ubuntu-24.04
-    runs-on: ubuntu-24.04
+    name: Ubuntu-26.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout
@@ -45,8 +45,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: /home/runner/uclibc
-          key: uclibc-2025.08-1
-          restore-keys: uclibc-2025.08-1
+          key: uclibc-2026.08-1
+          restore-keys: uclibc-2026.08-1
 
       - name: Cache hexagon
         uses: actions/cache@v6
@@ -67,7 +67,7 @@ jobs:
           fi
           ln -sf /home/runner/openwrt/openwrt-toolchain-${ver}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
-          ver=2025.08-1
+          ver=2026.08-1
           if [ ! -d /home/runner/uclibc/armv7 ]; then
             mkdir -p /home/runner/uclibc/armv7
             curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/armv7

@@ -41,12 +41,12 @@ jobs:
         uses: actions/cache@v6
         with:
           path: /home/runner/yocto
-          key: yocto-6.0.2
-          restore-keys: yocto-6.0.2
+          key: yocto-6.0.3
+          restore-keys: yocto-6.0.3
 
       - name: Toolchain downloads
         run: |
-          ver=6.0.2
+          ver=6.0.3
           url=https://downloads.yoctoproject.org/releases/yocto/yocto-${ver}/toolchain/x86_64
           files=(
           poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${ver}.sh
