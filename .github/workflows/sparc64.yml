@@ -138,35 +138,6 @@ jobs:
           docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
           docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
 
-          docker run --rm --entrypoint sh \
-            ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
-            -c '
-              for f in \
-                /sparc64-unknown-openbsd/sparc64-unknown-openbsd/usr/lib/*.a \
-                /sparc64-unknown-openbsd/sparc64-unknown-openbsd/usr/lib/*.so*; do
-                nm -A "$f" 2>/dev/null | grep -E "[[:space:]]ldexp$" && echo "$f"
-              done
-            '
-            docker run --rm --entrypoint sh \
-              ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
-              -c '
-                nm -A /sparc64-unknown-openbsd/sparc64-unknown-openbsd/usr/lib/libm.a |
-                  grep -E "(ldexp|s_scalbn)"
-              '
-
-              docker run --rm --entrypoint sh \
-                ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9 \
-                -c '
-              cat >/tmp/test.c <<EOF
-              #include <math.h>
-              int main(void) {
-                  return ldexp(1.0, 2) != 4.0;
-              }
-              EOF
-
-              sparc64-unknown-openbsd-clang -v /tmp/test.c -o /tmp/test
-              '
-
           targets=(
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd
