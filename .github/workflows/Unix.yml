@@ -66,7 +66,7 @@ jobs:
           mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
 
-          freebsd=(amd64 arm64 riscv)
+          freebsd=(amd64 arm64 riscv powerpc)
           for arch in "${freebsd[@]}"; do
             if [ ! -d sysroot/freebsd/$arch ]; then
                 mkdir -p sysroot/freebsd/$arch
@@ -134,6 +134,7 @@ jobs:
             riscv64gc-unknown-freebsd
             powerpc64-unknown-freebsd
             powerpc64le-unknown-freebsd
+            powerpc-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
@@ -176,6 +177,7 @@ jobs:
             riscv64gc-unknown-freebsd
             powerpc64-unknown-freebsd
             powerpc64le-unknown-freebsd
+            powerpc-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
