@@ -16,6 +16,11 @@ jobs:
     name: Ubuntu-24.04
     runs-on: ubuntu-24.04
 
+    env:
+      openwrt: "25.12.5"
+      uclibc: "2026.08-1"
+      hexagon: "22.1.8"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -38,60 +43,57 @@ jobs:
         uses: actions/cache@v6
         with:
           path: /home/runner/openwrt
-          key: openwrt-25.12.5
-          restore-keys: openwrt-25.12.5
+          key: openwrt-${{openwrt}}
+          restore-keys: openwrt-${{openwrt}}
 
       - name: Cache uclibc
         uses: actions/cache@v6
         with:
           path: /home/runner/uclibc
-          key: uclibc-2026.08-1
-          restore-keys: uclibc-2026.08-1
+          key: uclibc-${{uclibc}}
+          restore-keys: uclibc-${{uclibc}}
 
       - name: Cache hexagon
         uses: actions/cache@v6
         with:
           path: /home/runner/hexagon
-          key: hexagon-22.1.8
-          restore-keys: hexagon-22.1.8
+          key: hexagon-${{hexagon}}
+          restore-keys: hexagon-${{hexagon}}
 
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy
 
       - name: Toolchain downloads
         run: |
-          ver=25.12.5
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
-            curl -LsSf https://downloads.openwrt.org/releases/${ver}/targets/octeon/generic/openwrt-toolchain-${ver}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
+            curl -LsSf https://downloads.openwrt.org/releases/${openwrt}/targets/octeon/generic/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
           fi
-          ln -sf /home/runner/openwrt/openwrt-toolchain-${ver}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
+          ln -sf /home/runner/openwrt/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
-          ver=2026.08-1
           if [ ! -d /home/runner/uclibc/armv7 ]; then
             mkdir -p /home/runner/uclibc/armv7
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/armv7
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/armv7
           fi
-          ln -sf /home/runner/uclibc/armv7/armv7-eabihf--uclibc--bleeding-edge-${ver} armv7
+          ln -sf /home/runner/uclibc/armv7/armv7-eabihf--uclibc--bleeding-edge-${uclibc} armv7
 
           if [ ! -d /home/runner/uclibc/mips32el ]; then
             mkdir -p /home/runner/uclibc/mips32el
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32el/tarballs/mips32el--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32el
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32el/tarballs/mips32el--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32el
           fi
-          ln -sf /home/runner/uclibc/mips32el/mips32el--uclibc--bleeding-edge-${ver} mipsel
+          ln -sf /home/runner/uclibc/mips32el/mips32el--uclibc--bleeding-edge-${uclibc} mipsel
 
           if [ ! -d /home/runner/uclibc/mips32 ]; then
             mkdir -p /home/runner/uclibc/mips32
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32/tarballs/mips32--uclibc--bleeding-edge-${ver}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32/tarballs/mips32--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32
           fi
-          ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${ver} mips
+          ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${uclibc} mips
 
-          ver=22.1.8
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${ver}________/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
           fi
-          ln -sf /home/runner/hexagon/clang+llvm-${ver}-cross-hexagon-unknown-linux-musl/x86_64-ubuntu-22.04 hexagon
+          ln -sf /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-ubuntu-22.04 hexagon
 
       - name: Build Release
         run: |
