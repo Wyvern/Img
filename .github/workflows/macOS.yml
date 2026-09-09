@@ -48,8 +48,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: llvm-mingw
-          key: ${{ runner.os }}-${{mingw}}
-          restore-keys: ${{ runner.os }}-llvm-${{mingw}}
+          key: ${{ runner.os }}-${{env.mingw}}
+          restore-keys: ${{ runner.os }}-llvm-${{env.mingw}}
 
       - name: llvm-mingw
         run: |

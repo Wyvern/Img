@@ -41,22 +41,22 @@ jobs:
         uses: actions/cache@v6
         with:
           path: /home/runner/openwrt
-          key: openwrt-${{openwrt}}
-          restore-keys: openwrt-${{openwrt}}
+          key: openwrt-${{env.openwrt}}
+          restore-keys: openwrt-${{env.openwrt}}
 
       - name: Cache uclibc
         uses: actions/cache@v6
         with:
           path: /home/runner/uclibc
-          key: uclibc-${{uclibc}}
-          restore-keys: uclibc-${{uclibc}}
+          key: uclibc-${{env.uclibc}}
+          restore-keys: uclibc-${{env.uclibc}}
 
       - name: Cache hexagon
         uses: actions/cache@v6
         with:
           path: /home/runner/hexagon
-          key: hexagon-${{hexagon}}
-          restore-keys: hexagon-${{hexagon}}
+          key: hexagon-${{env.hexagon}}
+          restore-keys: hexagon-${{env.hexagon}}
 
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy

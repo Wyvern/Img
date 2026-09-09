@@ -38,9 +38,9 @@ jobs:
       - name: Android NDK cache
         uses: actions/cache@v6
         with:
-          path: /home/runner/android-ndk-${{ndk}}
-          key: android-ndk-${{ndk}}
-          restore-keys: android-ndk-${{ndk}}
+          path: /home/runner/android-ndk-${{env.ndk}}
+          key: android-ndk-${{env.ndk}}
+          restore-keys: android-ndk-${{env.ndk}}
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main

@@ -42,8 +42,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: /home/runner/yocto
-          key: yocto-${{yocto}}
-          restore-keys: yocto-${{yocto}}
+          key: yocto-${{env.yocto}}
+          restore-keys: yocto-${{env.yocto}}
 
       - name: Toolchain downloads
         run: |
