@@ -11,7 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  mingw: "20260826"
+  mingw: "20260908"
 
 jobs:
   macOS:
