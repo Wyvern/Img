@@ -10,9 +10,9 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
-  freebsd: "15.1"
-  openbsd: "7.9"
-  netbsd: "11.0"
+  FREEBSD: "15.1"
+  OPENBSD: "7.9"
+  NETBSD: "11.0"
 
 jobs:
   Linux:
@@ -70,7 +70,7 @@ jobs:
           for arch in "${freebsd[@]}"; do
             if [ ! -d sysroot/freebsd/$arch ]; then
                 mkdir -p sysroot/freebsd/$arch
-                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/${freebsd}-RELEASE/base.txz \
+                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/${FREEBSD}-RELEASE/base.txz \
             | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
             fi
           done
@@ -79,7 +79,7 @@ jobs:
           for arch in "${ppc[@]}"; do
             if [ ! -d sysroot/freebsd/$arch ]; then
               mkdir -p sysroot/freebsd/$arch
-              curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/${freebsd}-RELEASE/base.txz \
+              curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/${FREEBSD}-RELEASE/base.txz \
                 | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
             fi
           done
@@ -90,7 +90,7 @@ jobs:
             if [ ! -d sysroot/openbsd/$arch ]; then
               mkdir -p sysroot/openbsd/$arch
               for file in "${files[@]}"; do
-                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$openbsd/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
+                curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$OPENBSD/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
               done
             fi
           done
@@ -102,7 +102,7 @@ jobs:
               mkdir -p sysroot/netbsd/$arch
               for file in "${files[@]}"; do
                 for ext in tar.xz tgz; do
-                        url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-$netbsd/$arch/binary/sets/$file.$ext"
+                        url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${NETBSD}/$arch/binary/sets/$file.$ext"
                         out="sysroot/netbsd/$arch"
                         if curl -fsSI "$url" &>/dev/null; then
                             echo "→ Fetching $file.$ext"
