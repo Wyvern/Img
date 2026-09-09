@@ -513,23 +513,23 @@ rustflags = ["-Clink-arg=--sysroot=ndk/sysroot"]
 
 [target.riscv64-linux-android]
 ar = "ndk/bin/riscv64-linux-android-ar"
-linker = "ndk/bin/riscv64-linux-android35-clang"
+linker = "ndk/bin/riscv64-linux-android37-clang"
 
 [target.aarch64-linux-android]
 ar = "ndk/bin/aarch64-linux-android-ar"
-linker = "ndk/bin/aarch64-linux-android35-clang"
+linker = "ndk/bin/aarch64-linux-android37-clang"
 
 [target.x86_64-linux-android]
 ar = "ndk/bin/x86_64-linux-android-ar"
-linker = "ndk/bin/x86_64-linux-android35-clang"
+linker = "ndk/bin/x86_64-linux-android37-clang"
 
 [target.armv7-linux-androideabi]
 ar = "ndk/bin/arm-linux-androideabi-ar"
-linker = "ndk/bin/armv7a-linux-androideabi35-clang"
+linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 
 [target.thumbv7neon-linux-androideabi]
 ar = "ndk/bin/arm-linux-androideabi-ar"
-linker = "ndk/bin/armv7a-linux-androideabi35-clang"
+linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 
 [target.'cfg(target_env="ohos")']
 linker = "ohos/bin/clang"
