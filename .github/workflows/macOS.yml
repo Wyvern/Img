@@ -11,6 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  mingw: "20260826"
 
 jobs:
   macOS:
@@ -47,14 +48,14 @@ jobs:
         uses: actions/cache@v6
         with:
           path: llvm-mingw
-          key: ${{ runner.os }}-20260826
-          restore-keys: ${{ runner.os }}-llvm-20260826
+          key: ${{ runner.os }}-${{mingw}}
+          restore-keys: ${{ runner.os }}-llvm-${{mingw}}
 
       - name: llvm-mingw
         run: |
           if [ ! -d llvm-mingw ]; then
             mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20260826/llvm-mingw-20260826-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 

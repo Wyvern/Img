@@ -10,14 +10,12 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  ndk: "r30"
 
 jobs:
   Linux:
     name: Ubuntu-26.04
     runs-on: ubuntu-26.04
-
-    env:
-        ndk: "r30"
 
     steps:
       - name: Checkout

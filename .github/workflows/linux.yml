@@ -10,16 +10,14 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  openwrt: "25.12.5"
+  uclibc: "2026.08-1"
+  hexagon: "22.1.8"
 
 jobs:
   Linux:
     name: Ubuntu-24.04
     runs-on: ubuntu-24.04
-
-    env:
-      openwrt: "25.12.5"
-      uclibc: "2026.08-1"
-      hexagon: "22.1.8"
 
     steps:
       - name: Checkout
