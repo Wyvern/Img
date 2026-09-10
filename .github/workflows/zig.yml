@@ -47,13 +47,6 @@ jobs:
         with:
           version: master
 
-      - name: Cache sysroot
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.HOME }}/unix
-          key: PowerPC
-          restore-keys: PowerPC
-
       - name: Build Release
         run: |
           cargo update
@@ -64,19 +57,11 @@ jobs:
           # cargo s powerpc64-unknown-linux-gnuelfv2
           # exit
 
-          ln -sf "$HOME/unix" sysroot
-
-          if [ ! -d $HOME/unix/freebsd/powerpc ]; then
-            mkdir -p $HOME/unix/freebsd/powerpc
-            curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
-          fi
-
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             armeb-unknown-linux-gnueabi
             powerpc64-unknown-linux-musl
-            powerpc-unknown-freebsd
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
@@ -113,7 +98,6 @@ jobs:
             powerpc64-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
-            powerpc-unknown-freebsd
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd

@@ -75,6 +75,11 @@ jobs:
             fi
           done
 
+          if [ ! -d sysroot/freebsd/powerpc ]; then
+            mkdir -p sysroot/freebsd/powerpc
+            curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
+          fi
+
           ppc=(powerpc64 powerpc64le)
           for arch in "${ppc[@]}"; do
             if [ ! -d sysroot/freebsd/$arch ]; then
@@ -125,6 +130,9 @@ jobs:
           wait
           chmod -R u+rwX sysroot
 
+          cargo s powerpc-unknown-freebsd
+          exit
+
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
           targets=(
@@ -134,6 +142,7 @@ jobs:
             riscv64gc-unknown-freebsd
             powerpc64-unknown-freebsd
             powerpc64le-unknown-freebsd
+            powerpc-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
@@ -176,6 +185,7 @@ jobs:
             riscv64gc-unknown-freebsd
             powerpc64-unknown-freebsd
             powerpc64le-unknown-freebsd
+            powerpc-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
