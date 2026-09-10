@@ -101,8 +101,12 @@ jobs:
           cargo update
           set +e -x
 
+          ln -sf result/bin/ ppc64
+
           nix build nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc
-          ls -al result/bin/*powerpc64*
+          CC=$(find -L result/bin -name '*gcc' -type f | head -1)
+          echo "$CC"
+          "$CC" -print-sysroot
           exit
 
           time cargo s powerpc64-unknown-linux-gnuelfv2

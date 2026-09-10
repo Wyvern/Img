@@ -663,7 +663,7 @@ rustflags = ["-Clink-arg=--sysroot=sysroots/core2-64-poky-linux"]
 rustflags = ["-Clink-arg=/compat.o"]
 
 [target.powerpc64-unknown-linux-gnuelfv2]
-linker = "ppc64/bin/powerpc64-buildroot-linux-gnu-gcc"
+linker = "ppc64/powerpc64-unknown-linux-gnuabielfv2-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=ppc64/powerpc64-buildroot-linux-gnu/sysroot"
 ]
