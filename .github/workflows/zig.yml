@@ -66,8 +66,8 @@ jobs:
 
           ln -sf "$HOME/unix" sysroot
 
-          if [ ! -d "sysroot/freebsd/powerpc" ]; then
-            mkdir -p "sysroot/freebsd/powerpc"
+          if [ ! -d sysroot/freebsd/powerpc ]; then
+            mkdir -p sysroot/freebsd/powerpc
             curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
           fi
 
