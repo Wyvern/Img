@@ -55,15 +55,19 @@ jobs:
           # hexagon-unknown-linux-musl
           # cargo s x86_64-unknown-illumos
           # cargo s powerpc64-unknown-linux-gnuelfv2
-          # cargo s sparc64-unknown-netbsd
-          # cargo s sparc64-unknown-openbsd
           # exit
+
+          mkdir -p /home/runner/unix;
+          ln -sf /home/runner/unix sysroot
+
+          curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
 
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             armeb-unknown-linux-gnueabi
             powerpc64-unknown-linux-musl
+            powerpc-unknown-freebsd
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
@@ -100,6 +104,7 @@ jobs:
             powerpc64-unknown-linux-musl
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
+            powerpc-unknown-freebsd
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd

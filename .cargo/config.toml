@@ -451,12 +451,6 @@ rustflags = [
   "-Clink-arg=--target=powerpc64le--freebsd",
 ]
 
-[target.powerpc-unknown-freebsd]
-rustflags = [
-  "-Clink-arg=--sysroot=sysroot/freebsd/powerpc",
-  "-Clink-arg=--target=powerpc--freebsd",
-]
-
 [target.x86_64-unknown-dragonfly]
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/dfly",
@@ -582,6 +576,13 @@ rustflags = [
   "-Clink-arg=--target=riscv64gc--fuchsia",
   "-Clink-arg=--sysroot=fuchsia/arch/riscv64/sysroot",
   "-Lnative=fuchsia/arch/riscv64/lib",
+]
+
+[target.powerpc-unknown-freebsd]
+linker = "./zig-cc.sh"
+rustflags = [
+  "-Clink-arg=--sysroot=sysroot/freebsd/powerpc",
+  "-Clink-arg=--target=powerpc-freebsd",
 ]
 
 [target.mipsel-unknown-netbsd]
