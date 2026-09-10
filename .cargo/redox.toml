@@ -257,7 +257,7 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   "-Zvalidate-mir=no",
   "-Zcache-proc-macros",
-  "-Ztyping-mode-post-typeck-until-borrowck",
+  # "-Ztyping-mode-post-typeck-until-borrowck",
   # "-Zembed-metadata=no",
 
   # "-Zoffload=Device",
