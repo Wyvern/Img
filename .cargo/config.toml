@@ -639,11 +639,6 @@ rustflags = [
   "-Ctarget-feature=-soft-float",
 ]
 
-[target.powerpc64-unknown-linux-musl]
-linker = "ppc64/powerpc64-unknown-linux-musl-gcc"
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=powerpc64-linux-musl"]
-
 [target.aarch64-oe-linux-gnu]
 linker = "aarch64-poky-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=sysroots/armv8a-poky-linux"]
@@ -665,6 +660,9 @@ rustflags = ["-Clink-arg=/compat.o"]
 
 [target.powerpc64-unknown-linux-gnuelfv2]
 linker = "ppc64/powerpc64-unknown-linux-gnuabielfv2-gcc"
+
+[target.powerpc64-unknown-linux-musl]
+linker = "ppc64/powerpc64-unknown-linux-musl-gcc"
 
 [target.armeb-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"

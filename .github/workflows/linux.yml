@@ -104,12 +104,11 @@ jobs:
           ln -sf result/bin/ ppc64
           nix build --quiet nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc
           nix build --quiet nixpkgs#pkgsCross.ppc64-musl.stdenv.cc
-          cargo s powerpc64-unknown-linux-musl
-          exit
 
           targets=(
             powerpc64-unknown-linux-gnu
             powerpc64-unknown-linux-gnuelfv2
+            powerpc64-unknown-linux-musl
             powerpc-unknown-linux-gnu
             powerpc-unknown-linux-musl
             hexagon-unknown-linux-musl
@@ -157,6 +156,7 @@ jobs:
                   armv7-unknown-linux-uclibceabihf
                   powerpc64-unknown-linux-gnu
                   powerpc64-unknown-linux-gnuelfv2
+                  powerpc64-unknown-linux-musl
                   powerpc-unknown-linux-gnu
                   powerpc-unknown-linux-musl
                   mips64-openwrt-linux-musl
