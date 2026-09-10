@@ -640,8 +640,8 @@ rustflags = [
 ]
 
 [target.powerpc64-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc64-linux-musl"]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=powerpc64-linux-musl"]
 
 [target.aarch64-oe-linux-gnu]
 linker = "aarch64-poky-linux-gcc"
