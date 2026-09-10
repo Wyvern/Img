@@ -104,13 +104,16 @@ jobs:
           cargo update
           set +e -x
 
-          echo 'int main(void) { return 0; }' |
-            ppc64/bin/powerpc64-buildroot-linux-gnu-gcc \
-              -mabi=elfv2 \
-              -o test \
-              -x c -
-          readelf -h test
-
+          ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -dumpspecs | grep -A5 -B5 'elfv'
+          ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -dumpspecs |
+              grep -E 'mabi|elfv1|elfv2|mcall'
+          ppc64/bin/powerpc64-buildroot-linux-gnu-ld --verbose |
+              grep -i elfv
+          ppc64/bin/powerpc64-buildroot-linux-gnu-ld --help |
+              grep -i abi
+          ppc64/bin/powerpc64-buildroot-linux-gnu-gcc \
+              -mabi=elfv2 -### /tmp/a.c -o /tmp/a 2>&1 |
+              tail -30
           time cargo s powerpc64-unknown-linux-gnuelfv2
           exit
 
