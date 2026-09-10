@@ -87,6 +87,12 @@ jobs:
           fi
           ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${uclibc} mips
 
+          if [ ! -d /home/runner/uclibc/ppc64 ]; then
+            mkdir -p /home/runner/uclibc/ppc64
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/powerpc64-power8/tarballs/powerpc64-power8--glibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/ppc64
+          fi
+          ln -sf /home/runner/uclibc/ppc64/powerpc64-power8--glibc--bleeding-edge-${uclibc} ppc64
+
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
@@ -97,6 +103,9 @@ jobs:
         run: |
           cargo update
           set +e -x
+
+          time cargo s powerpc64-unknown-linux-gnuelfv2
+          exit
 
           targets=(
             powerpc64-unknown-linux-gnu
