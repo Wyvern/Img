@@ -102,14 +102,11 @@ jobs:
           set +e -x
 
           ln -sf result/bin/ ppc64
-
           nix build nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc
-
-          time cargo s powerpc64-unknown-linux-gnuelfv2
-          exit
 
           targets=(
             powerpc64-unknown-linux-gnu
+            powerpc64-unknown-linux-gnuelfv2
             powerpc-unknown-linux-gnu
             powerpc-unknown-linux-musl
             hexagon-unknown-linux-musl
@@ -156,6 +153,7 @@ jobs:
                   mips-unknown-linux-gnu
                   armv7-unknown-linux-uclibceabihf
                   powerpc64-unknown-linux-gnu
+                  powerpc64-unknown-linux-gnuelfv2
                   powerpc-unknown-linux-gnu
                   powerpc-unknown-linux-musl
                   mips64-openwrt-linux-musl
