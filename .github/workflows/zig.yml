@@ -54,7 +54,6 @@ jobs:
 
           # hexagon-unknown-linux-musl
           # cargo s x86_64-unknown-illumos
-          # cargo s powerpc64-unknown-linux-gnuelfv2
           # exit
 
           targets=(

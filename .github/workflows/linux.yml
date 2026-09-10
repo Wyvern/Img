@@ -102,7 +102,10 @@ jobs:
           set +e -x
 
           ln -sf result/bin/ ppc64
-          nix build nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc
+          nix build -Q nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc
+          nix build -Q nixpkgs#pkgsCross.ppc64-musl.stdenv.cc
+          cargo s powerpc64-unknown-linux-musl
+          exit
 
           targets=(
             powerpc64-unknown-linux-gnu
