@@ -93,8 +93,14 @@ jobs:
           fi
           ln -sf /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-ubuntu-22.04 hexagon
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+      # - name: Install Nix
+      #   uses: DeterminateSystems/nix-installer-action@main
+
+      # - name: Install Nix
+      #   uses: cachix/install-nix-action
+
+      - name: Nix Quick Install
+        uses: nixbuild/nix-quick-install-action
 
       - name: Build Release
         run: |
