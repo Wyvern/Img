@@ -45,6 +45,13 @@ jobs:
           key: Unix
           restore-keys: Unix
 
+      - name: Cache ppc-freebsd
+        uses: actions/cache@v6
+        with:
+          path: /home/runner/unix/freebsd/powerpc
+          key: ppc-freebsd
+          restore-keys: ppc-freebsd
+
       - name: Install LLVM
         run: |
           ver=23
