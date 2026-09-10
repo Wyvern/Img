@@ -581,7 +581,7 @@ rustflags = [
 [target.powerpc-unknown-freebsd]
 linker = "./zig-cc.sh"
 rustflags = [
-  "-Clink-arg=--sysroot=sysroot/freebsd/powerpc",
+  "-Clink-arg=--sysroot=/Users/runner/unix/freebsd/powerpc",
   "-Clink-arg=--target=powerpc-freebsd",
 ]
 
