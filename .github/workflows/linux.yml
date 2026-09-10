@@ -100,7 +100,7 @@ jobs:
       #   uses: cachix/install-nix-action
 
       - name: Nix Quick Install
-        uses: nixbuild/nix-quick-install-action
+        uses: nixbuild/nix-quick-install-action@v35
 
       - name: Build Release
         run: |
