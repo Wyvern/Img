@@ -64,11 +64,11 @@ jobs:
           # cargo s powerpc64-unknown-linux-gnuelfv2
           # exit
 
-          sysroot="$HOME/unix"
+          ln -sf "$HOME/unix" sysroot
 
           if [ ! -d "$HOME/unix" ]; then
             mkdir -p "$HOME/unix"
-            curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C ${sysroot}/freebsd/powerpc 2>/dev/null &
+            curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null
           fi
 
           targets=(
