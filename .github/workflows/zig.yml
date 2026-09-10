@@ -1,4 +1,4 @@
-name: Zig-build
+name: Zig-Linker
 
 on:
   push:
@@ -54,8 +54,8 @@ jobs:
 
           # hexagon-unknown-linux-musl
           # cargo s x86_64-unknown-illumos
-          # cargo s powerpc64-unknown-linux-gnuelfv2
-          # exit
+          cargo s powerpc64-unknown-linux-gnuelfv2
+          exit
 
           targets=(
             aarch64_be-unknown-linux-gnu
