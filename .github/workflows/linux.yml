@@ -104,10 +104,6 @@ jobs:
           ln -sf result/bin/ ppc64
 
           nix build nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc
-          CC=$(find -L result/bin -name '*gcc' -type f | head -1)
-          echo "$CC"
-          "$CC" -print-sysroot
-          exit
 
           time cargo s powerpc64-unknown-linux-gnuelfv2
           exit
