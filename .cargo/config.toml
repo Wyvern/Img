@@ -666,6 +666,7 @@ rustflags = ["-Clink-arg=/compat.o"]
 linker = "ppc64/bin/powerpc64-buildroot-linux-gnu-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=ppc64/powerpc64-buildroot-linux-gnu/sysroot",
+  "-Clink-arg=-mabi=elfv2"
 ]
 
 [target.armeb-unknown-linux-gnueabi]
