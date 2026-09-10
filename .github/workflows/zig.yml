@@ -57,7 +57,7 @@ jobs:
           # cargo s powerpc64-unknown-linux-gnuelfv2
           # exit
 
-          mkdir -p /home/runner/unix;
+          sudo mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
 
           curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
