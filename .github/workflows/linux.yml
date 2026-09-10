@@ -104,8 +104,12 @@ jobs:
           cargo update
           set +e -x
 
-          ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -Q --help=target | grep abi
-          ppc64/bin/powerpc64-buildroot-linux-gnu-gcc -### -mabi=elfv2 -x c -o /dev/null -c /dev/null
+          echo 'int main(void) { return 0; }' |
+            ppc64/bin/powerpc64-buildroot-linux-gnu-gcc \
+              -mabi=elfv2 \
+              -o test \
+              -x c -
+          readelf -h test
 
           time cargo s powerpc64-unknown-linux-gnuelfv2
           exit
