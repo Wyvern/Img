@@ -10,12 +10,17 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
-  yocto: "6.0.3"
+  IMAGE: ghcr.io/${{ github.repository }}
+  YOCTO: "6.0.3"
 
 jobs:
   Linux:
     name: Yocto/OpenEmbedded
     runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout
@@ -35,18 +40,16 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Ubuntu apt update and install
-        run: |
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
 
-      - name: Cache Yocto
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/yocto
-          key: yocto-${{env.yocto}}
-          restore-keys: yocto-${{env.yocto}}
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Toolchain downloads
         run: |
+          IMAGE="${IMAGE,,}"
           url=https://downloads.yoctoproject.org/releases/yocto/yocto-${yocto}/toolchain/x86_64
           files=(
           poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${yocto}.sh
@@ -55,20 +58,28 @@ jobs:
           poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${yocto}.sh
           )
 
-          mkdir -p /home/runner/yocto
-
-          for file in "${files[@]}"; do
-              if [[ ! -f "/home/runner/yocto/$file" ]]; then
-                  curl -LsSf "$url/$file" -o "/home/runner/yocto/$file"
-              fi
-              chmod +x "/home/runner/yocto/$file"
-              echo | "/home/runner/yocto/$file"
-          done
+          if oras pull --allow-path-traversal "${IMAGE}:yocto${YOCTO}" -o /tmp/; then
+            mkdir -p "/opt/poky/$YOCTO"
+            tar --zstd -xf /tmp/yocto${YOCTO}.tar.zst -C /opt/poky/$YOCTO
+          else
+            mkdir -p /home/runner/yocto
+            for file in "${files[@]}"; do
+                path="/home/runner/yocto/$file"
+                if [[ ! -f "$path" ]]; then
+                    curl -LsSf "$url/$file" -o "$path"
+                    chmod +x "$path"
+                fi
+                echo | "$path"
+            done
+            tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd"
+          fi
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
+          exit
 
           targets=(
             "aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux"
