@@ -58,9 +58,9 @@ jobs:
           poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${YOCTO}.sh
           )
 
-          if oras pull --allow-path-traversal "${IMAGE}:yocto${YOCTO}" -o /tmp/; then
-            mkdir -p "/opt/poky/$YOCTO"
-            tar --zstd -xf /tmp/yocto${YOCTO}.tar.zst -C /opt/poky/$YOCTO
+          mkdir -p "/opt/poky/$YOCTO"
+          if oras pull --allow-path-traversal "${IMAGE}:yocto${YOCTO}" -o "/opt/poky/$YOCTO"; then
+            tar --zstd -xf /opt/poky/$YOCTO/yocto${YOCTO}.tar.zst -C /opt/poky/$YOCTO
           else
             mkdir -p /home/runner/yocto
             for file in "${files[@]}"; do
