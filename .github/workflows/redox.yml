@@ -85,7 +85,7 @@ jobs:
           else
             for target in "${targets[@]}"; do
                 # if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
-                  redoxer env TARGET="$target" redoxer toolchain
+                  redoxer env TARGET="$target" bash -c "redoxer toolchain"
                 # fi
             done
             mkdir -p "$REDOXER_TOOLCHAIN"
