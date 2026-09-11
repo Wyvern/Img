@@ -43,14 +43,13 @@ jobs:
       - name: Ubuntu apt update and install
         run: sudo apt install crosshurd libfuse3-dev -qy
 
-      - name: Cache Redoxer
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.redoxer
-            ~/.cargo/bin/redoxer
-          key: redoxer
-          restore-keys: redoxer
+      # - name: Cache Redoxer
+      #   uses: actions/cache@v6
+      #   with:
+      #     path: |
+      #       ~/.cargo/bin/redoxer
+      #     key: redoxer
+      #     restore-keys: redoxer
 
       - name: setup-oras
         uses: oras-project/setup-oras@v2
@@ -73,7 +72,7 @@ jobs:
           mv .cargo/config.toml .cargo/config.toml.bak
           mv .cargo/redox.toml .cargo/config.toml
 
-          export REDOXER_TOOLCHAIN="$HOME/.redoxer/toolchain"
+          export REDOXER_TOOLCHAIN="/home/runner/redoxer"
           targets=(
             aarch64-unknown-redox
             riscv64gc-unknown-redox
@@ -86,9 +85,10 @@ jobs:
           else
             for target in "${targets[@]}"; do
                 if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
-                  redoxer toolchain
+                  redoxer env TARGET="$target" redoxer toolchain
                 fi
             done
+            mkdir -p "$REDOXER_TOOLCHAIN"
             tar --zstd -C "$REDOXER_TOOLCHAIN" -cf /tmp/redoxer-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redoxer-toolchain" "redoxer-toolchain.tar.zst:application/vnd.wyvern.redoxer-toolchain.tar.zstd"
             exit
