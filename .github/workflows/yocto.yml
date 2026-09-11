@@ -50,12 +50,12 @@ jobs:
       - name: Toolchain downloads
         run: |
           IMAGE="${IMAGE,,}"
-          url=https://downloads.yoctoproject.org/releases/yocto/yocto-${yocto}/toolchain/x86_64
+          url=https://downloads.yoctoproject.org/releases/yocto/yocto-${YOCTO}/toolchain/x86_64
           files=(
-          poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${yocto}.sh
-          poky-glibc-x86_64-core-image-sato-armv8a-genericarm64-toolchain-${yocto}.sh
-          poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-beaglebone-yocto-toolchain-${yocto}.sh
-          poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${yocto}.sh
+          poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${YOCTO}.sh
+          poky-glibc-x86_64-core-image-sato-armv8a-genericarm64-toolchain-${YOCTO}.sh
+          poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-beaglebone-yocto-toolchain-${YOCTO}.sh
+          poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${YOCTO}.sh
           )
 
           if oras pull --allow-path-traversal "${IMAGE}:yocto${YOCTO}" -o /tmp/; then
