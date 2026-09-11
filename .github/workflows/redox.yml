@@ -84,11 +84,12 @@ jobs:
             tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
           else
             for target in "${targets[@]}"; do
-                if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
+                # if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
                   redoxer env TARGET="$target" redoxer toolchain
-                fi
+                # fi
             done
             mkdir -p "$REDOXER_TOOLCHAIN"
+            ls -ahl $REDOXER_TOOLCHAIN
             tar --zstd -C "$REDOXER_TOOLCHAIN" -cf /tmp/redoxer-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redoxer-toolchain" "/tmp/redoxer-toolchain.tar.zst:application/vnd.wyvern.redoxer-toolchain.tar.zstd"
             exit
