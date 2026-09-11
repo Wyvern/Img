@@ -57,10 +57,10 @@ jobs:
           poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-beaglebone-yocto-toolchain-${YOCTO}.sh
           poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${YOCTO}.sh
           )
-
+          set -o pipefail
           mkdir -p "/opt/poky/$YOCTO"
-          if oras pull --allow-path-traversal "${IMAGE}:yocto${YOCTO}" -o "/opt/poky/$YOCTO"; then
-            tar --zstd -xf /opt/poky/$YOCTO/yocto${YOCTO}.tar.zst -C /opt/poky/$YOCTO
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}" 2>/dev/null); then
+            oras blob fetch -output - "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO"
           else
             mkdir -p /home/runner/yocto
             for file in "${files[@]}"; do
