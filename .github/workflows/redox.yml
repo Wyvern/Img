@@ -43,14 +43,6 @@ jobs:
       - name: Ubuntu apt update and install
         run: sudo apt install crosshurd libfuse3-dev -qy
 
-      # - name: Cache Redoxer
-      #   uses: actions/cache@v6
-      #   with:
-      #     path: |
-      #       ~/.cargo/bin/redoxer
-      #     key: redoxer
-      #     restore-keys: redoxer
-
       - name: setup-oras
         uses: oras-project/setup-oras@v2
 
@@ -88,7 +80,7 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            redoxer env TARGET=$target REDOXER_USE_LTO=1 bash -c '
+            redoxer env TARGET="$target" REDOXER_USE_LTO=1 bash -c '
             if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
               redoxer toolchain
             fi
