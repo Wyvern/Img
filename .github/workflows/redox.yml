@@ -11,7 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   IMAGE: ghcr.io/${{ github.repository }}
-  OCI: "1"
+  OCI: "true"
 
 jobs:
   Linux:
@@ -72,7 +72,7 @@ jobs:
           REDOXER_TOOLCHAIN="$HOME/.redoxer"
           mkdir -p $REDOXER_TOOLCHAIN
 
-          if [[ "$OCI" == "1" ]]; then
+          if [[ "$OCI" == "true" ]]; then
             oras pull --allow-path-traversal "${IMAGE}:redoxer-toolchain" -o /tmp/
             tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
           fi
@@ -96,7 +96,7 @@ jobs:
           mv .cargo/config.toml .cargo/redox.toml
           mv .cargo/config.toml.bak .cargo/config.toml
 
-          if [[ ! "$OCI" == "1" ]]; then
+          if [[ ! "$OCI" == "true" ]]; then
             tar --zstd -C "$REDOXER_TOOLCHAIN" -cf /tmp/redoxer-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redoxer-toolchain" "/tmp/redoxer-toolchain.tar.zst:application/vnd.wyvern.redoxer-toolchain.tar.zstd"
           fi
