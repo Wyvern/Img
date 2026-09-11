@@ -80,8 +80,11 @@ jobs:
           ln -sf /home/runner/unix sysroot
 
           if [[ "$OCI" == "true" ]]; then
-            oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
-            tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix
+            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" 2>/dev/null);
+            echo "Unix: $digest"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix"
+            # oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
+            # tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix
           else
             freebsd=(amd64 arm64 riscv)
             for arch in "${freebsd[@]}"; do

@@ -73,8 +73,11 @@ jobs:
           mkdir -p $REDOXER_TOOLCHAIN
 
           if [[ "$OCI" == "true" ]]; then
-            oras pull --allow-path-traversal "${IMAGE}:redoxer-toolchain" -o /tmp/
-            tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
+            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redoxer-toolchain" 2>/dev/null);
+            echo "Redoxer: $digest"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "$REDOXER_TOOLCHAIN"
+            # oras pull --allow-path-traversal "${IMAGE}:redoxer-toolchain" -o /tmp/
+            # tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
           fi
 
           targets=(

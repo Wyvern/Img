@@ -80,8 +80,11 @@ jobs:
           ln -sf /home/runner/Fuchsia fuchsia
 
           if [ "$OCI" == "true" ]; then
-            oras pull --allow-path-traversal "${IMAGE}:fuchsia" -o /tmp/
-            tar --zstd -xf /tmp/Fuchsia.tar.zst -C /home/runner/Fuchsia
+            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia" 2>/dev/null);
+            echo "Fuchsia: $digest"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia"
+            # oras pull --allow-path-traversal "${IMAGE}:fuchsia" -o /tmp/
+            # tar --zstd -xf /tmp/Fuchsia.tar.zst -C /home/runner/Fuchsia
           else
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
             chmod +x cipd
