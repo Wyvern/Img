@@ -65,7 +65,7 @@ jobs:
           set +e -x
           IMAGE="${IMAGE,,}"
 
-          REDOXER_TOOLCHAIN="~/.redoxer/toolchain/"
+          REDOXER_TOOLCHAIN="~/.cache/redoxer/toolchain/"
 
           if [ ! -f ~/.cargo/bin/redoxer ]; then
             cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git --locked redoxer -q --force
@@ -76,6 +76,7 @@ jobs:
 
 
           if [[ "$OCI" == "true" ]]; then
+            mkdir -p $REDOXER_TOOLCHAIN
             oras pull --allow-path-traversal "${IMAGE}:redoxer-toolchain" -o /tmp/
             tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
           fi
