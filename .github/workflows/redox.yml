@@ -72,8 +72,6 @@ jobs:
           mv .cargo/config.toml .cargo/config.toml.bak
           mv .cargo/redox.toml .cargo/config.toml
 
-          export REDOXER_TOOLCHAIN="$HOME/.redoxer"
-          mkdir -p "$REDOXER_TOOLCHAIN"
 
           if [[ "$OCI" == "true" ]]; then
             oras pull --allow-path-traversal "${IMAGE}:redoxer-toolchain" -o /tmp/
@@ -88,14 +86,14 @@ jobs:
 
           for target in ${targets[@]}; do
             redoxer env TARGET=$target REDOXER_USE_LTO=1 bash -c '
-            if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
+            # if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
               redoxer toolchain
-            fi
-            ls -ahl $REDOXER_TOOLCHAIN
+            # fi
+            ls -ahl .redoxer/
             time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $target
             '
           done
-
+          exit
           if [[ ! "$OCI" == "true" ]]; then
             tar --zstd -C "$REDOXER_TOOLCHAIN" -cf /tmp/redoxer-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redoxer-toolchain" "/tmp/redoxer-toolchain.tar.zst:application/vnd.wyvern.redoxer-toolchain.tar.zstd"
