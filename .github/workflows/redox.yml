@@ -57,7 +57,7 @@ jobs:
           set +e -x
           IMAGE="${IMAGE,,}"
 
-          export REDOXER_TOOLCHAIN="/home/runner/redoxer"
+          REDOXER_TOOLCHAIN="/home/runner/redoxer"
           mkdir -p $REDOXER_TOOLCHAIN
 
           if [ ! -f ~/.cargo/bin/redoxer ]; then
@@ -80,7 +80,7 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            redoxer env TARGET="$target" REDOXER_USE_LTO=1 bash -c '
+            redoxer env TARGET="$target" REDOXER_USE_LTO=1 REDOXER_TOOLCHAIN="$REDOXER_TOOLCHAIN" bash -c '
             if [ ! -d $REDOXER_TOOLCHAIN/$TARGET ]; then
               redoxer toolchain
             fi
