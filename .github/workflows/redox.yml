@@ -11,7 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   IMAGE: ghcr.io/${{ github.repository }}
-  OCI: ""
+  OCI: "true"
 
 jobs:
   Linux:
@@ -81,13 +81,13 @@ jobs:
 
           for target in "${targets[@]}"; do
             redoxer env TARGET="$target" REDOXER_USE_LTO=1 bash -c '
-            # if [ ! -d $REDOXER_TOOLCHAIN/$TARGET ]; then
+            if [ ! -d $REDOXER_TOOLCHAIN/$TARGET ]; then
               redoxer toolchain
-            # fi
-            # time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $target
+            fi
+            time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $target
             '
           done
-          ls -ahl $REDOXER_TOOLCHAIN
+
           if [[ ! "$OCI" == "true" ]]; then
             tar --zstd -C "$REDOXER_TOOLCHAIN" -cf /tmp/redoxer-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redoxer-toolchain" "/tmp/redoxer-toolchain.tar.zst:application/vnd.wyvern.redoxer-toolchain.tar.zstd"
