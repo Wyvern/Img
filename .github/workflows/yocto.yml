@@ -72,8 +72,8 @@ jobs:
                 echo | "$path"
             done
             rm -f /home/runner/yocto/*
-            sudo tar --zstd -C /opt/poky/$YOCTO -cf - . | \
-            oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/dev/stdin:application/vnd.wyvern.yocto.tar.zstd"
+            sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd"
           fi
 
       - name: Build Release
