@@ -72,7 +72,7 @@ jobs:
           mv .cargo/config.toml .cargo/config.toml.bak
           mv .cargo/redox.toml .cargo/config.toml
 
-          export REDOXER_TOOLCHAIN="/home/runner/redoxer"
+          export REDOXER_TOOLCHAIN="$HOME/.redoxer"
           mkdir -p "$REDOXER_TOOLCHAIN"
 
           if [[ "$OCI" == "true" ]]; then
@@ -87,7 +87,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            redoxer env TARGET=$target REDOXER_TOOLCHAIN="/home/runner/redoxer" REDOXER_USE_LTO=1 bash -c '
+            redoxer env TARGET=$target REDOXER_USE_LTO=1 bash -c '
             if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
               redoxer toolchain
             fi
