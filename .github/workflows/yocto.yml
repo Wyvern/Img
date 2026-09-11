@@ -89,7 +89,7 @@ jobs:
             "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
           )
 
-          sdk=/opt/poky/${yocto}
+          sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
 
           for entry in "${targets[@]}"; do
