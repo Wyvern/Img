@@ -61,7 +61,7 @@ jobs:
           mkdir -p "/opt/poky/$YOCTO"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}" 2>/dev/null); then
             echo "Layer: $digest"
-            oras blob fetch -output - "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO"
           else
             mkdir -p /home/runner/yocto
             for file in "${files[@]}"; do
