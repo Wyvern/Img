@@ -10,11 +10,13 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  LLVM : "23"
 
 jobs:
   Illumos:
     name: Solaris/Illumos
     runs-on: ubuntu-24.04
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -51,10 +53,15 @@ jobs:
 
       - name: Install LLVM
         run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
+          if [ "$LLVM" = "23" ]; then
+              wget https://apt.llvm.org/llvm.sh
+              chmod +x llvm.sh
+              sudo ./llvm.sh $LLVM
+          fi
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
 
       - name: Build Release
         continue-on-error: true
@@ -127,6 +134,13 @@ jobs:
     name: BSD Unix
     runs-on: ubuntu-24.04-arm
 
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+
+    permissions:
+      contents: write
+      packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -145,73 +159,40 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Cache sysroot
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/unix
-          key: Unix
-          restore-keys: Unix
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Install LLVM
         run: |
-          sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- 22
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-22 200
-          sudo update-alternatives --install /usr/bin/lld lld /usr/bin/lld-22 200
+          if [ "$LLVM" = "23" ]; then
+              wget https://apt.llvm.org/llvm.sh
+              chmod +x llvm.sh
+              sudo ./llvm.sh $LLVM
+          fi
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
+          IMAGE="${IMAGE,,}"
 
           mkdir -p /home/runner/unix;
           ln -sf /home/runner/unix sysroot
 
-          freebsd=(amd64)
-          for arch in "${freebsd[@]}"; do
-            if [ ! -d sysroot/freebsd/$arch ]; then
-                mkdir -p sysroot/freebsd/$arch
-                curl -fsSL https://download.freebsd.org/ftp/releases/$arch/15.0-RELEASE/base.txz \
-            | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
-            fi
-          done
-
-          # ppc=(powerpc64 powerpc64le)
-          # for arch in "${ppc[@]}"; do
-          #   if [ ! -d sysroot/freebsd/$arch ]; then
-          #     mkdir -p sysroot/freebsd/$arch
-          #     curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/15.0-RELEASE/base.txz \
-          #       | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
-          #   fi
-          # done
-
-          # openbsd=(amd64)
-          # files=(base77 comp77)
-          # for arch in "${openbsd[@]}"; do
-          #   if [ ! -d sysroot/openbsd/$arch ]; then
-          #     mkdir -p sysroot/openbsd/$arch
-          #     for file in "${files[@]}"; do
-          #       curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/7.7/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
-          #     done
-          #   fi
-          # done
-
-          netbsd=(amd64)
-          files=(base comp etc)
-          for arch in "${netbsd[@]}"; do
-            if [ ! -d sysroot/netbsd/$arch ]; then
-              mkdir -p sysroot/netbsd/$arch
-              for file in "${files[@]}"; do
-                curl -fsSL https://cdn.netbsd.org/pub/NetBSD/NetBSD-10.1/$arch/binary/sets/$file.tar.xz | tar -xJf - -C sysroot/netbsd/$arch 2>/dev/null &
-              done
-            fi
-          done
-
-          wait
-          chmod -R u+rwX sysroot
+          oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
+          tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix
 
           targets=(
             x86_64-unknown-freebsd
+            aarch64-unknown-freebsd
             x86_64-unknown-netbsd
           )
 
@@ -240,6 +221,7 @@ jobs:
         run: |
           targets=(
                   "x86_64-unknown-freebsd FreeBSD-x86_64"
+                  "aarch64-unknown-freebsd FreeBSD-aarch64"
                   "x86_64-unknown-netbsd NetBSD-x86_64"
           )
           for target in "${targets[@]}"; do
