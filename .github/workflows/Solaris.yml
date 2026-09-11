@@ -12,7 +12,7 @@ env:
   RUSTC_WRAPPER: "sccache"
   LLVM: "23"
   IMAGE: ghcr.io/${{ github.repository }}
-  OCI: "no"
+  OCI: "true"
 
 jobs:
   Linux:
@@ -90,8 +90,16 @@ jobs:
             cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
             tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
             oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd"
-            exit
           fi
+
+          targets=(
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
+          )
+          for target in ${targets[@]}; do
+            time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target
+          done
 
           targets=(
             aarch64-unknown-hermit
@@ -105,15 +113,6 @@ jobs:
           done
 
           time cargo s x86_64-fortanix-unknown-sgx
-
-          targets=(
-            aarch64-unknown-fuchsia
-            riscv64gc-unknown-fuchsia
-            x86_64-unknown-fuchsia
-          )
-          for target in ${targets[@]}; do
-            time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target
-          done
 
           targets=(
             x86_64-unknown-illumos
