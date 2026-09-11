@@ -80,7 +80,6 @@ jobs:
         run: |
           cargo update
           set +e -x
-          exit
 
           targets=(
             "aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux"
