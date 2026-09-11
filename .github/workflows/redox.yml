@@ -81,7 +81,7 @@ jobs:
 
           for target in "${targets[@]}"; do
             redoxer env TARGET="$target" REDOXER_USE_LTO=1 bash -c '
-            if [ ! -d $REDOXER_TOOLCHAIN/$target ]; then
+            if [ ! -d $REDOXER_TOOLCHAIN/$TARGET ]; then
               redoxer toolchain
             fi
             # time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $target
