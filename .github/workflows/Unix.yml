@@ -150,7 +150,7 @@ jobs:
           chmod -R u+rwX sysroot
 
           tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
-          oras push "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd"
+          oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd"
 
           # mkdir -p /home/runner/unix
           # oras pull "${IMAGE}:unix" -o /tmp/unix-artifact
