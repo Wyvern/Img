@@ -73,9 +73,9 @@ jobs:
           mv .cargo/redox.toml .cargo/config.toml
 
           export REDOXER_TOOLCHAIN="/home/runner/redoxer"
+          mkdir -p "$REDOXER_TOOLCHAIN"
 
           if [[ "$OCI" == "true" ]]; then
-            mkdir -p "$REDOXER_TOOLCHAIN"
             oras pull --allow-path-traversal "${IMAGE}:redoxer-toolchain" -o /tmp/
             tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
           fi
