@@ -10,11 +10,18 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  LLVM: "23"
+  IMAGE: ghcr.io/${{ github.repository }}
+  OCI: "no"
 
 jobs:
   Linux:
     name: Solaris+Illumos+Fuchsia
     runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout
@@ -44,71 +51,47 @@ jobs:
           fi
           cross --version
 
-      - name: Cache Fuchsia
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/Fuchsia
-          key: Fuchsia
-          restore-keys: Fuchsia
-
       - name: Install LLVM
         run: |
-          ver=23
-          if [ "$ver" = "23" ]; then
+          if [ "$LLVM" = "23" ]; then
               wget https://apt.llvm.org/llvm.sh
               chmod +x llvm.sh
-              sudo ./llvm.sh $ver
+              sudo ./llvm.sh $LLVM
           fi
           for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
           done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
-      #
-      # - name: Cache Illumos/Solaris
-      #   uses: actions/cache@v6
-      #   with:
-      #     path: /home/runner/Illumos
-      #     key: Illomos-${{ runner.os }}-${{ runner.arch }}
-      #     restore-keys: Illomos-${{ runner.os }}-${{ runner.arch }}
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
 
-      # - name: Zig toolchain install
-      #   uses: mlugg/setup-zig@v2
-      #   with:
-      #     version: master
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
+          IMAGE="${IMAGE,,}"
 
-          # mkdir -p /home/runner/Illumos
+          mkdir -p /home/runner/Fuchsia;
+          ln -sf /home/runner/Fuchsia fuchsia
 
-          # if [ ! -f Illumos/omnios-r151058.zfs ]; then
-          #   mkdir -p /home/runner/Illumos/omnios
-          #   curl -fsSL https://downloads.omnios.org/media/stable/omnios-r151058.zfs.xz | xz -d > /home/runner/Illumos/omnios-r151058.zfs
-          # fi
-
-          # sudo truncate -s 1G /tmp/omnios.img
-          # sudo zpool create -f solaris /tmp/omnios.img
-          # sudo zfs recv -o mountpoint=/home/runner/Illumos/omnios solaris/omnios < Illumos/omnios-r151058.zfs
-
-          # zpool status
-          # zfs list
-
-          # ln -sf /home/runner/Illumos/omnios illumos
-
-          if [ ! -d /home/runner/Fuchsia ]; then
+          if [ "$OCI" == "true" ]; then
+            oras pull --allow-path-traversal "${IMAGE}:fuchsia" -o /tmp/
+            tar --zstd -xf /tmp/Fuchsia.tar.zst -C /home/runner/Fuchsia
+          else
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
             mkdir -p /home/runner/Fuchsia
             cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
+            tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd"
+            exit
           fi
-
-          ln -sf /home/runner/Fuchsia fuchsia
-
-          # cargo install fortanix-sgx-tools sgxs-tools -q
-          # sudo snap install zig --classic --beta
 
           targets=(
             aarch64-unknown-hermit
@@ -117,15 +100,9 @@ jobs:
             x86_64-unknown-hermit
           )
 
-          # mv .cargo/config.toml .cargo/config.toml.bak
-          # mv .cargo/hermit.toml .cargo/config.toml
-
           for target in ${targets[@]}; do
             time cargo s $target
           done
-
-          # mv .cargo/config.toml .cargo/hermit.toml
-          # mv .cargo/config.toml.bak .cargo/config.toml
 
           time cargo s x86_64-fortanix-unknown-sgx
 
@@ -148,9 +125,6 @@ jobs:
             export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
             time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
           done
-
-          # sudo zfs destroy -r solaris/omnios
-          # sudo zpool destroy solaris
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu

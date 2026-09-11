@@ -15,6 +15,7 @@ env:
   OPENBSD: "7.9"
   NETBSD: "11.0"
   OCI: "true"
+  LLVM: "23"
 
 jobs:
   Linux:
@@ -33,7 +34,6 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          # toolchain: nightly-2026-02-09
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -53,16 +53,15 @@ jobs:
 
       - name: Install LLVM
         run: |
-          ver=23
-          if [ "$ver" = "23" ]; then
+          if [ "$LLVM" = "23" ]; then
               wget https://apt.llvm.org/llvm.sh
               chmod +x llvm.sh
-              sudo ./llvm.sh $ver
+              sudo ./llvm.sh $LLVM
           fi
           for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
           done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
 
       - name: setup-oras
         uses: oras-project/setup-oras@v2
