@@ -10,6 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  IMAGE: ghcr.io/${{ github.repository }}
   FREEBSD: "15.1"
   OPENBSD: "7.9"
   NETBSD: "11.0"
@@ -18,6 +19,9 @@ jobs:
   Linux:
     name: Unix
     runs-on: ubuntu-26.04-arm
+
+    permissions:
+        packages: write
 
     steps:
       - name: Checkout
@@ -136,6 +140,22 @@ jobs:
 
           wait
           chmod -R u+rwX sysroot
+
+          cat > /tmp/Dockerfile <<'EOF'
+          FROM scratch
+          COPY . /sysroot/
+          EOF
+
+          docker build -f /tmp/Dockerfile -t ${IMAGE}:unix /home/runner/unix
+          docker push "${IMAGE}:unix"
+
+          cid=$(docker create "${IMAGE}:unix")
+          docker cp "$cid:/sysroot/." /demo/
+          docker rm "$cid"
+
+          ls -ahl /demo
+
+          exit
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 

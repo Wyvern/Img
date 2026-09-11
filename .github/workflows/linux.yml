@@ -97,7 +97,7 @@ jobs:
       #   uses: DeterminateSystems/nix-installer-action@main
 
       # - name: Install Nix
-      #   uses: cachix/install-nix-action
+      #   uses: cachix/install-nix-action@31
 
       - name: Nix Quick Install
         uses: nixbuild/nix-quick-install-action@v35
