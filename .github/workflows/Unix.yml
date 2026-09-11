@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-26.04-arm
 
     permissions:
+      contents: write
       packages: write
 
     steps:
