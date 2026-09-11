@@ -69,7 +69,7 @@ jobs:
                 if [ ! -d ~/.redoxer/toolchain/$target ]; then
                   redoxer toolchain
                 fi
-                time redoxer build -- -q --profile redox -Zbuild-std=std,panic_abort --target $target
+                time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $target
                 "
           done
 
