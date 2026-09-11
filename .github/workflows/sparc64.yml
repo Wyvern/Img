@@ -17,13 +17,13 @@ jobs:
     runs-on: ubuntu-26.04
 
     permissions:
-          contents: write
-          packages: write
+      contents: write
+      packages: write
 
     env:
-          IMAGE: ghcr.io/${{ github.repository }}
-          NETBSD_VERSION: "11.0"
-          OPENBSD_VERSION: "7.9"
+      IMAGE: ghcr.io/${{ github.repository }}
+      NETBSD_VERSION: "11.0"
+      OPENBSD_VERSION: "7.9"
 
     steps:
       - name: Checkout
@@ -49,6 +49,23 @@ jobs:
           repository: taiki-e/rust-cross-toolchain
           path: rust-cross-toolchain
 
+      - name: Patch rust-cross-toolchain
+        working-directory: rust-cross-toolchain
+        run: |
+            sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
+            docker/base/netbsd.Dockerfile
+
+            sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
+            sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
+
+            for file in docker/netbsd.Dockerfile docker/openbsd.Dockerfile; do
+                sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
+
+                sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
+                RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
+                ' "$file"
+            done
+
       - name: Login to GHCR
         uses: docker/login-action@v4
         with:
@@ -56,69 +73,59 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Build toolchain
-      #   working-directory: rust-cross-toolchain
-      #   run: |
-      #     sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
-      #       docker/base/netbsd.Dockerfile
+      - name: Pull/Push cross-toolchain images
+        working-directory: rust-cross-toolchain
+        run: |
+          IMAGE="${IMAGE,,}"
 
-      #     sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
-      #     sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
+          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null 2>&1; then
+              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
+          else
+              # NetBSD base image required by docker/netbsd.Dockerfile
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --file docker/base/netbsd.Dockerfile \
+                --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+                --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
+                docker/base
 
-      #     for file in docker/netbsd.Dockerfile docker/openbsd.Dockerfile; do
-      #         sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
+              # NetBSD final image
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --file docker/netbsd.Dockerfile \
+                --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+                --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
+                docker
+              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
+          fi
 
-      #         sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
-      #         RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
-      #         ' "$file"
-      #     done
-
-      #     IMAGE="${IMAGE,,}"
-
-      #     # NetBSD base image required by docker/netbsd.Dockerfile
-      #     docker buildx build \
-      #       --platform linux/amd64 \
-      #       --provenance=false \
-      #       --load \
-      #       --file docker/base/netbsd.Dockerfile \
-      #       --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-      #       --build-arg HOST_ARCH=amd64 \
-      #       --build-arg UBUNTU_VERSION=24.04 \
-      #       --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-      #       --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
-      #       docker/base
-
-      #     # NetBSD final image
-      #     docker buildx build \
-      #       --platform linux/amd64 \
-      #       --provenance=false \
-      #       --load \
-      #       --file docker/netbsd.Dockerfile \
-      #       --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-      #       --build-arg HOST_ARCH=amd64 \
-      #       --build-arg UBUNTU_VERSION=24.04 \
-      #       --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-      #       --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
-      #       docker
-
-      #     # OpenBSD final image
-      #     docker buildx build \
-      #       --platform linux/amd64 \
-      #       --provenance=false \
-      #       --load \
-      #       --file docker/openbsd.Dockerfile \
-      #       --build-arg RUST_TARGET=sparc64-unknown-openbsd \
-      #       --build-arg HOST_ARCH=amd64 \
-      #       --build-arg UBUNTU_VERSION=24.04 \
-      #       --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
-      #       --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
-      #       docker
-
-      # - name: Publish toolchains
-      #   run: |
-      #     IMAGE="${IMAGE,,}"
-      #     docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
-      #     docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
+          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" >/dev/null 2>&1; then
+              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
+          else
+              # OpenBSD final image
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --file docker/openbsd.Dockerfile \
+                --build-arg RUST_TARGET=sparc64-unknown-openbsd \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
+                --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
+                docker
+              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
+          fi
 
       - name: Cross-rs
         run: |
@@ -133,10 +140,6 @@ jobs:
         run: |
           cargo update
           set +e -x
-
-          IMAGE="${IMAGE,,}"
-          docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}"
-          docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}"
 
           targets=(
             sparc64-unknown-netbsd
