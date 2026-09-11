@@ -21,7 +21,8 @@ jobs:
     runs-on: ubuntu-26.04-arm
 
     permissions:
-        packages: write
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
@@ -68,6 +69,13 @@ jobs:
             sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$ver" 200
           done
           sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$ver 200
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Release
         run: |
