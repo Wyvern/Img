@@ -87,7 +87,7 @@ jobs:
             # time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $target
             '
           done
-          ls -ahl $REDOXER_TOOLCHAIN
+          ls -ahl ~/.redoxer/ /home/runner/.redoxer/
           if [[ ! "$OCI" == "true" ]]; then
             tar --zstd -C "$REDOXER_TOOLCHAIN" -cf /tmp/redoxer-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redoxer-toolchain" "/tmp/redoxer-toolchain.tar.zst:application/vnd.wyvern.redoxer-toolchain.tar.zstd"
