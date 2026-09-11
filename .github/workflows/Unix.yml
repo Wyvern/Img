@@ -87,7 +87,7 @@ jobs:
           ln -sf /home/runner/unix sysroot
 
           if [[ "$OCI" == "true" ]]; then
-            oras pull "${IMAGE}:unix" -o /tmp/unix-artifact
+            oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/unix-artifact
             tar --zstd -xf /tmp/unix-artifact/unix.tar.zst -C /home/runner/unix
           else
             freebsd=(amd64 arm64 riscv)
@@ -158,6 +158,7 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd"
           fi
 
+          exit
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
 
           targets=(
