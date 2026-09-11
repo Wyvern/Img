@@ -44,13 +44,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      # - name: Cache sysroot
-      #   uses: actions/cache@v6
-      #   with:
-      #     path: /home/runner/unix
-      #     key: Unix
-      #     restore-keys: Unix
-
       - name: Cache ppc-freebsd
         uses: actions/cache@v6
         with:
