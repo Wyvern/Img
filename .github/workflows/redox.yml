@@ -90,7 +90,7 @@ jobs:
           mv .cargo/redox.toml .cargo/config.toml
           for target in "${targets[@]}"; do
             redoxer env TARGET="$target" REDOXER_USE_LTO=1 bash -c '
-            if [ ! -d $REDOXER_TOOLCHAIN/$TARGET ]; then
+            if [ ! "$OCI" == "true" ]; then
               redoxer toolchain
             fi
             time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $TARGET
