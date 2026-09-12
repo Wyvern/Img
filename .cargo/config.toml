@@ -641,12 +641,6 @@ linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
 
-[target.aarch64-unknown-redox]
-linker = "/home/runner/.redoxer/aarch64-unknown-redox/toolchain/bin/aarch64-unknown-redox-ld"
-
-[target.riscv64gc-unknown-redox]
-linker = "/home/runner/.redoxer/riscv64gc-unknown-redox/toolchain/bin/riscv64-unknown-redox-ld"
-
 # [target.x86_64-unknown-illumos]
 # linker = "./zig-cc.sh"
 # rustflags = [
