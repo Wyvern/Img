@@ -54,9 +54,9 @@ jobs:
 
           if [ ! -d ~/android-ndk-${ndk} ]; then
             mkdir -p ~/android-ndk-${ndk}
-            echo "Downloading Android NDK..."
+            echo "Downloading Android NDK ${ndk} ..."
             curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
-            echo "Unzipping Android NDK..."
+            echo "Unzipping Android NDK ${ndk} ..."
             unzip -q android-ndk-${ndk}-linux.zip -d ~/
           fi
 
