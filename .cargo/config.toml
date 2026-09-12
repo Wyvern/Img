@@ -254,7 +254,6 @@ rustflags = [
   "-Clinker-plugin-lto",
   "-Clink-arg=-Wl,--icf=all",
   "-Clink-arg=-Wl,--relax",
-  "-Clink-arg=-Wl,-z,pack-relative-relocs",
 ]
 
 [target.'cfg(all(target_os="linux",not(any(target_family="wasm"))))']
@@ -267,6 +266,7 @@ rustflags = [
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
   "-Clink-arg=-Wl,--no-eh-frame-hdr",
+  "-Clink-arg=-Wl,-z,noseparate-code"
 ]
 
 [target.'cfg(target_family="windows")']
