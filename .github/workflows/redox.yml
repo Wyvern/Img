@@ -80,8 +80,9 @@ jobs:
             # tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
           fi
 
-          find "$HOME/.redoxer" -type f -name '*-unknown-redox-ld' -print
-
+          aarch64-unknown-redox-ld -v
+          riscv64-unknown-redox-ld -v
+          exit
           targets=(
             aarch64-unknown-redox
             riscv64gc-unknown-redox
