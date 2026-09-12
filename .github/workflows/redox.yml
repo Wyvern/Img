@@ -80,6 +80,8 @@ jobs:
             # tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
           fi
 
+          find "$HOME/.redoxer" -type f -name '*-unknown-redox-ld' -print
+
           targets=(
             aarch64-unknown-redox
             riscv64gc-unknown-redox
@@ -93,7 +95,7 @@ jobs:
             if [ ! -d $REDOXER_TOOLCHAIN/$TARGET ]; then
               redoxer toolchain
             fi
-            time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $target
+            time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $TARGET
             '
           done
           mv .cargo/config.toml .cargo/redox.toml
