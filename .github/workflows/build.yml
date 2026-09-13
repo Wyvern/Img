@@ -161,7 +161,6 @@ jobs:
         uses: actions/cache@v6
         with:
           path: |
-            ~/.redoxer
             ~/.cargo/bin/redoxer
           key: redoxer
           restore-keys: redoxer

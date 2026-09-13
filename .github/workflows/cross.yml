@@ -76,15 +76,12 @@ jobs:
           cargo update
           set +e -x
 
-          if [ ! -d /home/runner/Fuchsia ]; then
-            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
-            chmod +x cipd
-            sudo mv cipd /usr/local/bin/
-            mkdir -p /home/runner/Fuchsia
-            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
-          fi
-
+          mkdir -p /home/runner/Fuchsia
           ln -sf /home/runner/Fuchsia fuchsia
+
+          digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia" 2>/dev/null);
+          echo "Fuchsia: $digest"
+          oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia"
 
           targets=(
             aarch64-unknown-fuchsia
