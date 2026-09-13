@@ -75,6 +75,8 @@ jobs:
             x86_64-unknown-redox
           )
 
+          mkdir -p "redox"
+
           if [[ "$OCI" == "true" ]]; then
             digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null);
             echo "Redox: $digest"
