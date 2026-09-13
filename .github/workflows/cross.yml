@@ -80,7 +80,6 @@ jobs:
           ln -sf /home/runner/Fuchsia fuchsia
 
           digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia" 2>/dev/null);
-          echo "Fuchsia: $digest"
           oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia"
 
           targets=(
@@ -192,7 +191,6 @@ jobs:
           ln -sf /home/runner/unix sysroot
 
           digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" 2>/dev/null);
-          echo "Unix: $digest"
           oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix"
 
           targets=(
