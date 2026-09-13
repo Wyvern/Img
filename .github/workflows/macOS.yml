@@ -10,7 +10,6 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   mingw: "20260908"
 
 jobs:
