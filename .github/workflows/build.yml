@@ -117,6 +117,14 @@ jobs:
     name: Ubuntu-24.04
     runs-on: ubuntu-24.04
 
+    env:
+      NDK: "r30"
+      IMAGE: ghcr.io/${{ github.repository }}
+
+    permissions:
+      contents: write
+      packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -135,19 +143,12 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Get latest Android NDK version
-        run: |
-          latest_ndk=$(curl -fsSL https://developer.android.com/ndk/downloads \
-            | sed -n 's/.*Latest Stable Version (\([^)]*\)).*/\1/p')
-          echo "NDK_VERSION=$latest_ndk" >> $GITHUB_ENV
-          echo "Latest NDK: $latest_ndk"
-
       - name: Android NDK cache
         uses: actions/cache@v6
         with:
-          path: ~/android-ndk-${{ env.NDK_VERSION }}
-          key: android-ndk-${{ env.NDK_VERSION }}
-          restore-keys: android-ndk-${{ env.NDK_VERSION }}
+          path: ~/android-ndk-${{ env.NDK }}
+          key: android-ndk-${{ env.NDK }}
+          restore-keys: android-ndk-${{ env.NDK }}
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
@@ -157,46 +158,43 @@ jobs:
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
 
-      - name: Cache Redoxer
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.cargo/bin/redoxer
-          key: redoxer
-          restore-keys: redoxer
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          ver=${NDK_VERSION}
-          export ANDROID_NDK_HOME=~/android-ndk-$ver
+          export ANDROID_NDK_HOME=~/android-ndk-$NDK
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
 
-          if [ ! -d ~/android-ndk-${ver} ]; then
-            mkdir -p ~/android-ndk-${ver}
+          if [ ! -d ~/android-ndk-${NDK} ]; then
+            mkdir -p ~/android-ndk-${NDK}
             echo "Downloading Android NDK..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ver}-linux.zip
-            echo "Unzipping Android NDK..."
-            unzip -q android-ndk-${ver}-linux.zip -d ~/
+            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${NDK}-linux.zip
+            echo "Unzipping Android NDK $NDK ..."
+            unzip -q android-ndk-${NDK}-linux.zip -d ~/
           fi
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
-          if [ ! -f ~/.cargo/bin/redoxer ]; then
-            cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git redoxer -q --locked --force
-          fi
-          if [ ! -d ~/.redoxer ]; then
-            redoxer toolchain
-          fi
+          mkdir -p "redox"
+
+          digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null);
+          oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox"
 
           targets=(
             x86_64-unknown-redox
           )
-          for target in ${targets[@]}; do
-            time redoxer build -- -q --profile lto --target $target
+
+          for target in "${targets[@]}"; do
+            time cargo s $target
           done
 
           targets=(
