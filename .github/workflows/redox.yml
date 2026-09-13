@@ -67,7 +67,6 @@ jobs:
 
           if [[ "$OCI" == "true" ]]; then
             digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null);
-            echo "Redox: $digest"
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox"
           else
             file=relibc-install.tar.gz

@@ -81,7 +81,6 @@ jobs:
 
           if [[ "$OCI" == "true" ]]; then
             digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" 2>/dev/null);
-            echo "Unix: $digest"
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix"
             # oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
             # tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix
