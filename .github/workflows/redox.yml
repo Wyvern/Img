@@ -11,7 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   IMAGE: ghcr.io/${{ github.repository }}
-  OCI: "true"
+  OCI: "true "
 
 jobs:
   Linux:
@@ -69,40 +69,44 @@ jobs:
             cargo install --git https://gitlab.redox-os.org/redox-os/redoxer.git --locked redoxer -q --force
           fi
 
-          REDOXER_TOOLCHAIN="$HOME/.redoxer"
-          mkdir -p $REDOXER_TOOLCHAIN
-
-          if [[ "$OCI" == "true" ]]; then
-            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redoxer-toolchain" 2>/dev/null);
-            echo "Redoxer: $digest"
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "$REDOXER_TOOLCHAIN"
-            # oras pull --allow-path-traversal "${IMAGE}:redoxer-toolchain" -o /tmp/
-            # tar --zstd -xf /tmp/redoxer-toolchain.tar.zst -C "$REDOXER_TOOLCHAIN"
-          fi
-
+          file=relibc-install.tar.gz
+          url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
           targets=(
             aarch64-unknown-redox
             riscv64gc-unknown-redox
             x86_64-unknown-redox
           )
 
-          mv .cargo/config.toml .cargo/config.toml.bak
-          mv .cargo/redox.toml .cargo/config.toml
           for target in "${targets[@]}"; do
-            redoxer env TARGET="$target" REDOXER_USE_LTO=1 bash -c '
-            if [ ! "$OCI" == "true" ]; then
-              redoxer toolchain
-            fi
-            time redoxer build -- -q --profile src -Zbuild-std=std,panic_abort --target $TARGET
-            '
+            mkdir -p "redox/$target"
+            curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target"
           done
-          mv .cargo/config.toml .cargo/redox.toml
-          mv .cargo/config.toml.bak .cargo/config.toml
 
-          if [[ ! "$OCI" == "true" ]]; then
-            tar --zstd -C "$REDOXER_TOOLCHAIN" -cf /tmp/redoxer-toolchain.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:redoxer-toolchain" "/tmp/redoxer-toolchain.tar.zst:application/vnd.wyvern.redoxer-toolchain.tar.zstd"
+          if [[ "$OCI" == "true" ]]; then
+            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null);
+            echo "Redox: $digest"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox"
+          else
+            file=relibc-install.tar.gz
+            url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
+            for target in "${targets[@]}"; do
+              mkdir -p "redox/$target"
+              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target"
+            done
+            tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd"
           fi
+          exit
+
+          # mv .cargo/config.toml .cargo/config.toml.bak
+          # mv .cargo/redox.toml .cargo/config.toml
+
+          for target in "${targets[@]}"; do
+            time cargo s $target
+          done
+
+          # mv .cargo/config.toml .cargo/redox.toml
+          # mv .cargo/config.toml.bak .cargo/config.toml
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu

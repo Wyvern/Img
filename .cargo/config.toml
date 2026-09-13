@@ -645,11 +645,11 @@ linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
 
-# [target.x86_64-unknown-illumos]
-# linker = "./zig-cc.sh"
-# rustflags = [
-#   "-Clink-arg=--target=x86_64-illumos",
-#   "-Clink-arg=--sysroot=illumos/",
-#   "-Clink-arg=-Lillumos/usr/lib/amd64",
-#   "-Clink-arg=-Lillumos/lib/amd64",
-# ]
+[target.x86_64-unknown-redox]
+linker = "redox/x86_64-unknown-redox/bin/x86_64-unknown-redox-gcc"
+
+[target.riscv64gc-unknown-redox]
+linker = "redox/riscv64gc-unknown-redox/bin/riscv64-unknown-redox-gcc"
+
+[target.aarch64-unknown-redox]
+linker = "redox/aarch64-unknown-redox/bin/aarch64-unknown-redox-gcc"
