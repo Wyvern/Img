@@ -647,9 +647,12 @@ rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
 
 [target.x86_64-unknown-redox]
 linker = "redox/x86_64-unknown-redox/bin/x86_64-unknown-redox-gcc"
+rustflags = ["-Clink-arg=--sysroot=redox/x86_64-unknown-redox"]
 
 [target.riscv64gc-unknown-redox]
 linker = "redox/riscv64gc-unknown-redox/bin/riscv64-unknown-redox-gcc"
+rustflags = ["-Clink-arg=--sysroot=redox/riscv64gc-unknown-redox"]
 
 [target.aarch64-unknown-redox]
 linker = "redox/aarch64-unknown-redox/bin/aarch64-unknown-redox-gcc"
+rustflags = ["-Clink-arg=--sysroot=redox/aarch64-unknown-redox"]
