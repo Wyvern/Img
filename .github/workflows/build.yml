@@ -257,6 +257,9 @@ jobs:
     name: macOS-26
     runs-on: macos-26
 
+    env:
+      mingw: "20260908"
+
     steps:
       - name: Disable macos spotlight index
         run: |
@@ -286,14 +289,14 @@ jobs:
         uses: actions/cache@v6
         with:
           path: llvm-mingw
-          key: ${{ runner.os }}-llvm-mingw-${{ hashFiles('llvm-mingw/**') }}
-          restore-keys: ${{ runner.os }}-llvm-mingw-
+          key: ${{ runner.os }}-${{env.mingw}}
+          restore-keys: ${{ runner.os }}-llvm-${{env.mingw}}
 
       - name: llvm-mingw
         run: |
           if [ ! -d llvm-mingw ]; then
             mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/20251216/llvm-mingw-20251216-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
