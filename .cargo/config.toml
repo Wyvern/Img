@@ -315,7 +315,7 @@ rustflags = [
 ]
 
 [target.'cfg(target_arch="x86_64")']
-rustflags = ["-Ctarget-cpu=x86-64-v3", "-Ztune-cpu=x86-64-v3"]
+rustflags = ["-Ctarget-cpu=broadwell", "-Ztune-cpu=broadwell"]
 
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
