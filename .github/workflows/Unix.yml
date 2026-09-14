@@ -51,6 +51,34 @@ jobs:
           key: ppc-freebsd
           restore-keys: ppc-freebsd
 
+      - name: Clang/GCC sccache wrapper
+        run: |
+            mkdir -p "sccache-bin"
+
+            cat > "sccache-bin/clang" <<'EOF'
+            #!/bin/bash
+            exec sccache /usr/bin/clang "$@"
+            EOF
+
+            cat > "sccache-bin/clang++" <<'EOF'
+            #!/bin/bash
+            exec sccache /usr/bin/clang++ "$@"
+            EOF
+
+            cat > "sccache-bin/gcc" <<'EOF'
+            #!/bin/bash
+            exec sccache /usr/bin/gcc "$@"
+            EOF
+
+            cat > "sccache-bin/g++" <<'EOF'
+            #!/bin/bash
+            exec sccache /usr/bin/g++ "$@"
+            EOF
+
+            chmod +x sccache-bin/clang sccache-bin/clang++ sccache-bin/gcc sccache-bin/g++
+
+            echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
       - name: Install LLVM
         run: |
           if [ "$LLVM" = "23" ]; then
