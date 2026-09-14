@@ -43,6 +43,22 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
       - name: Checkout rust-cross-toolchain
         uses: actions/checkout@v7
         with:

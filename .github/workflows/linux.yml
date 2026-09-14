@@ -37,33 +37,21 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Clang/GCC sccache wrapper
+      - name: C/C++ sccache wrappers
         run: |
-            mkdir -p "sccache-bin"
+          set -euo pipefail
 
-            cat > "sccache-bin/clang" <<'EOF'
-            #!/bin/bash
-            exec sccache /usr/bin/clang "$@"
-            EOF
+          mkdir -p "sccache-bin"
 
-            cat > "sccache-bin/clang++" <<'EOF'
-            #!/bin/bash
-            exec sccache /usr/bin/clang++ "$@"
-            EOF
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
 
-            cat > "sccache-bin/gcc" <<'EOF'
-            #!/bin/bash
-            exec sccache /usr/bin/gcc "$@"
-            EOF
-
-            cat > "sccache-bin/g++" <<'EOF'
-            #!/bin/bash
-            exec sccache /usr/bin/g++ "$@"
-            EOF
-
-            chmod +x sccache-bin/clang sccache-bin/clang++ sccache-bin/gcc sccache-bin/g++
-
-            echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
       - name: Cache openwrt
         uses: actions/cache@v6

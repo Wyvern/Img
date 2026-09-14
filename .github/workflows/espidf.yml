@@ -42,6 +42,22 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
       - name: Install ESP-IDF tools
         run: |
           git clone -b v6.1 --recursive --depth=1 https://github.com/espressif/esp-idf.git espidf
