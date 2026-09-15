@@ -119,6 +119,16 @@ jobs:
             time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target
           done
 
+          config=".cargo/config.toml"
+          backup=".cargo/config.toml.bak"
+          cp $config $backup
+          sed -i \
+                -e '/^CFLAGS[[:space:]]*=/d' \
+                -e '/^CXXFLAGS[[:space:]]*=/d' \
+                -e '/^CPPFLAGS[[:space:]]*=/d' \
+                -e '/^LDFLAGS[[:space:]]*=/d' \
+                $config
+
           targets=(
             aarch64-unknown-hermit
             aarch64_be-unknown-hermit
@@ -129,6 +139,8 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
+
+          cp -f $backup $config
 
           time cargo s x86_64-fortanix-unknown-sgx
 
