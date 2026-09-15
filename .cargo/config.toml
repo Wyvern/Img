@@ -208,7 +208,7 @@ rustflags = [
 
   "-Zunstable-options",
   "-Zembed-metadata=no",
-  "-Zexport-executable-symbols",
+  # "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
   "-Ztrap-unreachable=no",
@@ -307,7 +307,6 @@ rustflags = [
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
-  "-Clink-arg=-Wl,--discard-all",
   "-Clinker-plugin-lto",
 ]
 
