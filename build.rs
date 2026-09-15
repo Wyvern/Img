@@ -8,8 +8,11 @@ fn main() {
     let output = "web.cbor";
     println!("cargo::rerun-if-changed={input}");
 
-    let target_env = std::env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default();
-    if target_env.starts_with("musl") {
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS");
+    let target_env = std::env::var("CARGO_CFG_TARGET_ENV");
+    let target_family = std::env::var("CARGO_CFG_TARGET_FAMILY");
+
+    if target_env.is_ok_and(|e| e.starts_with("musl")) {
         println!("cargo::rustc-link-lib=m");
     }
 
@@ -24,15 +27,13 @@ fn main() {
     let writer = BufWriter::new(cbor_file);
     cbor4ii::serde::to_writer(writer, &value).unwrap();
 
-    let family = std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap_or_default();
-    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
-    let mut cmd = match family.as_str() {
-        "windows" => {
+    let mut cmd = match target_family.as_deref() {
+        Ok("windows") => {
             let mut c = process::Command::new("tar");
             c.args(["-czf", "web.tar.gz", output]);
             c
         }
-        t if t.contains("unix") && target_os != "espidf" => {
+        Ok(t) if t.contains("unix") && target_os.as_deref() != Ok("espidf") => {
             let mut c = process::Command::new("gzip");
             c.args(["-kf", output]);
             c
