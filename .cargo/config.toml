@@ -35,6 +35,7 @@ RUSTC_ICE = "0"
 RUSTC_BOOTSTRAP = "1"
 CFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto=thin -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0", force = true }
 CXXFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto=thin -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0", force = true }
+CPPFLAGS = { value = "-DNDEBUG", force = true }
 
 [net]
 # offline = true
