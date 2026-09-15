@@ -33,10 +33,10 @@ RUST_LIB_BACKTRACE = "0"
 RUST_PANIC_STRATEGY = "abort"
 RUSTC_ICE = "0"
 RUSTC_BOOTSTRAP = "1"
-CFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0", force = true }
-CXXFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0", force = true }
-CPPFLAGS = { value = "-DNDEBUG", force = true }
-LDFLAGS = { value = "-flto -Wl,-O3 -Wl,--gc-sections", force = true }
+# CFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = true }
+# CXXFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = true }
+# CPPFLAGS = { value = "-DNDEBUG", force = true }
+# LDFLAGS = { value = "-flto -Wl,-O3 -Wl,--gc-sections", force = true }
 
 [net]
 # offline = true
