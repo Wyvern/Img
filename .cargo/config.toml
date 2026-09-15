@@ -308,8 +308,9 @@ rustflags = [
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
+  "-Clink-arg=-Wl,-S,-x",
+  "-Clink-arg=-Wl,-O3",
   "-Clink-arg=-Wl,-no_uuid",
-  "-Clink-arg=-Wl,-S",
   "-Clink-arg=-Wl,-dead_strip",
   "-Clink-arg=-Wl,-dead_strip_dylibs",
 ]
