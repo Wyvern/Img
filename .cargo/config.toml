@@ -33,10 +33,10 @@ RUST_LIB_BACKTRACE = "0"
 RUST_PANIC_STRATEGY = "abort"
 RUSTC_ICE = "0"
 RUSTC_BOOTSTRAP = "1"
-CFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = false }
-CXXFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = false }
+CFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = true }
+CXXFLAGS = { value = "-O3 -fno-exceptions -fno-rtti -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = true }
 CPPFLAGS = { value = "-DNDEBUG", force = true }
-LDFLAGS = { value = "-Wl,-O3 -Wl,--gc-sections", force = false }
+LDFLAGS = { value = "-Wl,-O3 -Wl,--gc-sections", force = true }
 
 [net]
 # offline = true
@@ -307,6 +307,7 @@ rustflags = [
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
+  "-Clink-arg=-Wl,--discard-all",
   "-Clinker-plugin-lto",
 ]
 
@@ -317,6 +318,7 @@ rustflags = [
   "-Clink-arg=-Wl,-no_uuid",
   "-Clink-arg=-Wl,-dead_strip",
   "-Clink-arg=-Wl,-dead_strip_dylibs",
+  "-Clink-arg=-Wl,-no_exported_symbols"
 ]
 
 [target.'cfg(target_arch="x86_64")']
