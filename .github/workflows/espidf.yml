@@ -60,7 +60,7 @@ jobs:
 
       - name: Install ESP-IDF tools
         run: |
-          git clone -b v6.1 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf
           cd espidf
           ./install.sh all
 
@@ -80,8 +80,6 @@ jobs:
 
           . espidf/export.sh
           # export MCU=ESP32-P4
-
-          idf.py -DCONFIG_LIBC_NEWLIB=y -DCONFIG_LIBC_PICOLIBC=n build
 
           targets=(
             riscv32imac-esp-espidf
