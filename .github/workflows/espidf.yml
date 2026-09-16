@@ -81,6 +81,16 @@ jobs:
           . espidf/export.sh
           # export MCU=ESP32-P4
 
+          find . \
+            -type f \
+            \( -name sdkconfig -o -name sdkconfig.defaults \) \
+            -print
+
+          cat > sdkconfig <<'EOF'
+          CONFIG_LIBC_NEWLIB=y
+          # CONFIG_LIBC_PICOLIBC is not set
+          EOF
+
           targets=(
             riscv32imac-esp-espidf
           )
