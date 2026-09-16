@@ -15,15 +15,15 @@ env:
 jobs:
   macOS:
     name: ESP-IDF
-    runs-on: macos-26
+    runs-on: ubuntu-26.04-arm
 
     steps:
-      - name: Disable macos spotlight index
-        run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
-          sudo pmset -a powernap 0
-          sudo pmset -a sleep 0
+      # - name: Disable macos spotlight index
+      #   run: |
+      #     sudo mdutil -a -i off
+      #     sudo mdutil -a -d
+      #     sudo pmset -a powernap 0
+      #     sudo pmset -a sleep 0
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -60,7 +60,7 @@ jobs:
 
       - name: Install ESP-IDF tools
         run: |
-          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          git clone -b v6.1 --depth=1 https://github.com/espressif/esp-idf.git espidf
           cd espidf
           ./install.sh all
 
@@ -93,12 +93,8 @@ jobs:
 
           find ./target -iname img -type f | xargs ls -hl
 
-          sw_vers
-          hostinfo
-          sysctl -n machdep.cpu.brand_string
-
-          # lscpu
-          # free -m
+          lscpu
+          free -m
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
@@ -121,34 +117,34 @@ jobs:
             riscv32imc-esp-espidf
           )
 
-          # For macOS shell
+          # For Linux shell
           for target in "${targets[@]}"; do
-              IFS='-' read -r arch vendor os abi <<< "$target"
-
-              first=$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')
-              rest=$(printf '%s' "$os" | cut -c2-)
-              os_cap="${first}${rest}"
-
-              if [[ -n "$abi" ]]; then
-                  name="${os_cap}-${arch}-${abi}"
-              else
-                  name="${os_cap}-${arch}"
-              fi
-
-              echo "Uploading $name..."
-              mv target/$target/src/{img,$name} || true
-              gh release upload Nightly "target/$target/src/$name" --clobber || true
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
           done
 
-          # For Linux shell
+          # For macOS shell
           # for target in "${targets[@]}"; do
-          #   IFS='-' read -r arch vendor os abi <<< "$target"
-          #   if [[ -n "$abi" ]]; then
-          #       name="${os^}-${arch}-${abi}"
-          #   else
-          #       name="${os^}-${arch}"
-          #   fi
-          #   echo "Uploading $name..."
-          #   mv target/$target/src/{img,$name} || true
-          #   gh release upload Nightly --clobber target/$target/src/$name || true
+          #     IFS='-' read -r arch vendor os abi <<< "$target"
+
+          #     first=$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')
+          #     rest=$(printf '%s' "$os" | cut -c2-)
+          #     os_cap="${first}${rest}"
+
+          #     if [[ -n "$abi" ]]; then
+          #         name="${os_cap}-${arch}-${abi}"
+          #     else
+          #         name="${os_cap}-${arch}"
+          #     fi
+
+          #     echo "Uploading $name..."
+          #     mv target/$target/src/{img,$name} || true
+          #     gh release upload Nightly "target/$target/src/$name" --clobber || true
           # done
