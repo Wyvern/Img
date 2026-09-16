@@ -14,16 +14,16 @@ env:
 
 jobs:
   macOS:
-    name: macOS-26
-    runs-on: macos-26
+    name: ESP-IDF
+    runs-on: ubuntu-26.04-arm
 
     steps:
-      - name: Disable macos spotlight index
-        run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
-          sudo pmset -a powernap 0
-          sudo pmset -a sleep 0
+      # - name: Disable macos spotlight index
+      #   run: |
+      #     sudo mdutil -a -i off
+      #     sudo mdutil -a -d
+      #     sudo pmset -a powernap 0
+      #     sudo pmset -a sleep 0
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -86,6 +86,7 @@ jobs:
           )
           # riscv32imafc-esp-espidf
           # riscv32imc-esp-espidf
+
           for target in ${targets[@]}; do
             time cargo s $target
           done
