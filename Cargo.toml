@@ -34,10 +34,10 @@ file-format = "*"
 libc = "*"
 
 [target.'cfg(target_os = "espidf")'.dependencies]
-esp-idf-sys = "*"
+esp-idf-sys = { git = "https://github.com/esp-rs/esp-idf-sys", branch = "master" }
 
 [target.'cfg(target_os = "espidf")'.build-dependencies]
-embuild = "*"
+embuild = { git = "https://github.com/esp-rs/embuild", branch = "master" }
 
 [target.'cfg(target_os = "hermit")'.dependencies]
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
