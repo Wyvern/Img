@@ -81,6 +81,12 @@ jobs:
           . espidf/export.sh
           # export MCU=ESP32-P4
 
+          grep -Rni --exclude-dir=target --exclude-dir=.git \
+              -- '-nodefaultlibs' \
+              .cargo Cargo.toml 2>/dev/null
+
+          env | grep -E '^(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|CFLAGS|CXXFLAGS|CPPFLAGS|LDFLAGS)='
+
           targets=(
             riscv32imac-esp-espidf
           )
