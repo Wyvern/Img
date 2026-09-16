@@ -149,6 +149,8 @@ jobs:
 
               if [[ -n "$abi" ]]; then
                   name="${os_cap}-${arch}-${abi}"
+              elif [[ "$vendor" == "apple" ]]; then
+                  name=Apple-${os}-${arch}
               else
                   name="${os_cap}-${arch}"
               fi
@@ -162,8 +164,8 @@ jobs:
               else
                   for f in "${src}".*; do
                       if [[ -f "$f" ]]; then
-                          src="$f"
                           ext=".${f##*.}"
+                          [[ "$ext" == ".d" ]] && continue
                           name="${name}${ext}"
                           echo "Uploading $name..."
                           mv target/$target/src/{img${ext},$name} || true

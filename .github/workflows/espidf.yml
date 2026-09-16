@@ -117,7 +117,6 @@ jobs:
             riscv32imc-esp-espidf
           )
 
-          # For Linux shell
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
             if [[ -n "$abi" ]]; then
