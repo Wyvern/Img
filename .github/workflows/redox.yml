@@ -179,6 +179,6 @@ jobs:
             done
           done
 
-          echo "Uploading wasm32-emscripten..."
-          tar -cJf wasm32-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js
-          gh release upload Nightly wasm32-emscripten.tar.xz --clobber
+          echo "Uploading Wasm32-emscripten..."
+          tar -cJf Wasm32-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js
+          gh release upload Nightly Wasm32-emscripten.tar.xz --clobber
