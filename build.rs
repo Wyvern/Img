@@ -15,6 +15,10 @@ fn main() {
     if target_env.is_ok_and(|e| e.starts_with("musl")) {
         println!("cargo::rustc-link-lib=m");
     }
+    if target_os.as_deref() == Ok("espidf") {
+        #[cfg(target_os = "espidf")]
+        embuild::espidf::sysenv::output();
+    }
 
     use fs::*;
     use io::*;

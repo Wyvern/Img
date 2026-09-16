@@ -92,9 +92,8 @@ jobs:
           done
 
           find ./target -iname img -type f | xargs ls -hl
-          sw_vers
-          hostinfo
-          sysctl -n machdep.cpu.brand_string
+          lscpu
+          free -m
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
