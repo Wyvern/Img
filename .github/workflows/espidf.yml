@@ -81,11 +81,7 @@ jobs:
           . espidf/export.sh
           # export MCU=ESP32-P4
 
-          cat > sdkconfig.defaults <<'EOF'
-          CONFIG_LIBC_NEWLIB=y
-          # CONFIG_LIBC_PICOLIBC is not set
-          EOF
-          export ESP_IDF_SDKCONFIG_DEFAULTS="sdkconfig.defaults"
+          idf.py -DCONFIG_LIBC_NEWLIB=y -DCONFIG_LIBC_PICOLIBC=n build
 
           targets=(
             riscv32imac-esp-espidf
