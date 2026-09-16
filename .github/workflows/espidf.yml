@@ -81,6 +81,16 @@ jobs:
           . espidf/export.sh
           # export MCU=ESP32-P4
 
+          config=".cargo/config.toml"
+          backup=".cargo/config.toml.bak"
+          cp $config $backup
+          sed -i \
+                -e '/^CFLAGS[[:space:]]*=/d' \
+                -e '/^CXXFLAGS[[:space:]]*=/d' \
+                -e '/^CPPFLAGS[[:space:]]*=/d' \
+                -e '/^LDFLAGS[[:space:]]*=/d' \
+                $config
+
           targets=(
             riscv32imac-esp-espidf
           )
@@ -90,6 +100,8 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
+
+          cp -f $backup $config
 
           find ./target -iname img -type f | xargs ls -hl
 
