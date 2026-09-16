@@ -262,6 +262,7 @@ rustflags = [
 
 [target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
 rustflags = [
+  "-Clink-arg=-Wl,-O3",
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,-z,norelro",
   "-Clink-arg=-Wl,--as-needed",
@@ -664,5 +665,5 @@ linker = "redox/aarch64-unknown-redox/bin/aarch64-unknown-redox-gcc"
 rustflags = ["-Clink-arg=--sysroot=redox/aarch64-unknown-redox"]
 
 [target.'cfg(target_os="espidf")']
-# linker = "ldproxy"
+linker = "ldproxy"
 rustflags = ["-Cdefault-linker-libraries=yes"]

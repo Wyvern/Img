@@ -83,10 +83,9 @@ jobs:
 
           targets=(
             riscv32imac-esp-espidf
-            riscv32imafc-esp-espidf
-            riscv32imc-esp-espidf
           )
-
+          # riscv32imafc-esp-espidf
+          # riscv32imc-esp-espidf
           for target in ${targets[@]}; do
             time cargo s $target
           done
