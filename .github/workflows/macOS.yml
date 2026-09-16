@@ -17,6 +17,10 @@ jobs:
     name: macOS-26
     runs-on: macos-26
 
+    permissions:
+      contents: write
+      packages: write
+
     steps:
       - name: Disable macos spotlight index
         run: |
@@ -150,6 +154,11 @@ jobs:
               if [[ -n "$abi" ]]; then
                   name="${os_cap}-${arch}-${abi}"
               elif [[ "$vendor" == "apple" ]]; then
+                  if [[ "$os" == "darwin" ]]; then
+                    os="macOS"
+                  elif [[ "$os" == *os ]]; then
+                    os="${os%os}OS"
+                  fi
                   name=Apple-${os}-${arch}
               else
                   name="${os_cap}-${arch}"
