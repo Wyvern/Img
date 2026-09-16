@@ -81,16 +81,6 @@ jobs:
           . espidf/export.sh
           # export MCU=ESP32-P4
 
-          config=".cargo/config.toml"
-          backup=".cargo/config.toml.bak"
-          cp $config $backup
-          sed -i \
-                -e '/^CFLAGS[[:space:]]*=/d' \
-                -e '/^CXXFLAGS[[:space:]]*=/d' \
-                -e '/^CPPFLAGS[[:space:]]*=/d' \
-                -e '/^LDFLAGS[[:space:]]*=/d' \
-                $config
-
           targets=(
             riscv32imac-esp-espidf
           )
@@ -100,8 +90,6 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
-
-          cp -f $backup $config
 
           find ./target -iname img -type f | xargs ls -hl
 
@@ -141,22 +129,3 @@ jobs:
             mv target/$target/src/{img,$name} || true
             gh release upload Nightly --clobber target/$target/src/$name || true
           done
-
-          # For macOS shell
-          # for target in "${targets[@]}"; do
-          #     IFS='-' read -r arch vendor os abi <<< "$target"
-
-          #     first=$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')
-          #     rest=$(printf '%s' "$os" | cut -c2-)
-          #     os_cap="${first}${rest}"
-
-          #     if [[ -n "$abi" ]]; then
-          #         name="${os_cap}-${arch}-${abi}"
-          #     else
-          #         name="${os_cap}-${arch}"
-          #     fi
-
-          #     echo "Uploading $name..."
-          #     mv target/$target/src/{img,$name} || true
-          #     gh release upload Nightly "target/$target/src/$name" --clobber || true
-          # done
