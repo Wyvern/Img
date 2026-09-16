@@ -665,5 +665,5 @@ linker = "redox/aarch64-unknown-redox/bin/aarch64-unknown-redox-gcc"
 rustflags = ["-Clink-arg=--sysroot=redox/aarch64-unknown-redox"]
 
 [target.'cfg(target_os="espidf")']
-# linker = "ldproxy"
+linker = "ldproxy"
 rustflags = ["-Cdefault-linker-libraries=yes"]
