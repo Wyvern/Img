@@ -81,14 +81,10 @@ jobs:
           . espidf/export.sh
           # export MCU=ESP32-P4
 
-          grep -Rni --exclude-dir=target --exclude-dir=.git \
-              -- '-nodefaultlibs' \
-              .cargo Cargo.toml 2>/dev/null
-
-          env | grep -E '^(RUSTFLAGS|CARGO_ENCODED_RUSTFLAGS|CFLAGS|CXXFLAGS|CPPFLAGS|LDFLAGS)='
-
           targets=(
             riscv32imac-esp-espidf
+            riscv32imafc-esp-espidf
+            riscv32imc-esp-espidf
           )
 
           for target in ${targets[@]}; do
@@ -116,17 +112,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-                  "riscv32imac-esp-espidf Espidf-riscv32imac"
+            riscv32imac-esp-espidf
+            riscv32imafc-esp-espidf
+            riscv32imc-esp-espidf
           )
 
           for target in "${targets[@]}"; do
-            read -r arch name <<< "$target"
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
             echo "Uploading $name..."
-            for f in img; do
-                if [ -f "target/$arch/src/$f" ]; then
-                  mv target/$arch/src/{$f,$name} || true
-                  gh release upload Nightly target/$arch/src/$name --clobber || true
-                  break
-                fi
-            done
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
           done
