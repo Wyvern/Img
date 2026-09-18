@@ -124,11 +124,11 @@ jobs:
           set +e -x
 
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
-          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
+          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc
 
           targets=(
-            powerpc64-unknown-linux-gnuelfv2
             powerpc64-unknown-linux-musl
+            powerpc64-unknown-linux-gnuelfv2
             powerpc64-unknown-linux-gnu
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
