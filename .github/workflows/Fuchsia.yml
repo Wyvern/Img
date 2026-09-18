@@ -1,0 +1,183 @@
+name: Hermit+Fuchsia
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+  LLVM: "23"
+  IMAGE: ghcr.io/${{ github.repository }}
+  OCI: "true"
+
+jobs:
+  Linux:
+    name: Hermit+Fuchsia
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install LLVM
+        run: |
+          if [ "$LLVM" = "23" ]; then
+              wget https://apt.llvm.org/llvm.sh
+              chmod +x llvm.sh
+              sudo ./llvm.sh $LLVM &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+          targets: x86_64-fortanix-unknown-sgx
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+          IMAGE="${IMAGE,,}"
+
+          mkdir -p /home/runner/Fuchsia;
+          ln -sf /home/runner/Fuchsia fuchsia
+
+          if [ "$OCI" == "true" ]; then
+            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia" 2>/dev/null);
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" &
+            # oras pull --allow-path-traversal "${IMAGE}:fuchsia" -o /tmp/
+            # tar --zstd -xf /tmp/Fuchsia.tar.zst -C /home/runner/Fuchsia
+          else
+            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
+            chmod +x cipd
+            sudo mv cipd /usr/local/bin/
+            mkdir -p /home/runner/Fuchsia
+            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
+            tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
+          fi
+
+          config=".cargo/config.toml"
+          backup=".cargo/config.toml.bak"
+          cp $config $backup
+          sed -i \
+                -e '/^CFLAGS[[:space:]]*=/d' \
+                -e '/^CXXFLAGS[[:space:]]*=/d' \
+                -e '/^CPPFLAGS[[:space:]]*=/d' \
+                -e '/^LDFLAGS[[:space:]]*=/d' \
+                $config
+
+          targets=(
+            aarch64-unknown-hermit
+            aarch64_be-unknown-hermit
+            riscv64gc-unknown-hermit
+            x86_64-unknown-hermit
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          cp -f $backup $config
+
+          time cargo s x86_64-fortanix-unknown-sgx
+
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
+
+          targets=(
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
+          )
+
+          for target in ${targets[@]}; do
+            time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            aarch64-unknown-hermit
+            aarch64_be-unknown-hermit
+            riscv64gc-unknown-hermit
+            x86_64-unknown-hermit
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
+            x86_64-fortanix-unknown-sgx
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$os" == "unknown" ]]; then
+                    name="${vendor^}-${abi}"
+                else
+                    name="${os^}-${arch}-${abi}"
+                fi
+            else
+                name="${os^}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly target/$target/src/$name --clobber || true
+          done
