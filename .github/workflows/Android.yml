@@ -67,12 +67,6 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          export ANDROID_NDK_HOME=~/android-ndk-$ndk
-          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
-
-          ln -sf $OHOS_SDK_NATIVE/llvm ohos
-          ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
-
           if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}" 2>/dev/null; then
             echo "Downloading & Extracting ${IMAGE}:android-ndk-${ndk}..."
             oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ~/
@@ -94,6 +88,12 @@ jobs:
         run: |
           cargo update
           set +e -x
+
+          export ANDROID_NDK_HOME="~/android-ndk-$ndk"
+          ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
+
+          ln -sf $OHOS_SDK_NATIVE/llvm ohos
+          ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           targets=(
             aarch64-unknown-linux-ohos

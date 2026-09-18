@@ -53,6 +53,9 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
+      - name: Ubuntu apt update and install
+        run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy &
+
       - name: Cache openwrt
         uses: actions/cache@v6
         with:
@@ -73,9 +76,6 @@ jobs:
           path: /home/runner/hexagon
           key: hexagon-${{env.hexagon}}
           restore-keys: hexagon-${{env.hexagon}}
-
-      - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy
 
       - name: Toolchain downloads
         run: |
