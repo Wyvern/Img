@@ -20,11 +20,11 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
       - name: Ubuntu apt update and install
         run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy &
+
+      - name: Checkout
+        uses: actions/checkout@v7
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
