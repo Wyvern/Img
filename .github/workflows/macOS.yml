@@ -82,7 +82,9 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          cargo s armv7k-apple-watchos
+          cargo s armv7s-apple-ios
+          exit
           targets=(
             aarch64-apple-ios
             arm64e-apple-ios
