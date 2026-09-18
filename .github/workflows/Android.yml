@@ -10,12 +10,17 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  IMAGE: ghcr.io/${{ github.repository }}
   ndk: "r30"
 
 jobs:
   Linux:
     name: Ubuntu-26.04
     runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout
@@ -51,33 +56,41 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      - name: Android NDK cache
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/android-ndk-${{env.ndk}}
-          key: android-ndk-${{env.ndk}}
-          restore-keys: android-ndk-${{env.ndk}}
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
 
-      - name: Setup OpenHarmony SDK
-        uses: openharmony-rs/setup-ohos-sdk@main
-        with:
-          version: "6.1"
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Android and OHOS NDK
         run: |
           export ANDROID_NDK_HOME=~/android-ndk-$ndk
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
 
-          if [ ! -d ~/android-ndk-${ndk} ]; then
-            mkdir -p ~/android-ndk-${ndk}
-            echo "Downloading Android NDK ${ndk} ..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
-            echo "Unzipping Android NDK ${ndk} ..."
-            unzip -q android-ndk-${ndk}-linux.zip -d ~/
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk${ndk}" 2>/dev/null); then
+            echo "Downloading & Extracting ${IMAGE}@${digest}..."
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "~/android-ndk-$ndk" &
+          else
+            echo "Downloading & UnZipping Android NDK ${ndk} ..."
+            curl -fsSL "https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip" | bsdtar -xf - -C ~/
+            [[ -d ~/android-ndk-$ndk ]] || exit 1
+            echo "Compressing android-ndk-$ndk folder..."
+            sudo tar --zstd -C ~/android-ndk-$ndk -cf /tmp/android-ndk${ndk}.tar.zst .
+            echo "Push android-ndk${ndk} to GHCR..."
+            oras push --disable-path-validation "${IMAGE}:android-ndk${ndk}" "/tmp/android-ndk${ndk}.tar.zst:application/vnd.wyvern.android.tar.zstd" &
+
+            # curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
+            # unzip -q android-ndk-${ndk}-linux.zip -d ~/
           fi
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
+
+      - name: Setup OpenHarmony SDK
+        uses: openharmony-rs/setup-ohos-sdk@main
+        with:
+          version: "6.1"
 
       - name: Build Release
         run: |

@@ -81,31 +81,31 @@ jobs:
         run: |
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
-            curl -LsSf https://downloads.openwrt.org/releases/${openwrt}/targets/octeon/generic/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt
+            curl -LsSf https://downloads.openwrt.org/releases/${openwrt}/targets/octeon/generic/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt &
           fi
           ln -sf /home/runner/openwrt/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
           if [ ! -d /home/runner/uclibc/armv7 ]; then
             mkdir -p /home/runner/uclibc/armv7
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/armv7
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/armv7 &
           fi
           ln -sf /home/runner/uclibc/armv7/armv7-eabihf--uclibc--bleeding-edge-${uclibc} armv7
 
           if [ ! -d /home/runner/uclibc/mips32el ]; then
             mkdir -p /home/runner/uclibc/mips32el
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32el/tarballs/mips32el--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32el
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32el/tarballs/mips32el--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32el &
           fi
           ln -sf /home/runner/uclibc/mips32el/mips32el--uclibc--bleeding-edge-${uclibc} mipsel
 
           if [ ! -d /home/runner/uclibc/mips32 ]; then
             mkdir -p /home/runner/uclibc/mips32
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32/tarballs/mips32--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32
+            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32/tarballs/mips32--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32 &
           fi
           ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${uclibc} mips
 
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon &
           fi
           ln -sf /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-ubuntu-22.04 hexagon
 
@@ -123,20 +123,20 @@ jobs:
           cargo update
           set +e -x
 
-          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc
-          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc
+          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
+          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
           targets=(
-            powerpc64-unknown-linux-gnu
-            powerpc64-unknown-linux-gnuelfv2
-            powerpc64-unknown-linux-musl
             powerpc-unknown-linux-gnu
             powerpc-unknown-linux-musl
-            hexagon-unknown-linux-musl
             mipsel-unknown-linux-musl
             mipsel-unknown-linux-gnu
             mips-unknown-linux-musl
             mips-unknown-linux-gnu
+            powerpc64-unknown-linux-gnu
+            powerpc64-unknown-linux-gnuelfv2
+            powerpc64-unknown-linux-musl
+            hexagon-unknown-linux-musl
             mips-unknown-linux-uclibc
             mipsel-unknown-linux-uclibc
             armv7-unknown-linux-uclibceabihf

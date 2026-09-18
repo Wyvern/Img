@@ -74,7 +74,7 @@ jobs:
         run: |
           if [ ! -d llvm-mingw ]; then
             mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1 &
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
@@ -84,8 +84,6 @@ jobs:
           set +e -x
 
           targets=(
-            aarch64-pc-windows-gnullvm
-            x86_64-pc-windows-gnullvm
             aarch64-apple-ios
             arm64e-apple-ios
             aarch64-apple-tvos
@@ -97,6 +95,8 @@ jobs:
             x86_64h-apple-darwin
             wasm32-wasip2
             wasm32-wasip3
+            aarch64-pc-windows-gnullvm
+            x86_64-pc-windows-gnullvm
           )
 
           for target in ${targets[@]}; do

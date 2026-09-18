@@ -166,7 +166,7 @@ jobs:
             chmod -R u+rwX sysroot
 
             tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd"
+            oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
           fi
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly

@@ -97,7 +97,8 @@ jobs:
 
           if [ "$OCI" == "true" ]; then
             digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia" 2>/dev/null);
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" &
+            oras_pid=$!
             # oras pull --allow-path-traversal "${IMAGE}:fuchsia" -o /tmp/
             # tar --zstd -xf /tmp/Fuchsia.tar.zst -C /home/runner/Fuchsia
           else
@@ -107,17 +108,8 @@ jobs:
             mkdir -p /home/runner/Fuchsia
             cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
             tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd"
+            oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
           fi
-
-          targets=(
-            aarch64-unknown-fuchsia
-            riscv64gc-unknown-fuchsia
-            x86_64-unknown-fuchsia
-          )
-          for target in ${targets[@]}; do
-            time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target
-          done
 
           config=".cargo/config.toml"
           backup=".cargo/config.toml.bak"
@@ -143,6 +135,16 @@ jobs:
           cp -f $backup $config
 
           time cargo s x86_64-fortanix-unknown-sgx
+
+          targets=(
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
+          )
+          wait $oras_pid
+          for target in ${targets[@]}; do
+            time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target
+          done
 
           targets=(
             x86_64-unknown-illumos

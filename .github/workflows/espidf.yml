@@ -28,6 +28,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Install ESP-IDF tools
+        run: |
+          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          cd espidf
+          ./install.sh all &
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -58,15 +64,9 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      - name: Install ESP-IDF tools
-        run: |
-          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf
-          cd espidf
-          ./install.sh all
-
       - name: Install ldproxy
         run: |
-          cargo install ldproxy -q
+          cargo install ldproxy -q &
 
       - name: Build Release
         run: |

@@ -57,7 +57,7 @@ jobs:
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
       - name: Ubuntu apt update and install
-        run: sudo apt install crosshurd libfuse3-dev -qy
+        run: sudo apt install crosshurd -qy &
 
       - name: setup-oras
         uses: oras-project/setup-oras@v2
@@ -66,14 +66,14 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build Redox
+      - name: Build Redox+Hurd+Motor+Xous
         continue-on-error: true
         run: |
           cargo update
           set +e -x
           IMAGE="${IMAGE,,}"
 
-          targets=(
+          redoxes=(
             aarch64-unknown-redox
             riscv64gc-unknown-redox
             x86_64-unknown-redox
@@ -83,19 +83,29 @@ jobs:
 
           if [[ "$OCI" == "true" ]]; then
             digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null);
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
           else
             file=relibc-install.tar.gz
             url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
-            for target in "${targets[@]}"; do
+            for target in "${redoxes[@]}"; do
               mkdir -p "redox/$target"
               curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target"
             done
             tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd"
+            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
           fi
 
-          for target in "${targets[@]}"; do
+          targets=(
+            x86_64-unknown-motor
+            riscv32imac-unknown-xous-elf
+            x86_64-unknown-hurd-gnu
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          for target in "${redoxes[@]}"; do
             time cargo s $target
           done
 
@@ -110,7 +120,7 @@ jobs:
           key: emscripten
           restore-keys: emscripten
 
-      - name: Build Hurd+Motor+Xous+Emscripten
+      - name: Build Emscripten
         run: |
           cargo update
           set +e -x
@@ -124,9 +134,6 @@ jobs:
 
           targets=(
             wasm32-unknown-emscripten
-            x86_64-unknown-motor
-            x86_64-unknown-hurd-gnu
-            riscv32imac-unknown-xous-elf
           )
 
           for target in ${targets[@]}; do
