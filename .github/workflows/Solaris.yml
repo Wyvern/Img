@@ -27,6 +27,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Install LLVM
+        run: |
+          if [ "$LLVM" = "23" ]; then
+              wget https://apt.llvm.org/llvm.sh
+              chmod +x llvm.sh
+              sudo ./llvm.sh $LLVM &
+          fi
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -66,18 +74,6 @@ jobs:
             sudo mv cross ~/.cargo/bin/
           fi
           cross --version
-
-      - name: Install LLVM
-        run: |
-          if [ "$LLVM" = "23" ]; then
-              wget https://apt.llvm.org/llvm.sh
-              chmod +x llvm.sh
-              sudo ./llvm.sh $LLVM
-          fi
-          for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
-          done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
 
       - name: setup-oras
         uses: oras-project/setup-oras@v2
@@ -135,6 +131,11 @@ jobs:
           cp -f $backup $config
 
           time cargo s x86_64-fortanix-unknown-sgx
+
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
 
           targets=(
             aarch64-unknown-fuchsia
