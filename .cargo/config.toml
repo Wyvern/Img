@@ -592,6 +592,14 @@ rustflags = ["-Clink-arg=--target=powerpc-openbsd"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64_be-linux-gnu"]
 
+[target.aarch64_be-unknown-linux-gnu_ilp32]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=aarch64_be-linux-ilp32"]
+
+[target.aarch64-unknown-linux-gnu_ilp32]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=aarch64-linux-ilp32"]
+
 [target.aarch64_be-unknown-linux-musl]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]

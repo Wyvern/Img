@@ -70,7 +70,9 @@ jobs:
 
           # hexagon-unknown-linux-musl
           # cargo s x86_64-unknown-illumos
-          # exit
+          cargo s aarch64_be-unknown-linux-gnu_ilp32
+          cargo s aarch64-unknown-linux-gnu_ilp32
+          exit
 
           targets=(
             aarch64_be-unknown-linux-gnu
