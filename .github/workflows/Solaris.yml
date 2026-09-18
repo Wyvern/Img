@@ -165,7 +165,7 @@ jobs:
 
           for target in ${solaris[@]}; do
             export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
-            docker pull CROSS_IMAGE &
+            docker pull $CROSS_IMAGE &
           done
 
           targets=(
