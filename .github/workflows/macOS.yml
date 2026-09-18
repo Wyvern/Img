@@ -82,14 +82,14 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s arm64_32-apple-watchos
-          exit
+
           targets=(
             aarch64-apple-ios
             arm64e-apple-ios
             aarch64-apple-tvos
             arm64e-apple-tvos
             aarch64-apple-watchos
+            arm64_32-apple-watchos
             aarch64-apple-visionos
             aarch64-apple-darwin
             arm64e-apple-darwin
@@ -135,6 +135,7 @@ jobs:
               aarch64-apple-tvos
               arm64e-apple-tvos
               aarch64-apple-watchos
+              arm64_32-apple-watchos
               aarch64-apple-visionos
               aarch64-pc-windows-gnullvm
               x86_64-pc-windows-gnullvm
