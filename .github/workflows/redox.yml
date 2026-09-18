@@ -66,14 +66,11 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build Redox+Hurd+Motor+Xous
-        continue-on-error: true
+      - name: Redox Cache
         run: |
-          cargo update
-          set +e -x
           IMAGE="${IMAGE,,}"
 
-          redoxes=(
+          targets=(
             aarch64-unknown-redox
             riscv64gc-unknown-redox
             x86_64-unknown-redox
@@ -87,31 +84,14 @@ jobs:
           else
             file=relibc-install.tar.gz
             url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
-            for target in "${redoxes[@]}"; do
+            for target in "${targets[@]}"; do
               mkdir -p "redox/$target"
-              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target"
+              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
             done
+            wait
             tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
           fi
-
-          targets=(
-            x86_64-unknown-motor
-            riscv32imac-unknown-xous-elf
-            x86_64-unknown-hurd-gnu
-          )
-
-          for target in ${targets[@]}; do
-            time cargo s $target
-          done
-
-          for target in "${redoxes[@]}"; do
-            time cargo s $target
-          done
-
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Emscripten Cache
         uses: actions/cache@v6
@@ -120,20 +100,27 @@ jobs:
           key: emscripten
           restore-keys: emscripten
 
-      - name: Build Emscripten
+      - name: Build Release
+        continue-on-error: true
         run: |
           cargo update
           set +e -x
 
           if [ ! -d emsdk ]; then
             git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
-            ./emsdk/emsdk install latest
-            ./emsdk/emsdk activate latest
+            ./emsdk/emsdk install latest > /dev/null
+            ./emsdk/emsdk activate latest > /dev/null
           fi
-          source ./emsdk/emsdk_env.sh > /dev/null
+          source ./emsdk/emsdk_env.sh > /dev/null &
 
           targets=(
+            x86_64-unknown-motor
+            riscv32imac-unknown-xous-elf
+            x86_64-unknown-hurd-gnu
             wasm32-unknown-emscripten
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+            x86_64-unknown-redox
           )
 
           for target in ${targets[@]}; do
