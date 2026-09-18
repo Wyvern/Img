@@ -83,11 +83,16 @@ jobs:
             for file in "${files[@]}"; do
                 path="/home/runner/yocto/$file"
                 if [[ ! -f "$path" ]]; then
-                    curl -LsSf "$url/$file" -o "$path"
-                    chmod +x "$path"
+                    curl -LsSf "$url/$file" -o "$path" &
                 fi
-                echo | "$path"
             done
+            wait
+            for file in "${files[@]}"; do
+                path="/home/runner/yocto/$file"
+                chmod +x "$path"
+                echo | "$path" &
+            done
+            wait
             rm -f /home/runner/yocto/*
             sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
             oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &

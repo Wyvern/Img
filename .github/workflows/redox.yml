@@ -111,7 +111,7 @@ jobs:
             ./emsdk/emsdk install latest > /dev/null
             ./emsdk/emsdk activate latest > /dev/null
           fi
-          source ./emsdk/emsdk_env.sh > /dev/null &
+          source ./emsdk/emsdk_env.sh
 
           targets=(
             x86_64-unknown-motor
