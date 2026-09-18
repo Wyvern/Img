@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Disable macos spotlight index
         run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
-          sudo pmset -a powernap 0
-          sudo pmset -a sleep 0
+          sudo mdutil -a -i off &
+          sudo mdutil -a -d &
+          sudo pmset -a powernap 0 &
+          sudo pmset -a sleep 0 &
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -82,9 +82,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s armv7k-apple-watchos
-          cargo s armv7s-apple-ios
-          exit
+
           targets=(
             aarch64-apple-ios
             arm64e-apple-ios
@@ -92,6 +90,7 @@ jobs:
             arm64e-apple-tvos
             aarch64-apple-watchos
             arm64_32-apple-watchos
+            armv7k-apple-watchos
             aarch64-apple-visionos
             aarch64-apple-darwin
             arm64e-apple-darwin
@@ -138,6 +137,7 @@ jobs:
               arm64e-apple-tvos
               aarch64-apple-watchos
               arm64_32-apple-watchos
+              armv7k-apple-watchos
               aarch64-apple-visionos
               aarch64-pc-windows-gnullvm
               x86_64-pc-windows-gnullvm
