@@ -65,7 +65,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null 2>&1; then
-              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &
+              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null &
           else
               # NetBSD base image required by docker/netbsd.Dockerfile
               docker buildx build \
@@ -92,11 +92,11 @@ jobs:
                 --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
                 --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
                 docker
-              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &
+              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null &
           fi
 
           if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" >/dev/null 2>&1; then
-              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &
+              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" >/dev/null &
           else
               # OpenBSD final image
               docker buildx build \
@@ -110,7 +110,7 @@ jobs:
                 --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
                 --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
                 docker
-              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &
+              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" >/dev/null &
           fi
 
       - name: Rust Toolchain
@@ -165,7 +165,7 @@ jobs:
 
           for target in ${solaris[@]}; do
             CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
-            docker pull $CROSS_IMAGE &
+            docker pull $CROSS_IMAGE >/dev/null &
           done
 
           targets=(
