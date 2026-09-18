@@ -64,6 +64,17 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
+          targets=(
+            x86_64-unknown-illumos
+            sparcv9-sun-solaris
+            x86_64-pc-solaris
+          )
+
+          for target in ${targets[@]}; do
+            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
+            docker pull $CROSS_IMAGE >/dev/null &
+          done
+
           if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null 2>&1; then
               docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null &
           else
@@ -157,27 +168,15 @@ jobs:
           cargo update
           set +e -x
 
-          solaris=(
+          targets=(
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
             x86_64-unknown-illumos
             sparcv9-sun-solaris
             x86_64-pc-solaris
           )
 
-          for target in ${solaris[@]}; do
-            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
-            docker pull $CROSS_IMAGE >/dev/null &
-          done
-
-          targets=(
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
-          )
-
           for target in ${targets[@]}; do
-            time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
-          done
-
-          for target in ${solaris[@]}; do
             time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
           done
 
