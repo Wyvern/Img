@@ -29,36 +29,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
-
       - name: Checkout rust-cross-toolchain
         uses: actions/checkout@v7
         with:
@@ -143,6 +113,36 @@ jobs:
               docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &
           fi
 
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
       - name: Cross-rs
         run: |
           # cargo install cross --git https://github.com/cross-rs/cross --branch main -q
@@ -164,7 +164,7 @@ jobs:
           )
 
           for target in ${solaris[@]}; do
-            export CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
+            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
             docker pull $CROSS_IMAGE &
           done
 
