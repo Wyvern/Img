@@ -132,9 +132,7 @@ jobs:
                   sleep 1
               done
           )
-          nix build -o sparc-gnu nixpkgs#pkgsCross.sparc-gnu.stdenv.cc
-          cargo s sparc-unknown-linux-gnu
-          exit
+
           targets=(
             powerpc-unknown-linux-gnu
             powerpc-unknown-linux-musl
