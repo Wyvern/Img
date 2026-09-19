@@ -28,7 +28,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy > /dev/null && touch ~/apt.finish &
+          sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy > /dev/null && touch ~/apt.finish &
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
@@ -141,6 +141,8 @@ jobs:
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
             powerpc64-unknown-linux-gnu
+            sparc64-unknown-linux-gnu
+            sparc-unknown-linux-gnu
             mipsel-unknown-linux-musl
             mipsel-unknown-linux-gnu
             mips-unknown-linux-musl
@@ -184,6 +186,8 @@ jobs:
                   mipsel-unknown-linux-gnu
                   mips-unknown-linux-gnu
                   armv7-unknown-linux-uclibceabihf
+                  sparc64-unknown-linux-gnu
+                  sparc-unknown-linux-gnu
                   powerpc64-unknown-linux-gnu
                   powerpc64-unknown-linux-gnuelfv2
                   powerpc64-unknown-linux-musl

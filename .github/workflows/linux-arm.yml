@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Ubuntu apt update and install
         run: |
-          sudo apt update --fix-missing && sudo apt install -q gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools -qy > /dev/null && touch ~/apt.finish &
+          sudo apt update --fix-missing && sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools -qy > /dev/null && touch ~/apt.finish &
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -80,8 +80,6 @@ jobs:
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
             riscv64a23-unknown-linux-gnu
-            sparc64-unknown-linux-gnu
-            sparc-unknown-linux-gnu
             mips64-unknown-linux-gnuabi64
             mips64-unknown-linux-muslabi64
             mips64el-unknown-linux-gnuabi64
@@ -130,8 +128,6 @@ jobs:
             x86_64-unknown-linux-gnux32
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
-            sparc64-unknown-linux-gnu
-            sparc-unknown-linux-gnu
             mips64-unknown-linux-gnuabi64
             mips64-unknown-linux-muslabi64
             mips64el-unknown-linux-gnuabi64
