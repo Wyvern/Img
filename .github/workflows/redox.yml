@@ -36,6 +36,21 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
+      - name: Emscripten Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten" 2>/dev/null); then
+            echo "Downloading & Extracting ${IMAGE}@${digest}..."
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" &
+          else
+            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
+            ./emsdk/emsdk install latest > /dev/null
+            ./emsdk/emsdk activate latest > /dev/null
+            tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
+          fi
+
       - name: Redox Cache
         run: |
           IMAGE="${IMAGE,,}"
@@ -61,21 +76,6 @@ jobs:
             wait
             tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
-          fi
-
-      - name: Emscripten Cache
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten" 2>/dev/null); then
-            echo "Downloading & Extracting ${IMAGE}@${digest}..."
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" &
-          else
-            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
-            ./emsdk/emsdk install latest > /dev/null
-            ./emsdk/emsdk activate latest > /dev/null
-            tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
           fi
 
       - name: Rust Toolchain

@@ -26,36 +26,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
-
       - name: setup-oras
         uses: oras-project/setup-oras@v2
 
@@ -97,6 +67,36 @@ jobs:
             sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
             oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
           fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
       - name: Build Release
         run: |
