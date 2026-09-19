@@ -11,7 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   IMAGE: ghcr.io/${{ github.repository }}
-  OCI: "true"
+
 
 jobs:
   Linux:
@@ -25,6 +25,58 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Ubuntu apt update and install
+        run: sudo apt install crosshurd -qy > /dev/null &
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Redox Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          targets=(
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+            x86_64-unknown-redox
+          )
+
+          mkdir -p "redox"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null); then
+            echo "Downloading & Extracting ${IMAGE}@${digest}..."
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
+          else
+            file=relibc-install.tar.gz
+            url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
+            for target in "${targets[@]}"; do
+              mkdir -p "redox/$target"
+              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
+            done
+            wait
+            tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
+          fi
+
+      - name: Emscripten Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten" 2>/dev/null); then
+            echo "Downloading & Extracting ${IMAGE}@${digest}..."
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" &
+          else
+            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
+            ./emsdk/emsdk install latest > /dev/null
+            ./emsdk/emsdk activate latest > /dev/null
+            tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
+          fi
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -56,61 +108,12 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      - name: Ubuntu apt update and install
-        run: sudo apt install crosshurd -qy &
-
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-      - name: Redox Cache
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          targets=(
-            aarch64-unknown-redox
-            riscv64gc-unknown-redox
-            x86_64-unknown-redox
-          )
-
-          mkdir -p "redox"
-
-          if [[ "$OCI" == "true" ]]; then
-            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null);
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
-          else
-            file=relibc-install.tar.gz
-            url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
-            for target in "${targets[@]}"; do
-              mkdir -p "redox/$target"
-              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
-            done
-            wait
-            tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
-          fi
-
-      - name: Emscripten Cache
-        uses: actions/cache@v6
-        with:
-          path: emsdk/
-          key: emscripten
-          restore-keys: emscripten
-
       - name: Build Release
         continue-on-error: true
         run: |
           cargo update
           set +e -x
 
-          if [ ! -d emsdk ]; then
-            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
-            ./emsdk/emsdk install latest > /dev/null
-            ./emsdk/emsdk activate latest > /dev/null
-          fi
           source ./emsdk/emsdk_env.sh
 
           targets=(

@@ -32,7 +32,7 @@ jobs:
           if [ "$LLVM" = "23" ]; then
               wget https://apt.llvm.org/llvm.sh
               chmod +x llvm.sh
-              sudo ./llvm.sh $LLVM &
+              sudo ./llvm.sh $LLVM > /dev/null &
           fi
 
       - name: Rust Toolchain
