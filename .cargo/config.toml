@@ -656,6 +656,9 @@ linker = "ppc64-gnu/bin/powerpc64-unknown-linux-gnuabielfv2-gcc"
 [target.powerpc64-unknown-linux-musl]
 linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
 
+[target.sparc-unknown-linux-gnu]
+linker = "sparc-gnu/bin/sparc-unknown-linux-gnu-gcc"
+
 [target.armeb-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
