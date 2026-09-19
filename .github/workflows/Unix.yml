@@ -14,7 +14,6 @@ env:
   FREEBSD: "15.1"
   OPENBSD: "7.9"
   NETBSD: "11.0"
-  OCI: "true"
   LLVM: "23"
 
 jobs:
@@ -37,6 +36,93 @@ jobs:
               chmod +x llvm.sh
               sudo ./llvm.sh $LLVM &
           fi
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Unix sysroot cache
+        run: |
+            IMAGE="${IMAGE,,}"
+
+            mkdir -p /home/runner/unix;
+            ln -sf /home/runner/unix sysroot
+
+            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" 2>/dev/null); then
+              oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.sysroot &
+              # oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
+              # tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix
+            else
+              freebsd=(amd64 arm64 riscv)
+              for arch in "${freebsd[@]}"; do
+                if [ ! -d sysroot/freebsd/$arch ]; then
+                    mkdir -p sysroot/freebsd/$arch
+                    curl -fsSL https://download.freebsd.org/ftp/releases/$arch/${FREEBSD}-RELEASE/base.txz \
+                | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
+                fi
+              done
+
+              if [ ! -d sysroot/freebsd/powerpc ]; then
+                mkdir -p sysroot/freebsd/powerpc
+                curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
+              fi
+
+              ppc=(powerpc64 powerpc64le)
+              for arch in "${ppc[@]}"; do
+                if [ ! -d sysroot/freebsd/$arch ]; then
+                  mkdir -p sysroot/freebsd/$arch
+                  curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/${FREEBSD}-RELEASE/base.txz \
+                    | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
+                fi
+              done
+
+              openbsd=(amd64 arm64 riscv64 powerpc64)
+              files=(base79 comp79)
+              for arch in "${openbsd[@]}"; do
+                if [ ! -d sysroot/openbsd/$arch ]; then
+                  mkdir -p sysroot/openbsd/$arch
+                  for file in "${files[@]}"; do
+                    curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$OPENBSD/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
+                  done
+                fi
+              done
+
+              netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
+              files=(base comp etc)
+              for arch in "${netbsd[@]}"; do
+                if [ ! -d sysroot/netbsd/$arch ]; then
+                  mkdir -p sysroot/netbsd/$arch
+                  for file in "${files[@]}"; do
+                    for ext in tar.xz tgz; do
+                            url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${NETBSD}/$arch/binary/sets/$file.$ext"
+                            out="sysroot/netbsd/$arch"
+                            if curl -fsSI "$url" &>/dev/null; then
+                                echo "→ Fetching $file.$ext"
+                                if [ "$ext" = "tar.xz" ]; then
+                                    curl -fsSL "$url" | tar -xJf - -C "$out" 2>/dev/null &
+                                else
+                                    curl -fsSL "$url" | tar -xzf - -C "$out" 2>/dev/null &
+                                fi
+                            fi
+                        done
+                  done
+                fi
+              done
+
+              if [ ! -f sysroot/dfly-x86_64-6.4.2_REL.iso ]; then
+                curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-6.4.2_REL.iso &
+                mkdir -p sysroot/dfly
+              fi
+
+              wait
+              chmod -R u+rwX sysroot
+
+              tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
+              oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
+            fi
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -75,97 +161,19 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
-
       - name: Build Release
         run: |
           cargo update
           set +e -x
-          IMAGE="${IMAGE,,}"
 
-          mkdir -p /home/runner/unix;
-          ln -sf /home/runner/unix sysroot
+          (
+              set +x
+              while [[ ! -f ~/unix.sysroot ]]; do
+                  sleep 1
+              done
+          )
 
-          if [[ "$OCI" == "true" ]]; then
-            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" 2>/dev/null);
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix"
-            # oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
-            # tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix
-          else
-            freebsd=(amd64 arm64 riscv)
-            for arch in "${freebsd[@]}"; do
-              if [ ! -d sysroot/freebsd/$arch ]; then
-                  mkdir -p sysroot/freebsd/$arch
-                  curl -fsSL https://download.freebsd.org/ftp/releases/$arch/${FREEBSD}-RELEASE/base.txz \
-              | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
-              fi
-            done
-
-            if [ ! -d sysroot/freebsd/powerpc ]; then
-              mkdir -p sysroot/freebsd/powerpc
-              curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
-            fi
-
-            ppc=(powerpc64 powerpc64le)
-            for arch in "${ppc[@]}"; do
-              if [ ! -d sysroot/freebsd/$arch ]; then
-                mkdir -p sysroot/freebsd/$arch
-                curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/${FREEBSD}-RELEASE/base.txz \
-                  | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
-              fi
-            done
-
-            openbsd=(amd64 arm64 riscv64 powerpc64)
-            files=(base79 comp79)
-            for arch in "${openbsd[@]}"; do
-              if [ ! -d sysroot/openbsd/$arch ]; then
-                mkdir -p sysroot/openbsd/$arch
-                for file in "${files[@]}"; do
-                  curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$OPENBSD/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
-                done
-              fi
-            done
-
-            netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
-            files=(base comp etc)
-            for arch in "${netbsd[@]}"; do
-              if [ ! -d sysroot/netbsd/$arch ]; then
-                mkdir -p sysroot/netbsd/$arch
-                for file in "${files[@]}"; do
-                  for ext in tar.xz tgz; do
-                          url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${NETBSD}/$arch/binary/sets/$file.$ext"
-                          out="sysroot/netbsd/$arch"
-                          if curl -fsSI "$url" &>/dev/null; then
-                              echo "→ Fetching $file.$ext"
-                              if [ "$ext" = "tar.xz" ]; then
-                                  curl -fsSL "$url" | tar -xJf - -C "$out" 2>/dev/null &
-                              else
-                                  curl -fsSL "$url" | tar -xzf - -C "$out" 2>/dev/null &
-                              fi
-                          fi
-                      done
-                done
-              fi
-            done
-
-            if [ ! -f sysroot/dfly-x86_64-6.4.2_REL.iso ]; then
-              curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-6.4.2_REL.iso &
-              mkdir -p sysroot/dfly
-            fi
-
-            wait
-            chmod -R u+rwX sysroot
-
-            tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
-          fi
-
-          sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly
+          sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly &
 
           for x in clang clang++ lld; do
             sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200

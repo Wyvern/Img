@@ -20,11 +20,14 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy > /dev/null &
-
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Ubuntu apt update and install
+        run: |
+          sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy > /dev/null && touch ~/apt.finish &
+          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
+          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -123,17 +126,21 @@ jobs:
           cargo update
           set +e -x
 
-          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
-          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc
+          (
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          )
 
           targets=(
+            powerpc-unknown-linux-gnu
+            powerpc-unknown-linux-musl
+            powerpc64le-unknown-linux-gnu
+            powerpc64le-unknown-linux-musl
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
             powerpc64-unknown-linux-gnu
-            powerpc64le-unknown-linux-gnu
-            powerpc64le-unknown-linux-musl
-            powerpc-unknown-linux-gnu
-            powerpc-unknown-linux-musl
             mipsel-unknown-linux-musl
             mipsel-unknown-linux-gnu
             mips-unknown-linux-musl
