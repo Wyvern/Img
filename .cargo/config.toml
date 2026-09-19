@@ -357,7 +357,7 @@ linker = "powerpc-linux-gnu-gcc"
 [target.'cfg(all(target_arch="riscv64",target_os="linux"))']
 linker = "riscv64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="sparc64",target_os="linux"))']
+[target.'cfg(all(any(target_arch="sparc64",target_arch="sparc"),target_os="linux"))']
 linker = "sparc64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="loongarch64",target_os="linux",not(target_env="ohos")))']
@@ -655,10 +655,6 @@ linker = "ppc64-gnu/bin/powerpc64-unknown-linux-gnuabielfv2-gcc"
 
 [target.powerpc64-unknown-linux-musl]
 linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
-
-[target.sparc-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=sparc-linux-gnu"]
 
 [target.armeb-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"
