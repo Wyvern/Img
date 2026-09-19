@@ -47,7 +47,7 @@ jobs:
           mkdir -p "/opt/poky/$YOCTO"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}" 2>/dev/null); then
             echo "Downloading & Extracting ${IMAGE}@${digest}..."
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO"
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO" && touch ~/finish.yocto &
           else
             mkdir -p /home/runner/yocto
             for file in "${files[@]}"; do
@@ -112,6 +112,10 @@ jobs:
 
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
+
+          while [[ ! -f ~/finish.yocto ]]; do
+              sleep 1
+          done
 
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"

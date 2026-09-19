@@ -41,6 +41,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten" 2>/dev/null); then
+            mkdir -p emsdk
             echo "Downloading & Extracting ${IMAGE}@${digest}..."
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" &
           else
