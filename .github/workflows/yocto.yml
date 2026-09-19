@@ -113,9 +113,12 @@ jobs:
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
 
-          while [[ ! -f ~/finish.yocto ]]; do
-              sleep 1 > /dev/null
-          done
+          (
+              set +x
+              while [[ ! -f ~/finish.yocto ]]; do
+                  sleep 1
+              done
+          )
 
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
