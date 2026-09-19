@@ -68,8 +68,7 @@ jobs:
                   sleep 1
               done
           )
-          cargo s sparc-unknown-linux-gnu
-          exit
+
           targets=(
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
@@ -82,6 +81,7 @@ jobs:
             riscv64gc-unknown-linux-musl
             riscv64a23-unknown-linux-gnu
             sparc64-unknown-linux-gnu
+            sparc-unknown-linux-gnu
             mips64-unknown-linux-gnuabi64
             mips64-unknown-linux-muslabi64
             mips64el-unknown-linux-gnuabi64
