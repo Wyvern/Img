@@ -114,7 +114,7 @@ jobs:
           ln -s $sdk/sysroots sysroots
 
           while [[ ! -f ~/finish.yocto ]]; do
-              sleep 1
+              sleep 1 > /dev/null
           done
 
           for entry in "${targets[@]}"; do
