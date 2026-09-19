@@ -23,6 +23,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Nix Quick Install
+        uses: nixbuild/nix-quick-install-action@v35
+
       - name: Ubuntu apt update and install
         run: |
           sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools libc++1 libc++abi1 -qy > /dev/null && touch ~/apt.finish &
@@ -117,9 +120,6 @@ jobs:
 
       # - name: Install Nix
       #   uses: cachix/install-nix-action@31
-
-      - name: Nix Quick Install
-        uses: nixbuild/nix-quick-install-action@v35
 
       - name: Build Release
         run: |
