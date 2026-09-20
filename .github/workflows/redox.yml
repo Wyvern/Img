@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Ubuntu apt update and install
-        run: sudo apt install crosshurd -qy &
+        run: sudo apt install crosshurd -qy > /dev/null &
 
       - name: setup-oras
         uses: oras-project/setup-oras@v2
@@ -42,7 +42,6 @@ jobs:
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten" 2>/dev/null); then
             mkdir -p emsdk
-            echo "Downloading & Extracting ${IMAGE}@${digest}..."
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" &
           else
             git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
@@ -65,7 +64,6 @@ jobs:
           mkdir -p "redox"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null); then
-            echo "Downloading & Extracting ${IMAGE}@${digest}..."
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
           else
             file=relibc-install.tar.gz
