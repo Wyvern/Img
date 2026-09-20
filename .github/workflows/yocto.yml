@@ -45,7 +45,7 @@ jobs:
           )
           set -o pipefail
           mkdir -p "/opt/poky/$YOCTO"
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}" 2>/dev/null); then
+          (if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}" 2>/dev/null); then
             echo "Downloading & Extracting ${IMAGE}@${digest}..."
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO" && touch ~/finish.yocto &
           else
@@ -66,7 +66,7 @@ jobs:
             rm -f /home/runner/yocto/*
             sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
             oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
-          fi
+          fi) &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly

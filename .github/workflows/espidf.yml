@@ -30,9 +30,9 @@ jobs:
 
       - name: Install ESP-IDF tools
         run: |
-          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          (git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf
           cd espidf
-          ./install.sh all &
+          ./install.sh all) &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly

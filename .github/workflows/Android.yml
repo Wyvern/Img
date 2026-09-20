@@ -67,7 +67,7 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}" >/dev/null 2>&1; then
+          (if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}" >/dev/null 2>&1; then
             oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ./
             unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
           else
@@ -76,7 +76,7 @@ jobs:
             unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
             echo "Push android-ndk-${ndk}-linux.zip to GHCR..."
             oras push --disable-path-validation "${IMAGE}:android-ndk-${ndk}" "android-ndk-${ndk}-linux.zip:application/zip" &
-          fi
+          fi) &
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
