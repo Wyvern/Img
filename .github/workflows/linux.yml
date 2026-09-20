@@ -47,10 +47,11 @@ jobs:
       - name: Cache uclibc
         run: |
           IMAGE="${IMAGE,,}"
+          path=/home/runner/uclibc
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}" 2>/dev/null); then
-            mkdir -p ~/uclibc
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "~/uclibc" &
+            mkdir -p $path
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
           else
             for target in armv7-eabihf mips32el mips32; do
                 case "$target" in
@@ -68,19 +69,19 @@ jobs:
                         ;;
                 esac
 
-                if [ ! -d "/home/runner/uclibc/$dir" ]; then
-                    mkdir -p "/home/runner/uclibc/$dir"
+                if [ ! -d "$path/$dir" ]; then
+                    mkdir -p "$path/$dir"
                     curl -LsSf \
                       "https://toolchains.bootlin.com/downloads/releases/toolchains/$target/tarballs/${target}--uclibc--bleeding-edge-${uclibc}.tar.xz" |
-                      tar -xJ -C "/home/runner/uclibc/$dir" &
+                      tar -xJ -C "$path/$dir" &
                 fi
 
-                ln -sfn "/home/runner/uclibc/$dir/${target}--uclibc--bleeding-edge-${uclibc}" "$link"
+                ln -sfn "$path/$dir/${target}--uclibc--bleeding-edge-${uclibc}" "$link"
             done
 
             wait
 
-            tar --zstd -C /home/runner/uclibc/ -cf /tmp/uclibc-${uclibc}.tar.zst .
+            tar --zstd -C $path -cf /tmp/uclibc-${uclibc}.tar.zst .
             oras push --disable-path-validation "${IMAGE}:uclibc-${uclibc}" "/tmp/uclibc-${uclibc}.tar.zst:application/vnd.wyvern.uclibc.tar.zstd" &
           fi
 
