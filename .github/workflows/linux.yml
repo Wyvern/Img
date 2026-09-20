@@ -50,7 +50,6 @@ jobs:
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}" 2>/dev/null); then
             mkdir -p ~/uclibc
-            echo "Downloading & Extracting ${IMAGE}@${digest}..."
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "~/uclibc" &
           else
             for target in armv7-eabihf mips32el mips32; do
