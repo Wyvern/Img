@@ -10,6 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
+  IMAGE: ghcr.io/${{ github.repository }}
   openwrt: "25.12.5"
   uclibc: "2026.08-1"
   hexagon: "22.1.8"
@@ -18,6 +19,10 @@ jobs:
   Linux:
     name: Ubuntu-24.04
     runs-on: ubuntu-24.04
+
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout
@@ -31,6 +36,55 @@ jobs:
           sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy > /dev/null && touch ~/apt.finish &
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Cache uclibc
+        uses: actions/cache@v6
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}" 2>/dev/null); then
+            mkdir -p ~/uclibc
+            echo "Downloading & Extracting ${IMAGE}@${digest}..."
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "~/uclibc" &
+          else
+            for target in armv7-eabihf mips32el mips32; do
+                case "$target" in
+                    armv7-eabihf)
+                        dir=armv7
+                        link=armv7
+                        ;;
+                    mips32el)
+                        dir=mips32el
+                        link=mipsel
+                        ;;
+                    mips32)
+                        dir=mips32
+                        link=mips
+                        ;;
+                esac
+
+                if [ ! -d "/home/runner/uclibc/$dir" ]; then
+                    mkdir -p "/home/runner/uclibc/$dir"
+                    curl -LsSf \
+                      "https://toolchains.bootlin.com/downloads/releases/toolchains/$target/tarballs/${target}--uclibc--bleeding-edge-${uclibc}.tar.xz" |
+                      tar -xJ -C "/home/runner/uclibc/$dir" &
+                fi
+
+                ln -sfn "/home/runner/uclibc/$dir/${target}--uclibc--bleeding-edge-${uclibc}" "$link"
+            done
+
+            wait
+
+            tar --zstd -C /home/runner/uclibc/ -cf /tmp/uclibc-${uclibc}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:uclibc-${uclibc}" "/tmp/uclibc-${uclibc}.tar.zst:application/vnd.wyvern.uclibc.tar.zstd" &
+          fi
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -69,13 +123,6 @@ jobs:
           key: openwrt-${{env.openwrt}}
           restore-keys: openwrt-${{env.openwrt}}
 
-      - name: Cache uclibc
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/uclibc
-          key: uclibc-${{env.uclibc}}
-          restore-keys: uclibc-${{env.uclibc}}
-
       - name: Cache hexagon
         uses: actions/cache@v6
         with:
@@ -90,24 +137,6 @@ jobs:
             curl -LsSf https://downloads.openwrt.org/releases/${openwrt}/targets/octeon/generic/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt &
           fi
           ln -sf /home/runner/openwrt/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
-
-          if [ ! -d /home/runner/uclibc/armv7 ]; then
-            mkdir -p /home/runner/uclibc/armv7
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/armv7-eabihf/tarballs/armv7-eabihf--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/armv7 &
-          fi
-          ln -sf /home/runner/uclibc/armv7/armv7-eabihf--uclibc--bleeding-edge-${uclibc} armv7
-
-          if [ ! -d /home/runner/uclibc/mips32el ]; then
-            mkdir -p /home/runner/uclibc/mips32el
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32el/tarballs/mips32el--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32el &
-          fi
-          ln -sf /home/runner/uclibc/mips32el/mips32el--uclibc--bleeding-edge-${uclibc} mipsel
-
-          if [ ! -d /home/runner/uclibc/mips32 ]; then
-            mkdir -p /home/runner/uclibc/mips32
-            curl -LsSf https://toolchains.bootlin.com/downloads/releases/toolchains/mips32/tarballs/mips32--uclibc--bleeding-edge-${uclibc}.tar.xz | tar -xJ -C /home/runner/uclibc/mips32 &
-          fi
-          ln -sf /home/runner/uclibc/mips32/mips32--uclibc--bleeding-edge-${uclibc} mips
 
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
@@ -125,8 +154,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s armv7-unknown-linux-uclibceabi
-          exit
+
           targets=(
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
@@ -157,6 +185,7 @@ jobs:
             hexagon-unknown-linux-musl
             mips-unknown-linux-uclibc
             mipsel-unknown-linux-uclibc
+            armv7-unknown-linux-uclibceabi
             armv7-unknown-linux-uclibceabihf
             mips64-openwrt-linux-musl
           )
@@ -192,9 +221,10 @@ jobs:
                   mips-unknown-linux-musl
                   mipsel-unknown-linux-gnu
                   mips-unknown-linux-gnu
-                  armv7-unknown-linux-uclibceabihf
                   sparc64-unknown-linux-gnu
                   sparc-unknown-linux-gnu
+                  armv7-unknown-linux-uclibceabi
+                  armv7-unknown-linux-uclibceabihf
                   powerpc64-unknown-linux-gnu
                   powerpc64-unknown-linux-gnuelfv2
                   powerpc64-unknown-linux-musl

@@ -615,7 +615,6 @@ linker = "sparc64-unknown-netbsd-gcc"
 linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
 rustflags = [
   "-Clink-arg=--sysroot=armv7/arm-buildroot-linux-uclibcgnueabihf/sysroot",
-  # "-Ctarget-feature=-soft-float"
 ]
 
 [target.armv7-unknown-linux-uclibceabihf]
