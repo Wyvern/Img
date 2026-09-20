@@ -26,6 +26,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Android and OHOS NDK
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}" > /dev/null 2>&1; then
+            oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ./ && unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
+          else
+            echo "Downloading & UnZipping Android NDK ${ndk} ..."
+            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
+            unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
+            echo "Push android-ndk-${ndk}-linux.zip to GHCR..."
+            oras push --disable-path-validation "${IMAGE}:android-ndk-${ndk}" "android-ndk-${ndk}-linux.zip:application/zip" &
+          fi
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -55,27 +76,6 @@ jobs:
           done
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
-
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-      - name: Android and OHOS NDK
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}" > /dev/null 2>&1; then
-            oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ./ && unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
-          else
-            echo "Downloading & UnZipping Android NDK ${ndk} ..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
-            unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
-            echo "Push android-ndk-${ndk}-linux.zip to GHCR..."
-            oras push --disable-path-validation "${IMAGE}:android-ndk-${ndk}" "android-ndk-${ndk}-linux.zip:application/zip" &
-          fi
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
