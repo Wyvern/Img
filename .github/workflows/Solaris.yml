@@ -75,7 +75,7 @@ jobs:
             docker pull $CROSS_IMAGE >/dev/null &
           done
 
-          (if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null 2>&1; then
+          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null 2>&1; then
               docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" >/dev/null &
           else
               # NetBSD base image required by docker/netbsd.Dockerfile
@@ -122,7 +122,7 @@ jobs:
                 --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
                 docker
               docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" >/dev/null &
-          fi) &
+          fi
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly

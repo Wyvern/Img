@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Ubuntu apt update and install
         run: |
-          (sudo apt update --fix-missing -q && sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools -qy && touch ~/apt.finish) &
+          sudo apt update --fix-missing -q > /dev/null && sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools -qy > /dev/null && touch ~/apt.finish &
 
       - name: Checkout
         uses: actions/checkout@v7
