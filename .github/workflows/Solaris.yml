@@ -106,7 +106,7 @@ jobs:
               docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
           fi
 
-          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" >/dev/null 2>&1; then
+          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null; then
               docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
           else
               # OpenBSD final image
