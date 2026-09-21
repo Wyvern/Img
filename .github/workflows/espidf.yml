@@ -76,23 +76,10 @@ jobs:
           cargo update
           set +e -x
 
-          # curl -fsSL https://github.com/esp-rs/espup/releases/download/v0.17.1/espup-aarch64-apple-darwin -o ./espup
-          # chmod +x ./espup
-          # ./espup install
-          # . ~/export-esp.sh
-
           time {
           espidf/install.sh all
           . espidf/export.sh
           } &>/dev/null
-
-          config=.cargo/config.toml
-          backup=.cargo/config.toml.bak
-          mv $config $backup
-          cp .cargo/espidf.toml $config
-          cargo +esp s xtensa-esp32-espidf
-          mv $backup $config
-          exit
 
           targets=(
             riscv32imac-esp-espidf
@@ -104,6 +91,11 @@ jobs:
             time cargo s $target
           done
 
+          config=.cargo/config.toml
+          backup=.cargo/config.toml.bak
+          mv $config $backup
+          cp .cargo/espidf.toml $config
+
           targets=(
             xtensa-esp32-espidf
             xtensa-esp32s2-espidf
@@ -113,6 +105,8 @@ jobs:
           for target in ${targets[@]}; do
             time cargo +esp s $target
           done
+
+           mv $backup $config
 
           find ./target -iname img -type f | xargs ls -hl
 
