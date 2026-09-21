@@ -25,7 +25,7 @@ serde_json = "*"
 [build-dependencies]
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 serde_json = "*"
-
+embuild = { version = "*", features = ["espidf"] }
 [target.'cfg(all(unix, not(target_os = "espidf")))'.build-dependencies]
 libc = "*"
 
