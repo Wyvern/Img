@@ -19,8 +19,8 @@ fn main() {
     if target_os.as_deref() == Ok("espidf")
     {
         embuild::espidf::sysenv::output();
-        _ = embuild::build::CfgArgs::output_propagated("ESP_IDF");
-        _ = embuild::build::LinkArgs::output_propagated("ESP_IDF");
+        // _ = embuild::build::CfgArgs::output_propagated("ESP_IDF");
+        // _ = embuild::build::LinkArgs::output_propagated("ESP_IDF");
     }
 
     use fs::*;
