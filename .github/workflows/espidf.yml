@@ -76,7 +76,7 @@ jobs:
           # ./espup install
           # . ~/export-esp.sh
 
-          {
+          time {
           espidf/install.sh all
           . espidf/export.sh
           } &>/dev/null

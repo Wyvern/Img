@@ -37,7 +37,7 @@ libc = "*"
 esp-idf-sys = "*"
 
 [target.'cfg(target_os = "espidf")'.build-dependencies]
-embuild = "*"
+embuild = { version = "*", features = ["espidf"] }
 
 [target.'cfg(target_os = "hermit")'.dependencies]
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
