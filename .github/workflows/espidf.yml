@@ -48,6 +48,10 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Install ldproxy
+        run: |
+          cargo install ldproxy -q &
+
       - name: Rust Toolchain for Xtensa
         uses: esp-rs/xtensa-toolchain@v1.7.0
 
@@ -66,10 +70,6 @@ jobs:
           done
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
-
-      - name: Install ldproxy
-        run: |
-          cargo install ldproxy -q &
 
       - name: Build Release
         run: |
