@@ -34,7 +34,7 @@ jobs:
           if [ "$LLVM" = "23" ]; then
               wget https://apt.llvm.org/llvm.sh
               chmod +x llvm.sh
-              sudo ./llvm.sh $LLVM >/dev/null 2>&1 &
+              sudo ./llvm.sh $LLVM &>/dev/null &
           fi
 
       - name: setup-oras
@@ -51,7 +51,7 @@ jobs:
             mkdir -p /home/runner/unix;
             ln -sf /home/runner/unix sysroot
 
-            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" 2>/dev/null); then
+            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" &>/dev/null); then
               oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.sysroot &
               # oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
               # tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix
@@ -61,13 +61,13 @@ jobs:
                 if [ ! -d sysroot/freebsd/$arch ]; then
                     mkdir -p sysroot/freebsd/$arch
                     curl -fsSL https://download.freebsd.org/ftp/releases/$arch/${FREEBSD}-RELEASE/base.txz \
-                | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
+                | tar -xJf - -C sysroot/freebsd/$arch &>/dev/null &
                 fi
               done
 
               if [ ! -d sysroot/freebsd/powerpc ]; then
                 mkdir -p sysroot/freebsd/powerpc
-                curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc 2>/dev/null &
+                curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc &>/dev/null &
               fi
 
               ppc=(powerpc64 powerpc64le)
@@ -75,7 +75,7 @@ jobs:
                 if [ ! -d sysroot/freebsd/$arch ]; then
                   mkdir -p sysroot/freebsd/$arch
                   curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/${FREEBSD}-RELEASE/base.txz \
-                    | tar -xJf - -C sysroot/freebsd/$arch 2>/dev/null &
+                    | tar -xJf - -C sysroot/freebsd/$arch &>/dev/null &
                 fi
               done
 
@@ -85,7 +85,7 @@ jobs:
                 if [ ! -d sysroot/openbsd/$arch ]; then
                   mkdir -p sysroot/openbsd/$arch
                   for file in "${files[@]}"; do
-                    curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$OPENBSD/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch 2>/dev/null &
+                    curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$OPENBSD/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch &>/dev/null &
                   done
                 fi
               done
@@ -102,9 +102,9 @@ jobs:
                             if curl -fsSI "$url" &>/dev/null; then
                                 echo "→ Fetching $file.$ext"
                                 if [ "$ext" = "tar.xz" ]; then
-                                    curl -fsSL "$url" | tar -xJf - -C "$out" 2>/dev/null &
+                                    curl -fsSL "$url" | tar -xJf - -C "$out" &>/dev/null &
                                 else
-                                    curl -fsSL "$url" | tar -xzf - -C "$out" 2>/dev/null &
+                                    curl -fsSL "$url" | tar -xzf - -C "$out" &>/dev/null &
                                 fi
                             fi
                         done

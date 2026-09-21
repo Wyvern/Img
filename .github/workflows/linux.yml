@@ -33,7 +33,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy > /dev/null && touch ~/apt.finish &
+          sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
@@ -49,7 +49,7 @@ jobs:
           IMAGE="${IMAGE,,}"
           path=/home/runner/uclibc
 
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}" 2>/dev/null); then
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}" &>/dev/null); then
             mkdir -p $path
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
             for target in armv7-eabihf mips32el mips32; do

@@ -32,7 +32,7 @@ jobs:
           if [ "$LLVM" = "23" ]; then
               wget https://apt.llvm.org/llvm.sh
               chmod +x llvm.sh
-              sudo ./llvm.sh $LLVM >/dev/null 2>&1 &
+              sudo ./llvm.sh $LLVM &>/dev/null &
           fi
 
       - name: setup-oras
@@ -50,7 +50,7 @@ jobs:
           ln -sf /home/runner/Fuchsia fuchsia
 
           if [ "$OCI" == "true" ]; then
-            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia" 2>/dev/null);
+            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia" &>/dev/null);
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" && touch ~/.finish &
           else
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
