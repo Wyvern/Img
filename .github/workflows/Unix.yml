@@ -32,7 +32,7 @@ jobs:
       - name: Install LLVM
         run: |
           if [ "$LLVM" = "23" ]; then
-              wget https://apt.llvm.org/llvm.sh
+              wget https://apt.llvm.org/llvm.sh &>/dev/null
               chmod +x llvm.sh
               sudo ./llvm.sh $LLVM &>/dev/null &
           fi
@@ -51,7 +51,7 @@ jobs:
             mkdir -p /home/runner/unix;
             ln -sf /home/runner/unix sysroot
 
-            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix" &>/dev/null); then
+            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix"); then
               oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.sysroot &
               # oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
               # tar --zstd -xf /tmp/unix.tar.zst -C /home/runner/unix

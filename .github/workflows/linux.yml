@@ -49,7 +49,7 @@ jobs:
           IMAGE="${IMAGE,,}"
           path=/home/runner/uclibc
 
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}" &>/dev/null); then
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
             mkdir -p $path
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
             for target in armv7-eabihf mips32el mips32; do

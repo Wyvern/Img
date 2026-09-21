@@ -37,7 +37,7 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}" &>/dev/null; then
+          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}"; then
             oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ./ && unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
           else
             echo "Downloading & UnZipping Android NDK ${ndk} ..."

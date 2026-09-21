@@ -30,7 +30,7 @@ jobs:
 
       - name: Install ESP-IDF tools
         run: |
-          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf &> /dev/null &
+          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf &>/dev/null &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -78,7 +78,6 @@ jobs:
 
           espidf/install.sh all &>/dev/null
           . espidf/export.sh &>/dev/null
-          # export MCU=ESP32-P4
 
           targets=(
             riscv32imac-esp-espidf

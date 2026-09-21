@@ -40,7 +40,7 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten" &>/dev/null); then
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten"); then
             mkdir -p emsdk
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" &
           else
@@ -63,7 +63,7 @@ jobs:
 
           mkdir -p "redox"
 
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" &>/dev/null); then
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
           else
             file=relibc-install.tar.gz

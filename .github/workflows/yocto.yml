@@ -45,7 +45,7 @@ jobs:
           )
           set -o pipefail
           mkdir -p "/opt/poky/$YOCTO"
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}" &>/dev/null); then
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO" && touch ~/finish.yocto &
           else
             mkdir -p /home/runner/yocto
