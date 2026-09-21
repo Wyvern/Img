@@ -81,6 +81,10 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
+          cargo tree -i embuild
+          cargo tree -i ldproxy
+          cargo tree -i esp-idf-sys
+          exit
           targets=(
             riscv32imac-esp-espidf
           )
@@ -91,7 +95,7 @@ jobs:
           # xtensa-esp32s3-espidf
 
           for target in ${targets[@]}; do
-            time cargo v $target
+            time cargo s $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
