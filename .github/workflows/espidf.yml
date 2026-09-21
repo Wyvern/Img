@@ -30,9 +30,7 @@ jobs:
 
       - name: Install ESP-IDF tools
         run: |
-          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf > /dev/null
-          cd espidf
-          ./install.sh all > /dev/null &
+          git clone -b v5.5.5 --depth=1 https://github.com/espressif/esp-idf.git espidf > /dev/null &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -78,17 +76,19 @@ jobs:
           # ./espup install
           # . ~/export-esp.sh
 
+          espidf/install.sh all > /dev/null
           . espidf/export.sh
           # export MCU=ESP32-P4
 
           targets=(
-            xtensa-esp32s3-espidf
+            xtensa-esp32-espidf
             riscv32imac-esp-espidf
           )
           # riscv32imafc-esp-espidf
           # riscv32imc-esp-espidf
           # xtensa-esp32-espidf
           # xtensa-esp32s2-espidf
+          # xtensa-esp32s3-espidf
 
           for target in ${targets[@]}; do
             time cargo s $target
