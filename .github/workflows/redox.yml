@@ -42,7 +42,7 @@ jobs:
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten"); then
             mkdir -p emsdk
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" &
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" && touch ~/ems.finish &
           else
             git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
             ./emsdk/emsdk install latest &>/dev/null
@@ -119,12 +119,24 @@ jobs:
             x86_64-unknown-motor
             riscv32imac-unknown-xous-elf
             x86_64-unknown-hurd-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          time (
+              set +x
+              while [[ ! -f ~/ems.finish ]]; do
+                  sleep 1
+              done
+          )
+
+          targets=(
             wasm32-unknown-emscripten
             aarch64-unknown-redox
             riscv64gc-unknown-redox
             x86_64-unknown-redox
-          )
-
+            )
           for target in ${targets[@]}; do
             time cargo s $target
           done
