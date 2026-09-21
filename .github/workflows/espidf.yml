@@ -49,7 +49,7 @@ jobs:
         uses: mozilla-actions/sccache-action@main
 
       - name: Rust Toolchain for Xtensa
-        uses: esp-rs/xtensa-toolchain@v1
+        uses: esp-rs/xtensa-toolchain@v1.7.0
 
       - name: C/C++ sccache wrappers
         run: |
@@ -86,7 +86,7 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
-          time cargo +esp s xtensa-esp32-espidf
+          cargo +esp s xtensa-esp32-espidf
           exit
 
           targets=(
