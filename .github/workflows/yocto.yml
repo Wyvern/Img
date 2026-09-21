@@ -127,7 +127,7 @@ jobs:
             for v in ${!CARGO_TARGET_@}; do
                 unset "$v"
             done
-            export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
+            # export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
             time cargo s $target
             )
           done
