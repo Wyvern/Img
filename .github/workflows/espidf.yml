@@ -32,7 +32,6 @@ jobs:
         run: |
           {
           git clone -b v6.1 --depth=1 https://github.com/espressif/esp-idf.git espidf
-          espidf/install.sh all
           } &>/dev/null &
 
       - name: Rust Toolchain
@@ -80,10 +79,9 @@ jobs:
           # . ~/export-esp.sh
 
           time {
-          # espidf/install.sh all
+          espidf/install.sh all
           . espidf/export.sh
           } &>/dev/null
-
 
           targets=(
             riscv32imac-esp-espidf
