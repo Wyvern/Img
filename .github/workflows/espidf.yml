@@ -48,6 +48,9 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Rust Toolchain for Xtensa
+        uses: esp-rs/xtensa-toolchain@v1
+
       - name: C/C++ sccache wrappers
         run: |
           set -euo pipefail
@@ -83,18 +86,27 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
+          time cargo +esp s xtensa-esp32-espidf
+          exit
+
           targets=(
             riscv32imac-esp-espidf
             riscv32imafc-esp-espidf
             riscv32imc-esp-espidf
           )
 
-          # xtensa-esp32-espidf
-          # xtensa-esp32s2-espidf
-          # xtensa-esp32s3-espidf
-
           for target in ${targets[@]}; do
             time cargo s $target
+          done
+
+          targets=(
+            xtensa-esp32-espidf
+            xtensa-esp32s2-espidf
+            xtensa-esp32s3-espidf
+          }
+
+          for target in ${targets[@]}; do
+            time cargo +esp s $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
@@ -121,12 +133,17 @@ jobs:
             riscv32imac-esp-espidf
             riscv32imafc-esp-espidf
             riscv32imc-esp-espidf
+            xtensa-esp32-espidf
+            xtensa-esp32s2-espidf
+            xtensa-esp32s3-espidf
           )
 
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
             if [[ -n "$abi" ]]; then
                 name="${os^}-${arch}-${abi}"
+            elif [[ "$arch" == "xtensa" ]]; then
+                name="${os^}-${vendor}"
             else
                 name="${os^}-${arch}"
             fi
