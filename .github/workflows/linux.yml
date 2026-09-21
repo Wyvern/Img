@@ -179,7 +179,7 @@ jobs:
             time cargo s $target
           done
 
-          (
+          time (
               set +x
               while [[ ! -f ~/apt.finish ]]; do
                   sleep 1

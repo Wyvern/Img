@@ -62,7 +62,7 @@ jobs:
           cargo update
           set +e -x
 
-          (
+          time (
               set +x
               while [[ ! -f ~/apt.finish ]]; do
                   sleep 1

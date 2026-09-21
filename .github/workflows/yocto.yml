@@ -112,7 +112,7 @@ jobs:
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
 
-          (
+          time (
               set +x
               while [[ ! -f ~/finish.yocto ]]; do
                   sleep 1

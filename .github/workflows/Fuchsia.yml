@@ -128,7 +128,7 @@ jobs:
           done
           sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
 
-          (
+          time (
               set +x
               while [[ ! -f ~/.finish ]]; do
                   sleep 1

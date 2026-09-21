@@ -166,7 +166,7 @@ jobs:
           cargo update
           set +e -x
 
-          (
+          time (
               set +x
               while [[ ! -f ~/unix.sysroot ]]; do
                   sleep 1
