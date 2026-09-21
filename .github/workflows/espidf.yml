@@ -91,7 +91,7 @@ jobs:
           # xtensa-esp32s3-espidf
 
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo vv $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
