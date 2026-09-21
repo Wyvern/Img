@@ -26,6 +26,7 @@ serde_json = "*"
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 serde_json = "*"
 embuild = { version = "*", features = ["espidf"] }
+
 [target.'cfg(all(unix, not(target_os = "espidf")))'.build-dependencies]
 libc = "*"
 
@@ -35,9 +36,6 @@ libc = "*"
 
 [target.'cfg(target_os = "espidf")'.dependencies]
 esp-idf-sys = "*"
-
-[target.'cfg(target_os = "espidf")'.build-dependencies]
-embuild = { version = "*", features = ["espidf"] }
 
 [target.'cfg(target_os = "hermit")'.dependencies]
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
