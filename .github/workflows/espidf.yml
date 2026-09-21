@@ -87,7 +87,7 @@ jobs:
             riscv32imc-esp-espidf
           )
 
-          for target in ${targets[@]}; do
+          for target in "${targets[@]}"; do
             time cargo s $target
           done
 
@@ -100,13 +100,13 @@ jobs:
             xtensa-esp32-espidf
             xtensa-esp32s2-espidf
             xtensa-esp32s3-espidf
-          }
+          )
 
-          for target in ${targets[@]}; do
+          for target in "${targets[@]}"; do
             time cargo +esp s $target
           done
 
-           mv $backup $config
+          mv $backup $config
 
           find ./target -iname img -type f | xargs ls -hl
 
