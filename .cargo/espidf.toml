@@ -208,7 +208,7 @@ rustflags = [
   "-Cpanic=immediate-abort",
 
   "-Zunstable-options",
-  "-Zembed-metadata=no",
+  # "-Zembed-metadata=no",
   # "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",

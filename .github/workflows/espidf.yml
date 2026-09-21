@@ -86,12 +86,12 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
-          mv .cargo/config.toml .cargo/config.toml.bak
-          cp .cargo/espidf.toml .cargo/config.toml
-
+          config=.cargo/config.toml
+          backup=.cargo/config.toml.bak
+          mv $config $backup
+          cp .cargo/espidf.toml $config
           cargo +esp s xtensa-esp32-espidf
-
-          mv .cargo/config.toml.bak .cargo/config.toml
+          mv $backup $config
           exit
 
           targets=(
