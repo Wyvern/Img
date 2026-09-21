@@ -81,13 +81,7 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
-          cargo tree --target riscv32imac-esp-espidf -i esp-idf-sys
-          cargo tree --target riscv32imac-esp-espidf -i embuild
-          cargo tree --target riscv32imac-esp-espidf -i ldproxy
-          cargo tree --target riscv32imac-esp-espidf | grep -E 'esp-idf-sys|embuild|ldproxy'
-          cargo tree --target riscv32imac-esp-espidf -e features -i esp-idf-sys
-          cargo tree --target riscv32imac-esp-espidf -e all | grep -E 'esp-idf-sys|embuild|ldproxy'
-          exit
+
           targets=(
             riscv32imac-esp-espidf
           )
