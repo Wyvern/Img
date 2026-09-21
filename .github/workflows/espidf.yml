@@ -86,7 +86,12 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
+          mv .cargo/config.toml .cargo/config.toml.bak
+          cp .cargo/espidf.toml .cargo/config.toml
+
           cargo +esp s xtensa-esp32-espidf
+
+          mv .cargo/config.toml.bak .cargo/config.toml
           exit
 
           targets=(
