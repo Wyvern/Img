@@ -116,12 +116,12 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
 
           cp -f $backup $config
 
-          time cargo s x86_64-fortanix-unknown-sgx
+          time cargo s x86_64-fortanix-unknown-sgx &
 
           for x in clang clang++ lld; do
             sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
@@ -142,9 +142,9 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target
+            time cargo b -q --profile src -Zbuild-std=std,panic_abort --target $target &
           done
-
+          wait
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m

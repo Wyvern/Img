@@ -95,9 +95,9 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
-
+          wait
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m

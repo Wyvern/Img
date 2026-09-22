@@ -88,7 +88,7 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            time cargo s $target
+            time cargo s $target &
           done
 
           config=.cargo/config.toml
@@ -103,13 +103,13 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            time cargo +esp s $target
+            time cargo +esp s $target &
           done
 
           mv $backup $config
 
+          wait
           find ./target -iname img -type f | xargs ls -hl
-
           lscpu
           free -m
 
