@@ -91,6 +91,13 @@ jobs:
             time cargo s $target &
           done
 
+          sleep 1
+
+          config=.cargo/config.toml
+          backup=.cargo/config.toml.bak
+          mv $config $backup
+          cp .cargo/espidf.toml $config
+
           targets=(
             xtensa-esp32-espidf
             xtensa-esp32s2-espidf
@@ -98,7 +105,7 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            time cargo +esp s $target --config .cargo/espidf.toml &
+            time cargo +esp s $target &
           done
           wait
           find ./target -iname img -type f | xargs ls -hl

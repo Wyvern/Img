@@ -98,15 +98,15 @@ jobs:
           cargo update
           set +e -x
 
-          # config=".cargo/config.toml"
-          # backup=".cargo/config.toml.bak"
-          # cp $config $backup
-          # sed -i \
-          #       -e '/^CFLAGS[[:space:]]*=/d' \
-          #       -e '/^CXXFLAGS[[:space:]]*=/d' \
-          #       -e '/^CPPFLAGS[[:space:]]*=/d' \
-          #       -e '/^LDFLAGS[[:space:]]*=/d' \
-          #       $config
+          config=".cargo/config.toml"
+          backup=".cargo/config.toml.bak"
+          cp $config $backup
+          sed -i \
+                -e '/^CFLAGS[[:space:]]*=/d' \
+                -e '/^CXXFLAGS[[:space:]]*=/d' \
+                -e '/^CPPFLAGS[[:space:]]*=/d' \
+                -e '/^LDFLAGS[[:space:]]*=/d' \
+                $config
 
           targets=(
             aarch64-unknown-hermit
@@ -116,10 +116,11 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target --config .cargo/hermit.toml &
+            time cargo s $target &
           done
 
-          # cp -f $backup $config
+          sleep 1
+          cp -f $backup $config
 
           time cargo s x86_64-fortanix-unknown-sgx &
 
