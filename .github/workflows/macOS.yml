@@ -102,9 +102,9 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
-
+          wait
           lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
 
           find ./target \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
