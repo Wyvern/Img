@@ -105,7 +105,7 @@ jobs:
             riscv64gc-unknown-hermit
             x86_64-unknown-hermit
           )
-          s = (b -q --profile src -Zbuild-std=std,panic_abort --target)
+          s=(b -q --profile src -Zbuild-std=std,panic_abort --target)
           for target in ${targets[@]}; do
             time cargo "${s[@]}" $target --config ".cargo/hermit.toml" &
           done
