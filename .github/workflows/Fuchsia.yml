@@ -107,7 +107,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target --config ".cargo/hermit.toml" &
+            time cargo --config ".cargo/hermit.toml" s $target &
           done
 
           sleep 1

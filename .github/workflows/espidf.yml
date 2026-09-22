@@ -101,7 +101,7 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            time cargo +esp s $target --config ".cargo/espidf.toml" &
+            time cargo +esp --config ".cargo/espidf.toml" s $target &
           done
           wait
           find ./target -iname img -type f | xargs ls -hl
