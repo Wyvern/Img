@@ -173,12 +173,12 @@ jobs:
               done
           )
 
-          sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly &
+          sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly &>/dev/null
 
           for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200 &>/dev/null
           done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200 &>/dev/null
 
           targets=(
             x86_64-unknown-dragonfly
