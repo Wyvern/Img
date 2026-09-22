@@ -31,11 +31,16 @@ jobs:
 
       - name: Install LLVM
         run: |
-          if [ "$LLVM" = "23" ]; then
+          (if [ "$LLVM" = "23" ]; then
               wget https://apt.llvm.org/llvm.sh &>/dev/null
               chmod +x llvm.sh
-              sudo ./llvm.sh $LLVM &>/dev/null &
+              sudo ./llvm.sh $LLVM &>/dev/null
           fi
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
+          touch ~/llvm.finish)&
 
       - name: setup-oras
         uses: oras-project/setup-oras@v2
@@ -168,17 +173,12 @@ jobs:
 
           time (
               set +x
-              while [[ ! -f ~/unix.sysroot ]]; do
+              while [[ ! -f ~/.finish || ! -f ~/llvm.finish ]]; do
                   sleep 1
               done
           )
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly &>/dev/null
-
-          for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200 &>/dev/null
-          done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200 &>/dev/null
 
           targets=(
             x86_64-unknown-dragonfly
