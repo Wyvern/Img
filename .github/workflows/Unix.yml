@@ -199,11 +199,9 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
-
-          sudo umount sysroot/dfly
-
+          wait
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m

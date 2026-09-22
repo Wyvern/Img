@@ -105,9 +105,6 @@ jobs:
           for target in "${targets[@]}"; do
             time cargo +esp s $target &
           done
-
-          mv $backup $config
-
           wait
           find ./target -iname img -type f | xargs ls -hl
           lscpu

@@ -86,9 +86,9 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
-
+          wait
           find ./target -type f -name "img" -exec ls -hl {} \;
           sw_vers
           hostinfo

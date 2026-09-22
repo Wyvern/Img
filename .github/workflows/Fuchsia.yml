@@ -116,7 +116,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cargo s $target &
+            time cargo s $target
           done
 
           cp -f $backup $config
