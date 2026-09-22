@@ -100,9 +100,7 @@ jobs:
           for target in "${targets[@]}"; do
             time cargo +esp s $target --config .cargo/espidf.toml &
           done
-
           wait
-
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
