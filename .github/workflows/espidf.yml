@@ -99,10 +99,11 @@ jobs:
             xtensa-esp32s2-espidf
             xtensa-esp32s3-espidf
           )
-
+          s = (b -q --profile src -Zbuild-std=std,panic_abort --target)
           for target in "${targets[@]}"; do
-            time cargo +esp --config ".cargo/espidf.toml" s $target &
+            time cargo +esp "${s[@]}" $target --config ".cargo/espidf.toml" &
           done
+          unset s
           wait
           find ./target -iname img -type f | xargs ls -hl
           lscpu
