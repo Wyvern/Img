@@ -173,7 +173,7 @@ jobs:
 
           time (
               set +x
-              while [[ ! -f ~/.finish || ! -f ~/llvm.finish ]]; do
+              while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
                   sleep 1
               done
           )
