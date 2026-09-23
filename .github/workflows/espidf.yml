@@ -81,6 +81,8 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
+          cd espidf
+
           targets=(
             riscv32imac-esp-espidf
             riscv32imafc-esp-espidf
@@ -93,7 +95,7 @@ jobs:
 
           sleep 1
 
-          mv .cargo/config.toml .cargo/config.toml.bak
+          mv ../.cargo/config.toml ../.cargo/config.toml.bak
           targets=(
             xtensa-esp32-espidf
             xtensa-esp32s2-espidf
@@ -101,7 +103,7 @@ jobs:
           )
           s=(b -q --profile src -Zbuild-std=std,panic_abort --target)
           for target in "${targets[@]}"; do
-            time cargo +esp "${s[@]}" $target --config ".cargo/espidf.toml" &
+            time cargo +esp "${s[@]}" $target --config "../.cargo/espidf.toml" &
           done
           unset s
           wait
@@ -116,8 +118,8 @@ jobs:
         with:
           name: build-output
           path: |
-            target/**/img*
-            !target/**/*.d
+            espidf/target/**/img*
+            !espidf/target/**/*.d
           if-no-files-found: ignore
 
       - name: Upload binaries to a GitHub release
@@ -143,6 +145,6 @@ jobs:
                 name="${os^}-${arch}"
             fi
             echo "Uploading $name..."
-            mv target/$target/src/{img,$name} || true
-            gh release upload Nightly --clobber target/$target/src/$name || true
+            mv espidf/target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber espidf/target/$target/src/$name || true
           done
