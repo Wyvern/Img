@@ -16,6 +16,10 @@ fn main() {
         println!("cargo::rustc-link-lib=m");
     }
 
+    if target_os.as_deref() == Ok("espidf") {
+        embuild::espidf::sysenv::output();
+    }
+
     use fs::*;
     use io::*;
 
