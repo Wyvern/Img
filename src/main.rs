@@ -1227,6 +1227,7 @@ fn website() -> serde_json::Value {
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
         windows => run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz")),
+        target_os = "espidf" => *include_bytes!("web.cbor"),
         _ => *include_bytes!("../web.cbor"),
     };
     cbor4ii::serde::from_slice(&data).unwrap_or_else(|e| {
