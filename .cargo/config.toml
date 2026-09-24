@@ -155,6 +155,7 @@ codegen-backend = true
 target-applies-to-host = true
 host-config = true
 trim-paths = true
+prerelease = true
 gc = true
 git = { shallow_index = true, shallow_deps = true }
 gitoxide = { checkout = true, fetch = true, internal_use_git2 = true }
