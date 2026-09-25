@@ -222,6 +222,7 @@ rustflags = [
   "-Zpolonius=next",
   "-Ztrim-diagnostic-paths",
   "-Zshare-generics",
+  "-Zmerge-functions=aliases",
   "-Zinline-mir-preserve-debug=n",
   "-Zmir-opt-level=4",
   "-Zpacked-bundled-libs",
