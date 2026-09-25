@@ -74,7 +74,7 @@ jobs:
         run: |
           if [ ! -d llvm-mingw ]; then
             mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1 &
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
