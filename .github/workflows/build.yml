@@ -316,7 +316,7 @@ jobs:
         run: |
           if [ ! -d llvm-mingw ]; then
             mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1 &
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
@@ -327,8 +327,6 @@ jobs:
 
           targets=(
             x86_64-fortanix-unknown-sgx
-            aarch64-pc-windows-gnullvm
-            x86_64-pc-windows-gnullvm
             aarch64-apple-darwin
             aarch64-apple-ios
             x86_64-apple-darwin
@@ -337,6 +335,8 @@ jobs:
             aarch64-apple-watchos
             wasm32-wasip2
             wasm32-wasip3
+            aarch64-pc-windows-gnullvm
+            x86_64-pc-windows-gnullvm
           )
           for target in ${targets[@]}; do
             time cargo l $target

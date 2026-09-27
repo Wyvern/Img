@@ -11,14 +11,12 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   LLVM : "23"
+  IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
   Illumos:
     name: Solaris/Illumos
     runs-on: ubuntu-26.04
-
-    env:
-      IMAGE: ghcr.io/${{ github.repository }}
 
     permissions:
       contents: write
