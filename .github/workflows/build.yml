@@ -141,7 +141,7 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Android and OHOS NDK
+      - name: Android NDK cache
         run: |
           IMAGE="${IMAGE,,}"
 
@@ -153,6 +153,32 @@ jobs:
             unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
             echo "Push android-ndk-${ndk}-linux.zip to GHCR..."
             oras push --disable-path-validation "${IMAGE}:android-ndk-${ndk}" "android-ndk-${ndk}-linux.zip:application/zip" &
+          fi
+
+      - name: Redox Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          targets=(
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+            x86_64-unknown-redox
+          )
+
+          mkdir -p "redox"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
+          else
+            file=relibc-install.tar.gz
+            url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
+            for target in "${targets[@]}"; do
+              mkdir -p "redox/$target"
+              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
+            done
+            wait
+            tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
           fi
 
       - name: Rust Toolchain
@@ -184,11 +210,6 @@ jobs:
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
-
-          mkdir -p "redox"
-
-          digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain" 2>/dev/null);
-          oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox"
 
           targets=(
             x86_64-unknown-redox
