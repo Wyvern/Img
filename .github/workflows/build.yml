@@ -118,6 +118,8 @@ jobs:
     runs-on: ubuntu-24.04
 
     env:
+      SCCACHE_GHA_ENABLED: "on"
+      RUSTC_WRAPPER: "sccache"
       NDK: "r30"
       IMAGE: ghcr.io/${{ github.repository }}
 
@@ -128,6 +130,30 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Ubuntu apt update and install
+        run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy &>/dev/null &
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Android and OHOS NDK
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}"; then
+            oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ./ && unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
+          else
+            echo "Downloading & UnZipping Android NDK ${ndk} ..."
+            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
+            unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
+            echo "Push android-ndk-${ndk}-linux.zip to GHCR..."
+            oras push --disable-path-validation "${IMAGE}:android-ndk-${ndk}" "android-ndk-${ndk}-linux.zip:application/zip" &
+          fi
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -143,43 +169,18 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Android NDK cache
-        uses: actions/cache@v6
-        with:
-          path: ~/android-ndk-${{ env.NDK }}
-          key: android-ndk-${{ env.NDK }}
-          restore-keys: android-ndk-${{ env.NDK }}
-
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
         with:
           version: "6.1"
-
-      - name: Ubuntu apt update and install
-        run: sudo apt install gcc-powerpc64-linux-gnu musl-tools libfuse3-dev -qy
-
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          export ANDROID_NDK_HOME=~/android-ndk-$NDK
+          export ANDROID_NDK_HOME=~/android-ndk-$ndk
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
-
-          if [ ! -d ~/android-ndk-${NDK} ]; then
-            mkdir -p ~/android-ndk-${NDK}
-            echo "Downloading Android NDK..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${NDK}-linux.zip
-            echo "Unzipping Android NDK $NDK ..."
-            unzip -q android-ndk-${NDK}-linux.zip -d ~/
-          fi
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
