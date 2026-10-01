@@ -53,17 +53,17 @@ jobs:
           mkdir -p /home/runner/Fuchsia;
           ln -sf /home/runner/Fuchsia fuchsia
 
-          if [ "$OCI" == "true" ]; then
-            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia");
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" && touch ~/.finish &
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" &>/dev/null && touch ~/.finish &
           else
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
             mkdir -p /home/runner/Fuchsia
             cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
+            touch ~/.finish
             tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
+            oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &>/dev/null &
           fi
 
       - name: Rust Toolchain
@@ -260,7 +260,7 @@ jobs:
 
               wait
               chmod -R u+rwX sysroot
-
+              touch ~/unix.sysroot
               tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
               oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
             fi
@@ -268,7 +268,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-unknown-freebsd,x86_64-unknown-netbsd
+          targets: x86_64-unknown-freebsd,aarch64-unknown-freebsd,x86_64-unknown-netbsd
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2

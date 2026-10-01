@@ -20,6 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Ubuntu apt update and install
+        run: |
+          sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu gcc-arm-linux-gnueabihf musl-tools -qy &>/dev/null &
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -33,11 +37,6 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-
-      - name: Ubuntu apt update and install
-        continue-on-error: true
-        run: |
-          sudo apt update -q && sudo apt install -q gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-sparc64-linux-gnu gcc-14-loongarch64-linux-gnu gcc-arm-linux-gnueabihf musl-tools -y
 
       - name: Build Release
         run: |
