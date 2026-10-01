@@ -63,6 +63,7 @@ jobs:
             sudo mv cipd /usr/local/bin/
             mkdir -p /home/runner/Fuchsia
             cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
+            touch ~/.finish
             tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
             oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
           fi

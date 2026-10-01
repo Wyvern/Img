@@ -47,6 +47,7 @@ jobs:
             git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
             ./emsdk/emsdk install latest &>/dev/null
             ./emsdk/emsdk activate latest &>/dev/null
+            touch ~/ems.finish
             tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
             oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
           fi

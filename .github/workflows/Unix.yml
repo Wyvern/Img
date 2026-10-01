@@ -124,7 +124,7 @@ jobs:
 
               wait
               chmod -R u+rwX sysroot
-
+              touch ~/unix.sysroot
               tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
               oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
             fi
