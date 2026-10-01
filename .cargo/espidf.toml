@@ -240,6 +240,7 @@ rustflags = [
   # "-Ztyping-mode-post-typeck-until-borrowck",
   # "-Zexperimental-default-bounds",
   # "-Zhigher-ranked-assumptions",
+  # "-Zmir-move-elimination=y",
   "-Zcache-proc-macros",
   "-Zvalidate-mir=no",
   # "-Zwasm-proc-macros",
