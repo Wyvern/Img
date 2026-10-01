@@ -145,14 +145,14 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}"; then
-            oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ./ && unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
+          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${NDK}"; then
+            oras pull --allow-path-traversal "${IMAGE}:android-ndk-${NDK}" -o ./ && unzip -q android-ndk-${NDK}-linux.zip -d ~/ &
           else
-            echo "Downloading & UnZipping Android NDK ${ndk} ..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
-            unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
-            echo "Push android-ndk-${ndk}-linux.zip to GHCR..."
-            oras push --disable-path-validation "${IMAGE}:android-ndk-${ndk}" "android-ndk-${ndk}-linux.zip:application/zip" &
+            echo "Downloading & UnZipping Android NDK ${NDK} ..."
+            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${NDK}-linux.zip
+            unzip -q android-ndk-${NDK}-linux.zip -d ~/ &
+            echo "Push android-ndk-${NDK}-linux.zip to GHCR..."
+            oras push --disable-path-validation "${IMAGE}:android-ndk-${NDK}" "android-ndk-${NDK}-linux.zip:application/zip" &
           fi
 
       - name: Redox Cache
@@ -276,7 +276,7 @@ jobs:
     runs-on: macos-26
 
     env:
-      mingw: "20260908"
+      mingw: "20260922"
 
     steps:
       - name: Disable macos spotlight index
@@ -292,7 +292,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,wasm32-wasip3,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -332,10 +332,10 @@ jobs:
             aarch64-apple-visionos
             aarch64-apple-watchos
             wasm32-wasip2
-            wasm32-wasip3
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
           )
+          # wasm32-wasip3
           for target in ${targets[@]}; do
             time cargo l $target
           done

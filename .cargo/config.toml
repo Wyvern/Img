@@ -210,8 +210,8 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros=y",
   "-Zvalidate-mir=no",
-  "-Zoffload=Device",
   # "-Zmir-move-elimination=y",
+  # "-Zoffload=Device",
   # "-Zcrate-attr=feature(cfg_select)",
 
   "-Dclippy::redundant_clone",
