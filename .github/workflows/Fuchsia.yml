@@ -12,7 +12,6 @@ env:
   RUSTC_WRAPPER: "sccache"
   LLVM: "23"
   IMAGE: ghcr.io/${{ github.repository }}
-  OCI: "true"
 
 jobs:
   Linux:
@@ -54,16 +53,15 @@ jobs:
           mkdir -p /home/runner/Fuchsia;
           ln -sf /home/runner/Fuchsia fuchsia
 
-          if [ "$OCI" == "true" ]; then
-            digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia");
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" && touch ~/.finish &
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" && touch ~/fuchsia.finish &
           else
             curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
             chmod +x cipd
             sudo mv cipd /usr/local/bin/
             mkdir -p /home/runner/Fuchsia
             cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
-            touch ~/.finish
+            touch ~/fuchsia.finish
             tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
             oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
           fi
@@ -123,7 +121,7 @@ jobs:
 
           time (
               set +x
-              while [[ ! -f ~/.finish || ! -f ~/llvm.finish ]]; do
+              while [[ ! -f ~/fuchsia.finish || ! -f ~/llvm.finish ]]; do
                   sleep 1
               done
           )
