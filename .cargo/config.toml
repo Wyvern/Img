@@ -478,3 +478,19 @@ rustflags = ["-Clink-arg=--target=powerpc64-linux-musl"]
 
 [target.'cfg(target_os = "solaris")']
 rustflags = ["-Clink-arg=/compat.o"]
+
+[target.x86_64-unknown-redox]
+linker = "redox/x86_64-unknown-redox/bin/x86_64-unknown-redox-gcc"
+rustflags = ["-Clink-arg=--sysroot=redox/x86_64-unknown-redox"]
+
+[target.riscv64gc-unknown-redox]
+linker = "redox/riscv64gc-unknown-redox/bin/riscv64-unknown-redox-gcc"
+rustflags = ["-Clink-arg=--sysroot=redox/riscv64gc-unknown-redox"]
+
+[target.aarch64-unknown-redox]
+linker = "redox/aarch64-unknown-redox/bin/aarch64-unknown-redox-gcc"
+rustflags = ["-Clink-arg=--sysroot=redox/aarch64-unknown-redox"]
+
+[target.'cfg(target_os="espidf")']
+linker = "ldproxy"
+rustflags = ["-Cdefault-linker-libraries=yes"]
