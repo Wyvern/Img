@@ -106,7 +106,7 @@ jobs:
           )
           sed -i 's/^\([[:space:]]*\)"-Zmir-move-elimination=y",$/\1# "-Zmir-move-elimination=y",/' .cargo/config.toml
           for target in ${r6[@]}; do
-            time cargo +nightly-2026-09-02 s $target
+            time cargo +nightly-2026-09-02 s $target &>/dev/null
           done
 
           find ./target -iname img -type f | xargs ls -hl

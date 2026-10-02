@@ -64,6 +64,8 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
+          docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
+
           targets=(
             x86_64-unknown-illumos
             sparcv9-sun-solaris
@@ -167,6 +169,15 @@ jobs:
         run: |
           cargo update
           set +e -x
+
+          targets=(
+            aarch64-unknown-nuttx
+            riscv64gc-unknown-nuttx-elf
+          )
+          for target in ${targets[@]}; do
+            time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
+          done
+          exit
 
           targets=(
             sparc64-unknown-netbsd
