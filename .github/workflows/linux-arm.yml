@@ -30,7 +30,6 @@ jobs:
           components: rust-src
 
       - run: rustup toolchain install nightly-2026-09-02 --component rust-src
-      - run: rustup toolchain install nightly-2026-09-03 --component rust-src
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -69,18 +68,6 @@ jobs:
               done
           )
 
-          r6=(
-            mipsisa64r6-unknown-linux-gnuabi64
-            mipsisa64r6el-unknown-linux-gnuabi64
-            mipsisa32r6-unknown-linux-gnu
-            mipsisa32r6el-unknown-linux-gnu
-          )
-          for target in ${r6[@]}; do
-            time cargo +nightly-2026-09-02 s $target
-            time cargo +nightly-2026-09-03 s $target
-          done
-          exit
-
           targets=(
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
@@ -110,6 +97,18 @@ jobs:
             time cargo s $target &
           done
           wait
+
+          r6=(
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            mipsisa32r6-unknown-linux-gnu
+            mipsisa32r6el-unknown-linux-gnu
+          )
+          sed -i 's/^"\(-Zmir-move-elimination=y\)",$/# "\1",/' .cargo/config.toml
+          for target in ${r6[@]}; do
+            time cargo +nightly-2026-09-02 s $target
+          done
+
           find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
