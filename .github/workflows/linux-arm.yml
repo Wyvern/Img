@@ -104,7 +104,7 @@ jobs:
             mipsisa32r6-unknown-linux-gnu
             mipsisa32r6el-unknown-linux-gnu
           )
-          sed -i 's/^"\(-Zmir-move-elimination=y\)",$/# "\1",/' .cargo/config.toml
+          sed -i 's/^\([[:space:]]*\)"-Zmir-move-elimination=y",$/\1# "-Zmir-move-elimination=y",/' .cargo/config.toml
           for target in ${r6[@]}; do
             time cargo +nightly-2026-09-02 s $target
           done
