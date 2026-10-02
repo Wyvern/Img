@@ -189,8 +189,10 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time "${cb[@]}" $target
+            time "${cb[@]}" $target &>/dev/null &
           done
+
+          wait
 
           find ./target -iname img -type f | xargs ls -hl
           lscpu
