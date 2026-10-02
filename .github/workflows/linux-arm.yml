@@ -28,6 +28,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
+          toolchain: nightly,nightly-2026-09-02
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -56,9 +57,6 @@ jobs:
 
       - name: Build Release
         run: |
-          # sudo snap install zig --classic --beta
-          # pipx install cargo-zigbuild
-
           cargo update
           set +e -x
 
@@ -68,6 +66,17 @@ jobs:
                   sleep 1
               done
           )
+
+          r6=(
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            mipsisa32r6-unknown-linux-gnu
+            mipsisa32r6el-unknown-linux-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo +nightly-2026-09-02 s $target
+          done
+          exit
 
           targets=(
             aarch64-unknown-linux-gnu
