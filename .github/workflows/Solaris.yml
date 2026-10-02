@@ -170,14 +170,15 @@ jobs:
           cargo update
           set +e -x
 
+          cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
+
           targets=(
             aarch64-unknown-nuttx
             riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
-            time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
+            time "${cb[@]}" $target
           done
-          exit
 
           targets=(
             sparc64-unknown-netbsd
@@ -188,7 +189,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time cross build -q --profile src -Zbuild-std=std,panic_abort --target $target
+            time "${cb[@]}" $target
           done
 
           find ./target -iname img -type f | xargs ls -hl
