@@ -28,7 +28,9 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          toolchain: nightly,nightly-2026-09-02
+
+      - run: rustup toolchain install nightly-2026-09-02 --component rust-src &
+      - run: rustup toolchain install nightly-2026-09-03 --component rust-src &
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -75,6 +77,9 @@ jobs:
           )
           for target in ${targets[@]}; do
             time cargo +nightly-2026-09-02 s $target
+          done
+          for target in ${targets[@]}; do
+            time cargo +nightly-2026-09-03 s $target
           done
           exit
 
