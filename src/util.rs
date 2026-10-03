@@ -205,7 +205,10 @@ pub trait Dbg: fmt::Debug {
 }
 impl<T: fmt::Debug> Dbg for T {}
 
-#[cfg(all(unix, not(target_os = "espidf")))]
+#[cfg(all(
+    unix,
+    not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+))]
 fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcgetattr(fd, old.as_mut_ptr());
@@ -216,7 +219,10 @@ fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) 
     }
 }
 
-#[cfg(all(unix, not(target_os = "espidf")))]
+#[cfg(all(
+    unix,
+    not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+))]
 fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
     unsafe {
         libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
@@ -236,7 +242,10 @@ pub fn terminal_input(o: &mut io::StdoutLock) -> Mode {
                 ch.make_ascii_lowercase();
                 Mode::Raw(ch)
             }
-            all(unix, not(target_os = "espidf")) => {
+            all(
+                unix,
+                not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+            ) => {
                 let fd = libc::STDIN_FILENO;
                 let old = mem::MaybeUninit::<libc::termios>::uninit();
                 let mut key = [0u8; 1];
