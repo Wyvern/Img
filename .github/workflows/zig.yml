@@ -68,7 +68,7 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p /opt/csky
+          sudo mkdir -p /opt/csky
           curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C /opt/csky
           ln -sf /opt/csky/csky-linux-gnuabiv2/libc csky
           find /opt/csky/ -type f -name 'libatomic.a' -print
