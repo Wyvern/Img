@@ -41,7 +41,7 @@ jobs:
             sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
             docker/base/netbsd.Dockerfile
 
-            df=(netbsd openbsd linux)
+            df=(netbsd openbsd linux-gnu)
             for file in "${df[@]}"; do
               sed -i '/RUN \/test\/test.sh/d' docker/$file.Dockerfile
               sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "docker/$file.Dockerfile"
@@ -76,7 +76,7 @@ jobs:
                 --platform linux/amd64 \
                 --provenance=false \
                 --load \
-                --file docker/linux.Dockerfile \
+                --file docker/linux-gnu.Dockerfile \
                 --build-arg RUST_TARGET="$target" \
                 --build-arg HOST_ARCH=amd64 \
                 --build-arg UBUNTU_VERSION=24.04 \
