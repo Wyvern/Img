@@ -608,14 +608,6 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-ilp32"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64-linux-ilp32"]
 
-# [target.csky-unknown-linux-gnuabiv2]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=csky-linux-gnueabi"]
-#
-# [target.csky-unknown-linux-gnuabiv2hf]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf"]
-
 [target.sparc64-unknown-openbsd]
 linker = "sparc64-unknown-openbsd-clang"
 rustflags = ["-Clink-arg=-lc"]
@@ -693,3 +685,9 @@ rustflags = ["-Clink-arg=--sysroot=redox/aarch64-unknown-redox"]
 [target.'cfg(target_os="espidf")']
 linker = "ldproxy"
 rustflags = ["-Cdefault-linker-libraries=yes"]
+
+[target.csky-unknown-linux-gnuabiv2]
+linker = "csky-unknown-linux-gnuabiv2-gcc"
+
+[target.csky-unknown-linux-gnuabiv2hf]
+linker = "csky-unknown-linux-gnuabiv2hf-gcc"

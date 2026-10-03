@@ -45,6 +45,9 @@ jobs:
             for file in "${df[@]}"; do
               dockerfile="docker/$file.Dockerfile"
               sed -i '/RUN \/test\/test.sh/d' "$dockerfile"
+              if [[ "$file" == "linux-gnu" ]]; then
+                sed -i '/^RUN <<EOF$/,/^EOF$/d' "$dockerfile"
+              fi
               sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$dockerfile"
 
               sed -i '/^FROM \(ubuntu:"${UBUNTU_VERSION}"\|"${DISTRO}":"${DISTRO_VERSION}"\) AS final$/a\
