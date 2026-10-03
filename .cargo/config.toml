@@ -693,9 +693,9 @@ rustflags = ["-Cdefault-linker-libraries=yes"]
 [target.csky-unknown-linux-gnuabiv2]
 # linker = "csky-unknown-linux-gnuabiv2-gcc"
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=csky-linux-gnueabi","-Clink-arg=--sysroot=csky"]
+rustflags = ["-Clink-arg=--target=csky-linux-gnueabi","-Clink-arg=--sysroot=/Users/runner/work/Img/Img/csky"]
 
 [target.csky-unknown-linux-gnuabiv2hf]
 # linker = "csky-unknown-linux-gnuabiv2hf-gcc"
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=--sysroot=csky"]
+rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=--sysroot=/Users/runner/work/Img/Img/csky"]
