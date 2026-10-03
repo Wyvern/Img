@@ -94,8 +94,6 @@ jobs:
             fi
           done
 
-          exit
-
           docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
 
           targets=(
@@ -205,18 +203,16 @@ jobs:
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
-            csky-unknown-linux-gnuabiv2
-            csky-unknown-linux-gnuabiv2hf
-            # aarch64-unknown-nuttx
-            # riscv64gc-unknown-nuttx-elf
+            aarch64-unknown-nuttx
+            riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
-            time "${cb[@]}" $target
+            time "${cb[@]}" $target &>/dev/nuull
           done
 
-          exit
-
           targets=(
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd
             x86_64-unknown-illumos
