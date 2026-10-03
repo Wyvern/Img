@@ -44,10 +44,14 @@ jobs:
             df=(netbsd openbsd linux-gnu)
             for file in "${df[@]}"; do
               dockerfile="docker/$file.Dockerfile"
-              sed -i '/RUN \/test\/test.sh/d' "$dockerfile"
               if [[ "$file" == "linux-gnu" ]]; then
-                sed -i '/^RUN <<EOF$/,/^EOF$/d' "$dockerfile"
+                sed -i '/^FROM ghcr.io\/taiki-e\/build-base:"${DISTRO}-${DISTRO_VERSION}" AS test-base$/,/^FROM "${DISTRO}":"${DISTRO_VERSION}" AS final$/{
+                  /^FROM "${DISTRO}":"${DISTRO_VERSION}" AS final$/!d
+                }' "$dockerfile"
+
+                sed -i 's/COPY --from=test \//COPY --from=builder \//' "$dockerfile"
               fi
+              sed -i '/RUN \/test\/test.sh/d' "$dockerfile"
               sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$dockerfile"
 
               sed -i '/^FROM \(ubuntu:"${UBUNTU_VERSION}"\|"${DISTRO}":"${DISTRO_VERSION}"\) AS final$/a\
@@ -83,7 +87,7 @@ jobs:
                 --file docker/linux-gnu.Dockerfile \
                 --build-arg RUST_TARGET="$target" \
                 --build-arg HOST_ARCH=amd64 \
-                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg DISTRO_VERSION=24.04 \
                 --tag "$IMAGE:$target" \
                 docker
               docker push "$IMAGE:$target" &>/dev/null &
