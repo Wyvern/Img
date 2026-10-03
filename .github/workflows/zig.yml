@@ -70,7 +70,7 @@ jobs:
 
           mkdir -p csky-linux
           curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky-linux
-          ln -sfn csky-linux/csky-linux-gnuabiv2 csky
+          ln -sfn csky-linux/csky-linux-gnuabiv2/lib csky
           find csky-linux/ -type f -name 'libatomic.a' -print
 
           # hexagon-unknown-linux-musl
