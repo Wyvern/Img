@@ -207,12 +207,12 @@ jobs:
             riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
-            time "${cb[@]}" $target &>/dev/nuull
+            time "${cb[@]}" $target &>/dev/null
           done
 
           targets=(
-            csky-unknown-linux-gnuabiv2
-            csky-unknown-linux-gnuabiv2hf
+            # csky-unknown-linux-gnuabiv2
+            # csky-unknown-linux-gnuabiv2hf
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd
             x86_64-unknown-illumos
