@@ -207,7 +207,7 @@ jobs:
             riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
-            time "${cb[@]}" $target &>/dev/null
+            time "${cb[@]}" $target
           done
 
           targets=(
