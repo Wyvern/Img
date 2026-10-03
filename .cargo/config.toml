@@ -273,7 +273,7 @@ rustflags = [
   "-Clink-arg=-Wl,--discard-all",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
-  "-Clink-arg=-Wl,--no-eh-frame-hdr"
+  # "-Clink-arg=-Wl,--no-eh-frame-hdr"
 ]
 
 [target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",all(target_arch="aarch64",target_endian="big",target_os="linux"),all(target_arch="arm",target_endian="big",target_os="linux"))))']
