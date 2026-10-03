@@ -43,12 +43,13 @@ jobs:
 
             df=(netbsd openbsd linux-gnu)
             for file in "${df[@]}"; do
-              sed -i '/RUN \/test\/test.sh/d' docker/$file.Dockerfile
-              sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "docker/$file.Dockerfile"
+              dockerfile="docker/$file.Dockerfile"
+              sed -i '/RUN \/test\/test.sh/d' "$dockerfile"
+              sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$dockerfile"
 
-              sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
+              sed -i '/^FROM \(ubuntu:"${UBUNTU_VERSION}"\|"${DISTRO}":"${DISTRO_VERSION}"\) AS final$/a\
               RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
-              ' "docker/$file.Dockerfile"
+              ' "$dockerfile"
             done
 
       - name: Login to GHCR
@@ -79,7 +80,7 @@ jobs:
                 --file docker/linux-gnu.Dockerfile \
                 --build-arg RUST_TARGET="$target" \
                 --build-arg HOST_ARCH=amd64 \
-                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg DISTRO_VERSION=24.04 \
                 --tag "$IMAGE:$target" \
                 docker
               docker push "$IMAGE:$target" &>/dev/null &
