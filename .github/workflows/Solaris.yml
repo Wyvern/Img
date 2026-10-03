@@ -211,8 +211,8 @@ jobs:
           done
 
           targets=(
-            # csky-unknown-linux-gnuabiv2
-            # csky-unknown-linux-gnuabiv2hf
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd
             x86_64-unknown-illumos
