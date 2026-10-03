@@ -596,6 +596,10 @@ rustflags = ["-Clink-arg=--target=powerpc-openbsd"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64_be-linux-gnu"]
 
+[target.aarch64_be-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
+
 [target.aarch64_be-unknown-linux-gnu_ilp32]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64_be-linux-ilp32"]
@@ -604,9 +608,17 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-ilp32"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64-linux-ilp32"]
 
-[target.aarch64_be-unknown-linux-musl]
+[target.csky-unknown-linux-gnuabiv2]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
+rustflags = ["-Clink-arg=--target=csky-linux-gnueabi"]
+
+[target.csky-unknown-linux-gnuabiv2hf]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf"]
+
+[target.sparc-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=sparc-linux-gnu"]
 
 [target.sparc64-unknown-openbsd]
 linker = "sparc64-unknown-openbsd-clang"

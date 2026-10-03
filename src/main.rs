@@ -861,21 +861,27 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     let mut no_ext = collections::HashMap::new();
-    #[cfg(not(all(unix, not(target_os = "espidf"))))]
-    let mut no_ext_curl = process::Command::new("curl");
-    #[cfg(not(all(unix, not(target_os = "espidf"))))]
-    no_ext_curl.args([
-        "-Z",
-        "--parallel-immediate",
-        "-sILo",
-        if cfg!(target_os = "windows") {
-            "NUL"
-        } else {
-            "/dev/null"
-        },
-        "-w",
-        "\n%{url} |-> %{content_type}\n",
-    ]);
+    cfg_select! {
+        not(all(
+            unix,
+            not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+        )) => {
+            let mut no_ext_curl = process::Command::new("curl");
+            no_ext_curl.args([
+                "-Z",
+                "--parallel-immediate",
+                "-sILo",
+                if cfg!(target_os = "windows") {
+                    "NUL"
+                } else {
+                    "/dev/null"
+                },
+                "-w",
+                "\n%{url} |-> %{content_type}\n",
+            ]);
+        }
+        _ => (),
+    }
     static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
     let nan = NAN.get_or_init(|| {
         let remove = b".:/-_?=%";
@@ -919,7 +925,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         if has_ext.is_none() {
             lr.map_or_else(
                 || {
-                    #[cfg(not(all(unix, not(target_os = "espidf"))))]
+                    #[cfg(not(all(
+                        unix,
+                        not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+                    )))]
                     no_ext_curl.arg(&url);
                     no_ext.insert(url.clone(), name.to_owned());
                 },
