@@ -1049,7 +1049,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Infer file type through magic number
-#[cfg(all(unix, not(target_os = "espidf")))]
+#[cfg(all(
+    unix,
+    not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+))]
 fn magic_number_type(pb: path::PathBuf) {
     let t = file_format::FileFormat::from_file(&pb);
     fs::rename(
