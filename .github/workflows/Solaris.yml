@@ -80,7 +80,7 @@ jobs:
                 --file docker/linux-gnu.Dockerfile \
                 --build-arg RUST_TARGET="$target" \
                 --build-arg HOST_ARCH=amd64 \
-                --build-arg DISTRO_VERSION=24.04 \
+                --build-arg UBUNTU_VERSION=24.04 \
                 --tag "$IMAGE:$target" \
                 docker
               docker push "$IMAGE:$target" &>/dev/null &
