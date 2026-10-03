@@ -608,13 +608,13 @@ rustflags = ["-Clink-arg=--target=aarch64_be-linux-ilp32"]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=aarch64-linux-ilp32"]
 
-[target.csky-unknown-linux-gnuabiv2]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=csky-linux-gnueabi"]
-
-[target.csky-unknown-linux-gnuabiv2hf]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf"]
+# [target.csky-unknown-linux-gnuabiv2]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=csky-linux-gnueabi"]
+#
+# [target.csky-unknown-linux-gnuabiv2hf]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf"]
 
 [target.sparc64-unknown-openbsd]
 linker = "sparc64-unknown-openbsd-clang"

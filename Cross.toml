@@ -18,3 +18,9 @@ image = "ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest"
 
 [target.riscv64gc-unknown-nuttx-elf]
 image = "ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest"
+
+[target.csky-unknown-linux-gnuabiv2]
+image = "ghcr.io/wyvern/img:csky-unknown-linux-gnuabiv2"
+
+[target.csky-unknown-linux-gnuabiv2hf]
+image = "ghcr.io/wyvern/img:csky-unknown-linux-gnuabiv2hf"

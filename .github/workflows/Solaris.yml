@@ -41,15 +41,14 @@ jobs:
             sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
             docker/base/netbsd.Dockerfile
 
-            sed -i '/RUN \/test\/test.sh/d' docker/netbsd.Dockerfile
-            sed -i '/RUN \/test\/test.sh/d' docker/openbsd.Dockerfile
+            df=(netbsd openbsd linux)
+            for file in "${df[@]}"; do
+              sed -i '/RUN \/test\/test.sh/d' docker/$file.Dockerfile
+              sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "docker/$file.Dockerfile"
 
-            for file in docker/netbsd.Dockerfile docker/openbsd.Dockerfile; do
-                sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$file"
-
-                sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
-                RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
-                ' "$file"
+              sed -i '/^FROM ubuntu:"${UBUNTU_VERSION}" AS final$/a\
+              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
+              ' "docker/$file.Dockerfile"
             done
 
       - name: Login to GHCR
@@ -63,6 +62,31 @@ jobs:
         working-directory: rust-cross-toolchain
         run: |
           IMAGE="${IMAGE,,}"
+
+          targets=(
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
+          )
+
+          for target in "${targets[@]}"; do
+            if docker manifest inspect "$IMAGE:$target" &>/dev/null; then
+              docker pull "$IMAGE:$target" &>/dev/null &
+            else
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --file docker/linux.Dockerfile \
+                --build-arg RUST_TARGET="$target" \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg UBUNTU_VERSION=24.04 \
+                --tag "$IMAGE:$target" \
+                docker
+              docker push "$IMAGE:$target" &>/dev/null &
+            fi
+          done
+
+          exit
 
           docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
 
@@ -173,12 +197,16 @@ jobs:
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
-            aarch64-unknown-nuttx
-            riscv64gc-unknown-nuttx-elf
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
+            # aarch64-unknown-nuttx
+            # riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
             time "${cb[@]}" $target
           done
+
+          exit
 
           targets=(
             sparc64-unknown-netbsd
