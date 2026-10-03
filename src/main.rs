@@ -947,7 +947,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     // tdbg!(&no_ext);
     let opts = [
         "-e",
-        &format!("https://{host}"),
+        host,
         "--retry",
         "3",
         "-Z",
@@ -967,7 +967,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             curl.current_dir(path);
         }
 
-        #[cfg(all(unix, not(target_os = "espidf")))]
+        #[cfg(all(
+            unix,
+            not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+        ))]
         {
             fn fork() -> io::Result<libc::pid_t> {
                 let pid = unsafe { libc::fork() };
@@ -993,7 +996,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 Err(e) => quit!("Fork process failed: {e}"),
             }
         }
-        #[cfg(not(all(unix, not(target_os = "espidf"))))]
+        #[cfg(not(all(
+            unix,
+            not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
+        )))]
         {
             no_ext_curl.output().map_or_else(
                 |e| pl!("Query content-type info failed: {}", e),
