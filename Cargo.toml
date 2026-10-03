@@ -29,7 +29,7 @@ serde_json = "*"
 [target.'cfg(all(unix, not(target_os = "espidf")))'.build-dependencies]
 libc = "*"
 
-[target.'cfg(all(unix, not(target_os = "espidf")))'.dependencies]
+[target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))))'.dependencies]
 file-format = "*"
 libc = "*"
 
