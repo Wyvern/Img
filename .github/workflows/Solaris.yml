@@ -75,11 +75,13 @@ jobs:
               docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
               mkdir haiku
-              curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/r1beta6/3rdparty/docker/cross-compiler/Dockerfile \
-              -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/r1beta6/3rdparty/docker/cross-compiler/build-toolchain.sh
+              branch=master
+              curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/Dockerfile \
+              -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/build-toolchain.sh
               docker buildx build --tag "$IMAGE:haiku-cross" \
-                --build-arg BUILDTOOLS_REV=r1beta6 \
-                --build-arg HAIKU_REV=r1beta6 \
+                --build-arg BUILDTOOLS_REV=$branch \
+                --build-arg HAIKU_REV=$branch \
+                --progress=quiet \
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
           fi
