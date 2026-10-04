@@ -1,4 +1,4 @@
-name: Solaris+Sparc64
+name: Solaris
 
 on:
   push:
@@ -13,7 +13,7 @@ env:
 
 jobs:
   Linux:
-    name: Solaris+Sparc64
+    name: Solaris
     runs-on: ubuntu-26.04
 
     permissions:
@@ -66,10 +66,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull/Push cross-toolchain images
+      - name: Docker cross-toolchain images
         working-directory: rust-cross-toolchain
         run: |
           IMAGE="${IMAGE,,}"
+
+          mkdir haiku
+          cd haiku
+          curl -fsSLO https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
+          docker buildx build --tag "$IMAGE:haiku-cross" --load .
+          docker push "$IMAGE:haiku-cross"
+          cd ..
+          exit
 
           targets=(
             csky-unknown-linux-gnuabiv2
