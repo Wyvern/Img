@@ -25,5 +25,5 @@ image = "ghcr.io/wyvern/img:csky-unknown-linux-gnuabiv2"
 [target.csky-unknown-linux-gnuabiv2hf]
 image = "ghcr.io/wyvern/img:csky-unknown-linux-gnuabiv2hf"
 
-[target.x86_64-unknown-haiku-cross]
+[target.x86_64-unknown-haiku-cross.json]
 image = "ghcr.io/wyvern/img:haiku-cross"

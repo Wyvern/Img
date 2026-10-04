@@ -233,7 +233,7 @@ jobs:
           cargo update
           set +e -x
 
-          cb=(cross build --profile src -Zbuild-std=std,panic_abort --target)
+          cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
             x86_64-unknown-haiku-cross.json
@@ -287,7 +287,6 @@ jobs:
             x86_64-pc-solaris
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
-            x86_64-unknown-haiku-cross
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
