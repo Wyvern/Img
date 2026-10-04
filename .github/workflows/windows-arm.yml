@@ -63,9 +63,13 @@ jobs:
           $targets = @(
                       "aarch64-pc-windows-msvc",
                       "aarch64-uwp-windows-msvc",
+                      "arm64ec-pc-windows-msvc",
                       "x86_64-pc-windows-msvc",
                       "x86_64-uwp-windows-msvc",
-                      "arm64ec-pc-windows-msvc"
+                      "x86_64-win7-windows-msvc",
+                      "i686-pc-windows-msvc",
+                      "i686-uwp-windows-msvc",
+                      "i686-win7-windows-msvc"
                     )
           foreach ($target in $targets) {
               Write-Host "Building: $target"
@@ -97,7 +101,11 @@ jobs:
               @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
               @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
               @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
-              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe")
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe"),
+              @("i686-pc-windows-msvc", "Windows-i686.exe"),
+              @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
+              @("i686-win7-windows-msvc", Windows-i686-win7.exe),
+              @("x86_64-win7-windows-msvc", Windows-x86_64-win7.exe)
           )
 
           foreach ($target in $targets) {

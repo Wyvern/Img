@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Android and OHOS NDK
+      - name: Android NDK
         run: |
           IMAGE="${IMAGE,,}"
 
@@ -80,7 +80,7 @@ jobs:
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
         with:
-          version: "6.1"
+          version: "7.0"
 
       - name: Build Release
         run: |
