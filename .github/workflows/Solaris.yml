@@ -72,11 +72,10 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           mkdir haiku
-          cd haiku
-          curl -fsSLO https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
-          docker buildx build --tag "$IMAGE:haiku-cross" --load .
+          curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
+          -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
+          docker buildx build --tag "$IMAGE:haiku-cross" --load ./haiku
           docker push "$IMAGE:haiku-cross"
-          cd ..
           exit
 
           targets=(
@@ -207,6 +206,9 @@ jobs:
         run: |
           cargo update
           set +e -x
+
+
+          exit
 
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
