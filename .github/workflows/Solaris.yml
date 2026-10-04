@@ -71,7 +71,7 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if docker manifest inspect "$IMAGE:haiku-cross"; then
+          if docker buildx imagetools inspect "$IMAGE:haiku-cross"; then
               docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
               mkdir -p haiku
