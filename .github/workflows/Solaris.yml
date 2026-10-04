@@ -233,7 +233,7 @@ jobs:
           cargo update
           set +e -x
 
-          cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
+          cb=(cross build --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
             x86_64-unknown-haiku-cross.json
