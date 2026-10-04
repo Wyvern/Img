@@ -69,6 +69,8 @@ jobs:
                       "arm64ec-pc-windows-msvc",
                       "thumbv7a-pc-windows-msvc",
                       "thumbv7a-uwp-windows-msvc",
+                      "i686-win7-windows-msvc",
+                      "x86_64-win7-windows-msvc"
                     )
           foreach ($target in $targets) {
               Write-Host "Building: $target"
@@ -105,7 +107,9 @@ jobs:
               @("thumbv7a-uwp-windows-msvc", "Windows-thumb7a-uwp.exe"),
               @("i686-pc-windows-msvc", "Windows-i686.exe"),
               @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
-          )
+              @("i686-win7-windows-msvc", "Windows-i686-win7.exe),
+              @("x86_64-win7-windows-msvc" "Windows-x86_64-win7.exe)
+         )
 
           foreach ($target in $targets) {
               $arch = $target[0]
