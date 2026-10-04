@@ -100,9 +100,7 @@ jobs:
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
           fi
-
           exit
-
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
