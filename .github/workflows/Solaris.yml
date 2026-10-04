@@ -233,18 +233,10 @@ jobs:
           cargo update
           set +e -x
 
-          docker run --rm ghcr.io/wyvern/img:haiku-cross \
-              sh -c '
-                  command -v x86_64-unknown-haiku-gcc
-                  x86_64-unknown-haiku-gcc -v
-                  x86_64-unknown-haiku-gcc -print-sysroot
-                  x86_64-unknown-haiku-gcc -print-search-dirs
-              '
-          exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
-            x86_64-unknown-haiku
+            haiku-cross.json
             aarch64-unknown-nuttx
             riscv64gc-unknown-nuttx-elf
           )
