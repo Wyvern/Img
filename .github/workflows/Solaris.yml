@@ -71,7 +71,7 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if docker buildx imagetools inspect "$IMAGE:haiku-cross"; then
+          if docker buildx imagetools inspect "$IMAGE:haiku-cross" &>/dev/null; then
               docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
               mkdir -p haiku
@@ -96,6 +96,8 @@ jobs:
               docker buildx build --tag "$IMAGE:haiku-cross" \
                 --build-arg BUILDTOOLS_REV=$branch \
                 --build-arg HAIKU_REV=$branch \
+                --platform linux/amd64 \
+                --provenance=false \
                 --progress=quiet \
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
