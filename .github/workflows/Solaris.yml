@@ -75,10 +75,9 @@ jobs:
               docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
               mkdir -p haiku
-              branch=master
 
-              curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/Dockerfile \
-              -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/build-toolchain.sh
+              curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
+              -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
               file="haiku/build-toolchain.sh"
               if grep -q 'Patch RPattern.cpp' "$file"; then
@@ -94,8 +93,6 @@ jobs:
               fi
 
               docker buildx build --tag "$IMAGE:haiku-cross" \
-                --build-arg BUILDTOOLS_REV=$branch \
-                --build-arg HAIKU_REV=$branch \
                 --platform linux/amd64 \
                 --provenance=false \
                 --progress=quiet \
@@ -236,6 +233,18 @@ jobs:
           cargo update
           set +e -x
 
+          docker run --rm \
+            --platform linux/amd64 \
+            ghcr.io/wyvern/img:haiku-cross \
+            sh -c '
+              set -x
+              uname -m
+              echo "$PATH"
+              command -v x86_64-unknown-haiku-gcc
+              ls -l /bin/x86_64-unknown-haiku-gcc
+              x86_64-unknown-haiku-gcc --version
+            '
+            exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
