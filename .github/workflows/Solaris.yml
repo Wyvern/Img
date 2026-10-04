@@ -236,7 +236,7 @@ jobs:
           cb=(cross build --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
-            x86_64-unknown-haiku-cross
+            x86_64-unknown-haiku-cross.json
             aarch64-unknown-nuttx
             riscv64gc-unknown-nuttx-elf
           )
