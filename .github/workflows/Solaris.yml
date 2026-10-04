@@ -71,7 +71,7 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if docker buildx imagetools inspect "$IMAGE:haiku-cross" &>/dev/null; then
+          if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
               docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
               mkdir -p haiku
@@ -233,18 +233,6 @@ jobs:
           cargo update
           set +e -x
 
-          docker run --rm \
-            --platform linux/amd64 \
-            ghcr.io/wyvern/img:haiku-cross \
-            sh -c '
-              set -x
-              uname -m
-              echo "$PATH"
-              command -v x86_64-unknown-haiku-gcc
-              ls -l /bin/x86_64-unknown-haiku-gcc
-              x86_64-unknown-haiku-gcc --version
-            '
-            exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
