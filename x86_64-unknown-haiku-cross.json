@@ -25,5 +25,6 @@
   "target-family": [
     "unix"
   ],
-  "target-pointer-width": 64
+  "target-pointer-width": 64,
+  "linker": "x86_64-unknown-haiku-gcc"
 }
