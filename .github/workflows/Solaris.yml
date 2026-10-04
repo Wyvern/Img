@@ -74,15 +74,29 @@ jobs:
           if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
               docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
-              mkdir haiku
+              mkdir -p haiku
               branch=master
+
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/build-toolchain.sh
-              sed -i "s/jam -j\$NCPU -q haiku.hpkg haiku_devel.hpkg '<build>package'/jam -j\$NCPU haiku.hpkg haiku_devel.hpkg '<build>package'/" haiku/build-toolchain.sh
-              # --progress=quiet \
+
+              file="haiku/build-toolchain.sh"
+              if grep -q 'Patch RPattern.cpp' "$file"; then
+                  echo "already patched: $file"
+              else
+                  sed -i '/^git clone --depth=1 --branch \$BUILDTOOLS_REV https:\/\/review.haiku-os.org\/buildtools$/a\
+              \
+              # Patch RPattern.cpp: offsetof() requires <cstddef>.\
+              RPattern=$HAIKU/src/kits/storage/sniffer/RPattern.cpp\
+              sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$RPattern"\
+              ' "$file"
+                  echo "patched: $file"
+              fi
+
               docker buildx build --tag "$IMAGE:haiku-cross" \
                 --build-arg BUILDTOOLS_REV=$branch \
                 --build-arg HAIKU_REV=$branch \
+                --progress=quiet \
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
           fi
