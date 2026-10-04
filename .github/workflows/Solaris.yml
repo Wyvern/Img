@@ -79,10 +79,10 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/$branch/3rdparty/docker/cross-compiler/build-toolchain.sh
               sed -i "s/jam -j\$NCPU -q haiku.hpkg haiku_devel.hpkg '<build>package'/jam -j\$NCPU haiku.hpkg haiku_devel.hpkg '<build>package'/" haiku/build-toolchain.sh
+              # --progress=quiet \
               docker buildx build --tag "$IMAGE:haiku-cross" \
                 --build-arg BUILDTOOLS_REV=$branch \
                 --build-arg HAIKU_REV=$branch \
-                # --progress=quiet \
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
           fi
