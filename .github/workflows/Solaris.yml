@@ -111,7 +111,7 @@ jobs:
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
           fi
-          exit
+
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
@@ -233,12 +233,12 @@ jobs:
 
       - name: Cross-rs
         run: |
-          # if [ ! -f ~/.cargo/bin/cross ]; then
-          #   cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
-          #   # wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
-          #   # sudo mv cross ~/.cargo/bin/
-          # fi
-          # cross --version
+          if [ ! -f ~/.cargo/bin/cross ]; then
+            cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
+            # wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+            # sudo mv cross ~/.cargo/bin/
+          fi
+          cross --version
 
       - name: Build Release
         run: |
@@ -252,13 +252,11 @@ jobs:
           docker cp "$cid:/system/." /system/
           docker rm "$cid") &>/dev/null
           ln -s /tools/cross-tools-x86_64 haiku
-          time cargo s x86_64-unknown-haiku
-          exit
+          time cargo s x86_64-unknown-haiku&
 
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
-            x86_64-unknown-haiku
             aarch64-unknown-nuttx
             riscv64gc-unknown-nuttx-elf
           )
