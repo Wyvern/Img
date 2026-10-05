@@ -241,7 +241,6 @@ jobs:
           cross --version
 
       - name: Build Release
-        continue-on-error: true
         run: |
           cargo update
           set +e -x
@@ -264,7 +263,7 @@ jobs:
           for target in ${targets[@]}; do
             time "${cb[@]}" $target
           done
-          exit
+
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
