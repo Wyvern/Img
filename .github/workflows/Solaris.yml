@@ -79,13 +79,14 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
-              if ! grep -qF 'ENV PATH="/x86_64-unknown-haiku/bin:${PATH}"' haiku/Dockerfile; then
+              file="haiku/Dockerfile"
+              if ! grep -qF 'ENV PATH="/x86_64-unknown-haiku/bin:${PATH}"' "$file"; then
                   sed -i '/RUN \/tmp\/build-toolchain\.sh/a\
               \
               RUN ln -s "/tools/cross-tools-${ARCHITECTURE}" "/x86_64-unknown-haiku"\
               ENV PATH="/x86_64-unknown-haiku/bin:${PATH}"' \
-                      haiku/Dockerfile
-                  echo "patched: haiku/Dockerfile"
+                      "$file"
+                  echo "patched: $file"
               fi
 
               file="haiku/build-toolchain.sh"
@@ -244,7 +245,6 @@ jobs:
 
           docker run --rm "ghcr.io/wyvern/img:haiku-cross" sh -c '
               command -v x86_64-unknown-haiku-gcc
-              env | sort
               which -a x86_64-unknown-haiku-gcc
           '
 
