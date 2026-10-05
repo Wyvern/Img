@@ -27,3 +27,11 @@ image = "ghcr.io/wyvern/img:csky-unknown-linux-gnuabiv2hf"
 
 [target.x86_64-unknown-haiku]
 image = "ghcr.io/wyvern/img:haiku-cross"
+
+[target.x86_64-unknown-haiku.env]
+passthrough = [
+    "CARGO_TARGET_X86_64_UNKNOWN_HAIKU_LINKER",
+    "CC_x86_64_unknown_haiku",
+    "CXX_x86_64_unknown_haiku",
+    "AR_x86_64_unknown_haiku",
+]
