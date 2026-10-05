@@ -245,12 +245,10 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p tools/cross-tools-x86_64
+          sudo mkdir -p /tools/cross-tools-x86_64
           (cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
-          docker cp "$cid:/tools/cross-tools-x86_64/." tools/cross-tools-x86_64
+          docker cp "$cid:/tools/cross-tools-x86_64/." /tools/cross-tools-x86_64
           docker rm "$cid") &>/dev/null
-          sudo mkdir -p /tools
-          sudo ln -sfn "$PWD/tools/cross-tools-x86_64" /tools/cross-tools-x86_64
           ln -sfn /tools/cross-tools-x86_64 haiku
           time cargo s x86_64-unknown-haiku
           exit
