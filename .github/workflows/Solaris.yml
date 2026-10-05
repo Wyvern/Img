@@ -111,7 +111,7 @@ jobs:
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
           fi
-          exit
+          # exit
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
@@ -255,7 +255,7 @@ jobs:
           for target in ${targets[@]}; do
             time "${cb[@]}" $target
           done
-          exit
+          # exit
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
