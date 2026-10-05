@@ -252,7 +252,6 @@ jobs:
           docker rm "$cid") &>/dev/null
           ln -s /tools/cross-tools-x86_64 haiku
           docker run --rm ghcr.io/wyvern/img:haiku-cross sh -c '
-          docker run --rm ghcr.io/wyvern/img:haiku-cross sh -c '
           find / \
             \( -name crti.o -o \
                -name start_dyn.o -o \
