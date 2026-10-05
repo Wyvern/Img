@@ -84,7 +84,7 @@ jobs:
                   sed -i '/RUN \/tmp\/build-toolchain\.sh/a\
               \
               RUN ln -s "/tools/cross-tools-${ARCHITECTURE}" "/x86_64-unknown-haiku"\
-              ENV PATH="/x86_64-unknown-haiku/bin:${PATH}"' \
+              ENV PATH="/x86_64-unknown-haiku/bin:${PATH}"\
               ENV CARGO_TARGET_X86_64_UNKNOWN_HAIKU_LINKER=x86_64-unknown-haiku-gcc' \
                       "$file"
                   echo "patched: $file"
