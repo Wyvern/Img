@@ -233,17 +233,24 @@ jobs:
           cargo update
           set +e -x
 
+          mkdir -p haiku
+          cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
+          docker cp "$cid":/tools/cross-tools-x86_64/. haiku/
+          docker rm "$cid"
+
+          find haiku -name 'x86_64-unknown-haiku-gcc' -print
+          exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
-            x86_64-unknown-haiku
+            # x86_64-unknown-haiku
             aarch64-unknown-nuttx
             riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
             time "${cb[@]}" $target
           done
-          exit
+
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
