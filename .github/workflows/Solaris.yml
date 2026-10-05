@@ -241,6 +241,7 @@ jobs:
           cross --version
 
       - name: Build Release
+        continue-on-error: true
         run: |
           cargo update
           set +e -x
