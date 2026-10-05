@@ -701,4 +701,4 @@ linker = "csky-unknown-linux-gnuabiv2hf-gcc"
 # rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky"]
 
 [target.x86_64-unknown-haiku]
-# linker = "x86_64-unknown-haiku-gcc"
+linker = "/usr/bin/x86_64-unknown-haiku-gcc"
