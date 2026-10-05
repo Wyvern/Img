@@ -79,9 +79,13 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
-              sed -i '/RUN \/tmp\/build-toolchain\.sh/a\
+              if ! grep -qF 'ENV PATH="/tools/cross-tools-${ARCHITECTURE}/bin:${PATH}"' haiku/Dockerfile; then
+                  sed -i '/RUN \/tmp\/build-toolchain\.sh/a\
               \
-              ENV PATH="\/tools\/cross-tools-${ARCHITECTURE}\/bin:${PATH}"' haiku/Dockerfile
+              ENV PATH="/tools/cross-tools-${ARCHITECTURE}/bin:${PATH}"' \
+                      haiku/Dockerfile
+                  echo "patched: haiku/Dockerfile"
+              fi
 
               file="haiku/build-toolchain.sh"
               if grep -q 'Patch RPattern.cpp' "$file"; then
@@ -237,29 +241,17 @@ jobs:
           cargo update
           set +e -x
 
-          docker run --rm ghcr.io/wyvern/img:haiku-cross \
-              sh -c '
-                  echo "=== GCC sysroot ==="
-                  x86_64-unknown-haiku-gcc -print-sysroot
-                  echo "=== crti.o ==="
-                  x86_64-unknown-haiku-gcc -print-file-name=crti.o
-                  echo "=== libroot ==="
-                  x86_64-unknown-haiku-gcc -print-file-name=libroot.so
-                  echo "=== search dirs ==="
-                  x86_64-unknown-haiku-gcc -print-search-dirs
-              '
-          exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
-            # x86_64-unknown-haiku
+            x86_64-unknown-haiku
             aarch64-unknown-nuttx
             riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
             time "${cb[@]}" $target
           done
-
+          exit
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
