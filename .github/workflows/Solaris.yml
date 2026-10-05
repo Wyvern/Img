@@ -213,7 +213,7 @@ jobs:
           cache-workspace-crates: "true"
 
       - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+        # uses: mozilla-actions/sccache-action@main
 
       - name: C/C++ sccache wrappers
         run: |
