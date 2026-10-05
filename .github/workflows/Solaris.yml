@@ -241,6 +241,13 @@ jobs:
           cargo update
           set +e -x
 
+          docker run --rm "$IMAGE:haiku-cross" sh -c '
+              echo "$PATH"
+              ls -l /tools/cross-tools-x86_64/bin/x86_64-unknown-haiku-gcc
+              command -v x86_64-unknown-haiku-gcc
+              x86_64-unknown-haiku-gcc --version
+          '
+
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
