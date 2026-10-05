@@ -250,7 +250,12 @@ jobs:
           (cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
           docker cp "$cid:/tools/cross-tools-x86_64" /tools/
           docker rm "$cid") &>/dev/null
-          # ln -s /tools/cross-tools-x86_64 haiku
+          ln -s /tools/cross-tools-x86_64 haiku
+          /tools/cross-tools-x86_64/bin/x86_64-unknown-haiku-gcc \
+              -print-search-dirs
+
+          /tools/cross-tools-x86_64/bin/x86_64-unknown-haiku-gcc \
+              -print-file-name=libgcc_s.so
           time cargo s x86_64-unknown-haiku
           exit
 
