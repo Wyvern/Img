@@ -79,10 +79,11 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
-              if ! grep -qF 'ENV PATH="/tools/cross-tools-${ARCHITECTURE}/bin:${PATH}"' haiku/Dockerfile; then
+              if ! grep -qF 'ENV PATH="/x86_64-unknown-haiku/bin:${PATH}"' haiku/Dockerfile; then
                   sed -i '/RUN \/tmp\/build-toolchain\.sh/a\
               \
-              ENV PATH="/tools/cross-tools-${ARCHITECTURE}/bin:${PATH}"' \
+              RUN ln -s "/tools/cross-tools-${ARCHITECTURE}" "/x86_64-unknown-haiku"\
+              ENV PATH="/x86_64-unknown-haiku/bin:${PATH}"' \
                       haiku/Dockerfile
                   echo "patched: haiku/Dockerfile"
               fi
