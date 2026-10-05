@@ -246,26 +246,21 @@ jobs:
           set +e -x
 
           sudo mkdir -p /tools
+          sudo mkdir -p /system
           sudo chown "$USER:" /tools
-          (cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
+          sudo chown "$USER:" /system
+          cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
           docker cp "$cid:/tools/cross-tools-x86_64" /tools/
-          docker rm "$cid") &>/dev/null
+          docker cp "$cid:/system/." /system/
+          docker rm "$cid"
           ln -s /tools/cross-tools-x86_64 haiku
           docker run --rm ghcr.io/wyvern/img:haiku-cross sh -c '
-          find / \
-            \( -name crti.o -o \
-               -name start_dyn.o -o \
-               -name init_term_dyn.o -o \
-               -name crtn.o -o \
-               -name "libgnu.so*" -o \
-               -name "libbsd.so*" -o \
-               -name "libroot.so*" -o \
-               -name "libnetwork.so*" -o \
-               -name "libgcc_s.so*" \) \
-            -print 2>/dev/null
+          ls -ld /tools/cross-tools-x86_64/sysroot
+          ls -ld /system /system/lib /system/develop/lib
+          ls -ld /tools/cross-tools-x86_64/sysroot
+          ls -ld /tools/cross-tools-x86_64/sysroot/boot
+          ls -ld /tools/cross-tools-x86_64/sysroot/boot/system
           '
-          docker run --rm ghcr.io/wyvern/img:haiku-cross \
-              ls -la /tools/cross-tools-x86_64/sysroot/boot/system/develop/lib
           time cargo s x86_64-unknown-haiku
           exit
 
