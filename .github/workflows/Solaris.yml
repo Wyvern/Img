@@ -246,6 +246,7 @@ jobs:
               ls -l /tools/cross-tools-x86_64/bin/x86_64-unknown-haiku-gcc
               command -v x86_64-unknown-haiku-gcc
               x86_64-unknown-haiku-gcc --version
+              which -a x86_64-unknown-haiku-gcc
           '
 
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
