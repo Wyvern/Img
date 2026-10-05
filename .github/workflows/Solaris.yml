@@ -242,10 +242,9 @@ jobs:
           set +e -x
 
           docker run --rm "ghcr.io/wyvern/img:haiku-cross" sh -c '
-              echo "$PATH"
-              ls -l /tools/cross-tools-x86_64/bin/x86_64-unknown-haiku-gcc
               command -v x86_64-unknown-haiku-gcc
-              x86_64-unknown-haiku-gcc --version
+              type -a x86_64-unknown-haiku-gcc
+              env | sort
               which -a x86_64-unknown-haiku-gcc
           '
 
