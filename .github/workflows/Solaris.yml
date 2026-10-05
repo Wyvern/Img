@@ -237,15 +237,18 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p haiku
-          cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
-          docker cp "$cid":/tools/cross-tools-x86_64/. haiku/
-          docker rm "$cid"
-
-          find haiku -type f | grep -E '/(crti\.o|crtn\.o|start_dyn\.o|init_term_dyn\.o|lib(gnu|bsd|gcc_s|root|network)(\.a|\.so.*)?)$'
-          # time cargo s x86_64-unknown-haiku
+          docker run --rm ghcr.io/wyvern/img:haiku-cross \
+              sh -c '
+                  echo "=== GCC sysroot ==="
+                  x86_64-unknown-haiku-gcc -print-sysroot
+                  echo "=== crti.o ==="
+                  x86_64-unknown-haiku-gcc -print-file-name=crti.o
+                  echo "=== libroot ==="
+                  x86_64-unknown-haiku-gcc -print-file-name=libroot.so
+                  echo "=== search dirs ==="
+                  x86_64-unknown-haiku-gcc -print-search-dirs
+              '
           exit
-
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
