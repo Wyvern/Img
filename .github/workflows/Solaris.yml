@@ -251,11 +251,17 @@ jobs:
           docker cp "$cid:/tools/cross-tools-x86_64" /tools/
           docker rm "$cid") &>/dev/null
           ln -s /tools/cross-tools-x86_64 haiku
-          /tools/cross-tools-x86_64/bin/x86_64-unknown-haiku-gcc \
-              -print-search-dirs
-
-          /tools/cross-tools-x86_64/bin/x86_64-unknown-haiku-gcc \
-              -print-file-name=libgcc_s.so
+          find /tools/cross-tools-x86_64 \
+              \( -name 'crti.o' -o \
+                 -name 'start_dyn.o' -o \
+                 -name 'init_term_dyn.o' -o \
+                 -name 'crtn.o' -o \
+                 -name 'libgnu.so' -o \
+                 -name 'libbsd.so' -o \
+                 -name 'libroot.so' -o \
+                 -name 'libnetwork.so' -o \
+                 -name 'libgcc_s.so*' \) \
+              -print
           time cargo s x86_64-unknown-haiku
           exit
 
