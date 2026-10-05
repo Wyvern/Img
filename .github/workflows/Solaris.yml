@@ -79,6 +79,10 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
+              sed -i '/RUN \/tmp\/build-toolchain\.sh/a\
+              \
+              ENV PATH="\/tools\/cross-tools-${ARCHITECTURE}\/bin:${PATH}"' haiku/Dockerfile
+
               file="haiku/build-toolchain.sh"
               if grep -q 'Patch RPattern.cpp' "$file"; then
                   echo "already patched: $file"
@@ -222,11 +226,11 @@ jobs:
       - name: Cross-rs
         run: |
           if [ ! -f ~/.cargo/bin/cross ]; then
-            cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
+            # cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
             # wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
             # sudo mv cross ~/.cargo/bin/
           fi
-          cross --version
+          # cross --version
 
       - name: Build Release
         run: |
@@ -238,8 +242,9 @@ jobs:
           docker cp "$cid":/tools/cross-tools-x86_64/. haiku/
           docker rm "$cid"
 
-          find haiku -name 'x86_64-unknown-haiku-gcc' -print
+          time cargo s x86_64-unknown-haiku
           exit
+
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
@@ -292,6 +297,7 @@ jobs:
             x86_64-unknown-illumos
             sparcv9-sun-solaris
             x86_64-pc-solaris
+            x86_64-unknown-haiku
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
           )
