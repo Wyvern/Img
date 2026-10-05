@@ -247,10 +247,10 @@ jobs:
 
           sudo mkdir -p /tools
           sudo chown "$USER:" /tools
-          cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
+          (cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
           docker cp "$cid:/tools/cross-tools-x86_64" /tools/
-          docker rm "$cid"
-          ln -s /tools/cross-tools-x86_64 haiku
+          docker rm "$cid") &>/dev/null
+          # ln -s /tools/cross-tools-x86_64 haiku
           time cargo s x86_64-unknown-haiku
           exit
 
