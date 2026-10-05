@@ -212,8 +212,8 @@ jobs:
           cache-all-crates: "true"
           cache-workspace-crates: "true"
 
-      - name: Run sccache-cache
-        # uses: mozilla-actions/sccache-action@main
+      - name: Sccache Action
+        uses: Mozilla-Actions/sccache-action@v0.0.11
 
       - name: C/C++ sccache wrappers
         run: |
