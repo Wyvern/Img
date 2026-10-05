@@ -245,18 +245,12 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p ./haiku
-          cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
-          docker cp "$cid:/tools/cross-tools-x86_64/." ./haiku
-          docker rm "$cid"
-          ./haiku/bin/x86_64-unknown-haiku-gcc -print-sysroot
-          ./haiku/bin/x86_64-unknown-haiku-gcc -v -### -x c /dev/null -o /tmp/test
-          ./haiku/bin/x86_64-unknown-haiku-gcc -print-file-name=crti.o
-          ./haiku/bin/x86_64-unknown-haiku-gcc -print-file-name=libroot.so
-          ./haiku/bin/x86_64-unknown-haiku-gcc -print-file-name=start_dyn.o
-          ./haiku/bin/x86_64-unknown-haiku-gcc \
-              --sysroot="$PWD/haiku/sysroot" \
-              -print-file-name=crti.o
+          mkdir -p tools/cross-tools-x86_64
+          (cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
+          docker cp "$cid:/tools/cross-tools-x86_64/." tools/cross-tools-x86_64
+          docker rm "$cid") &>/dev/null
+          sudo ln -sfn tools/cross-tools-x86_64 /tools/cross-tools-x86_64
+          ln -sfn /tools/cross-tools-x86_64 haiku
           time cargo s x86_64-unknown-haiku
           exit
 
