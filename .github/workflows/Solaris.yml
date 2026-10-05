@@ -242,7 +242,8 @@ jobs:
           docker cp "$cid":/tools/cross-tools-x86_64/. haiku/
           docker rm "$cid"
 
-          time cargo s x86_64-unknown-haiku
+          find haiku -type f | grep -E '/(crti\.o|crtn\.o|start_dyn\.o|init_term_dyn\.o|lib(gnu|bsd|gcc_s|root|network)(\.a|\.so.*)?)$'
+          # time cargo s x86_64-unknown-haiku
           exit
 
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
