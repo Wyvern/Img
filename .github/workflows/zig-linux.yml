@@ -78,33 +78,20 @@ jobs:
           # cargo s aarch64_be-unknown-linux-gnu_ilp32
           # cargo s aarch64-unknown-linux-gnu_ilp32
 
-          # mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
+          mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
 
-          # time cargo s csky-unknown-linux-gnuabiv2
-          # time cargo s csky-unknown-linux-gnuabiv2hf
+          time cargo s csky-unknown-linux-gnuabiv2
+          time cargo s csky-unknown-linux-gnuabiv2hf
 
-          find /usr/i686-w64-mingw32 /usr/x86_64-w64-mingw32 \
-            \( -name 'libmsvcrt.a' \
-               -o -name '*synchronization*' \
-               -o -name '*msvcrt*' \
-               -o -name 'libpthread.a' \
-               -o -name 'libmingwex.a' \
-               -o -name 'libmingw32.a' \
-               -o -name 'libgcc.a' \
-               -o -name 'libgcc_eh.a' \) \
-            -print
-          i686-w64-mingw32-gcc -print-file-name=libgcc.a
-          x86_64-w64-mingw32-gcc -print-file-name=libgcc.a
-
-          targets=(
-          i686-pc-windows-gnu
-          i686-win7-windows-gnu
-          x86_64-pc-windows-gnu
-          x86_64-win7-windows-gnu
-          )
-          for target in ${targets[@]}; do
-            time cargo s $target
-          done
+          # targets=(
+          # i686-pc-windows-gnu
+          # i686-win7-windows-gnu
+          # x86_64-pc-windows-gnu
+          # x86_64-win7-windows-gnu
+          # )
+          # for target in ${targets[@]}; do
+          #   time cargo s $target
+          # done
           exit
 
           targets=(
