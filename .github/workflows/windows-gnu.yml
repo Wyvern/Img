@@ -80,10 +80,9 @@ jobs:
 
           wait
 
-          find ./target -type f -name "img" -exec ls -hl {} \;
-          sw_vers
-          hostinfo
-          sysctl -n machdep.cpu.brand_string
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
