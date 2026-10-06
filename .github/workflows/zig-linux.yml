@@ -29,7 +29,6 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          # targets: i686-pc-windows-gnu,x86_64-pc-windows-gnu
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -84,6 +83,8 @@ jobs:
           # time cargo s csky-unknown-linux-gnuabiv2hf
 
           targets=(
+          i686-uwp-windows-gnu
+          x86_64-uwp-windows-gnu
           i686-pc-windows-gnu
           i686-win7-windows-gnu
           x86_64-pc-windows-gnu
