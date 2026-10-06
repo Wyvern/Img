@@ -249,10 +249,9 @@ jobs:
           # sudo chown "$USER:" /tools /system
           cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
           docker cp "$cid:/tools/cross-tools-x86_64/." haiku/tools/cross-tools-x86_64
-          docker cp "$cid:/system" haiku
+          docker cp "$cid:/system/." haiku/system
           docker rm "$cid"
-          ln -s haiku/tools/cross-tools-x86_64/bin linker
-          ls -al linker/
+          ln -s haiku/tools/cross-tools-x86_64 linker
           time cargo s x86_64-unknown-haiku
           exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
