@@ -720,7 +720,7 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
 [target.x86_64-pc-windows-gnu]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
+rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/x86_64-w64-mingw32/lib"]
 [target.x86_64-win7-windows-gnu]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
+rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/x86_64-w64-mingw32/lib"]
