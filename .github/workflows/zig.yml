@@ -72,9 +72,13 @@ jobs:
           # cargo s x86_64-unknown-illumos
           # cargo s aarch64_be-unknown-linux-gnu_ilp32
           # cargo s aarch64-unknown-linux-gnu_ilp32
-          # time cargo s csky-unknown-linux-gnuabiv2
-          # time cargo s csky-unknown-linux-gnuabiv2hf
-          # exit
+
+          mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
+          find csky -type f -name 'libatomic*' -print
+          exit
+          time cargo s csky-unknown-linux-gnuabiv2
+          time cargo s csky-unknown-linux-gnuabiv2hf
+          exit
 
           targets=(
             aarch64_be-unknown-linux-gnu

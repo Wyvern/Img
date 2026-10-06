@@ -691,15 +691,14 @@ linker = "ldproxy"
 rustflags = ["-Cdefault-linker-libraries=yes"]
 
 [target.csky-unknown-linux-gnuabiv2]
-linker = "csky-unknown-linux-gnuabiv2-gcc"
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=csky-linux-gnueabi","-Clink-arg=-Lcsky"]
+# linker = "csky-unknown-linux-gnuabiv2-gcc"
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=csky-linux-gnueabi"]
 
 [target.csky-unknown-linux-gnuabiv2hf]
-linker = "csky-unknown-linux-gnuabiv2hf-gcc"
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky"]
+# linker = "csky-unknown-linux-gnuabiv2hf-gcc"
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf"]
 
 [target.x86_64-unknown-haiku]
 linker = "haiku/bin/x86_64-unknown-haiku-gcc"
-# rustflags = ["-Clink-arg=--sysroot=linker/sysroot"]
