@@ -28,4 +28,7 @@ for a in "$@"; do
   esac
 done
 
+printf 'zig cc args:\n'
+printf '  %q\n' "${filtered[@]}" >&2
+
 exec zig cc "${filtered[@]}"
