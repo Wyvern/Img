@@ -1,0 +1,193 @@
+name: Redox
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+  IMAGE: ghcr.io/${{ github.repository }}
+
+
+jobs:
+  Linux:
+    name: Ubuntu-26.04
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Ubuntu apt update and install
+        run: sudo apt install crosshurd -qy &>/dev/null &
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Emscripten Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten"); then
+            mkdir -p emsdk
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" && touch ~/ems.finish &
+          else
+            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
+            ./emsdk/emsdk install latest &>/dev/null
+            ./emsdk/emsdk activate latest &>/dev/null
+            touch ~/ems.finish
+            tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
+          fi
+
+      - name: Redox Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          targets=(
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+            x86_64-unknown-redox
+          )
+
+          mkdir -p "redox"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
+          else
+            file=relibc-install.tar.gz
+            url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
+            for target in "${targets[@]}"; do
+              mkdir -p "redox/$target"
+              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
+            done
+            wait
+            tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        continue-on-error: true
+        run: |
+          cargo update
+          set +e -x
+
+          source ./emsdk/emsdk_env.sh &>/dev/null
+
+          targets=(
+            x86_64-unknown-motor
+            riscv32imac-unknown-xous-elf
+            x86_64-unknown-hurd-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          time (
+              set +x
+              while [[ ! -f ~/ems.finish ]]; do
+                  sleep 1
+              done
+          )
+
+          targets=(
+            wasm32-unknown-emscripten
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+            x86_64-unknown-redox
+            )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+              x86_64-unknown-redox
+              aarch64-unknown-redox
+              riscv64gc-unknown-redox
+              x86_64-unknown-motor
+              x86_64-unknown-hurd-gnu
+              riscv32imac-unknown-xous-elf
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+
+            echo "Uploading $name..."
+            for d in src redox; do
+                if [ -d "target/$target/$d" ]; then
+                  mv target/$target/$d/{img,$name}|| true
+                  gh release upload Nightly target/$target/$d/$name --clobber || true
+                  break
+                fi
+            done
+          done
+
+          echo "Uploading Wasm32-emscripten..."
+          tar -cJf Wasm32-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js
+          gh release upload Nightly Wasm32-emscripten.tar.xz --clobber
