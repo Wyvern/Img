@@ -83,11 +83,6 @@ jobs:
           # time cargo s csky-unknown-linux-gnuabiv2
           # time cargo s csky-unknown-linux-gnuabiv2hf
 
-          i686-w64-mingw32-gcc -print-search-dirs
-          i686-w64-mingw32-gcc -v -E -x c /dev/null
-          zig cc -target x86-windows-gnu -### -c /dev/null -o /tmp/test.o
-          zig cc -target x86-windows-gnu -v /dev/null -o /tmp/test.exe
-
           targets=(
           i686-pc-windows-gnu
           i686-win7-windows-gnu
