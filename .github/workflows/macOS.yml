@@ -84,14 +84,6 @@ jobs:
           set +e -x
 
           targets=(
-            i686-uwp-windows-gnu
-            x86_64-uwp-windows-gnu
-          )
-          for target in ${targets[@]}; do
-            time cargo s $target
-          done
-          exit
-          targets=(
             aarch64-apple-ios
             arm64e-apple-ios
             aarch64-apple-tvos
