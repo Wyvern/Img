@@ -29,7 +29,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: i686-pc-windows-gnu,i686-win7-windows-gnu,x86_64-pc-windows-gnu,x86_64-win7-windows-gnu
+          targets: i686-pc-windows-gnu,x86_64-pc-windows-gnu
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
