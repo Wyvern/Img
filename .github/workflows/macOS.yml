@@ -99,6 +99,7 @@ jobs:
             wasm32-wasip3
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
+            i686-pc-windows-gnullvm
           )
 
           for target in ${targets[@]}; do
@@ -141,6 +142,7 @@ jobs:
               aarch64-apple-visionos
               aarch64-pc-windows-gnullvm
               x86_64-pc-windows-gnullvm
+              i686-pc-windows-gnullvm
               wasm32-wasip2
               wasm32-wasip3
           )
