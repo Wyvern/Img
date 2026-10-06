@@ -111,7 +111,7 @@ jobs:
                 --load ./haiku
               docker push "$IMAGE:haiku-cross" &
           fi
-          exit
+
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
@@ -231,29 +231,29 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      # - name: Cross-rs
-      #   run: |
-      #     if [ ! -f ~/.cargo/bin/cross ]; then
-      #       cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
-      #       # wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
-      #       # sudo mv cross ~/.cargo/bin/
-      #     fi
-      #     cross --version
+      - name: Cross-rs
+        run: |
+          if [ ! -f ~/.cargo/bin/cross ]; then
+            cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
+            # wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+            # sudo mv cross ~/.cargo/bin/
+          fi
+          cross --version
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          mkdir -p haiku/tools/cross-tools-x86_64 haiku/system
-          # sudo chown "$USER:" /tools /system
-          cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
-          docker cp "$cid:/tools/cross-tools-x86_64/." haiku/tools/cross-tools-x86_64
-          docker cp "$cid:/system/." haiku/system
-          docker rm "$cid"
-          ln -s haiku/tools/cross-tools-x86_64 linker
-          time cargo s x86_64-unknown-haiku
-          exit
+          sudo mkdir -p /tools /system
+          sudo chown "$USER:" /tools /system
+          (cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
+          docker cp "$cid:/tools/cross-tools-x86_64" /tools/
+          docker cp "$cid:/system/." /system/
+          docker rm "$cid") &>/dev/null
+          ln -s /tools/cross-tools-x86_64 haiku
+          time cargo s x86_64-unknown-haiku&
+
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
