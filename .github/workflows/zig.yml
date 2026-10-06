@@ -77,7 +77,17 @@ jobs:
 
           # time cargo s csky-unknown-linux-gnuabiv2
           # time cargo s csky-unknown-linux-gnuabiv2hf
-          # exit
+
+          targets=(
+          i686-pc-windows-gnu
+          i686-win7-windows-gnu
+          x86_64-pc-windows-gnu
+          x86_64-win7-windows-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+          exit
 
           targets=(
             aarch64_be-unknown-linux-gnu
