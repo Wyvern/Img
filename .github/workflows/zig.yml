@@ -75,7 +75,7 @@ jobs:
 
           mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
           find csky -type f -name 'libatomic*' -print
-          cp csky/csky-linux-gnuabiv2/lib/libatomic.a .
+
           time cargo s csky-unknown-linux-gnuabiv2
           time cargo s csky-unknown-linux-gnuabiv2hf
           exit
