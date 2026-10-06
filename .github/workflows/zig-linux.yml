@@ -23,7 +23,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install binutils-mingw-w64 binutils-mingw-w64-i686 gcc-mingw-w64 gcc-mingw-w64-i686
+          sudo apt install binutils-mingw-w64 binutils-mingw-w64-i686 gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -64,6 +64,13 @@ jobs:
         run: |
           cargo update
           set +e -x
+
+          time (
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          )
 
           # hexagon-unknown-linux-musl
           # cargo s x86_64-unknown-illumos
