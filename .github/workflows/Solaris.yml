@@ -231,17 +231,24 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
+      - name: Cache cross-rs
+        uses: actions/cache@v6
+        with:
+          path: ~/.cargo/bin/cross
+          key: ${{ runner.os }}-cross
+          restore-keys: ${{ runner.os }}-cross
+
       - name: Cross-rs
         run: |
           if [ ! -f ~/.cargo/bin/cross ]; then
-            cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
-            # wget -qO- https://github.com/cross-rs/cross/releases/latest/download/cross-x86_64-unknown-linux-gnu.tar.gz | tar -xz
-            # sudo mv cross ~/.cargo/bin/
+            cargo --config ./.cargo/config.toml install cross --git https://github.com/cross-rs/cross --branch main -q --force
           fi
           cross --version
+          exit
 
       - name: Build Release
         run: |
+          exit
           cargo update
           set +e -x
 
