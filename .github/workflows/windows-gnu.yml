@@ -23,7 +23,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          (sudo apt install binutils-mingw-w64 binutils-mingw-w64-i686 gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish) &>/dev/null &
+          (sudo apt install gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish) &>/dev/null &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -115,7 +115,8 @@ jobs:
             else
                 name="${os^}-${arch}"
             fi
+            name="${name}.exe"
             echo "Uploading $name..."
-            mv target/$target/src/{img,$name}|| true
+            mv target/$target/src/{img.exe,$name}|| true
             gh release upload Nightly --clobber target/$target/src/$name || true
           done
