@@ -29,7 +29,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
-          targets: i686-pc-windows-gnu,x86_64-pc-windows-gnu
+          # targets: i686-pc-windows-gnu,x86_64-pc-windows-gnu
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -56,10 +56,10 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      - name: Zig toolchain install
-        uses: mlugg/setup-zig@v2
-        with:
-          version: master
+      # - name: Zig toolchain install
+      #   uses: mlugg/setup-zig@v2
+      #   with:
+      #     version: master
 
       - name: Build Release
         run: |
@@ -78,20 +78,20 @@ jobs:
           # cargo s aarch64_be-unknown-linux-gnu_ilp32
           # cargo s aarch64-unknown-linux-gnu_ilp32
 
-          mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
+          # mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
 
-          time cargo s csky-unknown-linux-gnuabiv2
-          time cargo s csky-unknown-linux-gnuabiv2hf
+          # time cargo s csky-unknown-linux-gnuabiv2
+          # time cargo s csky-unknown-linux-gnuabiv2hf
 
-          # targets=(
-          # i686-pc-windows-gnu
-          # i686-win7-windows-gnu
-          # x86_64-pc-windows-gnu
-          # x86_64-win7-windows-gnu
-          # )
-          # for target in ${targets[@]}; do
-          #   time cargo s $target
-          # done
+          targets=(
+          i686-pc-windows-gnu
+          i686-win7-windows-gnu
+          x86_64-pc-windows-gnu
+          x86_64-win7-windows-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
           exit
 
           targets=(

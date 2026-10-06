@@ -307,7 +307,7 @@ rustflags = [
   # "-Clink-arg=/NXCOMPAT",
 ]
 
-[target.'cfg(all(target_family="windows",target_abi="llvm"))']
+[target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -317,14 +317,6 @@ rustflags = [
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
   "-Clinker-plugin-lto",
-]
-
-[target.'cfg(all(target_family="windows",target_env="gnu",not(target_abi="llvm")))']
-rustflags = [
-  "-Clink-arg=-Wl,--gc-sections",
-  "-Clink-arg=-Wl,--as-needed",
-  "-Clink-arg=-Wl,--build-id=none",
-  "-Clink-arg=-Wl,--strip-all",
 ]
 
 [target.'cfg(target_vendor="apple")']
@@ -699,28 +691,28 @@ linker = "ldproxy"
 rustflags = ["-Cdefault-linker-libraries=yes"]
 
 [target.csky-unknown-linux-gnuabiv2]
-# linker = "csky-unknown-linux-gnuabiv2-gcc"
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=csky-linux-gnueabi","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
+linker = "csky-unknown-linux-gnuabiv2-gcc"
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=csky-linux-gnueabi","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
 
 [target.csky-unknown-linux-gnuabiv2hf]
-# linker = "csky-unknown-linux-gnuabiv2hf-gcc"
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
+linker = "csky-unknown-linux-gnuabiv2hf-gcc"
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
 
 [target.x86_64-unknown-haiku]
 linker = "haiku/bin/x86_64-unknown-haiku-gcc"
 # rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
 
-[target.i686-pc-windows-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
-[target.i686-win7-windows-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
-[target.x86_64-pc-windows-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/x86_64-w64-mingw32/lib"]
-[target.x86_64-win7-windows-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/x86_64-w64-mingw32/lib"]
+# [target.i686-pc-windows-gnu]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
+# [target.i686-win7-windows-gnu]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
+# [target.x86_64-pc-windows-gnu]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/x86_64-w64-mingw32/lib"]
+# [target.x86_64-win7-windows-gnu]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/x86_64-w64-mingw32/lib"]
