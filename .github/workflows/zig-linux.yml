@@ -87,7 +87,11 @@ jobs:
             \( -name 'libmsvcrt.a' \
                -o -name '*synchronization*' \
                -o -name '*msvcrt*' \
-               )
+               -o -name 'libpthread.a' \
+               -o -name 'libmingwex.a' \
+               -o -name 'libmingw32.a' \
+               -o -name 'libgcc.a' \
+               -o -name 'libgcc_eh.a' \) \
             -print
 
           targets=(
