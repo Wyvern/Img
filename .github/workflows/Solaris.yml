@@ -245,10 +245,10 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p haiku
+          mkdir -p haiku/tools/cross-tools-x86_64 haiku/system
           # sudo chown "$USER:" /tools /system
           cid=$(docker create ghcr.io/wyvern/img:haiku-cross)
-          docker cp "$cid:/tools/cross-tools-x86_64" haiku
+          docker cp "$cid:/tools/cross-tools-x86_64/." haiku/tools/cross-tools-x86_64
           docker cp "$cid:/system" haiku
           docker rm "$cid"
           ln -s haiku/tools/cross-tools-x86_64/bin linker
