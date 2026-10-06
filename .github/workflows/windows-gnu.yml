@@ -109,7 +109,7 @@ jobs:
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
             if [[ "$vendor" == "win7" ]]; then
-                name="${os^}-${arch}-${vendor}"
+                name="${os^}-${arch}-${abi}-${vendor}"
             elif [[ -n "$abi" ]]; then
                 name="${os^}-${arch}-${abi}"
             else
