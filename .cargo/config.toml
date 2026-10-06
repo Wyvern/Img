@@ -714,13 +714,13 @@ linker = "haiku/bin/x86_64-unknown-haiku-gcc"
 
 [target.i686-pc-windows-gnu]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib","-Clink-arg=-L/usr/lib/gcc/i686-w64-mingw32/13-win32","-Clink-arg=-L/usr/i686-w64-mingw32/lib/i686-w64-mingw32/13-win32"]
+rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
 [target.i686-win7-windows-gnu]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib","-Clink-arg=-L/usr/lib/gcc/i686-w64-mingw32/13-win32","-Clink-arg=-L/usr/i686-w64-mingw32/lib/i686-w64-mingw32/13-win32"]
+rustflags = ["-Clink-arg=--target=x86-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
 [target.x86_64-pc-windows-gnu]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib","-Clink-arg=-L/usr/lib/gcc/i686-w64-mingw32/13-win32","-Clink-arg=-L/usr/i686-w64-mingw32/lib/i686-w64-mingw32/13-win32"]
+rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]
 [target.x86_64-win7-windows-gnu]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib","-Clink-arg=-L/usr/lib/gcc/i686-w64-mingw32/13-win32","-Clink-arg=-L/usr/i686-w64-mingw32/lib/i686-w64-mingw32/13-win32"]
+rustflags = ["-Clink-arg=--target=x86_64-windows-gnu","-Clink-arg=-L/usr/i686-w64-mingw32/lib"]

@@ -83,6 +83,12 @@ jobs:
           # time cargo s csky-unknown-linux-gnuabiv2
           # time cargo s csky-unknown-linux-gnuabiv2hf
 
+          find /usr/i686-w64-mingw32 /usr/lib/gcc/i686-w64-mingw32 \
+            \( -name 'libmsvcrt.a' \
+               -o -name '*synchronization*' \
+               -o -name '*msvcrt*' \
+            -print
+
           targets=(
           i686-pc-windows-gnu
           i686-win7-windows-gnu
