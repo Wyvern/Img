@@ -74,9 +74,9 @@ jobs:
           # cargo s aarch64-unknown-linux-gnu_ilp32
 
           mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
-          find csky -type f -name 'libatomic*' -print
           csky/csky-linux-gnuabiv2/bin/csky-linux-gnuabiv2-gcc \
               -print-file-name=libatomic.a
+          ./zig-cc.sh --target=csky-linux-gnueabi -### -c /dev/null -o /tmp/test.o
           time cargo s csky-unknown-linux-gnuabiv2
           time cargo s csky-unknown-linux-gnuabiv2hf
           exit
