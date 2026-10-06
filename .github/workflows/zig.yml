@@ -61,7 +61,7 @@ jobs:
       - name: Zig toolchain install
         uses: mlugg/setup-zig@v2
         with:
-          version: master
+          version: 0.17
 
       - name: Build Release
         run: |
@@ -75,6 +75,11 @@ jobs:
 
           mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
 
+          ./zig-cc.sh \
+            --target=csky-linux-gnueabi \
+            -### \
+            /path/to/object.o \
+            -o /tmp/test
 
           time cargo s csky-unknown-linux-gnuabiv2
           time cargo s csky-unknown-linux-gnuabiv2hf
