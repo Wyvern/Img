@@ -87,6 +87,7 @@ jobs:
             \( -name 'libmsvcrt.a' \
                -o -name '*synchronization*' \
                -o -name '*msvcrt*' \
+               )
             -print
 
           targets=(
