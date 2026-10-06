@@ -23,12 +23,13 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          (sudo apt install binutils-mingw-w64 binutils-mingw-w64-i686 gcc-mingw-w64 gcc-mingw-w64-i686 binutils-mingw-w64-x86-64-ucrt binutils-mingw-w64-i686-ucrt && touch ~/apt.finish) &>/dev/null &
+          (sudo apt install binutils-mingw-w64 binutils-mingw-w64-i686 gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish) &>/dev/null &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rust-src
+          targets: i686-pc-windows-gnu,x86_64-pc-windows-gnu
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
