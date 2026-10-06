@@ -23,7 +23,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install binutils-mingw-w64 binutils-mingw-w64-i686 gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish &
+          (sudo apt install binutils-mingw-w64 binutils-mingw-w64-i686 gcc-mingw-w64 gcc-mingw-w64-i686 binutils-mingw-w64-x86-64-ucrt binutils-mingw-w64-i686-ucrt && touch ~/apt.finish) &>/dev/null &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -81,6 +81,14 @@ jobs:
 
           # time cargo s csky-unknown-linux-gnuabiv2
           # time cargo s csky-unknown-linux-gnuabiv2hf
+
+          i686-w64-mingw32-gcc -print-sysroot
+          zig cc -target x86-windows-gnu -print-sysroot
+          i686-w64-mingw32-gcc -print-file-name=libmsvcrt.a
+          i686-w64-mingw32-gcc -print-file-name=libmingwex.a
+          i686-w64-mingw32-gcc -print-file-name=libmingw32.a
+          i686-w64-mingw32-gcc -print-file-name=libgcc.a
+          i686-w64-mingw32-gcc -print-file-name=libpthread.a
 
           targets=(
           i686-pc-windows-gnu
