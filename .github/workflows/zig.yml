@@ -75,9 +75,15 @@ jobs:
 
           mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
 
-          env | grep -Ei 'ZIG|TARGET|SYSROOT|GLIBC|MUSL|LINUX'
-          grep -RInE '5\.10\.0|2\.34\.0|linux5|gnueabi2|glibc' \
-              .cargo Cargo.toml zig-cc.sh 2>/dev/null
+          csky/csky-linux-gnuabiv2/bin/csky-linux-gnuabiv2-gcc \
+            -print-sysroot
+
+          ./zig-cc.sh \
+            --target=csky-linux-gnueabi \
+            -Lcsky/csky-linux-gnuabiv2/lib \
+            -### \
+            -c /dev/null \
+            -o /tmp/test.o
 
           time cargo s csky-unknown-linux-gnuabiv2
           time cargo s csky-unknown-linux-gnuabiv2hf
