@@ -1,4 +1,4 @@
-name: Zig-linux
+name: Windows-gnu
 
 on:
   push:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   macOS:
-    name: Zig-linux
+    name: Windows-gnu
     runs-on: ubuntu-26.04-arm
 
     steps:
@@ -83,12 +83,10 @@ jobs:
           # time cargo s csky-unknown-linux-gnuabiv2hf
 
           targets=(
-          i686-uwp-windows-gnu
-          x86_64-uwp-windows-gnu
-          i686-pc-windows-gnu
-          i686-win7-windows-gnu
-          x86_64-pc-windows-gnu
-          x86_64-win7-windows-gnu
+            i686-pc-windows-gnu
+            i686-win7-windows-gnu
+            x86_64-pc-windows-gnu
+            x86_64-win7-windows-gnu
           )
           for target in ${targets[@]}; do
             time cargo s $target
