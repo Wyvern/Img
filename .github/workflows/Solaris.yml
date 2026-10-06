@@ -241,10 +241,9 @@ jobs:
       - name: Cross-rs
         run: |
           if [ ! -f ~/.cargo/bin/cross ]; then
-            cargo --config ./.cargo/config.toml install cross --git https://github.com/cross-rs/cross --branch main -q --force
+            cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force
           fi
           cross --version
-          exit
 
       - name: Build Release
         run: |
