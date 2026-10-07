@@ -694,7 +694,6 @@ linker = "csky-unknown-linux-gnuabiv2-gcc"
 
 [target.csky-unknown-linux-gnuabiv2hf]
 linker = "csky-unknown-linux-gnuabiv2hf-gcc"
-rustflags = ["-Ctarget-cpu=ck810","-Clink-arg=-mcpu=ck810"]
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
 
