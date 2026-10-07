@@ -73,7 +73,8 @@ jobs:
           # )
 
           targets=(
-
+            powerpc-unknown-openbsd
+            powerpc-unknown-netbsd
           )
           for target in ${targets[@]}; do
             time cargo s $target
