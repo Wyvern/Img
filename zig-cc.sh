@@ -30,4 +30,6 @@ for a in "$@"; do
   esac
 done
 
+printf '%s\n' "${filtered[@]}" >&2
+exit 0
 exec zig cc "${filtered[@]}"
