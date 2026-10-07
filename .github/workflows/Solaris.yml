@@ -263,7 +263,7 @@ jobs:
           set +e -x
 
           time {
-              set +x
+              # set +x
               while [[ ! -f ~/haiku.finish ]]; do
                   sleep 1
               done
