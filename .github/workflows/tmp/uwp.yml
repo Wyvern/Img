@@ -73,7 +73,7 @@ jobs:
           # )
 
           targets=(
-            i586-unknown-netbsd
+
           )
           for target in ${targets[@]}; do
             time cargo s $target
@@ -101,10 +101,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-            i686-pc-windows-gnu
-            i686-win7-windows-gnu
-            x86_64-pc-windows-gnu
-            x86_64-win7-windows-gnu
+
           )
 
           for target in "${targets[@]}"; do
