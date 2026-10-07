@@ -119,12 +119,12 @@ jobs:
 
           time cargo s x86_64-fortanix-unknown-sgx &
 
-          time (
+          time {
               set +x
               while [[ ! -f ~/fuchsia.finish || ! -f ~/llvm.finish ]]; do
                   sleep 1
               done
-          )
+          }
 
           targets=(
             aarch64-unknown-fuchsia

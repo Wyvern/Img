@@ -117,12 +117,12 @@ jobs:
           sudo mkdir -p /tools /system
           sudo chown "$USER:" /tools /system
           {
-          cid=$(docker create "ghcr.io/wyvern/img:haiku-cross")
-          docker cp "$cid:/tools/cross-tools-x86_64" /tools/
-          docker cp "$cid:/system/." /system/
-          docker rm "$cid"
+          cid=$(docker create "ghcr.io/wyvern/img:haiku-cross") && \
+          docker cp "$cid:/tools/cross-tools-x86_64" /tools/ && \
+          docker cp "$cid:/system/." /system/ && \
+          docker rm "$cid" && \
           touch ~/haiku.finish
-          } &>/dev/null &
+          } &
 
           targets=(
             csky-unknown-linux-gnuabiv2

@@ -65,12 +65,12 @@ jobs:
           cargo update
           set +e -x
 
-          # time (
+          # time {
           #     set +x
           #     while [[ ! -f ~/apt.finish ]]; do
           #         sleep 1
           #     done
-          # )
+          # }
 
           targets=(
 

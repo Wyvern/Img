@@ -125,12 +125,12 @@ jobs:
             time cargo s $target
           done
 
-          time (
+          time {
               set +x
               while [[ ! -f ~/ems.finish ]]; do
                   sleep 1
               done
-          )
+          }
 
           targets=(
             wasm32-unknown-emscripten

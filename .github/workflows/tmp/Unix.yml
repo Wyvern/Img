@@ -171,12 +171,12 @@ jobs:
           cargo update
           set +e -x
 
-          time (
+          time {
               set +x
               while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
                   sleep 1
               done
-          )
+          }
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly &>/dev/null
 

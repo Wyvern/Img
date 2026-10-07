@@ -179,12 +179,12 @@ jobs:
             time cargo s $target &
           done
 
-          time (
+          time {
               set +x
               while [[ ! -f ~/apt.finish ]]; do
                   sleep 1
               done
-          )
+          }
 
           targets=(
             powerpc-unknown-linux-gnu
