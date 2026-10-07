@@ -260,7 +260,6 @@ jobs:
             docker cp "$cid:/system/." /system/
             docker rm "$cid"
           } &>/dev/null
-          exit
           ln -s /tools/cross-tools-x86_64 haiku
           time cargo s x86_64-unknown-haiku &
 
