@@ -73,7 +73,7 @@ jobs:
           # )
 
           targets=(
-
+            i586-unknown-netbsd
           )
           for target in ${targets[@]}; do
             time cargo s $target
