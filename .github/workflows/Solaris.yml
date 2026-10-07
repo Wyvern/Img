@@ -223,7 +223,7 @@ jobs:
           cache-workspace-crates: "true"
 
       - name: Sccache Action
-        uses: Mozilla-Actions/sccache-action@v0.0.11
+        uses: Mozilla-Actions/sccache-action@main
 
       - name: C/C++ sccache wrappers
         run: |
@@ -260,6 +260,15 @@ jobs:
           cargo update
           set +e -x
 
+          time (
+              set +x
+              while [[ ! -f ~/haiku.finish ]]; do
+                  sleep 1
+              done
+          )
+          ln -s /tools/cross-tools-x86_64 haiku
+          time cargo s x86_64-unknown-haiku &
+
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
@@ -283,15 +292,6 @@ jobs:
           for target in ${targets[@]}; do
             time "${cb[@]}" $target &
           done
-
-          time (
-              set +x
-              while [[ ! -f ~/haiku.finish ]]; do
-                  sleep 1
-              done
-          )
-          ln -s /tools/cross-tools-x86_64 haiku
-          time cargo s x86_64-unknown-haiku &
 
           wait
 
