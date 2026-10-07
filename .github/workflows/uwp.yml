@@ -73,7 +73,6 @@ jobs:
           # )
 
           targets=(
-            i686-unknown-freebsd
             i586-unknown-netbsd
             i686-unknown-netbsd
             i686-unknown-openbsd
