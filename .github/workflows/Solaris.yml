@@ -72,7 +72,8 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
-              docker pull "$IMAGE:haiku-cross" &>/dev/null &
+              # docker pull "$IMAGE:haiku-cross" &>/dev/null &
+              :
           else
               mkdir -p haiku
 
