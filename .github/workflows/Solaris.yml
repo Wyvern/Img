@@ -72,8 +72,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
-              # docker pull "$IMAGE:haiku-cross" &>/dev/null &
-              :
+              docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
               mkdir -p haiku
 
@@ -113,14 +112,6 @@ jobs:
 
               docker push "$IMAGE:haiku-cross" &
           fi
-
-          sudo mkdir -p /tools /system
-          sudo chown "$USER:" /tools /system
-          (cid=$(docker create "$IMAGE:haiku-cross")
-          docker cp "$cid:/tools/cross-tools-x86_64" /tools/
-          docker cp "$cid:/system/." /system/
-          docker rm "$cid"
-          touch ~/haiku.finish) &>/dev/null &
 
           targets=(
             csky-unknown-linux-gnuabiv2
@@ -260,12 +251,12 @@ jobs:
           cargo update
           set +e -x
 
-          time (
-              set +x
-              while [[ ! -f ~/haiku.finish ]]; do
-                  sleep 1
-              done
-          )
+          sudo mkdir -p /tools /system
+          sudo chown "$USER:" /tools /system
+          (cid=$(docker create "ghcr.io/wyvern/img:haiku-cross")
+          docker cp "$cid:/tools/cross-tools-x86_64" /tools/
+          docker cp "$cid:/system/." /system/
+          docker rm "$cid") &>/dev/null
           ln -s /tools/cross-tools-x86_64 haiku
           time cargo s x86_64-unknown-haiku &
 
