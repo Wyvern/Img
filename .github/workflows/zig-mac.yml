@@ -1,4 +1,4 @@
-name: uwp
+name: Zig-macOS
 
 on:
   push:
@@ -14,16 +14,19 @@ env:
 
 jobs:
   macOS:
-    name: uwp
-    runs-on: ubuntu-26.04-arm
+    name: Zig-macOS
+    runs-on: macos-26
 
     steps:
+      - name: Disable macos spotlight index
+        run: |
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
+          sudo pmset -a powernap 0
+          sudo pmset -a sleep 0
+
       - name: Checkout
         uses: actions/checkout@v7
-
-      - name: Ubuntu apt update and install
-        run: |
-          # (sudo apt install gcc-mingw-w64-x86-64 gcc-mingw-w64-i686 g++-mingw-w64-x86-64 g++-mingw-w64-i686  binutils-mingw-w64-all mingw-w64-ucrt64-dev && touch ~/apt.finish) &>/dev/null &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -65,27 +68,39 @@ jobs:
           cargo update
           set +e -x
 
-          # time (
-          #     set +x
-          #     while [[ ! -f ~/apt.finish ]]; do
-          #         sleep 1
-          #     done
-          # )
+          # hexagon-unknown-linux-musl
+          # cargo s x86_64-unknown-illumos
+          # cargo s aarch64_be-unknown-linux-gnu_ilp32
+          # cargo s aarch64-unknown-linux-gnu_ilp32
+
+          # mkdir -p csky && curl -fsSL 'https://occ-oss-prod.oss-cn-hangzhou.aliyuncs.com/resource/1356021/1619528643136/csky-linux-gnuabiv2-tools-x86_64-glibc-linux-4.9.56-20210423.tar.gz' | tar -xz -C csky --strip-components=1
+
+          # time cargo s csky-unknown-linux-gnuabiv2
+          # time cargo s csky-unknown-linux-gnuabiv2hf
+          # exit
 
           targets=(
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
+            armeb-unknown-linux-gnueabi
+            powerpc-unknown-openbsd
+            powerpc-unknown-netbsd
+            mipsel-unknown-netbsd
+            armv7-unknown-netbsd-eabihf
+            armv6-unknown-netbsd-eabihf
             i586-unknown-netbsd
             i686-unknown-netbsd
             i686-unknown-openbsd
           )
+
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
-
-          exit
-
-          find ./target -iname img.exe -type f | xargs ls -hl
-          lscpu
-          free -m
+          wait
+          find ./target -type f -name "img" -exec ls -hl {} \;
+          sw_vers
+          hostinfo
+          sysctl -n machdep.cpu.brand_string
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
@@ -103,23 +118,30 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-            i686-pc-windows-gnu
-            i686-win7-windows-gnu
-            x86_64-pc-windows-gnu
-            x86_64-win7-windows-gnu
+            armeb-unknown-linux-gnueabi
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
+            powerpc-unknown-openbsd
+            powerpc-unknown-netbsd
+            mipsel-unknown-netbsd
+            armv7-unknown-netbsd-eabihf
+            armv6-unknown-netbsd-eabihf
+            i586-unknown-netbsd
+            i686-unknown-netbsd
+            i686-unknown-openbsd
           )
 
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ "$vendor" == "win7" ]]; then
-                name="${os^}-${arch}-${abi}-${vendor}"
-            elif [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
+            first="$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')"
+            rest="${os#?}"
+            os_cap="${first}${rest}"
+            if [[ -n "$abi" ]]; then
+                name="${os_cap}-${arch}-${abi}"
             else
-                name="${os^}-${arch}"
+                name="${os_cap}-${arch}"
             fi
-            name="${name}.exe"
             echo "Uploading $name..."
-            mv target/$target/src/{img.exe,$name}|| true
+            mv target/$target/src/{img,$name} || true
             gh release upload Nightly --clobber target/$target/src/$name || true
           done
