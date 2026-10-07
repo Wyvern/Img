@@ -23,7 +23,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          (sudo apt install gcc-mingw-w64-x86-64 gcc-mingw-w64-i686 g++-mingw-w64-x86-64 g++-mingw-w64-i686  binutils-mingw-w64-all mingw-w64-ucrt64-dev && touch ~/apt.finish) &>/dev/null &
+          # (sudo apt install gcc-mingw-w64-x86-64 gcc-mingw-w64-i686 g++-mingw-w64-x86-64 g++-mingw-w64-i686  binutils-mingw-w64-all mingw-w64-ucrt64-dev && touch ~/apt.finish) &>/dev/null &
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -55,21 +55,28 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
+
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          time (
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          )
+          # time (
+          #     set +x
+          #     while [[ ! -f ~/apt.finish ]]; do
+          #         sleep 1
+          #     done
+          # )
 
           targets=(
-            i686-uwp-windows-gnu
-            x86_64-uwp-windows-gnu
+            i686-unknown-freebsd
+            i586-unknown-netbsd
+            i686-unknown-netbsd
+            i686-unknown-openbsd
           )
           for target in ${targets[@]}; do
             time cargo s $target

@@ -243,7 +243,7 @@ jobs:
           if [ ! -f ~/.cargo/bin/cross ]; then
             cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
           fi
-          cross --version
+          # cross --version
 
       - name: Build Release
         run: |
