@@ -280,7 +280,7 @@ jobs:
           )
 
           for target in ${targets[@]}; do
-            time "${cb[@]}" $target &>/dev/null
+            time "${cb[@]}" $target &
           done
 
           wait
