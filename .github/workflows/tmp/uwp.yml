@@ -73,8 +73,7 @@ jobs:
           # )
 
           targets=(
-            i686-unknown-netbsd
-            i686-unknown-openbsd
+
           )
           for target in ${targets[@]}; do
             time cargo s $target

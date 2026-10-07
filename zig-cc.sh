@@ -18,8 +18,6 @@ for a in "$@"; do
       ;;
     -Wl,--dynamic-list=*)
       ;;
-    -Wl,-plugin-opt*)
-      ;;
     -Wl,-z,pack-relative-relocs)
       ;;
     -Wl,-O*)
