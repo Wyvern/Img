@@ -262,12 +262,12 @@ jobs:
           cargo update
           set +e -x
 
-          time (
+          time {
               set +x
               while [[ ! -f ~/haiku.finish ]]; do
                   sleep 1
               done
-          )
+          }
           exit
           ln -s /tools/cross-tools-x86_64 haiku
           time cargo s x86_64-unknown-haiku &
