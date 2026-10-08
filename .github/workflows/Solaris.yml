@@ -252,6 +252,21 @@ jobs:
           cargo update
           set +e -x
 
+          cat > x86_64-unknown-haiku-gcc <<'EOF'
+          #!/bin/sh
+          exec docker run --rm \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            ghcr.io/wyvern/img:haiku-cross \
+            x86_64-unknown-haiku-gcc \
+            "$@"
+          EOF
+
+          chmod +x x86_64-unknown-haiku-gcc
+          # export PATH="$PWD:$PATH"
+          time cargo s x86_64-unknown-haiku
+          exit
+
           sudo mkdir -p /tools /system
           sudo chown "$USER:" /tools /system
           time {
