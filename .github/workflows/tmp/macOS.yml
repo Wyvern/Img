@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
-  mingw: "20260922"
+  mingw: "20261006"
 
 jobs:
   macOS:
