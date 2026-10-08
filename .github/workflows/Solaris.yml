@@ -263,8 +263,9 @@ jobs:
           EOF
 
           chmod +x x86_64-unknown-haiku-gcc
-          # export PATH="$PWD:$PATH"
+          export PATH="$PWD:$PATH"
           time cargo s x86_64-unknown-haiku
+
           exit
 
           sudo mkdir -p /tools /system
