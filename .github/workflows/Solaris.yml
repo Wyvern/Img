@@ -72,8 +72,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
-              # docker pull "$IMAGE:haiku-cross" &>/dev/null &
-              :
+              docker pull "$IMAGE:haiku-cross" &>/dev/null &
           else
               mkdir -p haiku
 
@@ -263,21 +262,9 @@ jobs:
           EOF
 
           chmod +x x86_64-unknown-haiku-gcc
-          export PATH="$PWD:$PATH"
           time cargo s x86_64-unknown-haiku
 
           exit
-
-          sudo mkdir -p /tools /system
-          sudo chown "$USER:" /tools /system
-          time {
-            cid=$(docker create "ghcr.io/wyvern/img:haiku-cross")
-            docker cp "$cid:/tools/cross-tools-x86_64" /tools/
-            docker cp "$cid:/system/." /system/
-            docker rm "$cid"
-          } &>/dev/null
-          ln -s /tools/cross-tools-x86_64 haiku
-          time cargo s x86_64-unknown-haiku &
 
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
