@@ -79,18 +79,6 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
-              file="haiku/Dockerfile"
-              if ! grep -qF 'ENV CARGO_TARGET_X86_64_UNKNOWN_HAIKU_LINKER=x86_64-unknown-haiku-gcc' "$file"; then
-                  sed -i '/RUN \/tmp\/build-toolchain\.sh/a\
-              \
-              ENV CARGO_TARGET_X86_64_UNKNOWN_HAIKU_LINKER=x86_64-unknown-haiku-gcc\
-              ENV CC_x86_64_unknown_haiku=x86_64-unknown-haiku-gcc\
-              ENV CXX_x86_64_unknown_haiku=x86_64-unknown-haiku-g++\
-              ENV AR_x86_64_unknown_haiku=x86_64-unknown-haiku-ar' \
-                      "$file"
-                  echo "patched: $file"
-              fi
-
               file="haiku/build-toolchain.sh"
               if grep -q 'Patch RPattern.cpp' "$file"; then
                   echo "already patched: $file"
@@ -262,9 +250,7 @@ jobs:
           EOF
 
           chmod +x x86_64-unknown-haiku-gcc
-          time cargo s x86_64-unknown-haiku
-
-          exit
+          time cargo s x86_64-unknown-haiku &
 
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 

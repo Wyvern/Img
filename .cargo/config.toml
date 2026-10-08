@@ -694,13 +694,10 @@ linker = "csky-unknown-linux-gnuabiv2hf-gcc"
 
 [target.x86_64-unknown-haiku]
 linker = "./x86_64-unknown-haiku-gcc"
-# rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
-
 
 [target.i686-unknown-openbsd]
 linker = "./zig-cc.sh"
-rustflags = [   "-Clink-arg=--target=x86-openbsd"
-    ]
+rustflags = ["-Clink-arg=--target=x86-openbsd"]
 [target.i686-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=x86-netbsd"]
