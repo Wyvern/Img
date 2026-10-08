@@ -79,6 +79,8 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
+              # sed '$a ENTRYPOINT ["x86_64-unknown-haiku-gcc"]' > haiku/Dockerfile
+
               file="haiku/build-toolchain.sh"
               if grep -q 'Patch RPattern.cpp' "$file"; then
                   echo "already patched: $file"
@@ -239,19 +241,6 @@ jobs:
           cargo update
           set +e -x
 
-          cat > x86_64-unknown-haiku-gcc <<'EOF'
-          #!/bin/sh
-          exec docker run --rm \
-            -v "$PWD:$PWD" \
-            -w "$PWD" \
-            ghcr.io/wyvern/img:haiku-cross \
-            x86_64-unknown-haiku-gcc \
-            "$@"
-          EOF
-
-          chmod +x x86_64-unknown-haiku-gcc
-          time cargo s x86_64-unknown-haiku &
-
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
@@ -275,6 +264,19 @@ jobs:
           for target in ${targets[@]}; do
             time "${cb[@]}" $target &
           done
+
+          cat > x86_64-unknown-haiku-gcc <<'EOF'
+          #!/bin/sh
+          exec docker run --rm \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            ghcr.io/wyvern/img:haiku-cross \
+            x86_64-unknown-haiku-gcc \
+            "$@"
+          EOF
+
+          chmod +x x86_64-unknown-haiku-gcc
+          time cargo s x86_64-unknown-haiku &
 
           wait
 
