@@ -106,7 +106,7 @@ jobs:
 
           RUN git clone --depth=1 https://github.com/flavioc/cross-hurd.git . \
               && sed -i 's/^ZLIB_VERSION=.*/ZLIB_VERSION=1.3.2/' vars.sh \
-              && sed -i 's|^ZLIB_URL=.*|ZLIB_URL=https://zlib.net/fossils/"$ZLIB_PKG"|' download-funcs.sh \
+              && printf '\nZLIB_URL=https://zlib.net/fossils/"$ZLIB_PKG"\n' >> download-funcs.sh \
               && CPU=i686 bash download.sh \
               && CPU=i686 bash bootstrap.sh \
               && test -x /cross-tools-i686/bin/i686-gnu-gcc \
