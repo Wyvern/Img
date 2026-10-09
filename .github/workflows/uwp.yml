@@ -76,11 +76,9 @@ jobs:
 
           LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
           lsblk -f "$LOOP"
-          sudo fdisk -l "$LOOP"
           sudo mkdir -p /mnt/hurd
           sudo mount -o ro ${LOOP}p2 /mnt/hurd
-          ls -hl /mnt/hurd
-          exit
+
           targets=(
             i686-unknown-hurd-gnu
           )
