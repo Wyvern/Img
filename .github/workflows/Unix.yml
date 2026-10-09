@@ -56,6 +56,17 @@ jobs:
             mkdir -p /home/runner/unix;
             ln -sf /home/runner/unix sysroot
 
+            mkdir -p freebsd/x86
+            curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C freebsd/x86 &>/dev/null &
+
+            {
+              curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/$FREEBSD/FreeBSD-${FREEBSD}-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
+              LOOP=$(sudo losetup --find --show --partscan armv7.img)
+              sudo mkdir -p /mnt/freebsd
+              sudo mount -t ufs -o ro,ufstype=ufs2 ${LOOP}p5 /mnt/freebsd
+              ln -s /mnt/freebsd freebsd/armv7
+            } &
+
             if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix"); then
               oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.sysroot &
               # oras pull --allow-path-traversal "${IMAGE}:unix" -o /tmp/
@@ -171,15 +182,16 @@ jobs:
           cargo update
           set +e -x
 
-          mkdir -p freebsd/x86
-          curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C freebsd/x86 &>/dev/null &
-
           time {
               set +x
               while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
                   sleep 1
               done
           }
+          time cargo s i686-unknown-freebsd &
+          time cargo s armv7-unknown-freebsd &
+          wait
+          exit
 
           sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly &>/dev/null
 
@@ -192,6 +204,7 @@ jobs:
             powerpc64le-unknown-freebsd
             powerpc-unknown-freebsd
             i686-unknown-freebsd
+            armv7-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
@@ -234,6 +247,7 @@ jobs:
             powerpc64le-unknown-freebsd
             powerpc-unknown-freebsd
             i686-unknown-freebsd
+            armv7-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
