@@ -711,7 +711,7 @@ linker = "csky-unknown-linux-gnuabiv2hf-gcc"
 linker = "./x86_64-unknown-haiku-gcc"
 
 [target.i686-unknown-hurd-gnu]
-linker = "./hurd.gcc"
+linker = "./i686-gnu-gcc"
 
 [target.i686-unknown-openbsd]
 linker = "./zig-cc.sh"

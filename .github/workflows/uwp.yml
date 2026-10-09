@@ -83,7 +83,7 @@ jobs:
           #     done
           # }
 
-          cat > hurd.gcc <<'EOF'
+          cat > i686-gnu-gcc <<'EOF'
           #!/bin/sh
           exec docker run --rm \
             -v "$PWD:$PWD" \
@@ -91,7 +91,7 @@ jobs:
             ghcr.io/wyvern/img:hurd-i686 \
             "$@"
           EOF
-          chmod +x hurd.gcc
+          chmod +x i686-gnu-gcc
 
           targets=(
             i686-unknown-hurd-gnu
