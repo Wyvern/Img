@@ -72,13 +72,15 @@ jobs:
           #     done
           # }
 
-          curl -fsSL https://cdimage.debian.org/cdimage/ports/stable/hurd-i386/debian-hurd.img.tar.gz | tar -xzOf - > debian-hurd.img
+          curl -fsSL https://cdimage.debian.org/cdimage/ports/stable/hurd-i386/debian-hurd.img.tar.xz | tar -xJOf - > debian-hurd.img
 
           LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
-          lsblk -f "$LOOP"
           sudo mkdir -p /mnt/hurd
           sudo mount -o ro ${LOOP}p2 /mnt/hurd
-
+          find /mnt/hurd/usr/bin /mnt/hurd/bin \
+            -maxdepth 1 -type f -o -type l 2>/dev/null |
+            grep -E '/(.*-gnu-gcc|.*-gnu-ld|gcc|ld)$'
+            exit
           targets=(
             i686-unknown-hurd-gnu
           )
