@@ -72,12 +72,12 @@ jobs:
           #     done
           # }
 
-          curl -fsSL https://cdimage.debian.org/cdimage/ports/stable/hurd-amd64/debian-hurd.img.tar.xz | tar -xJOf - > debian-hurd.img
+          curl -fsSL https://cdimage.debian.org/cdimage/ports/stable/hurd-i386/debian-hurd.img.tar.xz | tar -xJOf - > debian-hurd.img
 
           LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
           sudo mkdir -p /mnt/hurd
           sudo mount -o ro ${LOOP}p1 /mnt/hurd
-          zig targets | grep -E 'hurd|gnu'
+
           find /mnt/hurd -type f \( \
               -name 'libc.so' -o \
               -name 'libc.a' -o \
