@@ -26,9 +26,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Ubuntu apt update and install
-        run: sudo apt install crosshurd -qy &>/dev/null &
-
       - name: setup-oras
         uses: oras-project/setup-oras@v2
 

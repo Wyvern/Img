@@ -15,7 +15,7 @@ env:
 jobs:
   macOS:
     name: uwp
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
 
     steps:
       - name: Checkout
@@ -23,7 +23,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install crosshurd -qy &>/dev/null
+          # sudo apt install crosshurd -qy &>/dev/null
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -72,11 +72,20 @@ jobs:
           #     done
           # }
 
-
-
+          docker run --rm \
+            --platform=linux/386 \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            ubuntu:26.04 \
+            bash -euxc '
+            apt-get install -y --no-install-recommends curl build-essential ca-certificates
+            curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly --component rust-src
+            export PATH="$HOME/.cargo/bin:$PATH"
+            time cargo s i686-unknown-hurd-gnu
+            '
+          exit
           targets=(
             i686-unknown-hurd-gnu
-            x86_64-unknown-hurd-gnu
           )
           for target in ${targets[@]}; do
             time cargo s $target
