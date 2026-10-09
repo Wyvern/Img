@@ -75,9 +75,11 @@ jobs:
           curl -fsSL https://cdimage.debian.org/cdimage/ports/stable/hurd-amd64/debian-hurd.img.tar.xz | tar -xJOf - > debian-hurd.img
 
           LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
+          lsblk -f $LOOP
           sudo mkdir -p /mnt/hurd
           sudo mount -o ro ${LOOP}p2 /mnt/hurd
           ls -hl /mnt/hurd
+          exit
           targets=(
             i686-unknown-hurd-gnu
           )
