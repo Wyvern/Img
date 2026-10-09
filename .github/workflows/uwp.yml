@@ -92,10 +92,16 @@ jobs:
             "$@"
           EOF
           chmod +x i686-gnu-gcc
+          printf 'int main(void) { return 0; }\n' > .hurd-test.c
 
+          timeout 60s ./i686-gnu-gcc -v .hurd-test.c -o .hurd-test
+
+          echo "exit status: $?"
+          exit
           targets=(
             i686-unknown-hurd-gnu
           )
+
           for target in ${targets[@]}; do
             time cargo s $target
           done
