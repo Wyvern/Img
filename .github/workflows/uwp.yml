@@ -65,28 +65,30 @@ jobs:
           cargo update
           set +e -x
 
-          # time {
-          #     set +x
-          #     while [[ ! -f ~/apt.finish ]]; do
-          #         sleep 1
-          #     done
-          # }
-
-          curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/15.1/FreeBSD-15.1-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
-          LOOP=$(sudo losetup --find --show --partscan armv7.img)
-          lsblk -f "$LOOP"
-          sudo mkdir -p /mnt/freebsd
-          sudo mount -t ufs -o ro,ufstype=ufs2 /dev/loop0p5 /mnt/freebsd
-          mkdir freebsd
-          ln -s /mnt/freebsd freebsd/armv7
+          {
+            curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/15.1/FreeBSD-15.1-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
+            sudo losetup --find --show --partscan armv7.img
+            sudo mkdir -p /mnt/freebsd
+            sudo mount -t ufs -o ro,ufstype=ufs2 /dev/loop0p5 /mnt/freebsd
+            mkdir freebsd
+            ln -s /mnt/freebsd freebsd/armv7
+          } &
+          time {
+              set +x
+              while [[ ! -f freebsd/armv7 ]]; do
+                  sleep 1
+              done
+          }
+          sudo umount /mnt/freebsd
+          sudo losetup -d "$LOOP"
+          exit
           targets=(
-            armv7-unknown-freebsd
+
           )
           for target in ${targets[@]}; do
             time cargo s $target
           done
-          sudo umount /mnt/freebsd
-          sudo losetup -d "$LOOP"
+
           exit
 
           find ./target -iname img.exe -type f | xargs ls -hl
