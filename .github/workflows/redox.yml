@@ -65,7 +65,7 @@ jobs:
 
           mkdir -p "redox"
 
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain"); then
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" && touch ~/redox.finish &
           else
             file=relibc-install.tar.gz
@@ -76,8 +76,8 @@ jobs:
             done
             wait
             touch ~/redox.finish
-            tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
+            tar --zstd -C "redox/" -cf /tmp/redox.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:redox" "/tmp/redox.tar.zst:application/vnd.wyvern.redox.tar.zstd" &
           fi
 
       - name: Rust Toolchain
