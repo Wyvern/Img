@@ -65,7 +65,7 @@ jobs:
           mkdir -p "redox"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox-toolchain"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" &
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" && touch ~/redox.finish &
           else
             file=relibc-install.tar.gz
             url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
@@ -74,6 +74,7 @@ jobs:
               curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
             done
             wait
+            touch ~/redox.finish
             tar --zstd -C "redox/" -cf /tmp/redox-toolchain.tar.zst .
             oras push --disable-path-validation "${IMAGE}:redox-toolchain" "/tmp/redox-toolchain.tar.zst:application/vnd.wyvern.redox-toolchain.tar.zstd" &
           fi
@@ -131,15 +132,22 @@ jobs:
                   sleep 1
               done
           }
+          time cargo s wasm32-unknown-emscripten &
+
+          time {
+              set +x
+              while [[ ! -f ~/redox.finish ]]; do
+                  sleep 1
+              done
+          }
 
           targets=(
-            wasm32-unknown-emscripten
             aarch64-unknown-redox
             riscv64gc-unknown-redox
             x86_64-unknown-redox
             )
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
 
           find ./target -iname img -type f | xargs ls -hl
