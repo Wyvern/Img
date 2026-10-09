@@ -129,6 +129,7 @@ jobs:
           (
             time {
               set +x
+              echo "Wait for ems.finish:"
               while [[ ! -f ~/ems.finish ]]; do
                   sleep 1
               done
@@ -138,6 +139,7 @@ jobs:
 
           time {
             set +x
+            echo "Wait for redox.finish:"
             while [[ ! -f ~/redox.finish ]]; do
                 sleep 1
             done
