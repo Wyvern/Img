@@ -127,7 +127,7 @@ jobs:
           done
 
           (
-            time{
+            time {
               set +x
               while [[ ! -f ~/ems.finish ]]; do
                   sleep 1
@@ -136,7 +136,7 @@ jobs:
             time cargo s wasm32-unknown-emscripten
           ) &
 
-          time{
+          time {
             set +x
             while [[ ! -f ~/redox.finish ]]; do
                 sleep 1
