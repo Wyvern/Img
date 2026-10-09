@@ -956,7 +956,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     // tdbg!(&no_ext);
     let opts = [
         "-e",
-        host,
+        &format!("https://{host}"),
         "--retry",
         "3",
         "-Z",
