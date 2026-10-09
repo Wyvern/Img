@@ -83,7 +83,7 @@ jobs:
           #     done
           # }
 
-          make hurd
+          mkdir hurd
           cd hurd
 
           cat > Dockerfile <<'EOF'
@@ -122,6 +122,7 @@ jobs:
 
           docker push ghcr.io/wyvern/img:hurd-i686
           exit
+
           targets=(
             i686-unknown-hurd-gnu
           )
