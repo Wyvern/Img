@@ -129,20 +129,20 @@ jobs:
           (
             time {
               set +x
-              echo "Wait for ems.finish:"
               while [[ ! -f ~/ems.finish ]]; do
                   sleep 1
               done
+              echo "Wait for ems.finish:"
             }
             time cargo s wasm32-unknown-emscripten
           ) &
 
           time {
             set +x
-            echo "Wait for redox.finish:"
             while [[ ! -f ~/redox.finish ]]; do
                 sleep 1
             done
+            echo "Wait for redox.finish:"
           }
 
           targets=(
