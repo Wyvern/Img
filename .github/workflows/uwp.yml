@@ -55,10 +55,10 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      # - name: Zig toolchain install
-      #   uses: mlugg/setup-zig@v2
-      #   with:
-      #     version: master
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
 
       - name: Build Release
         run: |
@@ -72,7 +72,7 @@ jobs:
           #     done
           # }
           targets=(
-
+            i686-unknown-hurd-gnu
           )
           for target in ${targets[@]}; do
             time cargo s $target
