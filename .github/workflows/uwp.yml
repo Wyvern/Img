@@ -109,6 +109,8 @@ jobs:
               && sed -i 's|^ZLIB_URL=.*|ZLIB_URL=https:\/\/zlib.net\/fossils\/"$ZLIB_PKG"|' download-funcs.sh \
               && sed -i 's|^MAKE_URL=\$GNU_REPO/"\$MAKE_PKG"|MAKE_URL=$GNU_REPO/make/"$MAKE_PKG"|' download-funcs.sh \
               && sed -i '/apply_patch .*submitted-AF_LINK\.diff 1/c\    sed -i -e "s|^[[:space:]]*#define[[:space:]]*PF_LINK[[:space:]]*18.*|/* #define PF_LINK 18 Link layer interface. */|" -e "s|^[[:space:]]*#define[[:space:]]*AF_LINK[[:space:]]*PF_LINK|/* #define AF_LINK PF_LINK */|" sysdeps/mach/hurd/bits/socket.h &&' download-funcs.sh \
+              && sed -i 's|^DMIDECODE_URL=http://|DMIDECODE_URL=https://|' download-funcs.sh \
+              && sed -i 's|download\.savannah\.gnu\.org/releases/dmidecode/|download-mirror.savannah.gnu.org/releases/dmidecode/|' download-funcs.sh \
               && CPU=i686 bash -x download.sh \
               && CPU=i686 bash -x bootstrap.sh \
               && test -x /cross-tools-i686/bin/i686-gnu-gcc \
