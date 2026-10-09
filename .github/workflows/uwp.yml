@@ -55,10 +55,10 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      - name: Zig toolchain install
-        uses: mlugg/setup-zig@v2
-        with:
-          version: master
+      # - name: Zig toolchain install
+      #   uses: mlugg/setup-zig@v2
+      #   with:
+      #     version: master
 
       - name: Build Release
         run: |
@@ -72,14 +72,11 @@ jobs:
           #     done
           # }
 
-          curl -fsSL https://cdimage.debian.org/cdimage/ports/stable/hurd-i386/debian-hurd.img.tar.xz | tar -xJOf - > debian-hurd.img
 
-          LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
-          sudo mkdir -p /mnt/hurd
-          sudo mount -o ro ${LOOP}p2 /mnt/hurd
 
           targets=(
             i686-unknown-hurd-gnu
+            x86_64-unknown-hurd-gnu
           )
           for target in ${targets[@]}; do
             time cargo s $target
