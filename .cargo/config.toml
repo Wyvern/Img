@@ -714,7 +714,7 @@ linker = "./x86_64-unknown-haiku-gcc"
 linker = "./zig-cc.sh"
 rustflags = [
     "-Clink-arg=--target=x86-hurd",
-    "-Clink-arg=--sysroot=/mnt/hurd/usr/lib",
+    "-Clink-arg=-L/mnt/hurd/usr/lib",
 ]
 
 [target.i686-unknown-openbsd]
