@@ -416,7 +416,7 @@ runner = "qemu-x86_64 -L sysroot/freebsd/amd64"
 
 [target.i686-unknown-freebsd]
 rustflags = [
-  "-Clink-arg=--sysroot=sysroot/freebsd/x86",
+  "-Clink-arg=--sysroot=freebsd/x86",
   "-Clink-arg=--target=i686--freebsd",
 ]
 

@@ -171,6 +171,9 @@ jobs:
           cargo update
           set +e -x
 
+          mkdir -p freebsd/x86
+          curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C freebsd/x86 &>/dev/null &
+
           time {
               set +x
               while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
@@ -188,6 +191,7 @@ jobs:
             powerpc64-unknown-freebsd
             powerpc64le-unknown-freebsd
             powerpc-unknown-freebsd
+            i686-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd
@@ -229,6 +233,7 @@ jobs:
             powerpc64-unknown-freebsd
             powerpc64le-unknown-freebsd
             powerpc-unknown-freebsd
+            i686-unknown-freebsd
             x86_64-unknown-openbsd
             aarch64-unknown-openbsd
             riscv64gc-unknown-openbsd

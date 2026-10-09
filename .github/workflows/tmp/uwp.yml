@@ -72,12 +72,7 @@ jobs:
           #     done
           # }
 
-          mkdir -p sysroot/freebsd/x86
-          https://download.freebsd.org/releases/i386/14.5-RELEASE/
-          curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/x86
-
           targets=(
-            i686-unknown-freebsd
             # armv7-unknown-freebsd
           )
           for target in ${targets[@]}; do
