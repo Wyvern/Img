@@ -120,7 +120,7 @@ jobs:
           docker build --platform linux/amd64 \
               --provenance=false \
               --load \
-              --progress=quiet \
+              --progress=plain \
               -t ghcr.io/wyvern/img:hurd-i686 .
 
           docker push ghcr.io/wyvern/img:hurd-i686
