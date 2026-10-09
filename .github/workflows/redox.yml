@@ -182,8 +182,7 @@ jobs:
             "$@"
           EOF
           chmod +x i686-gnu-gcc
-          time cargo s i686-unknown-hurd-gnu
-          exit
+
           targets=(
             x86_64-unknown-motor
             riscv32imac-unknown-xous-elf
