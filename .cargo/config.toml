@@ -711,11 +711,7 @@ linker = "csky-unknown-linux-gnuabiv2hf-gcc"
 linker = "./x86_64-unknown-haiku-gcc"
 
 [target.i686-unknown-hurd-gnu]
-# linker = "./zig-cc.sh"
-# rustflags = [
-#     "-Clink-arg=--target=x86-hurd",
-#     "-Clink-arg=-L/mnt/hurd/usr/lib/i386-gnu",
-# ]
+linker = "./hurd.gcc"
 
 [target.i686-unknown-openbsd]
 linker = "./zig-cc.sh"
