@@ -77,10 +77,7 @@ jobs:
           LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
           sudo mkdir -p /mnt/hurd
           sudo mount -o ro ${LOOP}p2 /mnt/hurd
-          find /mnt/hurd/usr/bin /mnt/hurd/bin \
-            -maxdepth 1 -type f -o -type l 2>/dev/null |
-            grep -E '/(.*-gnu-gcc|.*-gnu-ld|gcc|ld)$'
-            exit
+          ln -s /mnt/hurd hurd
           targets=(
             i686-unknown-hurd-gnu
           )
