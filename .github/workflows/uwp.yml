@@ -76,7 +76,7 @@ jobs:
 
           LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
           sudo mkdir -p /mnt/hurd
-          sudo mount -o ro ${LOOP}p1 /mnt/hurd
+          sudo mount -o ro ${LOOP}p2 /mnt/hurd
 
           find /mnt/hurd -type f \( \
               -name 'libc.so' -o \
