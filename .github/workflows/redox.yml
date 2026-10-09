@@ -40,8 +40,8 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
-            docker pull "$IMAGE:haiku-cross" &>/dev/null &
+          if docker manifest inspect "$IMAGE:hurd-i686" &>/dev/null; then
+            docker pull "$IMAGE:hurd-i686" &>/dev/null &
           else
             mkdir hurd
             cd hurd
