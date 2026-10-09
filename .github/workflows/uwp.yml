@@ -73,13 +73,12 @@ jobs:
           # }
 
           curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/15.1/FreeBSD-15.1-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
-          file=armv7.img
-          LOOP=$(sudo losetup --find --show --partscan $file)
+          LOOP=$(sudo losetup --find --show --partscan armv7.img)
           lsblk -f "$LOOP"
           sudo mkdir -p /mnt/freebsd
           sudo mount -t ufs -o ro,ufstype=ufs2 /dev/loop0p5 /mnt/freebsd
-          ls -hl /mnt/freebsd
-          exit
+          mkdir freebsd
+          ln -s /mnt/freebsd freebsd/armv7
           targets=(
             armv7-unknown-freebsd
           )

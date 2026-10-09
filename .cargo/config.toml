@@ -420,6 +420,12 @@ rustflags = [
   "-Clink-arg=--target=i686--freebsd",
 ]
 
+[target.armv7-unknown-freebsd]
+rustflags = [
+  "-Clink-arg=--sysroot=freebsd/armv7",
+  "-Clink-arg=--target=armv7--freebsd",
+]
+
 [target.aarch64-unknown-freebsd]
 rustflags = [
   "-Clink-arg=--sysroot=sysroot/freebsd/arm64",
