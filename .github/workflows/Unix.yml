@@ -14,6 +14,7 @@ env:
   FREEBSD: "15.1"
   OPENBSD: "7.9"
   NETBSD: "11.0"
+  DFLY: "6.4.2"
   LLVM: "23"
 
 jobs:
@@ -56,9 +57,6 @@ jobs:
             mkdir -p /home/runner/unix;
             ln -sf /home/runner/unix sysroot
 
-            mkdir -p freebsd/x86
-            curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C freebsd/x86 &>/dev/null &
-
             {
               curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/$FREEBSD/FreeBSD-${FREEBSD}-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
               LOOP=$(sudo losetup --find --show --partscan armv7.img)
@@ -84,6 +82,11 @@ jobs:
               if [ ! -d sysroot/freebsd/powerpc ]; then
                 mkdir -p sysroot/freebsd/powerpc
                 curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc &>/dev/null &
+              fi
+
+              if [ ! -d sysroot/freebsd/i386 ]; then
+                mkdir -p sysroot/freebsd/i386
+                curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/i386 &>/dev/null &
               fi
 
               ppc=(powerpc64 powerpc64le)
@@ -128,8 +131,8 @@ jobs:
                 fi
               done
 
-              if [ ! -f sysroot/dfly-x86_64-6.4.2_REL.iso ]; then
-                curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-6.4.2_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-6.4.2_REL.iso &
+              if [ ! -f sysroot/dfly-x86_64-${DFLY}_REL.iso ]; then
+                curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-${DFLY}_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-${DFLY}_REL.iso &
                 mkdir -p sysroot/dfly
               fi
 
@@ -153,13 +156,6 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
-
-      - name: Cache ppc-freebsd
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/unix/freebsd/powerpc
-          key: ppc-freebsd
-          restore-keys: ppc-freebsd
 
       - name: C/C++ sccache wrappers
         run: |
@@ -188,12 +184,8 @@ jobs:
                   sleep 1
               done
           }
-          time cargo s i686-unknown-freebsd &
-          time cargo s armv7-unknown-freebsd &
-          wait
-          exit
 
-          sudo mount -o loop sysroot/dfly-x86_64-6.4.2_REL.iso sysroot/dfly &>/dev/null
+          sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
 
           targets=(
             x86_64-unknown-dragonfly
