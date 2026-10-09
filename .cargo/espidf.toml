@@ -154,7 +154,6 @@ profile-rustflags = true
 codegen-backend = true
 target-applies-to-host = true
 host-config = true
-trim-paths = true
 prerelease = true
 gc = true
 git = { shallow_index = true, shallow_deps = true }
@@ -397,7 +396,7 @@ linker = "mipsisa32r6-linux-gnu-gcc"
 [target.'cfg(all(target_arch="mips32r6",target_os="linux",target_endian = "little"))']
 linker = "mipsisa32r6el-linux-gnu-gcc"
 
-[target.'cfg(any(target_os="linux",target_os="android"))']
+[target.'cfg(all(any(target_arch="x86_64",target_arch="x86"),any(target_os="linux",target_os="android")))']
 rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_os="freebsd",all(target_os="netbsd",not(any(target_arch="sparc64",target_arch="powerpc",all(target_arch="mips",target_endian="little"),target_arch="arm",target_arch="x86"))),all(target_os="openbsd",not(any(target_arch="sparc64",target_arch="powerpc",target_arch="x86"))),target_os="dragonfly",target_os="fuchsia"))']
