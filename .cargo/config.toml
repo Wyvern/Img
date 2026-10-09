@@ -254,7 +254,7 @@ rustflags = [
 [target.'cfg(all(target_family = "unix", crate_type = "staticlib"))']
 rustflags = ["-Zstaticlib-hide-internal-symbols"]
 
-[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",target_arch="mips",target_arch="mipsel",all(target_arch="powerpc64",target_endian="big"),all(target_arch="aarch64",target_endian="big"),all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="arm",target_endian="big")))))']
+[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",target_arch="mips",all(target_arch="powerpc64",target_endian="big"),all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="arm",target_endian="big")))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -403,11 +403,7 @@ linker = "mipsisa32r6el-linux-gnu-gcc"
 [target.'cfg(all(any(target_arch="x86_64",target_arch="x86"),any(target_os="linux",target_os="android")))']
 rustflags = ["-Zrelax-elf-relocations"]
 
-# [target.'cfg(any(target_os="freebsd",all(target_os="netbsd",not(any(target_arch="sparc64",target_arch="powerpc",all(target_arch="mips",target_endian="little"),target_arch="arm",target_arch="x86"))),all(target_os="openbsd",not(any(target_arch="sparc64",target_arch="powerpc",target_arch="x86"))),target_os="dragonfly",target_os="fuchsia"))']
-# linker = "clang"
-# rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clinker-plugin-lto"]
-
-[target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia"))']
+[target.'cfg(any(target_os="freebsd",all(target_os="netbsd",not(any(target_arch="sparc64",target_arch="powerpc",all(target_arch="mips",target_endian="little"),target_arch="arm",target_arch="x86"))),all(target_os="openbsd",not(any(target_arch="sparc64",target_arch="powerpc",target_arch="x86"))),target_os="dragonfly",target_os="fuchsia"))']
 linker = "clang"
 rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clinker-plugin-lto"]
 
