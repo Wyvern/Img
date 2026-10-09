@@ -132,7 +132,6 @@ jobs:
               while [[ ! -f ~/ems.finish ]]; do
                   sleep 1
               done
-              echo "Wait for ems.finish:"
             }
             time cargo s wasm32-unknown-emscripten
           ) &
@@ -142,7 +141,6 @@ jobs:
             while [[ ! -f ~/redox.finish ]]; do
                 sleep 1
             done
-            echo "Wait for redox.finish:"
           }
 
           targets=(
