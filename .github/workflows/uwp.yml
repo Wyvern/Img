@@ -55,10 +55,10 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      # - name: Zig toolchain install
-      #   uses: mlugg/setup-zig@v2
-      #   with:
-      #     version: master
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
 
       - name: Build Release
         run: |
@@ -77,7 +77,14 @@ jobs:
           LOOP=$(sudo losetup --find --show --partscan debian-hurd.img)
           sudo mkdir -p /mnt/hurd
           sudo mount -o ro ${LOOP}p1 /mnt/hurd
-
+          zig targets | grep -E 'hurd|gnu'
+          find /mnt/hurd -type f \( \
+              -name 'libc.so' -o \
+              -name 'libc.a' -o \
+              -name 'crt1.o' -o \
+              -name 'crti.o' \
+          \)
+          exit
           targets=(
             i686-unknown-hurd-gnu
           )
