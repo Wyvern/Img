@@ -15,7 +15,11 @@ env:
 jobs:
   macOS:
     name: uwp
-    runs-on: ubuntu-26.04-arm
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout
@@ -60,6 +64,13 @@ jobs:
       #   with:
       #     version: master
 
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Release
         run: |
           cargo update
@@ -72,17 +83,42 @@ jobs:
           #     done
           # }
 
-          docker run --rm \
-            --platform=linux/386 \
-            -v "$PWD:$PWD" \
-            -w "$PWD" \
-            ubuntu:24.04 \
-            bash -euxc '
-            apt-get install -y --no-install-recommends curl build-essential ca-certificates
-            curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly --component rust-src
-            export PATH="$HOME/.cargo/bin:$PATH"
-            time cargo s i686-unknown-hurd-gnu
-            '
+          make hurd
+          cd hurd
+
+          cat > Dockerfile <<'EOF'
+          FROM ubuntu:24.04
+
+          ENV DEBIAN_FRONTEND=noninteractive
+          ENV PATH="/cross-tools-i686/bin:${PATH}"
+
+          RUN apt-get update && apt-get install -y --no-install-recommends \
+              git sudo ca-certificates curl wget \
+              build-essential make gcc g++ perl \
+              texinfo autopoint pkg-config libtool \
+              autotools-dev automake autoconf gettext \
+              libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev \
+              flex bison gawk m4 patch xz-utils bzip2 \
+              file python3 \
+              && rm -rf /var/lib/apt/lists/*
+
+          WORKDIR /src/cross-hurd
+
+          RUN git clone --depth=1 https://github.com/flavioc/cross-hurd.git . \
+              && CPU=i686 bash download.sh \
+              && CPU=i686 bash bootstrap.sh \
+              && test -x /cross-tools-i686/bin/i686-gnu-gcc \
+              && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine
+
+          ENTRYPOINT ["/cross-tools-i686/bin/i686-gnu-gcc"]
+          EOF
+
+          docker build --platform linux/amd64 \
+              --provenance=false \
+              --load \
+              -t ghcr.io/wyvern/img:hurd-i686 .
+
+          docker push ghcr.io/wyvern/img:hurd-i686
           exit
           targets=(
             i686-unknown-hurd-gnu
