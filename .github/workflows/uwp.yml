@@ -106,7 +106,7 @@ jobs:
 
           RUN git clone --depth=1 https://github.com/flavioc/cross-hurd.git . \
               && python3 -c 'from pathlib import Path; p=Path("vars.sh"); s=p.read_text().replace("ZLIB_VERSION=1.3.1", "ZLIB_VERSION=1.3.2"); p.write_text(s)' \
-              && python3 -c 'from pathlib import Path; p=Path("download-funcs.sh"); s=p.read_text().replace("http://zlib.net/", "https://zlib.net/"); s=s.replace("https://zlib.net/", "https://zlib.net/fossils/"); p.write_text(s)' \
+              && python3 -c 'from pathlib import Path; p=Path("download-funcs.sh"); lines=p.read_text().splitlines(); lines=[("ZLIB_URL=https://" + "zlib.net/fossils/" + "\"$ZLIB_PKG\"") if line.startswith("ZLIB_URL=") else line for line in lines]; p.write_text("\n".join(lines)+"\n")' \
               && CPU=i686 bash download.sh \
               && CPU=i686 bash bootstrap.sh \
               && test -x /cross-tools-i686/bin/i686-gnu-gcc \
