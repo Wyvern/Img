@@ -122,7 +122,6 @@ jobs:
             x86_64-unknown-motor
             riscv32imac-unknown-xous-elf
             x86_64-unknown-hurd-gnu
-            i686-unknown-hurd-gnu
           )
           for target in ${targets[@]}; do
             time cargo s $target
