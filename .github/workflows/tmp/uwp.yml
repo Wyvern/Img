@@ -15,7 +15,7 @@ env:
 jobs:
   macOS:
     name: uwp
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: read
@@ -84,18 +84,7 @@ jobs:
           # }
 
 
-          cat > i686-gnu-gcc <<'EOF'
-          #!/bin/sh
-          exec docker run --rm \
-            -v "$PWD:$PWD" \
-            -w "$PWD" \
-            ghcr.io/wyvern/img:hurd-i686 \
-            "$@"
-          EOF
-          chmod +x i686-gnu-gcc
-
           targets=(
-            i686-unknown-hurd-gnu
           )
 
           for target in ${targets[@]}; do
