@@ -23,7 +23,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          # sudo apt install crosshurd -qy &>/dev/null &
+          sudo apt install crosshurd -qy &>/dev/null
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
