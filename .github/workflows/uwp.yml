@@ -105,10 +105,12 @@ jobs:
           WORKDIR /src/cross-hurd
 
           RUN git clone --depth=1 https://github.com/flavioc/cross-hurd.git . \
-              && python3 -c 'from pathlib import Path; p=Path("vars.sh"); s=p.read_text().replace("ZLIB_VERSION=1.3.1", "ZLIB_VERSION=1.3.2"); p.write_text(s)' \
-              && python3 -c 'from pathlib import Path; p=Path("download-funcs.sh"); lines=p.read_text().splitlines(); lines=[("ZLIB_URL=https://" + "zlib.net/fossils/" + "\"$ZLIB_PKG\"") if line.startswith("ZLIB_URL=") else line for line in lines]; p.write_text("\n".join(lines)+"\n")' \
-              && CPU=i686 bash download.sh \
-              && CPU=i686 bash bootstrap.sh \
+              && python3 -c 'from pathlib import Path; p=Path("package-versions.sh"); s=p.read_text(); old="ZLIB_VERSION=1.3.1"; assert old in s, "Expected zlib version pin not found"; p.write_text(s.replace(old, "ZLIB_VERSION=1.3.2", 1))' \
+              && python3 -c 'from pathlib import Path; p=Path("download-funcs.sh"); lines=p.read_text().splitlines(); indexes=[i for i,line in enumerate(lines) if line.startswith("ZLIB_URL=")]; assert len(indexes)==1, "Expected exactly one ZLIB_URL assignment"; lines[indexes[0]]="ZLIB_URL=" + "https://" + "zlib.net/fossils/" + "\"$ZLIB_PKG\""; p.write_text("\n".join(lines)+"\n")' \
+              && grep '^ZLIB_VERSION=' package-versions.sh \
+              && grep '^ZLIB_URL=' download-funcs.sh \
+              && CPU=i686 bash -x download.sh \
+              && CPU=i686 bash -x bootstrap.sh \
               && test -x /cross-tools-i686/bin/i686-gnu-gcc \
               && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine
 
