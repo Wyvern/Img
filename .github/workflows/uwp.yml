@@ -72,12 +72,10 @@ jobs:
           #     done
           # }
 
-          URL="https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/15.1/FreeBSD-15.1-RELEASE-arm-armv7-GENERICSD.img.xz"
-
-          curl -fsSL "$URL" -o Freebsd-armv7
-          xz -dk Freebsd-armv7.img.xz
-          fdisk -l Freebsd-armv7.img
-          LOOP=$(sudo losetup --find --show --partscan Freebsd-armv7.img)
+          curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/15.1/FreeBSD-15.1-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
+          file=armv7.img
+          fdisk -l $file
+          LOOP=$(sudo losetup --find --show --partscan $file)
           echo "$LOOP"
           lsblk -f "$LOOP"
           sudo mkdir -p /mnt/freebsd
