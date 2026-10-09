@@ -76,7 +76,7 @@ jobs:
             --platform=linux/386 \
             -v "$PWD:$PWD" \
             -w "$PWD" \
-            ubuntu:26.04 \
+            ubuntu:24.04 \
             bash -euxc '
             apt-get install -y --no-install-recommends curl build-essential ca-certificates
             curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly --component rust-src
