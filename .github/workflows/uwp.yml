@@ -79,7 +79,7 @@ jobs:
           echo "$LOOP"
           lsblk -f "$LOOP"
           sudo mkdir -p /mnt/freebsd
-          sudo mount -t ufs -o ro,ufstype=ufs2 $LOOP /mnt/freebsd
+          sudo mount -t ufs -o ro,ufstype=ufs2 loop0p5 /mnt/freebsd
           ls -hl /mnt/freebsd
           exit
           targets=(
