@@ -96,11 +96,13 @@ jobs:
             "${env:ProgramFiles}\Microsoft Visual Studio"
           )
 
-          foreach ($root in $roots) {
-            Get-ChildItem $root -Filter kernel32.lib -Recurse -ErrorAction SilentlyContinue |
-              Where-Object { $_.FullName -match '\\(um|lib)\\arm\\' } |
-              Select-Object -ExpandProperty FullName
-          }
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+
+          & $vswhere -all -products '*' -format json |
+            ConvertFrom-Json |
+            Select-Object displayName, installationVersion, installationPath |
+            Format-Table -AutoSize
+
           exit
 
           $targets = @(
