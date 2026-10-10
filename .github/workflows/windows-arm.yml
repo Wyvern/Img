@@ -71,38 +71,36 @@ jobs:
         continue-on-error: true
         run: |
           cargo update
-                $ErrorActionPreference = 'Continue'
 
           $gcc = 'C:\msys64\mingw32\bin\gcc.exe'
-          $log = Join-Path $env:RUNNER_TEMP 'uwp-linker-diagnostic.log'
           $src = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.c'
-          $out = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.exe'
+          $asm = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.s'
+          $obj = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.o'
+          $exe = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.exe'
 
-          @'
-          int main(void) { return 0; }
-          '@ | Set-Content -LiteralPath $src -Encoding ascii
+          # Test 1: Compile only, no linking.
+          Write-Host "`n=== Test 1: compile to assembly ==="
+          & $gcc -v -S $src -o $asm 2>&1
+          "Exit code: $LASTEXITCODE"
+          "Assembly exists: $(Test-Path $asm)"
 
-          "=== GCC version ===" | Tee-Object -FilePath $log
-          & $gcc --version 2>&1 | Tee-Object -FilePath $log -Append
+          # Test 2: Assemble only.
+          Write-Host "`n=== Test 2: assemble ==="
+          & $gcc -v -c $src -o $obj 2>&1
+          "Exit code: $LASTEXITCODE"
+          "Object exists: $(Test-Path $obj)"
 
-          "`n=== LLD resolution ===" | Tee-Object -FilePath $log -Append
-          & $gcc -print-prog-name=ld 2>&1 | Tee-Object -FilePath $log -Append
-          Get-Command lld.exe -All -ErrorAction SilentlyContinue |
-            Select-Object -ExpandProperty Source |
-            Tee-Object -FilePath $log -Append
+          # Test 3: Link with GCC's default linker.
+          Write-Host "`n=== Test 3: default linker ==="
+          & $gcc -v $src -o $exe 2>&1
+          "Exit code: $LASTEXITCODE"
+          "Executable exists: $(Test-Path $exe)"
 
-          "`n=== Minimal link using LLD ===" |
-            Tee-Object -FilePath $log -Append
-          & $gcc '-fuse-ld=lld' $src '-o' $out '-v' 2>&1 |
-            Tee-Object -FilePath $log -Append
-          $linkExit = $LASTEXITCODE
-          "Minimal link exit code: $linkExit" |
-            Tee-Object -FilePath $log -Append
-
-          Get-Content -LiteralPath $log
-          if ($linkExit -ne 0) {
-            Write-Error "Minimal link failed. Diagnostic log: $log"
-          }
+          # Test 4: Link with LLD.
+          Write-Host "`n=== Test 4: LLD ==="
+          & $gcc -v -fuse-ld=lld $src -o $exe 2>&1
+          "Exit code: $LASTEXITCODE"
+          "Executable exists: $(Test-Path $exe)"
 
           # cargo s i686-uwp-windows-gnu
 
