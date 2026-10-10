@@ -62,9 +62,13 @@ jobs:
           & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
           & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-crt \
           mingw-w64-x86_64-crt \
-          mingw-w64-x86_64-winstorecompat \
-          mingw-w64-ucrt-x86_64-winstorecompat \
-          mingw-w64-clang-x86_64-winstorecompat '
+          mingw-w64-x86_64-winstorecompat '
+          & 'C:\msys64\usr\bin\bash.exe' -lc '
+            curl -fL -o /tmp/winstorecompat.pkg.tar.zst \
+              https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
+            pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
+          '
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build release
         run: |
