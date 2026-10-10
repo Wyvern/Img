@@ -724,9 +724,8 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=x86-netbsd"]
 
 [target.i686-uwp-windows-gnu]
-linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
-rustflags = ["-lgcc_eh"]
+# linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
 
 [target.x86_64-uwp-windows-gnu]
-linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
+# linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
 rustflags = ["-lgcc_eh"]
