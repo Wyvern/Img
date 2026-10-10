@@ -72,7 +72,68 @@ jobs:
         run: |
           cargo update
 
-          cargo s i686-uwp-windows-gnu
+
+          $ErrorActionPreference = 'Stop'
+
+          $target = 'i686-uwp-windows-gnu'
+          $specPath = Join-Path $env:RUNNER_TEMP "$target.json"
+
+            # Export the built-in target specification.
+            $jsonText = (
+                & rustc -Z unstable-options --print target-spec-json --target $target
+            ) -join "`n"
+
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Failed to export the Rust target specification.'
+            }
+
+            $spec = $jsonText | ConvertFrom-Json
+
+            # Make the linker explicit in the custom target.
+            $spec.linker = 'C:\msys64\mingw32\bin\gcc.exe'
+
+            # Append libgcc to the correct linker-flavor list.
+            $lateArgs = $spec.'late-link-args'
+            $gnuCc = $lateArgs.PSObject.Properties['gnu-cc']
+
+            if ($null -eq $gnuCc) {
+                throw "Expected late-link-args['gnu-cc'] was not found."
+            }
+
+            $args = @($gnuCc.Value)
+
+            if ($args -notcontains '-lmingw32') {
+                throw 'Expected -lmingw32 was not found in the target specification.'
+            }
+
+            if ($args -notcontains '-lgcc') {
+                $index = [array]::IndexOf($args, '-lmingw32')
+                $newArgs = @()
+
+                if ($index -gt 0) {
+                    $newArgs += $args[0..($index - 1)]
+                }
+
+                $newArgs += '-lmingw32'
+                $newArgs += '-lgcc'
+
+                if ($index -lt ($args.Length - 1)) {
+                    $newArgs += $args[($index + 1)..($args.Length - 1)]
+                }
+
+                $gnuCc.Value = $newArgs
+            }
+
+            $spec |
+                ConvertTo-Json -Depth 100 |
+                Set-Content -LiteralPath $specPath -Encoding utf8
+
+            Write-Host "Patched target specification: $specPath"
+
+            # Use the custom target JSON instead of the built-in triple.
+            cargo s $specPath
+
+          # cargo s i686-uwp-windows-gnu
 
           exit
           $targets = @(
