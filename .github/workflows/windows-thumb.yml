@@ -79,15 +79,17 @@ jobs:
             throw "Failed to install MSVC ARM32 tools. Exit code: $($process.ExitCode)"
           }
 
-          Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\*\arm\link.exe" |
-            Select-Object -ExpandProperty FullName
-
       - name: Build release
         run: |
           cargo update
 
+          $vcBin = Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\*\bin\HostX86\arm\link.exe" |
+          Select-Object -First 1 -ExpandProperty DirectoryName
+          if (-not $vcBin) { throw "MSVC ARM32 linker not found" }
+          $env:PATH = "$vcBin;$env:PATH"
+          "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+
           where.exe link
-          Get-Command link.exe -All
           exit
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
