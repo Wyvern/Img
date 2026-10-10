@@ -80,7 +80,9 @@ jobs:
       - name: Build release
         run: |
           cargo update
-
+          where.exe link
+          Get-Command link.exe -All
+          exit
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
                   "thumbv7a-uwp-windows-msvc"
