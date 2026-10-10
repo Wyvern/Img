@@ -90,11 +90,6 @@ jobs:
           $env:LIB = "$umArm;$ucrtArm;$env:LIB"
           "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
-          Get-ChildItem "$sdkLibRoot\ucrt\arm" -ErrorAction Stop |
-            Select-Object -First 10 -ExpandProperty Name
-
-          Get-ChildItem "$sdkLibRoot\um\arm\kernel32.lib"
-
       - name: Build release
         run: |
           cargo update
@@ -105,21 +100,21 @@ jobs:
           $env:PATH = "$vcBin;$env:PATH"
           "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
 
-          where.exe link
+          $vsRoot = "${env:ProgramFiles}\Microsoft Visual Studio"
 
-          $roots = @(
-            "${env:ProgramFiles(x86)}\Windows Kits\10\Lib",
-            "${env:ProgramFiles}\Microsoft Visual Studio"
-          )
+          Get-ChildItem "$vsRoot\*\*\VC\Tools\MSVC\*\lib\arm\msvcrt.lib" `
+            -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName
 
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          Get-ChildItem "$vsRoot\*\*\VC\Tools\MSVC\*\lib\arm\libcmt.lib" `
+            -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName
 
-          & $vswhere -all -products '*' -format json |
-            ConvertFrom-Json |
-            Select-Object displayName, installationVersion, installationPath |
-            Format-Table -AutoSize
+          Get-ChildItem "$vsRoot\18\Enterprise\VC\Tools\MSVC" `
+            -Filter msvcrt.lib -Recurse -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName
 
-          # exit
+          exit
 
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
