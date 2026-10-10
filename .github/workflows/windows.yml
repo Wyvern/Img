@@ -72,24 +72,17 @@ jobs:
           cargo update
 
           $targets = @(
-                      "i686-uwp-windows-gnu",
-                      "x86_64-uwp-windows-gnu"
-                    )
-          foreach ($target in $targets) {
-              Write-Host "Building: $target"
-              Measure-Command { cargo s $target }
-          }
-          exit
-          $targets = @(
                       "aarch64-pc-windows-msvc",
                       "aarch64-uwp-windows-msvc",
                       "arm64ec-pc-windows-msvc",
                       "x86_64-pc-windows-msvc",
                       "x86_64-uwp-windows-msvc",
-                      "x86_64-win7-windows-msvc"
+                      "x86_64-win7-windows-msvc",
+                      "x86_64-uwp-windows-gnu",
                       "i686-pc-windows-msvc",
                       "i686-uwp-windows-msvc",
-                      "i686-win7-windows-msvc"
+                      "i686-win7-windows-msvc",
+                      "i686-uwp-windows-gnu"
                     )
           foreach ($target in $targets) {
               Write-Host "Building: $target"
@@ -125,7 +118,9 @@ jobs:
               @("i686-pc-windows-msvc", "Windows-i686.exe"),
               @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
               @("i686-win7-windows-msvc", "Windows-i686-win7.exe"),
-              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe")
+              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe"),
+              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp.exe"),
+              @("i686-uwp-windows-gnu","Windows-i686-uwp.exe")
           )
 
           foreach ($target in $targets) {

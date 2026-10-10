@@ -56,6 +56,17 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Install MSYS2 packages
+        shell: pwsh
+        run: |
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-winstorecompat'
+          & 'C:\msys64\usr\bin\bash.exe' -lc '
+            curl -fL -o /tmp/winstorecompat.pkg.tar.zst \
+              https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
+            pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
+          '
+
       - name: Build release
         continue-on-error: true
         run: |
@@ -67,9 +78,11 @@ jobs:
                       "x86_64-pc-windows-msvc",
                       "x86_64-uwp-windows-msvc",
                       "x86_64-win7-windows-msvc",
+                      "x86_64-uwp-windows-gnu",
                       "i686-pc-windows-msvc",
                       "i686-uwp-windows-msvc",
-                      "i686-win7-windows-msvc"
+                      "i686-win7-windows-msvc",
+                      "i686-uwp-windows-gnu"
                     )
           foreach ($target in $targets) {
               Write-Host "Building: $target"
@@ -105,7 +118,9 @@ jobs:
               @("i686-pc-windows-msvc", "Windows-i686.exe"),
               @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
               @("i686-win7-windows-msvc", "Windows-i686-win7.exe"),
-              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe")
+              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe"),
+              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp.exe"),
+              @("i686-uwp-windows-gnu","Windows-i686-uwp.exe")
           )
 
           foreach ($target in $targets) {
