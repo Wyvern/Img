@@ -13,8 +13,8 @@ env:
 
 jobs:
   Windows:
-    name: Windows-2025
-    runs-on: windows-2025
+    name: Windows-11
+    runs-on: windows-11-arm
 
     steps:
       - name: Disable and Stop windows services
@@ -55,6 +55,27 @@ jobs:
 
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
+
+#       - name: Install MSVC ARM32 tools
+#         shell: pwsh
+#         run: |
+#           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+#           $vs = & $vswhere -latest -products '*' -property installationPath
+#
+#           if (-not $vs) {
+#             throw "Visual Studio installation not found"
+#           }
+#
+#           $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe"
+#
+#           & $installer modify `
+#             --installPath "$vs" `
+#             --add Microsoft.VisualStudio.Component.VC.Tools.ARM `
+#             --quiet --wait --norestart
+#
+#           if ($LASTEXITCODE -ne 0) {
+#             throw "Failed to install MSVC ARM32 tools: $LASTEXITCODE"
+#           }
 
       - name: Build release
         run: |
