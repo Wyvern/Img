@@ -308,15 +308,14 @@ rustflags = [
 
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
-  "-Clink-self-contained=+linker",
-  "-Clinker-features=+lld",
+
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc"),target_abi="llvm"))']
-rustflags = ["-Clink-arg=-Wl,--icf=all","-Clinker-plugin-lto"]
+rustflags = ["-Clink-self-contained=+linker","-Clinker-features=+lld","-Clink-arg=-Wl,--icf=all","-Clinker-plugin-lto"]
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
