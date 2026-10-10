@@ -90,6 +90,11 @@ jobs:
           $env:LIB = "$umArm;$ucrtArm;$env:LIB"
           "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
+          Get-ChildItem "$sdkLibRoot\ucrt\arm" -ErrorAction Stop |
+            Select-Object -First 10 -ExpandProperty Name
+
+          Get-ChildItem "$sdkLibRoot\um\arm\kernel32.lib"
+
       - name: Build release
         run: |
           cargo update
