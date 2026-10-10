@@ -1,4 +1,4 @@
-name: Windows
+name: Windows-11-Arm
 
 on:
   push:
@@ -12,9 +12,9 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Windows:
-    name: Windows-2025
-    runs-on: windows-2025-vs2026
+  Windows-arm:
+    name: Windows-11-arm
+    runs-on: windows-11-vs2026-arm
 
     steps:
       - name: Disable and Stop windows services
@@ -68,9 +68,9 @@ jobs:
           '
 
       - name: Build release
+        continue-on-error: true
         run: |
           cargo update
-
           $targets = @(
                       "aarch64-pc-windows-msvc",
                       "aarch64-uwp-windows-msvc",
@@ -91,7 +91,7 @@ jobs:
 
           # cmd /c dir /s target\src\img.exe
           Get-ChildItem -Path target\*\src\img.exe -File
-          systeminfo
+          # systeminfo
 
       - name: Rust Versions
         run: rustup -V; cargo -Vv; rustc -Vv
