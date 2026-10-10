@@ -70,9 +70,7 @@ jobs:
       - name: Build release
         run: |
           cargo update
-          cargo v i686-uwp-windows-gnu
-          cargo s x86_64-uwp-windows-gnu
-          exit
+
           $targets = @(
                       "i686-uwp-windows-gnu",
                       "x86_64-uwp-windows-gnu"
