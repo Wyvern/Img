@@ -91,6 +91,25 @@ jobs:
 
           where.exe link
 
+          $sdkRoot = "${env:ProgramFiles(x86)}\Windows Kits\10\Lib"
+          $armLib = Get-ChildItem "$sdkRoot\*\um\arm\kernel32.lib" -ErrorAction SilentlyContinue |
+            Sort-Object { [version]$_.Directory.Parent.Name } -Descending |
+            Select-Object -First 1
+
+          if (-not $armLib) {
+            Get-ChildItem "$sdkRoot\*\um\*\kernel32.lib" -ErrorAction SilentlyContinue |
+              Select-Object -ExpandProperty FullName
+            throw "Windows SDK ARM32 kernel32.lib not found"
+          }
+
+          $sdkVersion = $armLib.Directory.Parent.Name
+          $env:LIB = "$($armLib.Directory.FullName);$env:LIB"
+          "$($armLib.Directory.FullName)" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\Lib\*\um\arm\kernel32.lib" `
+            -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FullName
+          exit
+
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
                   "thumbv7a-uwp-windows-msvc"
