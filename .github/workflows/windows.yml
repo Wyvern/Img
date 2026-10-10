@@ -56,9 +56,24 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
+      - name: Install MSYS2 packages
+        shell: pwsh
+        run: |
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-crt mingw-w64-i686-winstorecompat mingw-w64-x86_64-crt mingw-w64-x86_64-winstorecompat'
+
       - name: Build release
         run: |
           cargo update
+          $targets = @(
+                      "i686-uwp-windows-gnu",
+                      "x86_64-uwp-windows-gnu"
+                    )
+          foreach ($target in $targets) {
+              Write-Host "Building: $target"
+              Measure-Command { cargo s $target }
+          }
+          exit
           $targets = @(
                       "aarch64-pc-windows-msvc",
                       "aarch64-uwp-windows-msvc",
