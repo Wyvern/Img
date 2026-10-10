@@ -72,37 +72,35 @@ jobs:
         run: |
           cargo update
 
-          $ErrorActionPreference = 'Continue'
 
-          $gcc = 'C:\msys64\mingw32\bin\gcc.exe'
-          $cc1 = 'C:\msys64\mingw32\lib\gcc\i686-w64-mingw32\16.2.0\cc1.exe'
-          $src = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.c'
-          $asm = Join-Path $env:RUNNER_TEMP 'cc1-direct-test.s'
+              $ErrorActionPreference = 'Stop'
 
-          Write-Host '=== Check source file ==='
-          Get-Item -LiteralPath $src | Format-List FullName, Length
-          Get-Content -LiteralPath $src
+              $bash = 'C:\msys64\usr\bin\bash.exe'
 
-          Write-Host "`n=== Check cc1 executable ==="
-          Test-Path -LiteralPath $cc1
-          & $cc1 --version 2>&1
-          "cc1 version exit code: $LASTEXITCODE"
+              & $bash -lc 'pacman -Syu --noconfirm'
+              if ($LASTEXITCODE -ne 0) {
+                throw "MSYS2 system update failed: $LASTEXITCODE"
+              }
 
-          Write-Host "`n=== Run cc1 directly ==="
-          & $cc1 -quiet -v `
-              -iprefix 'C:/msys64/mingw32/lib/gcc/i686-w64-mingw32/16.2.0/' `
-              -isysroot 'C:/msys64/mingw32/mingw32' `
-              -D_REENTRANT `
-              $src `
-              -o $asm 2>&1
+              & $bash -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-i686-binutils mingw-w64-i686-crt mingw-w64-i686-winpthreads'
+              if ($LASTEXITCODE -ne 0) {
+                throw "MSYS2 MinGW32 package installation failed: $LASTEXITCODE"
+              }
 
-          "cc1 direct exit code: $LASTEXITCODE"
-          "Assembly exists: $(Test-Path -LiteralPath $asm)"
+              $env:PATH = "C:\msys64\mingw32\bin;C:\msys64\usr\bin;$env:PATH"
 
-          Write-Host "`n=== Check required GCC files ==="
-          & $gcc -print-prog-name=cc1
-          & $gcc -print-prog-name=as
-          & $gcc -print-search-dirs
+              Write-Host '=== GCC ==='
+              & 'C:\msys64\mingw32\bin\gcc.exe' --version
+              if ($LASTEXITCODE -ne 0) {
+                throw "GCC still cannot start: $LASTEXITCODE"
+              }
+
+              Write-Host '=== cc1 ==='
+              $cc1 = 'C:\msys64\mingw32\lib\gcc\i686-w64-mingw32\16.2.0\cc1.exe'
+              & $cc1 --version
+              if ($LASTEXITCODE -ne 0) {
+                throw "cc1 still cannot start: $LASTEXITCODE"
+              }
 
           # cargo s i686-uwp-windows-gnu
 
