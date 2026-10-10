@@ -70,7 +70,8 @@ jobs:
       - name: Build release
         run: |
           cargo update
-
+          cargo s x86_64-uwp-windows-gnu
+          exit
           $targets = @(
                       "aarch64-pc-windows-msvc",
                       "aarch64-uwp-windows-msvc",
@@ -119,8 +120,8 @@ jobs:
               @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
               @("i686-win7-windows-msvc", "Windows-i686-win7.exe"),
               @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe"),
-              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp.exe"),
-              @("i686-uwp-windows-gnu","Windows-i686-uwp.exe")
+              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp-gnu.exe"),
+              @("i686-uwp-windows-gnu","Windows-i686-uwp-gnu.exe")
           )
 
           foreach ($target in $targets) {
