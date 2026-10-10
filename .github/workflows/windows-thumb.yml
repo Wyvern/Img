@@ -80,6 +80,24 @@ jobs:
       - name: Build release
         run: |
           cargo update
+
+          $matches = @(Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\*\arm\link.exe" -ErrorAction SilentlyContinue)
+
+          $matches | Select-Object -ExpandProperty FullName
+
+          $linker = $matches |
+            Where-Object { $_.FullName -match '\\bin\\HostARM64\\arm\\link\.exe$' } |
+            Sort-Object { [version]$_.Directory.Parent.Parent.Parent.Name } -Descending |
+            Select-Object -First 1
+
+          if (-not $linker) {
+            throw "No ARM32-targeting MSVC linker hosted on ARM64 was found. Inspect the paths printed above."
+          }
+
+          $vcBin = $linker.Directory.FullName
+          $env:PATH = "$vcBin;$env:PATH"
+          "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+
           where.exe link
           Get-Command link.exe -All
           exit
