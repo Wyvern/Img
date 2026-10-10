@@ -90,16 +90,14 @@ jobs:
           $env:LIB = "$umArm;$ucrtArm;$env:LIB"
           "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
-      - name: Build release
+      - name: Link and Lib search config
+        shell: pwsh
         run: |
-          cargo update
-
           $vcBin = Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\*\bin\HostX86\arm\link.exe" |
           Select-Object -First 1 -ExpandProperty DirectoryName
           if (-not $vcBin) { throw "MSVC ARM32 linker not found" }
           $env:PATH = "$vcBin;$env:PATH"
-
-          where.exe link
+          "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
 
           $msvcRoot = "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC"
 
@@ -117,7 +115,9 @@ jobs:
 
           Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
 
-          # exit
+      - name: Build release
+        run: |
+          cargo update
 
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
