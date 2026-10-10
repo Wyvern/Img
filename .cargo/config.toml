@@ -617,7 +617,7 @@ rustflags = ["-Clink-arg=--target=aarch64-linux-ilp32"]
 
 [target.sparc64-unknown-openbsd]
 linker = "sparc64-unknown-openbsd-clang"
-rustflags = ["-Clink-arg=-lc"]
+rustflags = ["-lc"]
 
 [target.sparc64-unknown-netbsd]
 linker = "sparc64-unknown-netbsd-gcc"
@@ -724,8 +724,8 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=x86-netbsd"]
 
 [target.i686-uwp-windows-gnu]
-# linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
-
+linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
+# rustflags = ["-lgcc_eh"]
 [target.x86_64-uwp-windows-gnu]
-# linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
+linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
 rustflags = ["-lgcc_eh"]
