@@ -71,7 +71,7 @@ jobs:
         continue-on-error: true
         run: |
           cargo update
-          cargo s i686-uwp-windows-gnu
+          cargo vv i686-uwp-windows-gnu
           exit
           $targets = @(
                       "aarch64-pc-windows-msvc",
