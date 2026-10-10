@@ -285,7 +285,7 @@ rustflags = ["-Clink-arg=-Wl,-z,noseparate-code"]
 rustflags = ["-Clink-arg=-Wl,-z,pack-relative-relocs"]
 
 [target.'cfg(target_family="windows")']
-# rustflags = ["-Cforce-unwind-tables=y"]
+rustflags = ["-Cforce-unwind-tables"]
 
 [target.'cfg(all(target_family="windows",target_env="msvc"))']
 rustflags = [
@@ -298,7 +298,6 @@ rustflags = [
   "-Clink-arg=/VERSION:0.0",
   "-Clink-arg=/PDB:NONE",
   "-Clink-arg=/NOLOGO",
-  "-Cforce-unwind-tables"
   # "-Clink-arg=/LTCG",
   # "-Clink-arg=/FILEALIGN:512",
   # "-Clink-arg=/ALIGN:1",
@@ -728,4 +727,4 @@ linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
 # rustflags = ["-lgcc_eh"]
 [target.x86_64-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
-# rustflags = ["-lgcc_eh"]
+rustflags = ["-lgcc_eh"]
