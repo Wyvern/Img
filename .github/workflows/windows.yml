@@ -56,13 +56,6 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Diagnose MSYS2 repositories
-        shell: pwsh
-        run: |
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman-conf --repo-list'
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Sl mingw32 | grep winstorecompat'
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Sl mingw64 | grep winstorecompat'
-
       - name: Install MSYS2 packages
         shell: pwsh
         run: |
