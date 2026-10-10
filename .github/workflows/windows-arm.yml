@@ -79,12 +79,18 @@ jobs:
           where.exe lld
           where.exe ld
 
-          Get-ChildItem C:\msys64\mingw32\i686-w64-mingw32\lib\libmingwex.a
-          Get-ChildItem C:\msys64\mingw32\i686-w64-mingw32\lib\libmingw32.a
+          $gcc = 'C:\msys64\mingw32\bin\gcc.exe'
 
-          Get-ChildItem `
-            "$env:USERPROFILE\.rustup\toolchains\nightly-aarch64-pc-windows-msvc\lib\rustlib\aarch64-pc-windows-msvc\bin\gcc-ld" `
-            -Force
+          foreach ($name in 'libmingwex.a', 'libmingw32.a', 'libmsvcrt.a') {
+              $path = & $gcc "-print-file-name=$name"
+              Write-Host "$name => $path"
+              if ($path -eq $name) {
+                  Write-Host "Searching MSYS2 installation..."
+                  Get-ChildItem C:\msys64\mingw32 -Filter $name -File -Recurse `
+                      -ErrorAction SilentlyContinue |
+                      Select-Object -ExpandProperty FullName
+              }
+          }
 
           cargo s i686-uwp-windows-gnu
 
