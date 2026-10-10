@@ -100,19 +100,25 @@ jobs:
           $env:PATH = "$vcBin;$env:PATH"
           "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
 
-          $vsRoot = "${env:ProgramFiles}\Microsoft Visual Studio"
+          # --------------------------
 
-          Get-ChildItem "$vsRoot\*\*\VC\Tools\MSVC\*\lib\arm\msvcrt.lib" `
-            -ErrorAction SilentlyContinue |
-            Select-Object -ExpandProperty FullName
+          $msvcRoot = "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC"
 
-          Get-ChildItem "$vsRoot\*\*\VC\Tools\MSVC\*\lib\arm\libcmt.lib" `
-            -ErrorAction SilentlyContinue |
-            Select-Object -ExpandProperty FullName
+          $armCrt = Get-ChildItem "$msvcRoot\*\lib\arm\msvcrt.lib" |
+            Sort-Object {
+              [version]$_.Directory.Parent.Name
+            } -Descending |
+            Select-Object -First 1
 
-          Get-ChildItem "$vsRoot\18\Enterprise\VC\Tools\MSVC" `
-            -Filter msvcrt.lib -Recurse -ErrorAction SilentlyContinue |
-            Select-Object -ExpandProperty FullName
+          if (-not $armCrt) {
+            throw "MSVC ARM32 CRT libraries not found"
+          }
+
+          $armLib = $armCrt.Directory.FullName
+          $env:LIB = "$armLib;$env:LIB"
+          "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+          Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
 
           exit
 
