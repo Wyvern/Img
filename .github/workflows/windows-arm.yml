@@ -72,13 +72,142 @@ jobs:
         run: |
           cargo update
 
+
           $ErrorActionPreference = 'Stop'
 
-          $TargetSpec = 'i686-uwp-windows-gnu.json'
+          $TargetSpec = Join-Path $env:GITHUB_WORKSPACE 'i686-uwp-windows-gnu.json'
 
+          # Create the target specification if it does not exist.
+          if (-not (Test-Path -LiteralPath $TargetSpec -PathType Leaf)) {
+              $TargetJson = @'
+          {
+            "abi": "uwp",
+            "abi-return-struct-as-int": true,
+            "arch": "x86",
+            "binary-format": "coff",
+            "cpu": "pentium4",
+            "crt-objects-fallback": "mingw",
+            "data-layout": "e-m:x-p:32:32-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:32-n8:16:32-a:0:32-S32",
+            "dll-prefix": "",
+            "dll-suffix": ".dll",
+            "dll-tls-export": false,
+            "dynamic-linking": true,
+            "eh-frame-header": false,
+            "emit-debug-gdb-scripts": false,
+            "env": "gnu",
+            "exe-suffix": ".exe",
+            "frame-pointer": "always",
+            "function-sections": false,
+            "has-thread-local": true,
+            "is-like-windows": true,
+            "late-link-args": {
+              "gnu": [
+                "-lwinstorecompat",
+                "-lruntimeobject",
+                "-lsynchronization",
+                "-lvcruntime140_app",
+                "-lucrt",
+                "-lwindowsapp",
+                "-lmingwex",
+                "-lmingw32"
+              ],
+              "gnu-cc": [
+                "-lwinstorecompat",
+                "-lruntimeobject",
+                "-lsynchronization",
+                "-lvcruntime140_app",
+                "-lucrt",
+                "-lwindowsapp",
+                "-lmingwex",
+                "-lmingw32"
+              ],
+              "gnu-lld": [
+                "-lwinstorecompat",
+                "-lruntimeobject",
+                "-lsynchronization",
+                "-lvcruntime140_app",
+                "-lucrt",
+                "-lwindowsapp",
+                "-lmingwex",
+                "-lmingw32"
+              ],
+              "gnu-lld-cc": [
+                "-lwinstorecompat",
+                "-lruntimeobject",
+                "-lsynchronization",
+                "-lvcruntime140_app",
+                "-lucrt",
+                "-lwindowsapp",
+                "-lmingwex",
+                "-lmingw32"
+              ]
+            },
+            "limit-rdylib-exports": false,
+            "linker": "gcc",
+            "linker-flavor": "gnu-cc",
+            "llvm-target": "i686-pc-windows-gnu",
+            "max-atomic-width": 64,
+            "metadata": {
+              "description": null,
+              "host_tools": false,
+              "std": null,
+              "tier": 3
+            },
+            "os": "windows",
+            "pre-link-args": {
+              "gnu": [
+                "--dynamicbase",
+                "--disable-auto-image-base",
+                "-m",
+                "i386pe",
+                "--large-address-aware"
+              ],
+              "gnu-cc": [
+                "-fno-use-linker-plugin",
+                "-Wl,--dynamicbase",
+                "-Wl,--disable-auto-image-base",
+                "-Wl,--large-address-aware"
+              ],
+              "gnu-lld": [
+                "--dynamicbase",
+                "--disable-auto-image-base",
+                "-m",
+                "i386pe",
+                "--large-address-aware"
+              ],
+              "gnu-lld-cc": [
+                "-fno-use-linker-plugin",
+                "-Wl,--dynamicbase",
+                "-Wl,--disable-auto-image-base",
+                "-Wl,--large-address-aware"
+              ]
+            },
+            "pre-link-objects-fallback": {
+              "dynamic-dylib": ["dllcrt2.o"],
+              "dynamic-nopic-exe": ["crt2.o"],
+              "dynamic-pic-exe": ["crt2.o"],
+              "static-dylib": ["dllcrt2.o"],
+              "static-nopic-exe": ["crt2.o"],
+              "static-pic-exe": ["crt2.o"]
+            },
+            "requires-uwtable": true,
+            "rustc-abi": "x86-sse2",
+            "target-family": ["windows"],
+            "target-mcount": "_mcount",
+            "target-pointer-width": 32,
+            "vendor": "uwp"
+          }
+          '@
+
+              Set-Content -LiteralPath $TargetSpec -Value $TargetJson -Encoding utf8
+              Write-Host "Created target specification: $TargetSpec"
+          }
+
+          # Load the target specification.
           $Spec = Get-Content -LiteralPath $TargetSpec -Raw |
               ConvertFrom-Json -AsHashtable
 
+          # Append -lgcc to each linker flavor, avoiding duplicates.
           foreach ($Flavor in @('gnu', 'gnu-cc', 'gnu-lld', 'gnu-lld-cc')) {
               $Args = $Spec['late-link-args'][$Flavor]
 
@@ -91,17 +220,25 @@ jobs:
               }
           }
 
+          # Save the patched specification.
           $Spec |
               ConvertTo-Json -Depth 100 |
               Set-Content -LiteralPath $TargetSpec -Encoding utf8
 
-          Write-Host "Patched $TargetSpec"
+          Write-Host "Patched target specification:"
+          Write-Host $TargetSpec
 
+          Write-Host "`nUpdated late-link-args:"
           foreach ($Flavor in @('gnu', 'gnu-cc', 'gnu-lld', 'gnu-lld-cc')) {
               Write-Host "$Flavor`: $($Spec['late-link-args'][$Flavor] -join ' ')"
           }
 
-            cargo s $TargetSpec
+          # Build using the custom target JSON and your existing cargo s alias.
+          cargo s $TargetSpec
+          if ($LASTEXITCODE -ne 0) {
+              throw "cargo s failed with exit code $LASTEXITCODE"
+          }
+
 
           # cargo s i686-uwp-windows-gnu
 
