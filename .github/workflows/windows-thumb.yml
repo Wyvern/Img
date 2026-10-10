@@ -56,28 +56,28 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-      - name: Install MSVC ARM32 tools
-        shell: pwsh
-        run: |
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vs = & $vswhere -latest -products '*' -property installationPath
-
-          if (-not $vs) {
-            throw "Visual Studio installation not found"
-          }
-
-          $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe"
-
-          & $installer modify `
-            --installPath "$vs" `
-            --add Microsoft.VisualStudio.Component.VC.Tools.ARM `
-            --quiet --norestart
-
-          $process = Start-Process -FilePath $installer -ArgumentList $args -Wait -PassThru
-
-          if ($process.ExitCode -ne 0) {
-            throw "Failed to install MSVC ARM32 tools. Exit code: $($process.ExitCode)"
-          }
+#       - name: Install MSVC ARM32 tools
+#         shell: pwsh
+#         run: |
+#           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+#           $vs = & $vswhere -latest -products '*' -property installationPath
+#
+#           if (-not $vs) {
+#             throw "Visual Studio installation not found"
+#           }
+#
+#           $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe"
+#
+#           & $installer modify `
+#             --installPath "$vs" `
+#             --add Microsoft.VisualStudio.Component.VC.Tools.ARM `
+#             --quiet --norestart
+#
+#           $process = Start-Process -FilePath $installer -ArgumentList $args -Wait -PassThru
+#
+#           if ($process.ExitCode -ne 0) {
+#             throw "Failed to install MSVC ARM32 tools. Exit code: $($process.ExitCode)"
+#           }
 
       - name: Build release
         run: |
@@ -88,6 +88,8 @@ jobs:
           if (-not $vcBin) { throw "MSVC ARM32 linker not found" }
           $env:PATH = "$vcBin;$env:PATH"
           "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+
+          where.exe link
 
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
