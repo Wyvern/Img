@@ -71,11 +71,16 @@ jobs:
           & $installer modify `
             --installPath "$vs" `
             --add Microsoft.VisualStudio.Component.VC.Tools.ARM `
-            --quiet --wait --norestart
+            --quiet --norestart
 
-          if ($LASTEXITCODE -ne 0) {
-            throw "Failed to install MSVC ARM32 tools: $LASTEXITCODE"
+          $process = Start-Process -FilePath $installer -ArgumentList $args -Wait -PassThru
+
+          if ($process.ExitCode -ne 0) {
+            throw "Failed to install MSVC ARM32 tools. Exit code: $($process.ExitCode)"
           }
+
+          Get-ChildItem "$vs\VC\Tools\MSVC\*\bin\*\arm\link.exe" |
+            Select-Object -ExpandProperty FullName
 
       - name: Build release
         run: |
