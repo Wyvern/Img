@@ -100,18 +100,14 @@ jobs:
           $env:PATH = "$vcBin;$env:PATH"
           "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
 
-          # --------------------------
-
           $msvcRoot = "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC"
 
-          $armCrt = Get-ChildItem "$msvcRoot\*\lib\arm\msvcrt.lib" |
-            Sort-Object {
-              [version]$_.Directory.Parent.Name
-            } -Descending |
-            Select-Object -First 1
+          $armCrt = Get-ChildItem "$msvcRoot\*\lib\arm\msvcrt.lib" -ErrorAction SilentlyContinue |
+              Sort-Object { [version]$_.Directory.Parent.Parent.Name } -Descending |
+              Select-Object -First 1
 
           if (-not $armCrt) {
-            throw "MSVC ARM32 CRT libraries not found"
+              throw "MSVC ARM32 CRT libraries not found"
           }
 
           $armLib = $armCrt.Directory.FullName
@@ -120,7 +116,7 @@ jobs:
 
           Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
 
-          exit
+          # exit
 
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
