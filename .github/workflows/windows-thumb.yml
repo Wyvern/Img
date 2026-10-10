@@ -89,8 +89,6 @@ jobs:
           $env:PATH = "$vcBin;$env:PATH"
           "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
 
-          where.exe link
-          exit
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
                   "thumbv7a-uwp-windows-msvc"
