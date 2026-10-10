@@ -68,7 +68,6 @@ jobs:
               https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
             pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
           '
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build release
         run: |
