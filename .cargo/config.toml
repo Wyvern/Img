@@ -307,15 +307,15 @@ rustflags = [
 
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
-
+  "-Clink-self-contained=+linker",
+  "-Clinker-features=+lld",
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
 ]
 [target.'cfg(all(target_family="windows",not(target_env="msvc"),target_abi="llvm"))']
-rustflags = ["-Clink-self-contained=+linker",
-"-Clinker-features=+lld","-Clink-arg=-Wl,--icf=all","-Clinker-plugin-lto"]
+rustflags = ["-Clink-arg=-Wl,--icf=all","-Clinker-plugin-lto"]
 
 [target.'cfg(target_vendor="apple")']
 rustflags = [
@@ -724,7 +724,7 @@ rustflags = ["-Clink-arg=--target=x86-netbsd"]
 
 [target.i686-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
-# rustflags = ["-lgcc_eh"]
+rustflags = ["-lgcc_eh"]
 [target.x86_64-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
-# rustflags = ["-lgcc_eh"]
+rustflags = ["-lgcc_eh"]
