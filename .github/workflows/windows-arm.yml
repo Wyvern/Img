@@ -209,15 +209,17 @@ jobs:
 
           # Append -lgcc to each linker flavor, avoiding duplicates.
           foreach ($Flavor in @('gnu', 'gnu-cc', 'gnu-lld', 'gnu-lld-cc')) {
-              $Args = $Spec['late-link-args'][$Flavor]
+              $Args = @($Spec['late-link-args'][$Flavor])
 
-              if ($null -eq $Args) {
+              if ($Args.Count -eq 0) {
                   throw "Missing late-link-args entry: $Flavor"
               }
 
               if ($Args -notcontains '-lgcc') {
-                  $Args.Add('-lgcc')
+                  $Args = @($Args) + @('-lgcc')
               }
+
+              $Spec['late-link-args'][$Flavor] = $Args
           }
 
           # Save the patched specification.
