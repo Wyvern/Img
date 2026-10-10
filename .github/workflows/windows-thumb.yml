@@ -98,7 +98,8 @@ jobs:
           Select-Object -First 1 -ExpandProperty DirectoryName
           if (-not $vcBin) { throw "MSVC ARM32 linker not found" }
           $env:PATH = "$vcBin;$env:PATH"
-          "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+
+          where.exe link
 
           $msvcRoot = "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC"
 
