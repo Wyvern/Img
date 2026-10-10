@@ -60,12 +60,7 @@ jobs:
         shell: pwsh
         run: |
           & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm
-          mingw-w64-i686-gcc \
-          mingw-w64-x86_64-gcc \
-          mingw-w64-i686-crt \
-          mingw-w64-x86_64-crt \
-          mingw-w64-x86_64-winstorecompat '
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-i686-crt mingw-w64-x86_64-crt mingw-w64-x86_64-winstorecompat'
           & 'C:\msys64\usr\bin\bash.exe' -lc '
             curl -fL -o /tmp/winstorecompat.pkg.tar.zst \
               https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
