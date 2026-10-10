@@ -56,28 +56,39 @@ jobs:
       - name: Run sccache-cache
         uses: mozilla-actions/sccache-action@main
 
-#       - name: Install MSVC ARM32 tools
-#         shell: pwsh
-#         run: |
-#           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-#           $vs = & $vswhere -latest -products '*' -property installationPath
-#
-#           if (-not $vs) {
-#             throw "Visual Studio installation not found"
-#           }
-#
-#           $installer = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\setup.exe"
-#
-#           & $installer modify `
-#             --installPath "$vs" `
-#             --add Microsoft.VisualStudio.Component.VC.Tools.ARM `
-#             --quiet --norestart
-#
-#           $process = Start-Process -FilePath $installer -ArgumentList $args -Wait -PassThru
-#
-#           if ($process.ExitCode -ne 0) {
-#             throw "Failed to install MSVC ARM32 tools. Exit code: $($process.ExitCode)"
-#           }
+      - name: Install Windows ARM32 SDK libraries
+        shell: pwsh
+        run: |
+          $version = '10.0.22621.3233'
+          $root = Join-Path $env:RUNNER_TEMP 'windows-sdk-arm'
+          $nupkg = Join-Path $env:RUNNER_TEMP "windows-sdk-arm.$version.zip"
+          $url = "https://api.nuget.org/v3-flatcontainer/microsoft.windows.sdk.cpp.arm/$version/microsoft.windows.sdk.cpp.arm.$version.nupkg"
+
+          Invoke-WebRequest -Uri $url -OutFile $nupkg
+          New-Item -ItemType Directory -Path $root -Force | Out-Null
+          Expand-Archive -Path $nupkg -DestinationPath $root -Force
+
+          $kernel32 = Get-ChildItem $root -Filter kernel32.lib -Recurse |
+            Where-Object { $_.FullName -match '\\um\\arm\\kernel32\.lib$' } |
+            Select-Object -First 1
+
+          if (-not $kernel32) {
+            throw "The NuGet package did not contain ARM32 um\arm\kernel32.lib"
+          }
+
+          $sdkLibRoot = $kernel32.Directory.Parent.Parent.FullName
+          $umArm = $kernel32.Directory.FullName
+          $ucrtArm = Join-Path $sdkLibRoot 'ucrt\arm'
+
+          Write-Host "ARM32 Windows SDK libraries: $sdkLibRoot"
+          Write-Host "kernel32.lib: $($kernel32.FullName)"
+
+          if (-not (Test-Path $ucrtArm)) {
+            throw "ARM32 UCRT libraries not found: $ucrtArm"
+          }
+
+          $env:LIB = "$umArm;$ucrtArm;$env:LIB"
+          "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Build release
         run: |
