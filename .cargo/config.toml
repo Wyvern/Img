@@ -725,8 +725,8 @@ rustflags = ["-Clink-arg=--target=x86-netbsd"]
 
 [target.i686-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
-# rustflags = ["-L", "native=C:\\msys64\\mingw32\\lib"]
+rustflags = ["-L", "native=C:\\msys64\\mingw32\\lib"]
 
 [target.x86_64-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
-# rustflags = ["-L", "native=C:\\msys64\\mingw64\\lib"]
+rustflags = ["-L", "native=C:\\msys64\\mingw64\\lib"]
