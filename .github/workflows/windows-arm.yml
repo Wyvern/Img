@@ -71,26 +71,6 @@ jobs:
         continue-on-error: true
         run: |
           cargo update
-          & 'C:\msys64\mingw32\bin\gcc.exe' -dumpmachine
-          & 'C:\msys64\mingw32\bin\gcc.exe' -print-prog-name=ld
-          & 'C:\msys64\mingw32\bin\gcc.exe' -print-file-name=libmingwex.a
-          & 'C:\msys64\mingw32\bin\gcc.exe' -print-file-name=libmingw32.a
-
-          where.exe lld
-          where.exe ld
-
-          $gcc = 'C:\msys64\mingw32\bin\gcc.exe'
-
-          foreach ($name in 'libmingwex.a', 'libmingw32.a', 'libmsvcrt.a') {
-              $path = & $gcc "-print-file-name=$name"
-              Write-Host "$name => $path"
-              if ($path -eq $name) {
-                  Write-Host "Searching MSYS2 installation..."
-                  Get-ChildItem C:\msys64\mingw32 -Filter $name -File -Recurse `
-                      -ErrorAction SilentlyContinue |
-                      Select-Object -ExpandProperty FullName
-              }
-          }
 
           cargo s i686-uwp-windows-gnu
 

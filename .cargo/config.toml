@@ -307,8 +307,8 @@ rustflags = [
 
 [target.'cfg(all(target_family="windows",not(target_env="msvc")))']
 rustflags = [
-  # "-Clink-self-contained=+linker",
-  # "-Clinker-features=+lld",
+  "-Clink-self-contained=+linker",
+  "-Clinker-features=+lld",
   "-Clink-arg=-Wl,--gc-sections",
   "-Clink-arg=-Wl,--as-needed",
   "-Clink-arg=-Wl,--build-id=none",
@@ -724,7 +724,7 @@ rustflags = ["-Clink-arg=--target=x86-netbsd"]
 
 [target.i686-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
-rustflags = ["-Clink-arg=-v"]
+rustflags = ["-lgcc"]
 [target.x86_64-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
 rustflags = ["-lgcc_eh"]
