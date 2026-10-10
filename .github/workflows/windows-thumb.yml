@@ -114,7 +114,7 @@ jobs:
             Select-Object displayName, installationVersion, installationPath |
             Format-Table -AutoSize
 
-          exit
+          # exit
 
           $targets = @(
                   "thumbv7a-pc-windows-msvc",
