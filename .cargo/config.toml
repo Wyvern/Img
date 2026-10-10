@@ -722,3 +722,8 @@ rustflags = ["-Clink-arg=--target=x86-netbsd"]
 [target.i586-unknown-netbsd]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=x86-netbsd"]
+
+[target.i686-uwp-windows-gnu]
+rustflags = ["-Lnative=C:\\msys64\\mingw64\\lib"]
+[target.x86_64-uwp-windows-gnu]
+rustflags = ["-Lnative=C:\\msys64\\mingw64\\lib"]

@@ -64,6 +64,43 @@ jobs:
           mingw-w64-x86_64-crt \
           mingw-w64-x86_64-winstorecompat'
 
+      # - name: Install WinStoreCompat libraries
+      #   shell: pwsh
+      #   run: |
+      #     $packages = @(
+      #       @{
+      #         Url = 'https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst'
+      #         Name = 'i686.pkg.tar.zst'
+      #         Sha256 = 'e52be1eefd52c825074b5fb64505127b68d1e78ef9dd7a27b39310ca6b5eabcc'
+      #       },
+      #       @{
+      #         Url = 'https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-winstorecompat-14.0.0.r220.gd999af622-1-any.pkg.tar.zst'
+      #         Name = 'x86_64.pkg.tar.zst'
+      #         Sha256 = '01bc0ad4152f4afdbf7da60d11fe185d249b79572e2dbcd2748edd0c32a9a82a'
+      #       }
+      #     )
+      #
+      #     New-Item -ItemType Directory -Force 'C:\msys64\tmp' | Out-Null
+      #
+      #     foreach ($package in $packages) {
+      #       $path = "C:\msys64\tmp\$($package.Name)"
+      #       Invoke-WebRequest $package.Url -OutFile $path
+      #
+      #       $actual = (Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant()
+      #       if ($actual -ne $package.Sha256) {
+      #         throw "SHA256 mismatch: $($package.Name)"
+      #       }
+      #
+      #       $unixPath = "/tmp/$($package.Name)"
+      #       Copy-Item $path "C:\msys64\tmp\$($package.Name)" -Force
+      #     }
+      #
+      #     & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -U --noconfirm /tmp/i686.pkg.tar.zst /tmp/x86_64.pkg.tar.zst'
+      #     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      #
+      #     & 'C:\msys64\usr\bin\bash.exe' -lc 'test -f /mingw32/lib/libwinstorecompat.a && test -f /mingw64/lib/libwinstorecompat.a'
+      #     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Build release
         run: |
           cargo update
