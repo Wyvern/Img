@@ -82,17 +82,13 @@ jobs:
               printf '\nENTRYPOINT ["x86_64-unknown-haiku-gcc"]\n' >> haiku/Dockerfile
 
               file="haiku/build-toolchain.sh"
-              if grep -q 'Patch RPattern.cpp' "$file"; then
-                  echo "already patched: $file"
-              else
-                  sed -i '/^git clone --depth=1 --branch \$BUILDTOOLS_REV https:\/\/review.haiku-os.org\/buildtools$/a\
+
+              sed -i '/^git clone --depth=1 --branch \$BUILDTOOLS_REV https:\/\/review.haiku-os.org\/buildtools$/a\
               \
-              # Patch RPattern.cpp: offsetof() requires <cstddef>.\
-              RPattern=$HAIKU/src/kits/storage/sniffer/RPattern.cpp\
-              sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$RPattern"\
+              # Patch Haiku source after cloning.\
+              sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$HAIKU/src/kits/storage/sniffer/RPattern.cpp"\
+              sed -i '\''s/FindBlock(pos, num, offset) < B_OK/FindBlock(pos, num, offset) != B_OK/g'\'' "$HAIKU/src/system/boot/loader/file_systems/fat/Stream.cpp"\
               ' "$file"
-                  echo "patched: $file"
-              fi
 
               python3 - <<'PY'
           from pathlib import Path
@@ -103,10 +99,9 @@ jobs:
           anchor = "$HAIKU/configure $configureArgs"
 
           flags = '''# Optimize the x86_64 Haiku target.
-          export HAIKU_CCFLAGS_x86_64="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
-          export HAIKU_CXXFLAGS_x86_64="$HAIKU_CCFLAGS_x86_64 -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
-          export HAIKU_LINKFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections"
-          export HAIKU_LDFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections"
+          export CFLAGS="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
+          export CXXFLAGS="$HAIKU_CCFLAGS_x86_64 -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
+          export LDFLAGS="-Wl,-O3 -Wl,--gc-sections"
 
           '''
 
