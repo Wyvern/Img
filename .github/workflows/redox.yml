@@ -85,9 +85,7 @@ jobs:
                         /tmp/* \
                         /var/tmp/* \
               && test -x /cross-tools-i686/bin/i686-gnu-gcc \
-              && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine \
-              && apt-get clean \
-              && apt-get purge -y --auto-remove
+              && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine
 
           ENTRYPOINT ["/cross-tools-i686/bin/i686-gnu-gcc"]
           EOF
@@ -95,7 +93,7 @@ jobs:
             docker build --platform linux/amd64 \
                 --provenance=false \
                 --load \
-                --progress=quiet \
+                --progress=plain \
                 -t ghcr.io/wyvern/img:hurd-i686 .
 
             docker push ghcr.io/wyvern/img:hurd-i686 &
