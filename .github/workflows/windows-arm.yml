@@ -72,37 +72,30 @@ jobs:
         run: |
           cargo update
 
+              $ErrorActionPreference = 'Continue'
 
-               $ErrorActionPreference = 'Continue'
-               $bin = 'C:\msys64\mingw32\bin'
-               $gcc = "$bin\gcc.exe"
-               $src = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.c'
-               $obj = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.o'
-               $env:PATH = "$bin;C:\msys64\usr\bin;$env:PATH"
+              Write-Host '=== Rust target ==='
+              rustc -vV
+              rustc --print target-list | Select-String 'i686.*uwp'
 
-               'int main(void) { return 0; }' |
-                 Set-Content -LiteralPath $src -Encoding ascii
+              Write-Host "`n=== Rust target linker configuration ==="
+              rustc -Z unstable-options --print target-spec-json --target i686-uwp-windows-gnu
 
-               & $gcc -c $src -o $obj
-               if ($LASTEXITCODE -ne 0) {
-                 throw "GCC compile failed: $LASTEXITCODE"
-               }
+              Write-Host "`n=== Rust linker helper files ==="
+              $rustlib = rustc --print sysroot
+              $rustlib = Join-Path $rustlib 'lib\rustlib'
 
-               Write-Host "`n=== Default GNU linker ==="
-               & $gcc -v $obj -o (Join-Path $env:RUNNER_TEMP 'test-gnu.exe') 2>&1
-               "GNU linker exit code: $LASTEXITCODE"
+              Get-ChildItem $rustlib -Recurse -File -ErrorAction SilentlyContinue |
+                Where-Object {
+                  $_.FullName -match 'gcc-ld|i686.*uwp|windows-gnu'
+                } |
+                Select-Object -ExpandProperty FullName
 
-               Write-Host "`n=== LLVM LLD via -fuse-ld=lld ==="
-               & $gcc -v -fuse-ld=lld $obj -o (Join-Path $env:RUNNER_TEMP 'test-lld.exe') 2>&1
-               "LLD exit code: $LASTEXITCODE"
+              Write-Host "`n=== Explicit tool paths ==="
+              Get-Command gcc.exe, ld.exe, lld.exe -All -ErrorAction SilentlyContinue |
+                Select-Object Name, Source
 
-               Write-Host "`n=== Linker resolution ==="
-               & $gcc -print-prog-name=ld
-               & $gcc -print-file-name=libgcc.a
-               Get-Command ld.exe, lld.exe -All -ErrorAction SilentlyContinue |
-                 Select-Object Name, Source
-
-          # cargo s i686-uwp-windows-gnu
+          cargo s i686-uwp-windows-gnu
 
           exit
           $targets = @(
