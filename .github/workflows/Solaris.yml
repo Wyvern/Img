@@ -99,9 +99,9 @@ jobs:
           anchor = "$HAIKU/configure $configureArgs"
 
           flags = '''# Optimize the x86_64 Haiku target.
-          export CFLAGS="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
-          export CXXFLAGS="$HAIKU_CCFLAGS_x86_64 -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
-          export LDFLAGS="-Wl,-O3 -Wl,--gc-sections"
+          export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
+          export CXXFLAGS="$CFLAGS -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
+          export LDFLAGS="-O3 --gc-sections --strip-all"
 
           '''
 
