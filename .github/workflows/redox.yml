@@ -72,8 +72,8 @@ jobs:
               && sed -i 's|^DMIDECODE_URL=http://|DMIDECODE_URL=https://|' download-funcs.sh \
               && sed -i 's|download\.savannah\.gnu\.org/releases/dmidecode/|download-mirror.savannah.gnu.org/releases/dmidecode/|' download-funcs.sh \
               && sed -i '/--disable-libgomp \\/a\      --disable-libsanitizer \\' bootstrap-funcs.sh \
-              && export CFLAGS="-O3 -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden" \
-              && export CXXFLAGS="-O3 -fno-exceptions -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden -fvisibility-inlines-hidden" \
+              && export CFLAGS="-O3 -pipe -g0 -fvisibility=hidden" \
+              && export CXXFLAGS="-O3 -pipe -g0 -fvisibility=hidden -fvisibility-inlines-hidden" \
               && export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all" \
               && CPU=i686 bash -x download.sh \
               && DISABLE_ADA=1 CPU=i686 bash -x bootstrap.sh \
