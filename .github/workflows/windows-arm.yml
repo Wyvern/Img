@@ -73,48 +73,32 @@ jobs:
           cargo update
 
 
-              $ErrorActionPreference = 'Continue'
+            $ErrorActionPreference = 'Continue'
 
-              $bin = 'C:\msys64\mingw32\bin'
-              $cc1 = 'C:\msys64\mingw32\lib\gcc\i686-w64-mingw32\16.2.0\cc1.exe'
-              $objdump = Join-Path $bin 'objdump.exe'
+            $gcc = 'C:\msys64\mingw32\bin\gcc.exe'
+            $src = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.c'
+            $asm = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.s'
+            $obj = Join-Path $env:RUNNER_TEMP 'uwp-linker-test.o'
 
-              $env:PATH = "$bin;C:\msys64\usr\bin;$env:PATH"
+            $env:PATH = "C:\msys64\mingw32\bin;C:\msys64\usr\bin;$env:PATH"
 
-              Write-Host '=== cc1 startup test ==='
-              & $cc1 --version 2>&1
-              "cc1 exit code: $LASTEXITCODE"
+            'int main(void) { return 0; }' |
+              Set-Content -LiteralPath $src -Encoding ascii
 
-              Write-Host "`n=== Direct DLL dependencies ==="
-              $dependencies = & $objdump -p $cc1 2>&1 |
-                ForEach-Object {
-                  if ("$_" -match 'DLL Name:\s*(\S+)') {
-                    $Matches[1]
-                  }
-                } |
-                Sort-Object -Unique
+            Write-Host '=== Compile source to assembly ==='
+            & $gcc -v -S $src -o $asm 2>&1
+            "Compile exit code: $LASTEXITCODE"
+            "Assembly exists: $(Test-Path -LiteralPath $asm)"
 
-              foreach ($dll in $dependencies) {
-                Write-Host "`nDLL: $dll"
-                $matches = @(
-                  & where.exe $dll 2>$null
-                )
+            Write-Host "`n=== Compile source to object ==="
+            & $gcc -v -c $src -o $obj 2>&1
+            "Object exit code: $LASTEXITCODE"
+            "Object exists: $(Test-Path -LiteralPath $obj)"
 
-                if ($matches.Count -eq 0) {
-                  Write-Host '  NOT FOUND on PATH'
-                } else {
-                  $matches | ForEach-Object {
-                    Write-Host "  Found: $_"
-                  }
-                }
-              }
-
-              Write-Host "`n=== Relevant GCC runtime DLLs ==="
-              Get-ChildItem -LiteralPath $bin -Filter '*.dll' |
-                Where-Object {
-                  $_.Name -match 'isl|mpc|mpfr|gmp|zstd|zlib|winpthread|gcc'
-                } |
-                Select-Object -ExpandProperty FullName
+            Write-Host "`n=== Locate assembler ==="
+            & $gcc -print-prog-name=as
+            Test-Path 'C:\msys64\mingw32\bin\as.exe'
+            Test-Path 'C:\msys64\mingw32\bin\..\i686-w64-mingw32\bin\as.exe'
 
           # cargo s i686-uwp-windows-gnu
 
