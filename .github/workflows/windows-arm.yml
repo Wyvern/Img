@@ -72,7 +72,25 @@ jobs:
         run: |
           cargo update
 
-          cargo s i686-uwp-windows-gnu
+              $ErrorActionPreference = 'Continue'
+              $env:PATH = "C:\msys64\mingw32\bin;C:\msys64\usr\bin;$env:PATH"
+
+              Write-Host '=== GCC linker selection ==='
+              & 'C:\msys64\mingw32\bin\gcc.exe' -print-prog-name=ld
+              & 'C:\msys64\mingw32\bin\gcc.exe' -print-file-name=libmingwex.a
+              & 'C:\msys64\mingw32\bin\gcc.exe' -print-file-name=libmingw32.a
+              & 'C:\msys64\mingw32\bin\gcc.exe' -print-file-name=libgcc.a
+
+              Write-Host "`n=== LLD versions ==="
+              & 'C:\Program Files\LLVM\bin\lld.exe' --version
+              & 'C:\Users\runneradmin\.rustup\toolchains\nightly-aarch64-pc-windows-msvc\lib\rustlib\aarch64-pc-windows-msvc\bin\gcc-ld\ld.lld.exe' --version
+
+              Write-Host "`n=== Available UWP libraries ==="
+              Get-ChildItem 'C:\msys64\mingw32\lib' -File -ErrorAction SilentlyContinue |
+                Where-Object Name -Match 'winstorecompat|runtimeobject|synchronization|vcruntime140_app|windowsapp|ucrt' |
+                Select-Object -ExpandProperty Name
+
+          # cargo s i686-uwp-windows-gnu
 
           exit
           $targets = @(
