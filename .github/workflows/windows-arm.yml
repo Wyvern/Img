@@ -72,29 +72,6 @@ jobs:
         run: |
           cargo update
 
-              $ErrorActionPreference = 'Continue'
-
-              Write-Host '=== Rust target ==='
-              rustc -vV
-              rustc --print target-list | Select-String 'i686.*uwp'
-
-              Write-Host "`n=== Rust target linker configuration ==="
-              rustc -Z unstable-options --print target-spec-json --target i686-uwp-windows-gnu
-
-              Write-Host "`n=== Rust linker helper files ==="
-              $rustlib = rustc --print sysroot
-              $rustlib = Join-Path $rustlib 'lib\rustlib'
-
-              Get-ChildItem $rustlib -Recurse -File -ErrorAction SilentlyContinue |
-                Where-Object {
-                  $_.FullName -match 'gcc-ld|i686.*uwp|windows-gnu'
-                } |
-                Select-Object -ExpandProperty FullName
-
-              Write-Host "`n=== Explicit tool paths ==="
-              Get-Command gcc.exe, ld.exe, lld.exe -All -ErrorAction SilentlyContinue |
-                Select-Object Name, Source
-
           cargo s i686-uwp-windows-gnu
 
           exit
