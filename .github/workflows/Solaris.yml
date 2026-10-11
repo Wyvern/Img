@@ -79,7 +79,7 @@ jobs:
               curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
-              sed '$a ENTRYPOINT ["x86_64-unknown-haiku-gcc"]' > haiku/Dockerfile
+              printf '\nENTRYPOINT ["x86_64-unknown-haiku-gcc"]\n' >> haiku/Dockerfile
 
               file="haiku/build-toolchain.sh"
               if grep -q 'Patch RPattern.cpp' "$file"; then
@@ -95,29 +95,29 @@ jobs:
               fi
 
               python3 - <<'PY'
-              from pathlib import Path
+          from pathlib import Path
 
-              path = Path("haiku/build-toolchain.sh")
-              script = path.read_text()
+          path = Path("haiku/build-toolchain.sh")
+          script = path.read_text()
 
-              anchor = "$HAIKU/configure $configureArgs"
+          anchor = "$HAIKU/configure $configureArgs"
 
-              flags = '''# Optimize the x86_64 Haiku target.
-              export HAIKU_CCFLAGS_x86_64="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
-              export HAIKU_CXXFLAGS_x86_64="$HAIKU_CCFLAGS_x86_64 -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
-              export HAIKU_LINKFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections"
-              export HAIKU_LDFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections"
+          flags = '''# Optimize the x86_64 Haiku target.
+          export HAIKU_CCFLAGS_x86_64="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
+          export HAIKU_CXXFLAGS_x86_64="$HAIKU_CCFLAGS_x86_64 -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
+          export HAIKU_LINKFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections"
+          export HAIKU_LDFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections"
 
-              '''
+          '''
 
-              if "# Optimize the x86_64 Haiku target." in script:
-                  print("Optimization flags already present.")
-              elif anchor not in script:
-                  raise SystemExit(f"ERROR: insertion point not found: {anchor}")
-              else:
-                  script = script.replace(anchor, flags + anchor, 1)
-                  path.write_text(script)
-                  print(f"Patched {path}")
+          if "# Optimize the x86_64 Haiku target." in script:
+              print("Optimization flags already present.")
+          elif anchor not in script:
+              raise SystemExit(f"ERROR: insertion point not found: {anchor}")
+          else:
+              script = script.replace(anchor, flags + anchor, 1)
+              path.write_text(script)
+              print(f"Patched {path}")
               PY
 
               docker buildx build --tag "$IMAGE:haiku-cross" \
