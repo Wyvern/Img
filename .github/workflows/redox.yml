@@ -54,7 +54,7 @@ jobs:
 
           RUN apt-get update && apt-get install -y --no-install-recommends \
               git sudo ca-certificates curl wget \
-              build-essential make gcc g++ perl \
+              build-essential perl \
               texinfo autopoint pkg-config libtool \
               autotools-dev automake autoconf gettext \
               libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev \
@@ -71,13 +71,23 @@ jobs:
               && sed -i '/apply_patch .*submitted-AF_LINK\.diff 1/c\    sed -i -e "s|^[[:space:]]*#define[[:space:]]*PF_LINK[[:space:]]*18.*|/* #define PF_LINK 18 Link layer interface. */|" -e "s|^[[:space:]]*#define[[:space:]]*AF_LINK[[:space:]]*PF_LINK|/* #define AF_LINK PF_LINK */|" sysdeps/mach/hurd/bits/socket.h &&' download-funcs.sh \
               && sed -i 's|^DMIDECODE_URL=http://|DMIDECODE_URL=https://|' download-funcs.sh \
               && sed -i 's|download\.savannah\.gnu\.org/releases/dmidecode/|download-mirror.savannah.gnu.org/releases/dmidecode/|' download-funcs.sh \
+              && export CFLAGS="-O3 -fno-exceptions -fno-rtti -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden" \
+              && export CXXFLAGS="-O3 -fno-exceptions -fno-rtti -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden -fvisibility-inlines-hidden" \
+              && export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all" \
               && CPU=i686 bash -x download.sh \
-              && CPU=i686 bash -x bootstrap.sh \
+              && DISABLE_ADA=1 CPU=i686 bash -x bootstrap.sh \
+              && find /cross-tools-i686 -type d \
+                    \( -name __pycache__ -o -name man -o -name doc -o -name docs \) \
+                    -prune -exec rm -rf {} + \
               && rm -rf /src/cross-hurd/src \
                         /src/cross-hurd/build-i686 \
                         /root/.cache/cross-hurd \
+                        /tmp/* \
+                        /var/tmp/* \
               && test -x /cross-tools-i686/bin/i686-gnu-gcc \
-              && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine
+              && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine \
+              && apt-get clean \
+              && apt-get purge -y --auto-remove
 
           ENTRYPOINT ["/cross-tools-i686/bin/i686-gnu-gcc"]
           EOF
@@ -182,7 +192,7 @@ jobs:
             "$@"
           EOF
           chmod +x i686-gnu-gcc
-
+          exit
           targets=(
             x86_64-unknown-motor
             riscv32imac-unknown-xous-elf
