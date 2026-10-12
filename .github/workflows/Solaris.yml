@@ -101,8 +101,6 @@ jobs:
           flags = '''# Optimize the x86_64 Haiku target.
           export CFLAGS="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
           export CXXFLAGS="$CFLAGS -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
-          export HAIKU_LINKFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
-          export HAIKU_LDFLAGS_x86_64="-O3 --gc-sections --strip-all"
           '''
 
           if flags_marker in script:
