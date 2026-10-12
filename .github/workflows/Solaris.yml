@@ -118,12 +118,12 @@ jobs:
               docker buildx build --tag "$IMAGE:haiku-cross" \
                 --platform linux/amd64 \
                 --provenance=false \
-                --progress=plain \
+                --progress=quiet \
                 --load ./haiku
 
               docker push "$IMAGE:haiku-cross" &
           fi
-          exit
+
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
@@ -261,7 +261,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          exit
+
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
           targets=(
