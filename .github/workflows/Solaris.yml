@@ -87,10 +87,7 @@ jobs:
               sed -i '/^git clone --depth=1 --branch \$BUILDTOOLS_REV https:\/\/review.haiku-os.org\/buildtools$/a\
               \
               # Patch Haiku source after cloning.\
-              sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$HAIKU/src/kits/storage/sniffer/RPattern.cpp"\
-              # sed -i '\''s/FindBlock(pos, num, offset) < B_OK/FindBlock(pos, num, offset) != B_OK/g'\'' "$HAIKU/src/system/boot/loader/file_systems/fat/Stream.cpp"\
-              ' "$file"
-
+              sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$HAIKU/src/kits/storage/sniffer/RPattern.cpp"\ ' "$file"
 
               python3 - <<'PY'
           from pathlib import Path
@@ -336,6 +333,18 @@ jobs:
         run: |
           cargo update
           set +e -x
+          cat > x86_64-unknown-haiku-gcc <<'EOF'
+          #!/bin/sh
+          exec docker run --rm \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            ghcr.io/wyvern/img:haiku-cross \
+            x86_64-unknown-haiku-gcc \
+            "$@"
+          EOF
+
+          chmod +x x86_64-unknown-haiku-gcc
+          time cargo s x86_64-unknown-haiku
           exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
