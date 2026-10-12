@@ -95,84 +95,14 @@ jobs:
           path = Path("haiku/build-toolchain.sh")
           script = path.read_text()
 
-          marker = 'rm -rf $OUTPUT/Jamfile $OUTPUT/attributes $OUTPUT/build $OUTPUT/build_packages $OUTPUT/download $OUTPUT/objects'
-          cleanup_marker = "# Remove build inputs and intermediate build directories."
           anchor = "$HAIKU/configure $configureArgs"
-
-          cleanup = r'''
-          # Remove build inputs and intermediate build directories.
-          rm -rf \
-              "$TOP/buildtools" \
-              "$TOP/haiku" \
-              "$OUTPUT/Jamfile" \
-              "$OUTPUT/attributes" \
-              "$OUTPUT/build" \
-              "$OUTPUT/build_packages" \
-              "$OUTPUT/download" \
-              "$OUTPUT/objects" \
-              /root/.cache \
-              /tmp/* \
-              /var/tmp/*
-
-          # Remove documentation and caches, but retain compiler runtime files.
-          for prefix in "$OUTPUT/cross-tools-$ARCH"; do
-              [ -d "$prefix" ] || continue
-
-              rm -rf \
-                  "$prefix/share/man" \
-                  "$prefix/share/info" \
-                  "$prefix/share/doc" \
-                  "$prefix/share/gtk-doc"
-
-              find "$prefix" -type d \
-                  \( -name __pycache__ -o -name .pytest_cache \
-                      -o -name .mypy_cache \) \
-                  -prune -exec rm -rf {} +
-
-              find "$prefix" -type f \
-                  \( -name '*.pyc' -o -name '*.pyo' \
-                      -o -name '*.gcda' -o -name '*.gcno' \
-                      -o -name '*.profraw' \) \
-                  -delete
-          done
-
-          if [ -n "$SECONDARY_ARCH" ]; then
-              prefix="$OUTPUT/cross-tools-$SECONDARY_ARCH"
-
-              if [ -d "$prefix" ]; then
-                  rm -rf \
-                      "$prefix/share/man" \
-                      "$prefix/share/info" \
-                      "$prefix/share/doc" \
-                      "$prefix/share/gtk-doc"
-
-                  find "$prefix" -type d \
-                      \( -name __pycache__ -o -name .pytest_cache \
-                          -o -name .mypy_cache \) \
-                      -prune -exec rm -rf {} +
-
-                  find "$prefix" -type f \
-                      \( -name '*.pyc' -o -name '*.pyo' \
-                          -o -name '*.gcda' -o -name '*.gcno' \
-                          -o -name '*.profraw' \) \
-                      -delete
-              fi
-          fi
-          '''
-
-          if cleanup_marker in script:
-              print("Cleanup block already present; skipping.")
-          else:
-              if marker not in script:
-                  raise SystemExit("ERROR: upstream cleanup marker not found.")
-              script = script.replace(marker, marker + "\n" + cleanup, 1)
-              print("Added cleanup block.")
 
           flags_marker = "# Optimize the x86_64 Haiku target."
           flags = '''# Optimize the x86_64 Haiku target.
           export CFLAGS="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
           export CXXFLAGS="$CFLAGS -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
-
+          export HAIKU_LINKFLAGS_x86_64="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
+          export HAIKU_LDFLAGS_x86_64="-O3 --gc-sections --strip-all"
           '''
 
           if flags_marker in script:
@@ -333,17 +263,6 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cat > x86_64-unknown-haiku-gcc <<'EOF'
-          #!/bin/sh
-          exec docker run --rm \
-            -v "$PWD:$PWD" \
-            -w "$PWD" \
-            ghcr.io/wyvern/img:haiku-cross \
-            "$@"
-          EOF
-
-          chmod +x x86_64-unknown-haiku-gcc
-          time cargo s x86_64-unknown-haiku
           exit
           cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
 
@@ -375,7 +294,6 @@ jobs:
             -v "$PWD:$PWD" \
             -w "$PWD" \
             ghcr.io/wyvern/img:haiku-cross \
-            x86_64-unknown-haiku-gcc \
             "$@"
           EOF
 
