@@ -33,8 +33,8 @@ RUST_LIB_BACKTRACE = "0"
 RUST_PANIC_STRATEGY = "abort"
 RUSTC_ICE = "0"
 RUSTC_BOOTSTRAP = "1"
-CFLAGS = { value = "-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0", force = true }
-CXXFLAGS = { value = "-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fno-exceptions -fno-rtti", force = true }
+CFLAGS = { value = "-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = true }
+CXXFLAGS = { value = "-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden -fvisibility-inlines-hidden -fno-exceptions -fno-rtti", force = true }
 CPPFLAGS = { value = "-DNDEBUG", force = true }
 LDFLAGS = { value = "-Wl,-O3 -Wl,--gc-sections", force = true }
 
@@ -727,3 +727,19 @@ linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
 [target.x86_64-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
 rustflags = ["-lgcc_eh"]
+
+[target.arm-unknown-linux-gnueabi]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
+
+[target.arm-unknown-linux-gnueabihf]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
+
+[target.arm-unknown-linux-musleabi]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-linux-musleabi"]
+
+[target.arm-unknown-linux-musleabihf]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-linux-musleabihf"]

@@ -59,10 +59,10 @@ jobs:
 
           echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
-      # - name: Zig toolchain install
-      #   uses: mlugg/setup-zig@v2
-      #   with:
-      #     version: master
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
 
       - name: Login to GHCR
         uses: docker/login-action@v4
@@ -85,6 +85,10 @@ jobs:
 
 
           targets=(
+              arm-unknown-linux-gnueabi
+              arm-unknown-linux-gnueabihf
+              arm-unknown-linux-musleabi
+              arm-unknown-linux-musleabihf
           )
 
           for target in ${targets[@]}; do

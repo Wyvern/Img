@@ -103,8 +103,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          time cargo s aarch64-unknown-hermit
-          exit
+
           mv .cargo/config.toml .cargo/config.toml.bak
           targets=(
             aarch64-unknown-hermit
