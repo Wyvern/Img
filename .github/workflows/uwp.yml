@@ -83,7 +83,6 @@ jobs:
           #     done
           # }
           cargo s riscv32gc-unknown-linux-musl
-          exit
           mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
           find l4re -type f \( -name '*gcc' -o -name '*g++' -o -name '*ld' -o -name 'collect2' \) -print
           exit
@@ -118,7 +117,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-
+            riscv32gc-unknown-linux-musl
           )
 
           for target in "${targets[@]}"; do
