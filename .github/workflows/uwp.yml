@@ -83,11 +83,10 @@ jobs:
           #     done
           # }
 
-          # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
-
+          mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
+          ls -hl l4re
           targets=(
-          riscv32gc-unknown-linux-musl
-          # aarch64-unknown-l4re-uclibc
+          aarch64-unknown-l4re-uclibc
           # x86_64-unknown-l4re-uclibc
           )
 
@@ -115,7 +114,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-            riscv32gc-unknown-linux-musl
+
           )
 
           for target in "${targets[@]}"; do
@@ -127,7 +126,13 @@ jobs:
             else
                 name="${os^}-${arch}"
             fi
+
             echo "Uploading $name..."
-            mv target/$target/src/{img,$name}|| true
-            gh release upload Nightly --clobber target/$target/src/$name || true
+            if [[ "$os" == "windows" ]]; then
+              mv target/$target/src/{img.exe,$name.exe}|| true
+              gh release upload Nightly --clobber target/$target/src/$name.exe || true
+            else
+              mv target/$target/src/{img,$name}|| true
+              gh release upload Nightly --clobber target/$target/src/$name || true
+            fi
           done
