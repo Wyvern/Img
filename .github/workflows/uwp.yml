@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-26.04-arm
 
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -83,8 +83,7 @@ jobs:
           #     done
           # }
 
-          mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
-          find l4re -type f \( -name '*gcc' -o -name '*g++' -o -name '*ld' -o -name 'collect2' \) -print
+          # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           targets=(
           riscv32gc-unknown-linux-musl
@@ -96,7 +95,7 @@ jobs:
             time cargo s $target
           done
 
-          find ./target -iname img.exe -type f | xargs ls -hl
+          find ./target -iname img -type f | xargs ls -hl
           lscpu
           free -m
 
