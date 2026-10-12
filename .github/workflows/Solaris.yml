@@ -339,7 +339,6 @@ jobs:
             -v "$PWD:$PWD" \
             -w "$PWD" \
             ghcr.io/wyvern/img:haiku-cross \
-            x86_64-unknown-haiku-gcc \
             "$@"
           EOF
 
