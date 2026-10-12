@@ -88,15 +88,13 @@ jobs:
 
           targets=(
           riscv32gc-unknown-linux-musl
-          aarch64-unknown-l4re-uclibc
-          x86_64-unknown-l4re-uclibc
+          # aarch64-unknown-l4re-uclibc
+          # x86_64-unknown-l4re-uclibc
           )
 
           for target in ${targets[@]}; do
             time cargo s $target
           done
-
-          exit
 
           find ./target -iname img.exe -type f | xargs ls -hl
           lscpu
