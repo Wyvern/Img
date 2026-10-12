@@ -36,7 +36,7 @@ RUSTC_BOOTSTRAP = "1"
 CFLAGS = { value = "-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden", force = true }
 CXXFLAGS = { value = "-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden -fvisibility-inlines-hidden -fno-exceptions -fno-rtti", force = true }
 CPPFLAGS = { value = "-DNDEBUG", force = true }
-LDFLAGS = { value = "-Wl,-O3 -Wl,--gc-sections", force = true }
+# LDFLAGS = { value = "-Wl,-O3 -Wl,--gc-sections", force = true }
 
 [net]
 # offline = true
