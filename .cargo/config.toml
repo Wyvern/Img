@@ -751,3 +751,6 @@ rustflags = ["-Clink-arg=--target=riscv32-linux-gnu"]
 [target.riscv32gc-unknown-linux-musl]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
+
+[target.'cfg(target_os="l4re")']
+linker = "l4re/bin/aarch64-l4re-gcc"
