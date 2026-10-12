@@ -80,6 +80,7 @@ jobs:
               -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
 
               printf '\nENTRYPOINT ["x86_64-unknown-haiku-gcc"]\n' >> haiku/Dockerfile
+              sed -i '/^RUN apt-get install/ s/$/ \&\& rm -rf \/var\/lib\/apt\/lists\/* \/var\/cache\/apt\/archives\/*/' haiku/Dockerfile
 
               file="haiku/build-toolchain.sh"
 
@@ -87,8 +88,9 @@ jobs:
               \
               # Patch Haiku source after cloning.\
               sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$HAIKU/src/kits/storage/sniffer/RPattern.cpp"\
-              sed -i '\''s/FindBlock(pos, num, offset) < B_OK/FindBlock(pos, num, offset) != B_OK/g'\'' "$HAIKU/src/system/boot/loader/file_systems/fat/Stream.cpp"\
+              # sed -i '\''s/FindBlock(pos, num, offset) < B_OK/FindBlock(pos, num, offset) != B_OK/g'\'' "$HAIKU/src/system/boot/loader/file_systems/fat/Stream.cpp"\
               ' "$file"
+
 
               python3 - <<'PY'
           from pathlib import Path
@@ -96,23 +98,96 @@ jobs:
           path = Path("haiku/build-toolchain.sh")
           script = path.read_text()
 
+          marker = 'rm -rf $OUTPUT/Jamfile $OUTPUT/attributes $OUTPUT/build $OUTPUT/build_packages $OUTPUT/download $OUTPUT/objects'
+          cleanup_marker = "# Remove build inputs and intermediate build directories."
           anchor = "$HAIKU/configure $configureArgs"
 
-          flags = '''# Optimize the x86_64 Haiku target.
+          cleanup = r'''
+          # Remove build inputs and intermediate build directories.
+          rm -rf \
+              "$TOP/buildtools" \
+              "$TOP/haiku" \
+              "$OUTPUT/Jamfile" \
+              "$OUTPUT/attributes" \
+              "$OUTPUT/build" \
+              "$OUTPUT/build_packages" \
+              "$OUTPUT/download" \
+              "$OUTPUT/objects" \
+              /root/.cache \
+              /tmp/* \
+              /var/tmp/*
 
-          export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
+          # Remove documentation and caches, but retain compiler runtime files.
+          for prefix in "$OUTPUT/cross-tools-$ARCH"; do
+              [ -d "$prefix" ] || continue
+
+              rm -rf \
+                  "$prefix/share/man" \
+                  "$prefix/share/info" \
+                  "$prefix/share/doc" \
+                  "$prefix/share/gtk-doc"
+
+              find "$prefix" -type d \
+                  \( -name __pycache__ -o -name .pytest_cache \
+                      -o -name .mypy_cache \) \
+                  -prune -exec rm -rf {} +
+
+              find "$prefix" -type f \
+                  \( -name '*.pyc' -o -name '*.pyo' \
+                      -o -name '*.gcda' -o -name '*.gcno' \
+                      -o -name '*.profraw' \) \
+                  -delete
+          done
+
+          if [ -n "$SECONDARY_ARCH" ]; then
+              prefix="$OUTPUT/cross-tools-$SECONDARY_ARCH"
+
+              if [ -d "$prefix" ]; then
+                  rm -rf \
+                      "$prefix/share/man" \
+                      "$prefix/share/info" \
+                      "$prefix/share/doc" \
+                      "$prefix/share/gtk-doc"
+
+                  find "$prefix" -type d \
+                      \( -name __pycache__ -o -name .pytest_cache \
+                          -o -name .mypy_cache \) \
+                      -prune -exec rm -rf {} +
+
+                  find "$prefix" -type f \
+                      \( -name '*.pyc' -o -name '*.pyo' \
+                          -o -name '*.gcda' -o -name '*.gcno' \
+                          -o -name '*.profraw' \) \
+                      -delete
+              fi
+          fi
+          '''
+
+          if cleanup_marker in script:
+              print("Cleanup block already present; skipping.")
+          else:
+              if marker not in script:
+                  raise SystemExit("ERROR: upstream cleanup marker not found.")
+              script = script.replace(marker, marker + "\n" + cleanup, 1)
+              print("Added cleanup block.")
+
+          flags_marker = "# Optimize the x86_64 Haiku target."
+          flags = '''# Optimize the x86_64 Haiku target.
+          export CFLAGS="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
           export CXXFLAGS="$CFLAGS -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
 
           '''
 
-          if "# Optimize the x86_64 Haiku target." in script:
-              print("Optimization flags already present.")
-          elif anchor not in script:
-              raise SystemExit(f"ERROR: insertion point not found: {anchor}")
+          if flags_marker in script:
+              print("Optimization flags already present; skipping.")
           else:
+              if anchor not in script:
+                  raise SystemExit(f"ERROR: insertion point not found: {anchor}")
               script = script.replace(anchor, flags + anchor, 1)
-              path.write_text(script)
-              print(f"Patched {path}")
+              print("Added optimization flags.")
+
+          path.write_text(script)
+          print(f"Patched {path}")
           PY
 
               docker buildx build --tag "$IMAGE:haiku-cross" \
