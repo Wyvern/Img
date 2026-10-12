@@ -76,6 +76,10 @@ jobs:
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             armeb-unknown-linux-gnueabi
+            arm-unknown-linux-gnueabi
+            arm-unknown-linux-gnueabihf
+            arm-unknown-linux-musleabi
+            arm-unknown-linux-musleabihf
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
@@ -112,6 +116,10 @@ jobs:
         run: |
           targets=(
             armeb-unknown-linux-gnueabi
+            arm-unknown-linux-gnueabi
+            arm-unknown-linux-gnueabihf
+            arm-unknown-linux-musleabi
+            arm-unknown-linux-musleabihf
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             powerpc-unknown-openbsd

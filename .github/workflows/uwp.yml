@@ -85,10 +85,8 @@ jobs:
 
 
           targets=(
-              arm-unknown-linux-gnueabi
-              arm-unknown-linux-gnueabihf
-              arm-unknown-linux-musleabi
-              arm-unknown-linux-musleabihf
+              riscv32gc-unknown-linux-gnu
+              riscv32gc-unknown-linux-musl
           )
 
           for target in ${targets[@]}; do
