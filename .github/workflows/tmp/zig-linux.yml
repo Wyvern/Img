@@ -82,6 +82,7 @@ jobs:
             riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl
             armv7-unknown-linux-uclibceabi
+            armv5te-unknown-linux-uclibceabi
             armeb-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf

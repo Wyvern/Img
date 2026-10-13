@@ -762,3 +762,19 @@ linker = "l4re/bin/aarch64-l4re-gcc"
 [target.armv5te-unknown-linux-uclibceabi]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
+
+[target.armv7-unknown-linux-musleabi]
+linker = "zig-cc.sh"
+rustflags = ["-Clink-arg=-target=arm-linux-musleabi"]
+
+[target.armv7-unknown-linux-musleabihf]
+linker = "zig-cc.sh"
+rustflags = ["-Clink-arg=-target=arm-linux-musleabihf"]
+
+[target.armv7-unknown-linux-gnueabi]
+linker = "zig-cc.sh"
+rustflags = ["-Clink-arg=-target=arm-linux-gnueabi"]
+
+[target.armv7-unknown-linux-gnueabihf]
+linker = "zig-cc.sh"
+rustflags = ["-Clink-arg=-target=arm-linux-gnueabihf"]
