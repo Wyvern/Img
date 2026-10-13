@@ -77,12 +77,14 @@ jobs:
           set +e -x
 
           targets=(
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
-            riscv32gc-unknown-linux-gnu
-            riscv32gc-unknown-linux-musl
+            armv7-unknown-linux-musleabi
+            armv7-unknown-linux-musleabihf
+            armv7-unknown-linux-gnueabi
+            armv7-unknown-linux-gnueabihf
             armv7-unknown-linux-uclibceabi
             armv5te-unknown-linux-uclibceabi
+            armv5te-unknown-linux-gnueabi
+            armv5te-unknown-linux-musleabi
             armeb-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf
@@ -114,11 +116,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
-            riscv32gc-unknown-linux-gnu
-            riscv32gc-unknown-linux-musl
+            armv7-unknown-linux-musleabi
+            armv7-unknown-linux-musleabihf
+            armv7-unknown-linux-gnueabi
+            armv7-unknown-linux-gnueabihf
             armv7-unknown-linux-uclibceabi
+            armv5te-unknown-linux-uclibceabi
+            armv5te-unknown-linux-gnueabi
+            armv5te-unknown-linux-musleabi
             armeb-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf

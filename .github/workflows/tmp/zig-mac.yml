@@ -1,4 +1,4 @@
-name: Zig-BSD
+name: Zig-Mac
 
 on:
   push:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   macOS:
-    name: Zig-BSD
+    name: Zig-Mac
     runs-on: macos-26
 
     steps:
@@ -73,6 +73,10 @@ jobs:
           # exit
 
           targets=(
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
+            riscv32gc-unknown-linux-gnu
+            riscv32gc-unknown-linux-musl
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
@@ -108,6 +112,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
+            riscv32gc-unknown-linux-gnu
+            riscv32gc-unknown-linux-musl
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
