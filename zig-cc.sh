@@ -13,11 +13,11 @@ for a in "$@"; do
   fi
 
   case "$a" in
-    -Wl,--dynamic-list)
-      skip_next=1   # also drop following list file
-      ;;
-    -Wl,--dynamic-list=*)
-      ;;
+    # -Wl,--dynamic-list)
+    #   skip_next=1   # also drop following list file
+    #   ;;
+    # -Wl,--dynamic-list=*)
+    #   ;;
     -Wl,-z,pack-relative-relocs)
       ;;
     -Wl,-O*)
