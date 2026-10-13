@@ -789,4 +789,4 @@ rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
 
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/clang"
-rustflags = ["-Clink-arg=--sysroot=WALI/build/sysroot/lib"]
+rustflags = ["-LWALI/build/sysroot/lib"]
