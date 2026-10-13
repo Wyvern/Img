@@ -798,15 +798,15 @@ linker = "WALI/build/llvm/bin/wasm-ld"
 rustflags = ["-LWALI/build/sysroot/lib"]
 
 
-[target.i586-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-linux-gnu"]
-[target.i586-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-linux-musl"]
-[target.i686-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-linux-gnu"]
-[target.i686-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-linux-musl"]
+# [target.i586-unknown-linux-gnu]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86-linux-gnu"]
+# [target.i586-unknown-linux-musl]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86-linux-musl"]
+# [target.i686-unknown-linux-gnu]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86-linux-gnu"]
+# [target.i686-unknown-linux-musl]
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=x86-linux-musl"]
