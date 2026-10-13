@@ -1,0 +1,153 @@
+name: WALI
+
+on:
+  push:
+    branches: ["dev"]
+  pull_request:
+    branches: ["dev"]
+
+env:
+  CARGO_TERM_COLOR: always
+  SCCACHE_GHA_ENABLED: "on"
+  RUSTC_WRAPPER: "sccache"
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  macOS:
+    name: WALI
+    runs-on: ubuntu-24.04-arm
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ubuntu apt update and install
+        run: |
+          # sudo apt install libxml2-16 -qy &>/dev/null
+
+      - name: WALI cache
+        run: |
+          IMAGE="${IMAGE,,}"
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
+            mkdir -p WALI && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "WALI" && touch ~/wali.finish &
+          else
+            export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden"
+            export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden -fno-exceptions -fno-rtti"
+            export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
+
+            git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
+            cd WALI
+            ./install-deps.sh
+            ./quick_setup.sh
+            cd ..
+            touch ~/wali.finish
+            tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -e ~/wali.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          targets=(
+             wasm32-wali-linux-musl
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          find target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+
+          )
+
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ "$vendor" == "win7" ]]; then
+                name="${os^}-${arch}-${abi}-${vendor}"
+            elif [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+
+            echo "Uploading $name..."
+            if [[ "$os" == "windows" ]]; then
+              mv target/$target/src/{img.exe,$name.exe}|| true
+              gh release upload Nightly --clobber target/$target/src/$name.exe || true
+            else
+              mv target/$target/src/{img,$name}|| true
+              gh release upload Nightly --clobber target/$target/src/$name || true
+            fi
+          done
