@@ -64,6 +64,9 @@ jobs:
         with:
           version: master
 
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
       - name: Login to GHCR
         uses: docker/login-action@v4
         with:
@@ -85,16 +88,23 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-          export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden"
-          export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden -fno-exceptions -fno-rtti"
-          export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
 
-          git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
-          cd WALI
-          ./install-deps.sh
-          ./quick_setup.sh
-          ls -hl build/llvm/bin/
-          exit
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "WALI" && touch ~/wali.finish &
+          else
+            export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden"
+            export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden -fno-exceptions -fno-rtti"
+            export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
+
+            git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
+            cd WALI
+            ./install-deps.sh
+            ./quick_setup.sh
+            cd ..
+            touch ~/wali.finish
+            tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
+          fi
           targets=(
             wasm32-wali-linux-musl
             # aarch64-unknown-l4re-uclibc

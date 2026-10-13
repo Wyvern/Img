@@ -788,4 +788,4 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
 
 [target.wasm32-wali-linux-musl]
-linker = "WALI/build/llvm/bin/lld"
+linker = "WALI/build/llvm/bin/wasm-ld"
