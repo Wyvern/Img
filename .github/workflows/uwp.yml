@@ -106,7 +106,12 @@ jobs:
             tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
             oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
           fi
-
+          find WALI \( \
+            -name 'libgcc_s*' -o \
+            -name 'libgcc.a' -o \
+            -name 'libunwind.a' \
+          \) -print
+          exit
           targets=(
             wasm32-wali-linux-musl
             # aarch64-unknown-l4re-uclibc
@@ -116,7 +121,7 @@ jobs:
             time cargo s $target
           done
 
-          find ./target -iname img* -type f | xargs ls -hl
+          find target -iname img -type f | xargs ls -hl
           lscpu
           free -m
 
