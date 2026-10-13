@@ -765,16 +765,16 @@ rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
 
 [target.armv7-unknown-linux-musleabi]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=-target=arm-linux-musleabi"]
+rustflags = ["-Clink-arg=--target=arm-linux-musleabi"]
 
 [target.armv7-unknown-linux-musleabihf]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=-target=arm-linux-musleabihf"]
+rustflags = ["-Clink-arg=--target=arm-linux-musleabihf"]
 
 [target.armv7-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=-target=arm-linux-gnueabi"]
+rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
 
 [target.armv7-unknown-linux-gnueabihf]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=-target=arm-linux-gnueabihf"]
+rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
