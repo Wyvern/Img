@@ -85,6 +85,8 @@ jobs:
             armv7-unknown-linux-musleabihf
             armv7-unknown-linux-gnueabi
             armv7-unknown-linux-gnueabihf
+            armv7-unknown-linux-uclibceabi
+            armv7-unknown-linux-uclibceabihf
             armv5te-unknown-linux-uclibceabi
             armv5te-unknown-linux-gnueabi
             armv5te-unknown-linux-musleabi
@@ -127,6 +129,8 @@ jobs:
             armv7-unknown-linux-musleabihf
             armv7-unknown-linux-gnueabi
             armv7-unknown-linux-gnueabihf
+            armv7-unknown-linux-uclibceabi
+            armv7-unknown-linux-uclibceabihf
             armv5te-unknown-linux-uclibceabi
             armv5te-unknown-linux-gnueabi
             armv5te-unknown-linux-musleabi
