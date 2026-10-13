@@ -342,8 +342,14 @@ linker = "x86_64-linux-gnu-gcc"
 [target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32"))']
 linker = "x86_64-linux-gnux32-gcc"
 
-[target.'cfg(all(target_arch="arm",target_os="linux",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="x86",target_os="linux"))']
+linker = "i686-linux-gnu-gcc"
+
+[target.'cfg(all(target_arch="arm",target_os="linux",target_abi="eabihf",not(target_env="ohos")))']
 linker = "arm-linux-gnueabihf-gcc"
+
+[target.'cfg(all(target_arch="arm",target_os="linux",target_abi="eabi",not(target_env="ohos")))']
+linker = "arm-linux-gnueabi-gcc"
 
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
@@ -790,3 +796,17 @@ rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/wasm-ld"
 rustflags = ["-LWALI/build/sysroot/lib"]
+
+
+[target.i586-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=x86-linux-gnu"]
+[target.i586-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=x86-linux-musl"]
+[target.i686-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=x86-linux-gnu"]
+[target.i686-unknown-linux-musl]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=x86-linux-musl"]
