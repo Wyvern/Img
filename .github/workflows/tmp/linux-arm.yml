@@ -20,7 +20,7 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           {
-          sudo apt update --fix-missing -q && sudo apt install gcc-i686-linux-gnu gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools -qy && touch ~/apt.finish
+          sudo apt update --fix-missing -q && sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-arm-linux-gnueabihf musl-tools -qy && touch ~/apt.finish
           } &>/dev/null &
 
       - name: Checkout
@@ -76,10 +76,6 @@ jobs:
             x86_64-unknown-linux-gnu
             x86_64-unknown-linux-musl
             x86_64-unknown-linux-gnux32
-            i586-unknown-linux-gnu
-            i586-unknown-linux-musl
-            i686-unknown-linux-gnu
-            i686-unknown-linux-musl
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
             riscv64a23-unknown-linux-gnu
@@ -130,10 +126,6 @@ jobs:
             x86_64-unknown-linux-gnu
             x86_64-unknown-linux-musl
             x86_64-unknown-linux-gnux32
-            i586-unknown-linux-gnu
-            i586-unknown-linux-musl
-            i686-unknown-linux-gnu
-            i686-unknown-linux-musl
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
             mips64-unknown-linux-gnuabi64

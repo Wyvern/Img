@@ -627,11 +627,11 @@ rustflags = ["-lc"]
 [target.sparc64-unknown-netbsd]
 linker = "sparc64-unknown-netbsd-gcc"
 
-[target.armv7-unknown-linux-uclibceabi]
-linker = "./zig-cc.sh"
-rustflags = [
-  "-Clink-arg=--target=arm-linux-gnueabi",
-]
+# [target.armv7-unknown-linux-uclibceabi]
+# linker = "./zig-cc.sh"
+# rustflags = [
+#   "-Clink-arg=--target=arm-linux-gnueabi",
+# ]
 # linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
 # rustflags = [
 #   "-Clink-arg=--sysroot=armv7/arm-buildroot-linux-uclibcgnueabihf/sysroot",
@@ -738,22 +738,6 @@ linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
 linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
 rustflags = ["-lgcc_eh"]
 
-# [target.arm-unknown-linux-gnueabi]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
-#
-# [target.arm-unknown-linux-gnueabihf]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
-#
-# [target.arm-unknown-linux-musleabi]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-musleabi"]
-#
-# [target.arm-unknown-linux-musleabihf]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-musleabihf"]
-
 [target.riscv32gc-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=riscv32-linux-gnu"]
@@ -764,34 +748,6 @@ rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
 
 [target.'cfg(target_os="l4re")']
 linker = "l4re/bin/aarch64-l4re-gcc"
-
-# [target.armv5te-unknown-linux-uclibceabi]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
-#
-# [target.armv5te-unknown-linux-gnueabi]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
-#
-# [target.armv5te-unknown-linux-musleabi]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-musleabi"]
-#
-# [target.armv7-unknown-linux-musleabi]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-musleabi"]
-#
-# [target.armv7-unknown-linux-musleabihf]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-musleabihf"]
-#
-# [target.armv7-unknown-linux-gnueabi]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
-#
-# [target.armv7-unknown-linux-gnueabihf]
-# linker = "./zig-cc.sh"
-# rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
 
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/wasm-ld"
