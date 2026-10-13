@@ -11,6 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
   macOS:
@@ -25,9 +26,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-i686-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf musl-tools -qy &>/dev/null &
+          # sudo apt install gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy &>/dev/null
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -64,44 +75,23 @@ jobs:
         with:
           version: master
 
-      - name: Login to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build Release
         run: |
           cargo update
           set +e -x
 
-          targets=(
-            i586-unknown-linux-gnu
-            i586-unknown-linux-musl
-            i686-unknown-linux-gnu
-            i686-unknown-linux-musl
-            armv7-unknown-linux-musleabi
-            armv7-unknown-linux-musleabihf
-            armv7-unknown-linux-gnueabi
-            armv7-unknown-linux-gnueabihf
-            armv7-unknown-linux-uclibceabi
-            armv7-unknown-linux-uclibceabihf
-            armv5te-unknown-linux-uclibceabi
-            armv5te-unknown-linux-gnueabi
-            armv5te-unknown-linux-musleabi
-            arm-unknown-linux-gnueabi
-            arm-unknown-linux-gnueabihf
-            arm-unknown-linux-musleabi
-            arm-unknown-linux-musleabihf
-            armeb-unknown-linux-gnueabi
-          )
+          # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
+          targets=(
+
+            # aarch64-unknown-l4re-uclibc
+            # x86_64-unknown-l4re-uclibc
+          )
           for target in ${targets[@]}; do
-            time cargo s $target &
+            time cargo s $target
           done
-          wait
-          find ./target -iname img -type f | xargs ls -hl
+
+          find target -iname img -type f | xargs ls -hl
           lscpu
           free -m
 
@@ -121,24 +111,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-            i586-unknown-linux-gnu
-            i586-unknown-linux-musl
-            i686-unknown-linux-gnu
-            i686-unknown-linux-musl
-            armv7-unknown-linux-musleabi
-            armv7-unknown-linux-musleabihf
-            armv7-unknown-linux-gnueabi
-            armv7-unknown-linux-gnueabihf
-            armv7-unknown-linux-uclibceabi
-            armv7-unknown-linux-uclibceabihf
-            armv5te-unknown-linux-uclibceabi
-            armv5te-unknown-linux-gnueabi
-            armv5te-unknown-linux-musleabi
-            arm-unknown-linux-gnueabi
-            arm-unknown-linux-gnueabihf
-            arm-unknown-linux-musleabi
-            arm-unknown-linux-musleabihf
-            armeb-unknown-linux-gnueabi
+
           )
 
           for target in "${targets[@]}"; do

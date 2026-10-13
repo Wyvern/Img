@@ -75,6 +75,7 @@ jobs:
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
+            armeb-unknown-linux-gnueabi
             riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl
             powerpc-unknown-openbsd
@@ -114,6 +115,7 @@ jobs:
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
+            armeb-unknown-linux-gnueabi
             riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl
             powerpc-unknown-openbsd
