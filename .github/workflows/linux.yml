@@ -170,7 +170,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          carto s armv7-unknown-linux-uclibceabi
+          exit
           targets=(
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
