@@ -200,7 +200,7 @@ jobs:
             mips-unknown-linux-gnu
             mips-unknown-linux-uclibc
             mipsel-unknown-linux-uclibc
-            armv7-unknown-linux-uclibceabi
+            # armv7-unknown-linux-uclibceabi
             armv7-unknown-linux-uclibceabihf
             hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
@@ -239,7 +239,7 @@ jobs:
                   mips-unknown-linux-gnu
                   sparc64-unknown-linux-gnu
                   sparc-unknown-linux-gnu
-                  armv7-unknown-linux-uclibceabi
+                  # armv7-unknown-linux-uclibceabi
                   armv7-unknown-linux-uclibceabihf
                   powerpc64-unknown-linux-gnu
                   powerpc64-unknown-linux-gnuelfv2
