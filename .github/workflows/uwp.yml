@@ -106,8 +106,7 @@ jobs:
             tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
             oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
           fi
-          find WALI \( -name '*clang*' -o -name '*gcc*' \) -print
-          exit
+
           targets=(
             wasm32-wali-linux-musl
             # aarch64-unknown-l4re-uclibc
