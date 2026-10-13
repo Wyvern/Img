@@ -253,7 +253,7 @@ rustflags = [
 [target.'cfg(all(target_family = "unix", crate_type = "staticlib"))']
 rustflags = ["-Zstaticlib-hide-internal-symbols"]
 
-[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",target_arch="mips",target_arch="mipsel",all(target_arch="powerpc64",target_endian="big"),all(target_arch="aarch64",target_endian="big"),all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="arm",target_endian="big"),target_arch="riscv32"))))']
+[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="powerpc64",target_endian="big"),all(target_arch="aarch64",target_endian="big"),all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="arm",target_endian="big"),target_arch="riscv32"))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -627,35 +627,25 @@ rustflags = ["-lc"]
 [target.sparc64-unknown-netbsd]
 linker = "sparc64-unknown-netbsd-gcc"
 
-# [target.armv7-unknown-linux-uclibceabi]
-# linker = "./zig-cc.sh"
-# rustflags = [
-#   "-Clink-arg=--target=arm-linux-gnueabi",
-# ]
+# [target.armv7-unknown-linux-uclibceabihf]
 # linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
 # rustflags = [
 #   "-Clink-arg=--sysroot=armv7/arm-buildroot-linux-uclibcgnueabihf/sysroot",
 # ]
 
-[target.armv7-unknown-linux-uclibceabihf]
-linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=armv7/arm-buildroot-linux-uclibcgnueabihf/sysroot",
-]
-
-[target.mips-unknown-linux-uclibc]
-linker = "mips/bin/mips-buildroot-linux-uclibc-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=mips/mips-buildroot-linux-uclibc/sysroot",
-  "-Ctarget-feature=-soft-float",
-]
-
-[target.mipsel-unknown-linux-uclibc]
-linker = "mipsel/bin/mipsel-buildroot-linux-uclibc-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
-  "-Ctarget-feature=-soft-float",
-]
+# [target.mips-unknown-linux-uclibc]
+# linker = "mips/bin/mips-buildroot-linux-uclibc-gcc"
+# rustflags = [
+#   "-Clink-arg=--sysroot=mips/mips-buildroot-linux-uclibc/sysroot",
+#   "-Ctarget-feature=-soft-float",
+# ]
+#
+# [target.mipsel-unknown-linux-uclibc]
+# linker = "mipsel/bin/mipsel-buildroot-linux-uclibc-gcc"
+# rustflags = [
+#   "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
+#   "-Ctarget-feature=-soft-float",
+# ]
 
 [target.aarch64-oe-linux-gnu]
 linker = "aarch64-poky-linux-gcc"
