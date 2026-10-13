@@ -28,7 +28,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install libxml2 -qy &>/dev/null
+          sudo apt install libxml2-16 -qy
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -115,7 +115,7 @@ jobs:
             time cargo s $target
           done
 
-          find ./target -iname img -type f | xargs ls -hl
+          find ./target -iname img* -type f | xargs ls -hl
           lscpu
           free -m
 
