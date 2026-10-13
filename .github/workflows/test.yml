@@ -1,4 +1,4 @@
-name: WALI
+name: TEST
 
 on:
   push:
@@ -15,8 +15,8 @@ env:
 
 jobs:
   macOS:
-    name: WALI
-    runs-on: ubuntu-24.04-arm
+    name: TEST
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: write
