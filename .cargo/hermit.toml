@@ -602,32 +602,6 @@ rustflags = ["-Clink-arg=-lc"]
 [target.sparc64-unknown-netbsd]
 linker = "sparc64-unknown-netbsd-gcc"
 
-[target.armv7-unknown-linux-uclibceabi]
-linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=armv7/arm-buildroot-linux-uclibcgnueabihf/sysroot",
-]
-
-[target.armv7-unknown-linux-uclibceabihf]
-linker = "armv7/bin/arm-buildroot-linux-uclibcgnueabihf-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=armv7/arm-buildroot-linux-uclibcgnueabihf/sysroot",
-]
-
-[target.mips-unknown-linux-uclibc]
-linker = "mips/bin/mips-buildroot-linux-uclibc-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=mips/mips-buildroot-linux-uclibc/sysroot",
-  "-Ctarget-feature=-soft-float",
-]
-
-[target.mipsel-unknown-linux-uclibc]
-linker = "mipsel/bin/mipsel-buildroot-linux-uclibc-gcc"
-rustflags = [
-  "-Clink-arg=--sysroot=mipsel/mipsel-buildroot-linux-uclibc/sysroot",
-  "-Ctarget-feature=-soft-float",
-]
-
 [target.aarch64-oe-linux-gnu]
 linker = "aarch64-poky-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=sysroots/armv8a-poky-linux"]

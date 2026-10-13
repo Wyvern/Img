@@ -36,6 +36,7 @@ jobs:
           sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
+          # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1 &
 
       - name: setup-oras
         uses: oras-project/setup-oras@v2
@@ -46,11 +47,11 @@ jobs:
 
       - name: Cache uclibc
         run: |
+          exit
+
           IMAGE="${IMAGE,,}"
 
           path=/home/runner/uclibc
-
-          mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1 &
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
             mkdir -p $path
@@ -203,10 +204,10 @@ jobs:
             mips-unknown-linux-gnu
             mips-unknown-linux-uclibc
             mipsel-unknown-linux-uclibc
-            # armv7-unknown-linux-uclibceabi
+            armv7-unknown-linux-uclibceabi
             armv7-unknown-linux-uclibceabihf
-            aarch64-unknown-l4re-uclibc
-            x86_64-unknown-l4re-uclibc
+            # aarch64-unknown-l4re-uclibc
+            # x86_64-unknown-l4re-uclibc
             hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
           )
@@ -238,15 +239,15 @@ jobs:
                   hexagon-unknown-linux-musl
                   mips-unknown-linux-uclibc
                   mipsel-unknown-linux-uclibc
-                  aarch64-unknown-l4re-uclibc
-                  x86_64-unknown-l4re-uclibc
+                  # aarch64-unknown-l4re-uclibc
+                  # x86_64-unknown-l4re-uclibc
                   mipsel-unknown-linux-musl
                   mips-unknown-linux-musl
                   mipsel-unknown-linux-gnu
                   mips-unknown-linux-gnu
                   sparc64-unknown-linux-gnu
                   sparc-unknown-linux-gnu
-                  # armv7-unknown-linux-uclibceabi
+                  armv7-unknown-linux-uclibceabi
                   armv7-unknown-linux-uclibceabihf
                   powerpc64-unknown-linux-gnu
                   powerpc64-unknown-linux-gnuelfv2
