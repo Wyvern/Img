@@ -38,7 +38,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-arm-linux-gnueabihf gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy &>/dev/null &
+          sudo apt install gcc-arm-linux-gnueabihf gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
