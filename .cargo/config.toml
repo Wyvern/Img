@@ -786,3 +786,7 @@ rustflags = ["-Clink-arg=--target=arm-linux-gnueabi"]
 [target.armv7-unknown-linux-gnueabihf]
 linker = "./zig-cc.sh"
 rustflags = ["-Clink-arg=--target=arm-linux-gnueabihf"]
+
+[target.armv6-unknown-freebsd]
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=arm-freebsd-eabihf"]
