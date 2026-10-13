@@ -85,14 +85,18 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
+          export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden"
+          export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden -fno-exceptions -fno-rtti"
+          export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
+
           git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
           cd WALI
           ./install-deps.sh
           ./quick_setup.sh
-          find . -type f \( -name ld.lld -o -name wasm-ld -o -name lld \) -print
+          ls -hl build/llvm/bin/
           exit
           targets=(
-
+            wasm32-wali-linux-musl
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
           )
