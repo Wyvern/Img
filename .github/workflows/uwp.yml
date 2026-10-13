@@ -11,6 +11,7 @@ env:
   SCCACHE_GHA_ENABLED: "on"
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
   macOS:
@@ -27,7 +28,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          # sudo apt install crosshurd -qy &>/dev/null
+          sudo apt install libxml2 -qy &>/dev/null
 
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -88,7 +89,7 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-
+          IMAGE="${IMAGE,,}"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "WALI" && touch ~/wali.finish &
           else
