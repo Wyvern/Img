@@ -47,7 +47,10 @@ jobs:
       - name: Cache uclibc
         run: |
           IMAGE="${IMAGE,,}"
+
           path=/home/runner/uclibc
+
+          mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1 &
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
             mkdir -p $path
@@ -202,6 +205,8 @@ jobs:
             mipsel-unknown-linux-uclibc
             # armv7-unknown-linux-uclibceabi
             armv7-unknown-linux-uclibceabihf
+            aarch64-unknown-l4re-uclibc
+            x86_64-unknown-l4re-uclibc
             hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
           )
@@ -233,6 +238,8 @@ jobs:
                   hexagon-unknown-linux-musl
                   mips-unknown-linux-uclibc
                   mipsel-unknown-linux-uclibc
+                  aarch64-unknown-l4re-uclibc
+                  x86_64-unknown-l4re-uclibc
                   mipsel-unknown-linux-musl
                   mips-unknown-linux-musl
                   mipsel-unknown-linux-gnu
