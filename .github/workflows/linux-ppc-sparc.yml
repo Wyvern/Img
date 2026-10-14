@@ -1,4 +1,4 @@
-name: Linux
+name: Linux-ppc-sparc
 
 on:
   push:
@@ -17,7 +17,7 @@ env:
 
 jobs:
   Linux:
-    name: Ubuntu-24.04
+    name: Linux-ppc-sparc
     runs-on: ubuntu-24.04
 
     permissions:
@@ -144,7 +144,7 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
-          exit
+
           time {
               set +x
               while [[ ! -f ~/apt.finish ]]; do
