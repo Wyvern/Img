@@ -21,7 +21,7 @@ env:
 
 jobs:
   TEST:
-    if: ${{ inputs.test }}
+    if: ${{ inputs.test != false }}
     name: Zig-Linux
     runs-on: ubuntu-26.04-arm
 
