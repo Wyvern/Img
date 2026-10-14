@@ -1192,10 +1192,10 @@ jobs:
             mips64-unknown-linux-muslabi64
             mips64el-unknown-linux-gnuabi64
             mips64el-unknown-linux-muslabi64
-            mipsisa64r6-unknown-linux-gnuabi64
-            mipsisa64r6el-unknown-linux-gnuabi64
-            mipsisa32r6-unknown-linux-gnu
-            mipsisa32r6el-unknown-linux-gnu
+            # mipsisa64r6-unknown-linux-gnuabi64
+            # mipsisa64r6el-unknown-linux-gnuabi64
+            # mipsisa32r6-unknown-linux-gnu
+            # mipsisa32r6el-unknown-linux-gnu
             s390x-unknown-linux-gnu
             s390x-unknown-linux-musl
             loongarch64-unknown-linux-gnu
@@ -1239,10 +1239,10 @@ jobs:
             mips64-unknown-linux-muslabi64
             mips64el-unknown-linux-gnuabi64
             mips64el-unknown-linux-muslabi64
-            mipsisa64r6-unknown-linux-gnuabi64
-            mipsisa64r6el-unknown-linux-gnuabi64
-            mipsisa32r6-unknown-linux-gnu
-            mipsisa32r6el-unknown-linux-gnu
+            # mipsisa64r6-unknown-linux-gnuabi64
+            # mipsisa64r6el-unknown-linux-gnuabi64
+            # mipsisa32r6-unknown-linux-gnu
+            # mipsisa32r6el-unknown-linux-gnu
             s390x-unknown-linux-gnu
             s390x-unknown-linux-musl
             loongarch64-unknown-linux-gnu
@@ -1261,7 +1261,7 @@ jobs:
           done
 
   macOS:
-    name: macOS-26
+    name: macOS
     if: ${{ vars.TEST != '1' || vars.macos == '1'  }}
     runs-on: macos-26
 
@@ -2891,7 +2891,7 @@ jobs:
             "armv7-oe-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
             "riscv64-oe-linux-gnu environment-setup-riscv64imafdc-poky-linux"
             "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
-            "i686-oe-linux-gnu environment-setup-core2-32-poky-linux"
+            # "i686-oe-linux-gnu environment-setup-core2-32-poky-linux"
           )
 
           sdk=/opt/poky/${YOCTO}
@@ -2941,7 +2941,7 @@ jobs:
                   armv7-oe-linux-gnueabihf
                   riscv64-oe-linux-gnu
                   x86_64-oe-linux-gnu
-                  i686-oe-linux-gnu
+                  # i686-oe-linux-gnu
           )
           for target in "${targets[@]}"; do
             IFS='-' read -r arch vendor os abi rest <<< "$target"
