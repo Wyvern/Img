@@ -355,8 +355,7 @@ jobs:
 
           export ANDROID_NDK_HOME=~/android-ndk-$ndk
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
-          ls -hl ndk/
-          exit
+
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
