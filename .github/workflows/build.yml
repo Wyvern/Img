@@ -20,9 +20,9 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  TEST:
-    if: ${{ inputs.test == true }}
+  haha:
     name: Zig-Linux
+    if: ${{ inputs.test }}
     runs-on: ubuntu-26.04-arm
 
     permissions:
