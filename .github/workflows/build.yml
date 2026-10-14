@@ -17,7 +17,7 @@ env:
 jobs:
   TEST:
     name: Test
-    if: ${{ vars.TEST == '1' }}
+    if: ${{ vars.TEST == '1' && vars.run == '1' }}
     runs-on: ubuntu-26.04-arm
 
     permissions:
