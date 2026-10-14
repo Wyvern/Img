@@ -59,16 +59,15 @@ jobs:
           else
             for abi in glibc musl; do
               url=https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64be/tarballs/aarch64be--${abi}--stable-${aarch64be}.tar.xz
-              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1
+              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1 &
             done
               ln -sfn $path/glibc aarch64be-gnu
               ln -sfn $path/musl aarch64be-musl
             wait
-            find $path -iname *gcc
             tar --zstd -C $path -cf /tmp/aarch64be-${aarch64be}.tar.zst .
             oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
           fi
-          exit
+
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -139,13 +138,15 @@ jobs:
           set +e -x
 
           targets=(
-            powerpc64-unknown-linux-musl
-            powerpc64-unknown-linux-gnuelfv2
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
+            # powerpc64-unknown-linux-musl
+            # powerpc64-unknown-linux-gnuelfv2
             )
           for target in ${targets[@]}; do
-            time cargo s $target &
+            time cargo s $target
           done
-
+          exit
           time {
               set +x
               while [[ ! -f ~/apt.finish ]]; do
