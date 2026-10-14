@@ -73,8 +73,6 @@ jobs:
           # exit
 
           targets=(
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
             armeb-unknown-linux-gnueabi
             riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl
@@ -113,8 +111,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
             armeb-unknown-linux-gnueabi
             riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl

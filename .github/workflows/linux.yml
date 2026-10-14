@@ -138,9 +138,8 @@ jobs:
           set +e -x
 
           targets=(
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
-            powerpc64-unknown-linux-musl
+            powerpc64-unknown-linux-gnu
+            # powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
             )
           for target in ${targets[@]}; do
@@ -160,6 +159,8 @@ jobs:
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
             powerpc64-unknown-linux-gnu
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
             sparc64-unknown-linux-gnu
             sparc-unknown-linux-gnu
             mipsel-unknown-linux-musl
@@ -198,6 +199,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           targets=(
+                  aarch64_be-unknown-linux-gnu
+                  aarch64_be-unknown-linux-musl
                   hexagon-unknown-linux-musl
                   mips-unknown-linux-uclibc
                   mipsel-unknown-linux-uclibc
