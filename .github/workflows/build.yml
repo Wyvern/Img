@@ -301,14 +301,16 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          if oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}"; then
-            oras pull --allow-path-traversal "${IMAGE}:android-ndk-${ndk}" -o ./ && unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C . &
           else
-            echo "Downloading & UnZipping Android NDK ${ndk} ..."
+            echo "Downloading Android NDK ${ndk} ..."
             curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
-            unzip -q android-ndk-${ndk}-linux.zip -d ~/ &
-            echo "Push android-ndk-${ndk}-linux.zip to GHCR..."
-            oras push --disable-path-validation "${IMAGE}:android-ndk-${ndk}" "android-ndk-${ndk}-linux.zip:application/zip" &
+            echo "UnZipping Android NDK ${ndk} ..."
+            unzip -q android-ndk-${ndk}-linux.zip -d .
+            file=android-ndk-${ndk}
+            tar --zstd -C ./$file -cf /tmp/$file.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:$file" "/tmp/$file.tar.zst:application/vnd.wyvern.android.tar.zstd" &
           fi
 
       - name: Rust Toolchain
