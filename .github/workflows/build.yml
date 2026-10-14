@@ -302,7 +302,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C ~/ &
+            mkdir ~/android-ndk-${ndk} && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C ~/android-ndk-${ndk} &
           else
             echo "Downloading Android NDK ${ndk} ..."
             curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
@@ -356,7 +356,6 @@ jobs:
           export ANDROID_NDK_HOME=~/android-ndk-$ndk
           ln -sf "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" ndk
           ls -hl ndk
-          ls -hl ANDROID_NDK_HOME
           exit
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
