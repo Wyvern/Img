@@ -10,7 +10,7 @@ on:
       test:
         description: 'Test workflow build'
         type: boolean
-        default: false
+        default: true
 
 env:
   CARGO_TERM_COLOR: always
