@@ -14,9 +14,13 @@ env:
   ndk: "r30"
 
 jobs:
-  Linux:
-    name: Ubuntu-26.04
+  Android:
+    name: Android
+    if: ${{ vars.TEST != '1' }}
     runs-on: ubuntu-26.04
+
+    env:
+      ndk: "r30"
 
     permissions:
       contents: write
