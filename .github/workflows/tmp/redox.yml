@@ -14,8 +14,9 @@ env:
 
 
 jobs:
-  Linux:
-    name: Ubuntu-26.04
+  Redox:
+    name: Redox
+    if: ${{ vars.TEST != '1' || vars.redox == '1'  }}
     runs-on: ubuntu-26.04
 
     permissions:

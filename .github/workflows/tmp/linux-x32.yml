@@ -13,8 +13,9 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  macOS:
+  Linux-x32:
     name: Linux-x32
+    if: ${{ vars.TEST != '1' || vars.x32 == '1'  }}
     runs-on: ubuntu-26.04-arm
 
     permissions:

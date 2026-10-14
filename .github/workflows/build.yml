@@ -12,6 +12,7 @@ env:
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IMAGE: ghcr.io/${{ github.repository }}
+  LLVM: "23"
 
 jobs:
   TEST:
@@ -425,5 +426,2673 @@ jobs:
 
             echo "Uploading $name..."
             mv target/$target/src/{img,$name}|| true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
+
+  ESP-IDF:
+    name: ESP-IDF
+    if: ${{ vars.TEST != '1' || vars.espidf == '1'  }}
+    runs-on: ubuntu-26.04-arm
+
+    steps:
+      # - name: Disable macos spotlight index
+      #   run: |
+      #     sudo mdutil -a -i off
+      #     sudo mdutil -a -d
+      #     sudo pmset -a powernap 0
+      #     sudo pmset -a sleep 0
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install ESP-IDF tools
+        run: |
+          {
+          git clone -b v6.1 --depth=1 https://github.com/espressif/esp-idf.git espidf
+          } &>/dev/null &
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Install ldproxy
+        run: |
+          cargo install ldproxy -q &
+
+      - name: Rust Toolchain for Xtensa
+        uses: esp-rs/xtensa-toolchain@v1.7.0
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+          espidf/install.sh all
+          . espidf/export.sh
+          } &>/dev/null
+
+          cd espidf
+
+          targets=(
+            riscv32imac-esp-espidf
+            riscv32imafc-esp-espidf
+            riscv32imc-esp-espidf
+          )
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+
+          sleep 1
+
+          mv ../.cargo/config.toml ../.cargo/config.toml.bak
+          targets=(
+            xtensa-esp32-espidf
+            xtensa-esp32s2-espidf
+            xtensa-esp32s3-espidf
+          )
+          s=(b -q --profile src -Zbuild-std=std,panic_abort --target)
+          for target in "${targets[@]}"; do
+            time cargo +esp "${s[@]}" $target --config "../.cargo/espidf.toml" &
+          done
+          unset s
+          wait
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            espidf/target/**/img*
+            !espidf/target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            riscv32imac-esp-espidf
+            riscv32imafc-esp-espidf
+            riscv32imc-esp-espidf
+            xtensa-esp32-espidf
+            xtensa-esp32s2-espidf
+            xtensa-esp32s3-espidf
+          )
+
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            elif [[ "$arch" == "xtensa" ]]; then
+                name="${os^}-${vendor}"
+            else
+                name="${os^}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv espidf/target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber espidf/target/$target/src/$name || true
+          done
+
+  Fuchsia:
+    name: Hermit+Fuchsia
+    if: ${{ vars.TEST != '1' || vars.fuchsia == '1'  }}
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install LLVM
+        run: |
+          {
+          if [ "$LLVM" = "23" ]; then
+              wget https://apt.llvm.org/llvm.sh &>/dev/null
+              chmod +x llvm.sh
+              sudo ./llvm.sh $LLVM &>/dev/null
+          fi
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
+          touch ~/llvm.finish
+          } &
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Fuchsia Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          mkdir -p /home/runner/Fuchsia;
+          ln -sf /home/runner/Fuchsia fuchsia
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" && touch ~/fuchsia.finish &
+          else
+            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
+            chmod +x cipd
+            sudo mv cipd /usr/local/bin/
+            mkdir -p /home/runner/Fuchsia
+            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
+            touch ~/fuchsia.finish
+            tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+          targets: x86_64-fortanix-unknown-sgx
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          mv .cargo/config.toml .cargo/config.toml.bak
+          targets=(
+            aarch64-unknown-hermit
+            aarch64_be-unknown-hermit
+            riscv64gc-unknown-hermit
+            x86_64-unknown-hermit
+          )
+          s=(b -q --profile src -Zbuild-std=std,panic_abort --target)
+          for target in ${targets[@]}; do
+            time cargo "${s[@]}" $target --config ".cargo/hermit.toml" &
+          done
+          unset s
+          sleep 1
+          mv .cargo/config.toml.bak .cargo/config.toml
+
+          time cargo s x86_64-fortanix-unknown-sgx &
+
+          time {
+              set +x
+              while [[ ! -f ~/fuchsia.finish || ! -f ~/llvm.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          targets=(
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            aarch64-unknown-hermit
+            aarch64_be-unknown-hermit
+            riscv64gc-unknown-hermit
+            x86_64-unknown-hermit
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
+            x86_64-fortanix-unknown-sgx
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$os" == "unknown" ]]; then
+                    name="${vendor^}-${abi}"
+                else
+                    name="${os^}-${arch}-${abi}"
+                fi
+            else
+                name="${os^}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly target/$target/src/$name --clobber || true
+          done
+
+  PPC-Sparc:
+    name: Linux-PPC-Sparc
+    if: ${{ vars.TEST != '1' || vars.ppc == '1'  }}
+    runs-on: ubuntu-24.04
+
+    env:
+      openwrt: "25.12.5"
+      aarch64be: "2026.08-1"
+      hexagon: "22.1.8"
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Nix Quick Install
+        uses: nixbuild/nix-quick-install-action@v35
+
+      - name: Ubuntu apt update and install
+        run: |
+          sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
+          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
+          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
+          # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1 &
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Cache aarch64be
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          path=/home/runner/aarch64be
+          mkdir -p $path
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:aarch64be-${aarch64be}"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
+            ln -sfn $path/glibc aarch64be-gnu
+            ln -sfn $path/musl aarch64be-musl
+          else
+            for abi in glibc musl; do
+              url=https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64be/tarballs/aarch64be--${abi}--stable-${aarch64be}.tar.xz
+              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1 &
+            done
+              ln -sfn $path/glibc aarch64be-gnu
+              ln -sfn $path/musl aarch64be-musl
+            wait
+            tar --zstd -C $path -cf /tmp/aarch64be-${aarch64be}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Cache openwrt
+        uses: actions/cache@v6
+        with:
+          path: /home/runner/openwrt
+          key: openwrt-${{env.openwrt}}
+          restore-keys: openwrt-${{env.openwrt}}
+
+      - name: Cache hexagon
+        uses: actions/cache@v6
+        with:
+          path: /home/runner/hexagon
+          key: hexagon-${{env.hexagon}}
+          restore-keys: hexagon-${{env.hexagon}}
+
+      - name: Toolchain downloads
+        run: |
+          if [ ! -d /home/runner/openwrt ]; then
+            mkdir -p /home/runner/openwrt
+            curl -LsSf https://downloads.openwrt.org/releases/${openwrt}/targets/octeon/generic/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt &
+          fi
+          ln -sf /home/runner/openwrt/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
+
+          if [ ! -d /home/runner/hexagon ]; then
+            mkdir -p /home/runner/hexagon
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl.tar.zst | tar --zstd -xf - -C /home/runner/hexagon &
+          fi
+          ln -sf /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-ubuntu-22.04 hexagon
+
+      # - name: Install Nix
+      #   uses: DeterminateSystems/nix-installer-action@main
+
+      # - name: Install Nix
+      #   uses: cachix/install-nix-action@31
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+            powerpc64-unknown-linux-musl
+            powerpc64-unknown-linux-gnuelfv2
+            )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          targets=(
+            powerpc-unknown-linux-gnu
+            powerpc-unknown-linux-musl
+            powerpc64le-unknown-linux-gnu
+            powerpc64le-unknown-linux-musl
+            powerpc64-unknown-linux-gnu
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
+            sparc64-unknown-linux-gnu
+            sparc-unknown-linux-gnu
+            mipsel-unknown-linux-musl
+            mipsel-unknown-linux-gnu
+            mips-unknown-linux-musl
+            mips-unknown-linux-gnu
+            mips-unknown-linux-uclibc
+            mipsel-unknown-linux-uclibc
+            # aarch64-unknown-l4re-uclibc
+            # x86_64-unknown-l4re-uclibc
+            hexagon-unknown-linux-musl
+            mips64-openwrt-linux-musl
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  aarch64_be-unknown-linux-gnu
+                  aarch64_be-unknown-linux-musl
+                  hexagon-unknown-linux-musl
+                  mips-unknown-linux-uclibc
+                  mipsel-unknown-linux-uclibc
+                  # aarch64-unknown-l4re-uclibc
+                  # x86_64-unknown-l4re-uclibc
+                  mipsel-unknown-linux-musl
+                  mips-unknown-linux-musl
+                  mipsel-unknown-linux-gnu
+                  mips-unknown-linux-gnu
+                  sparc64-unknown-linux-gnu
+                  sparc-unknown-linux-gnu
+                  powerpc64-unknown-linux-gnu
+                  powerpc64-unknown-linux-gnuelfv2
+                  powerpc64-unknown-linux-musl
+                  powerpc64le-unknown-linux-gnu
+                  powerpc64le-unknown-linux-musl
+                  powerpc-unknown-linux-gnu
+                  powerpc-unknown-linux-musl
+                  mips64-openwrt-linux-musl
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$vendor" == "openwrt" ]]; then
+                    name="${vendor^}-${arch}-${abi}"
+                else
+                    if [[ "$abi" == "ohos" ]]; then
+                        name="Android-${arch}-${abi}"
+                    else
+                        name="${os^}-${arch}-${abi}"
+                    fi
+                fi
+            else
+                if [[ "$os" == "androideabi" ]]; then
+                    name="Android-${arch}"
+                else
+                    name="${os^}-${arch}"
+                fi
+            fi
+
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
+
+  Linux-x32:
+    name: Linux-x32
+    if: ${{ vars.TEST != '1' || vars.x32 == '1'  }}
+    runs-on: ubuntu-26.04-arm
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Ubuntu apt update and install
+        run: |
+          sudo apt install gcc-i686-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf musl-tools -qy &>/dev/null &
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      # - name: Zig toolchain install
+      #   uses: mlugg/setup-zig@v2
+      #   with:
+      #     version: master
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+            i586-unknown-linux-gnu
+            i586-unknown-linux-musl
+            i686-unknown-linux-gnu
+            i686-unknown-linux-musl
+            thumbv7neon-unknown-linux-gnueabihf
+            thumbv7neon-unknown-linux-musleabihf
+            armv7-unknown-linux-musleabi
+            armv7-unknown-linux-musleabihf
+            armv7-unknown-linux-gnueabi
+            armv7-unknown-linux-gnueabihf
+            armv7-unknown-linux-uclibceabi
+            armv7-unknown-linux-uclibceabihf
+            armv5te-unknown-linux-uclibceabi
+            armv5te-unknown-linux-gnueabi
+            armv5te-unknown-linux-musleabi
+            arm-unknown-linux-gnueabi
+            arm-unknown-linux-gnueabihf
+            arm-unknown-linux-musleabi
+            arm-unknown-linux-musleabihf
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            i586-unknown-linux-gnu
+            i586-unknown-linux-musl
+            i686-unknown-linux-gnu
+            i686-unknown-linux-musl
+            thumbv7neon-unknown-linux-gnueabihf
+            thumbv7neon-unknown-linux-musleabihf
+            armv7-unknown-linux-musleabi
+            armv7-unknown-linux-musleabihf
+            armv7-unknown-linux-gnueabi
+            armv7-unknown-linux-gnueabihf
+            armv7-unknown-linux-uclibceabi
+            armv7-unknown-linux-uclibceabihf
+            armv5te-unknown-linux-uclibceabi
+            armv5te-unknown-linux-gnueabi
+            armv5te-unknown-linux-musleabi
+            arm-unknown-linux-gnueabi
+            arm-unknown-linux-gnueabihf
+            arm-unknown-linux-musleabi
+            arm-unknown-linux-musleabihf
+          )
+
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ "$vendor" == "win7" ]]; then
+                name="${os^}-${arch}-${abi}-${vendor}"
+            elif [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+
+            echo "Uploading $name..."
+            if [[ "$os" == "windows" ]]; then
+              mv target/$target/src/{img.exe,$name.exe}|| true
+              gh release upload Nightly --clobber target/$target/src/$name.exe || true
+            else
+              mv target/$target/src/{img,$name}|| true
+              gh release upload Nightly --clobber target/$target/src/$name || true
+            fi
+          done
+
+  Linux-x64:
+    name: Linux-x64
+    if: ${{ vars.TEST != '1' || vars.x64 == '1'  }}
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Ubuntu apt update and install
+        run: |
+          {
+          sudo apt update --fix-missing -q && sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu musl-tools -qy && touch ~/apt.finish
+          } &>/dev/null &
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          targets=(
+            aarch64-unknown-linux-gnu
+            aarch64-unknown-linux-musl
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
+            x86_64-unknown-linux-gnux32
+            riscv64gc-unknown-linux-gnu
+            riscv64gc-unknown-linux-musl
+            riscv64a23-unknown-linux-gnu
+            mips64-unknown-linux-gnuabi64
+            mips64-unknown-linux-muslabi64
+            mips64el-unknown-linux-gnuabi64
+            mips64el-unknown-linux-muslabi64
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            mipsisa32r6-unknown-linux-gnu
+            mipsisa32r6el-unknown-linux-gnu
+            s390x-unknown-linux-gnu
+            s390x-unknown-linux-musl
+            loongarch64-unknown-linux-gnu
+            loongarch64-unknown-linux-musl
+          )
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+          wait
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            riscv64gc-unknown-linux-gnu
+            riscv64gc-unknown-linux-musl
+            riscv64a23-unknown-linux-gnu
+            x86_64-unknown-linux-gnu
+            x86_64-unknown-linux-musl
+            x86_64-unknown-linux-gnux32
+            aarch64-unknown-linux-gnu
+            aarch64-unknown-linux-musl
+            mips64-unknown-linux-gnuabi64
+            mips64-unknown-linux-muslabi64
+            mips64el-unknown-linux-gnuabi64
+            mips64el-unknown-linux-muslabi64
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            mipsisa32r6-unknown-linux-gnu
+            mipsisa32r6el-unknown-linux-gnu
+            s390x-unknown-linux-gnu
+            s390x-unknown-linux-musl
+            loongarch64-unknown-linux-gnu
+            loongarch64-unknown-linux-musl
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name}|| true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
+
+  macOS:
+    name: macOS-26
+    if: ${{ vars.TEST != '1' || vars.macos == '1'  }}
+    runs-on: macos-26
+
+    env:
+      mingw: "20261006"
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Disable macos spotlight index
+        run: |
+          sudo mdutil -a -i off &
+          sudo mdutil -a -d &
+          sudo pmset -a powernap 0 &
+          sudo pmset -a sleep 0 &
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: wasm32-wasip2,wasm32-wasip3
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Cache llvm-mingw
+        uses: actions/cache@v6
+        with:
+          path: llvm-mingw
+          key: ${{ runner.os }}-${{env.mingw}}
+          restore-keys: ${{ runner.os }}-llvm-${{env.mingw}}
+
+      - name: llvm-mingw
+        run: |
+          if [ ! -d llvm-mingw ]; then
+            mkdir llvm-mingw
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
+          fi
+          echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+            aarch64-apple-ios
+            arm64e-apple-ios
+            aarch64-apple-tvos
+            arm64e-apple-tvos
+            aarch64-apple-watchos
+            arm64_32-apple-watchos
+            armv7k-apple-watchos
+            aarch64-apple-visionos
+            aarch64-apple-darwin
+            arm64e-apple-darwin
+            x86_64h-apple-darwin
+            wasm32-wasip2
+            wasm32-wasip3
+            aarch64-pc-windows-gnullvm
+            x86_64-pc-windows-gnullvm
+            i686-pc-windows-gnullvm
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
+          lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
+
+          find ./target \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
+          sw_vers
+          hostinfo
+          sysctl -n machdep.cpu.brand_string
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+              x86_64h-apple-darwin
+              aarch64-apple-darwin
+              arm64e-apple-darwin
+              aarch64-apple-ios
+              arm64e-apple-ios
+              aarch64-apple-tvos
+              arm64e-apple-tvos
+              aarch64-apple-watchos
+              arm64_32-apple-watchos
+              armv7k-apple-watchos
+              aarch64-apple-visionos
+              aarch64-pc-windows-gnullvm
+              x86_64-pc-windows-gnullvm
+              i686-pc-windows-gnullvm
+              wasm32-wasip2
+              wasm32-wasip3
+          )
+
+          for target in "${targets[@]}"; do
+              IFS='-' read -r arch vendor os abi <<< "$target"
+              if [[ -z "$os" ]]; then
+                  os="$arch"
+                  arch="$vendor"
+              fi
+              first=$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')
+              rest=$(printf '%s' "$os" | cut -c2-)
+              os_cap="${first}${rest}"
+
+              if [[ -n "$abi" ]]; then
+                  name="${os_cap}-${arch}-${abi}"
+              elif [[ "$vendor" == "apple" ]]; then
+                  if [[ "$os" == "darwin" ]]; then
+                    os="macOS"
+                  elif [[ "$os" == *os ]]; then
+                    os="${os%os}OS"
+                  fi
+                  name=Apple-${os}-${arch}
+              else
+                  name="${os_cap}-${arch}"
+              fi
+
+              src="target/$target/src/img"
+              ext=""
+              if [[ -f "$src" ]]; then
+                  echo "Uploading $name..."
+                  mv target/$target/src/{img,$name} || true
+                  gh release upload Nightly "target/$target/src/$name" --clobber || true
+              else
+                  for f in "${src}".*; do
+                      if [[ -f "$f" ]]; then
+                          ext=".${f##*.}"
+                          [[ "$ext" == ".d" ]] && continue
+                          name="${name}${ext}"
+                          echo "Uploading $name..."
+                          mv target/$target/src/{img${ext},$name} || true
+                          gh release upload Nightly "target/$target/src/$name" --clobber || true
+                          break
+                      fi
+                  done
+              fi
+          done
+
+          echo "Uploading Apple-macOS-universal..."
+          gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
+
+  Redox:
+    name: Redox
+    if: ${{ vars.TEST != '1' || vars.redox == '1'  }}
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Hurd-i686 cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if docker manifest inspect "$IMAGE:hurd-i686" &>/dev/null; then
+            docker pull "$IMAGE:hurd-i686" &>/dev/null &
+          else
+            mkdir hurd
+            cd hurd
+
+            cat > Dockerfile <<'EOF'
+          FROM ubuntu:24.04
+
+          ENV DEBIAN_FRONTEND=noninteractive
+          ENV PATH="/cross-tools-i686/bin:${PATH}"
+
+          RUN apt-get update && apt-get install -y --no-install-recommends \
+              git sudo ca-certificates curl wget \
+              build-essential perl \
+              texinfo autopoint pkg-config libtool \
+              autotools-dev automake autoconf gettext \
+              libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev \
+              flex bison gawk m4 patch xz-utils bzip2 \
+              file python3 \
+              && rm -rf /var/lib/apt/lists/*
+
+          WORKDIR /src/cross-hurd
+
+          RUN git clone --depth=1 https://github.com/flavioc/cross-hurd.git . \
+              && sed -i 's|^ZLIB_VERSION=1\.3\.1$|ZLIB_VERSION=1.3.2|' package-versions.sh \
+              && sed -i 's|^ZLIB_URL=.*|ZLIB_URL=https:\/\/zlib.net\/fossils\/"$ZLIB_PKG"|' download-funcs.sh \
+              && sed -i 's|^MAKE_URL=\$GNU_REPO/"\$MAKE_PKG"|MAKE_URL=$GNU_REPO/make/"$MAKE_PKG"|' download-funcs.sh \
+              && sed -i '/apply_patch .*submitted-AF_LINK\.diff 1/c\    sed -i -e "s|^[[:space:]]*#define[[:space:]]*PF_LINK[[:space:]]*18.*|/* #define PF_LINK 18 Link layer interface. */|" -e "s|^[[:space:]]*#define[[:space:]]*AF_LINK[[:space:]]*PF_LINK|/* #define AF_LINK PF_LINK */|" sysdeps/mach/hurd/bits/socket.h &&' download-funcs.sh \
+              && sed -i 's|^DMIDECODE_URL=http://|DMIDECODE_URL=https://|' download-funcs.sh \
+              && sed -i 's|download\.savannah\.gnu\.org/releases/dmidecode/|download-mirror.savannah.gnu.org/releases/dmidecode/|' download-funcs.sh \
+              && sed -i '/--disable-libgomp \\/a\      --disable-libsanitizer \\' bootstrap-funcs.sh \
+              && export CFLAGS="-O3 -pipe -g0" \
+              && export CXXFLAGS="-O3 -pipe -g0" \
+              && export LDFLAGS="-Wl,-O3" \
+              && CPU=i686 bash -x download.sh \
+              && DISABLE_ADA=1 CPU=i686 bash -x bootstrap.sh \
+              && find /cross-tools-i686 -type d \
+                    \( -name __pycache__ -o -name man -o -name doc -o -name docs \) \
+                    -prune -exec rm -rf {} + \
+              && rm -rf /src/cross-hurd/src \
+                        /src/cross-hurd/build-i686 \
+                        /root/.cache \
+                        /tmp/* \
+                        /var/tmp/* \
+              && test -x /cross-tools-i686/bin/i686-gnu-gcc \
+              && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine \
+              && apt-get clean \
+              && apt-get purge -y --auto-remove
+
+          ENTRYPOINT ["/cross-tools-i686/bin/i686-gnu-gcc"]
+          EOF
+
+            docker build --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --progress=plain \
+                -t ghcr.io/wyvern/img:hurd-i686 .
+
+            docker push ghcr.io/wyvern/img:hurd-i686 &
+          fi
+
+      - name: Emscripten Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten"); then
+            mkdir -p emsdk
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" && touch ~/ems.finish &
+          else
+            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
+            ./emsdk/emsdk install latest &>/dev/null
+            ./emsdk/emsdk activate latest &>/dev/null
+            touch ~/ems.finish
+            tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
+          fi
+
+      - name: Redox Cache
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          targets=(
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+            x86_64-unknown-redox
+            i586-unknown-redox
+          )
+
+          mkdir -p "redox"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" && touch ~/redox.finish &
+          else
+            file=relibc-install.tar.gz
+            url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
+            for target in "${targets[@]}"; do
+              mkdir -p "redox/$target"
+              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
+            done
+            wait
+            touch ~/redox.finish
+            tar --zstd -C "redox/" -cf /tmp/redox.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:redox" "/tmp/redox.tar.zst:application/vnd.wyvern.redox.tar.zstd" &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        continue-on-error: true
+        run: |
+          cargo update
+          set +e -x
+
+          source ./emsdk/emsdk_env.sh &>/dev/null
+
+          cat > i686-gnu-gcc <<'EOF'
+          #!/bin/sh
+          exec docker run --rm \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            ghcr.io/wyvern/img:hurd-i686 \
+            "$@"
+          EOF
+          chmod +x i686-gnu-gcc
+
+          targets=(
+            x86_64-unknown-motor
+            riscv32imac-unknown-xous-elf
+            x86_64-unknown-hurd-gnu
+            i686-unknown-hurd-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target
+          done
+
+          (
+            time {
+              set +x
+              while [[ ! -f ~/ems.finish ]]; do
+                  sleep 1
+              done
+            }
+            time cargo s wasm32-unknown-emscripten
+          ) &
+
+          time {
+            set +x
+            while [[ ! -f ~/redox.finish ]]; do
+                sleep 1
+            done
+          }
+
+          targets=(
+              aarch64-unknown-redox
+              riscv64gc-unknown-redox
+              x86_64-unknown-redox
+              i586-unknown-redox
+          )
+
+          for target in "${targets[@]}"; do
+              time cargo s "$target" &
+          done
+
+          wait
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+              i586-unknown-redox
+              x86_64-unknown-redox
+              aarch64-unknown-redox
+              riscv64gc-unknown-redox
+              x86_64-unknown-motor
+              x86_64-unknown-hurd-gnu
+              i686-unknown-hurd-gnu
+              riscv32imac-unknown-xous-elf
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+
+            echo "Uploading $name..."
+            for d in src redox; do
+                if [ -d "target/$target/$d" ]; then
+                  mv target/$target/$d/{img,$name}|| true
+                  gh release upload Nightly target/$target/$d/$name --clobber || true
+                  break
+                fi
+            done
+          done
+
+          echo "Uploading Wasm32-emscripten..."
+          tar -cJf Wasm32-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js
+          gh release upload Nightly Wasm32-emscripten.tar.xz --clobber
+
+  Solaris:
+    name: Solaris
+    if: ${{ vars.TEST != '1' || vars.solaris == '1'  }}
+    runs-on: ubuntu-26.04
+
+    permissions:
+      contents: write
+      packages: write
+
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+      NETBSD_VERSION: "11.0"
+      OPENBSD_VERSION: "7.9"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Checkout rust-cross-toolchain
+        uses: actions/checkout@v7
+        with:
+          repository: taiki-e/rust-cross-toolchain
+          path: rust-cross-toolchain
+
+      - name: Patch rust-cross-toolchain
+        working-directory: rust-cross-toolchain
+        run: |
+            sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
+            docker/base/netbsd.Dockerfile
+
+            df=(netbsd openbsd linux-gnu)
+            for file in "${df[@]}"; do
+              dockerfile="docker/$file.Dockerfile"
+              if [[ "$file" == "linux-gnu" ]]; then
+                sed -i '/^FROM ghcr.io\/taiki-e\/build-base:"${DISTRO}-${DISTRO_VERSION}" AS test-base$/,/^FROM "${DISTRO}":"${DISTRO_VERSION}" AS final$/{
+                  /^FROM "${DISTRO}":"${DISTRO_VERSION}" AS final$/!d
+                }' "$dockerfile"
+
+                sed -i 's/COPY --from=test \//COPY --from=builder \//' "$dockerfile"
+              fi
+              sed -i '/RUN \/test\/test.sh/d' "$dockerfile"
+              sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$dockerfile"
+
+              sed -i '/^FROM \(ubuntu:"${UBUNTU_VERSION}"\|"${DISTRO}":"${DISTRO_VERSION}"\) AS final$/a\
+              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
+              ' "$dockerfile"
+            done
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker cross-toolchain images
+        working-directory: rust-cross-toolchain
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
+              docker pull "$IMAGE:haiku-cross" &>/dev/null &
+          else
+              mkdir -p haiku
+
+              curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
+              -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
+
+              printf '\nENTRYPOINT ["x86_64-unknown-haiku-gcc"]\n' >> haiku/Dockerfile
+              sed -i '/^RUN apt-get install/ s/$/ \&\& rm -rf \/var\/lib\/apt\/lists\/* \/var\/cache\/apt\/archives\/*/' haiku/Dockerfile
+
+              file="haiku/build-toolchain.sh"
+
+              sed -i '/^git clone --depth=1 --branch \$BUILDTOOLS_REV https:\/\/review.haiku-os.org\/buildtools$/a\
+              \
+              # Patch Haiku source after cloning.\
+              sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$HAIKU/src/kits/storage/sniffer/RPattern.cpp"\ ' "$file"
+
+              python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("haiku/build-toolchain.sh")
+          script = path.read_text()
+
+          anchor = "$HAIKU/configure $configureArgs"
+
+          flags_marker = "# Optimize the x86_64 Haiku target."
+          flags = '''# Optimize the x86_64 Haiku target.
+          export CFLAGS="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
+          export CXXFLAGS="$CFLAGS -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
+          '''
+
+          if flags_marker in script:
+              print("Optimization flags already present; skipping.")
+          else:
+              if anchor not in script:
+                  raise SystemExit(f"ERROR: insertion point not found: {anchor}")
+              script = script.replace(anchor, flags + anchor, 1)
+              print("Added optimization flags.")
+
+          path.write_text(script)
+          print(f"Patched {path}")
+          PY
+
+              docker buildx build --tag "$IMAGE:haiku-cross" \
+                --platform linux/amd64 \
+                --provenance=false \
+                --progress=quiet \
+                --load ./haiku
+
+              docker push "$IMAGE:haiku-cross" &
+          fi
+
+          targets=(
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
+          )
+
+          for target in "${targets[@]}"; do
+            if docker manifest inspect "$IMAGE:$target" &>/dev/null; then
+              docker pull "$IMAGE:$target" &>/dev/null &
+            else
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --file docker/linux-gnu.Dockerfile \
+                --build-arg RUST_TARGET="$target" \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg DISTRO_VERSION=24.04 \
+                --progress=quiet \
+                --tag "$IMAGE:$target" \
+                docker
+              docker push "$IMAGE:$target" &>/dev/null &
+            fi
+          done
+
+          docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
+
+          targets=(
+            x86_64-unknown-illumos
+            sparcv9-sun-solaris
+            x86_64-pc-solaris
+          )
+
+          for target in ${targets[@]}; do
+            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
+            docker pull $CROSS_IMAGE &>/dev/null &
+          done
+
+          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null; then
+              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
+          else
+              # NetBSD base image required by docker/netbsd.Dockerfile
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --progress=quiet \
+                --file docker/base/netbsd.Dockerfile \
+                --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+                --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
+                docker/base
+
+              # NetBSD final image
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --progress=quiet \
+                --file docker/netbsd.Dockerfile \
+                --build-arg RUST_TARGET=sparc64-unknown-netbsd \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
+                --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
+                docker
+              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
+          fi
+
+          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null; then
+              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
+          else
+              # OpenBSD final image
+              docker buildx build \
+                --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --progress=quiet \
+                --file docker/openbsd.Dockerfile \
+                --build-arg RUST_TARGET=sparc64-unknown-openbsd \
+                --build-arg HOST_ARCH=amd64 \
+                --build-arg UBUNTU_VERSION=24.04 \
+                --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
+                --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
+                docker
+              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Sccache Action
+        uses: Mozilla-Actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Cache cross-rs
+        uses: actions/cache@v6
+        with:
+          path: ~/.cargo/bin/cross
+          key: ${{ runner.os }}-cross
+          restore-keys: ${{ runner.os }}-cross
+
+      - name: Cross-rs
+        run: |
+          if [ ! -f ~/.cargo/bin/cross ]; then
+            cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
+          fi
+          # cross --version
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          cb=(cross build -q --profile src -Zbuild-std=std,panic_abort --target)
+
+          targets=(
+            aarch64-unknown-nuttx
+            riscv64gc-unknown-nuttx-elf
+          )
+          for target in ${targets[@]}; do
+            time "${cb[@]}" $target
+          done
+
+          targets=(
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
+            x86_64-unknown-illumos
+            sparcv9-sun-solaris
+            x86_64-pc-solaris
+          )
+
+          for target in ${targets[@]}; do
+            time "${cb[@]}" $target &
+          done
+
+          cat > x86_64-unknown-haiku-gcc <<'EOF'
+          #!/bin/sh
+          exec docker run --rm \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            ghcr.io/wyvern/img:haiku-cross \
+            "$@"
+          EOF
+
+          chmod +x x86_64-unknown-haiku-gcc
+          time cargo s x86_64-unknown-haiku &
+
+          wait
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
+            x86_64-unknown-illumos
+            sparcv9-sun-solaris
+            x86_64-pc-solaris
+            x86_64-unknown-haiku
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
+
+  Unix:
+    name: Unix
+    if: ${{ vars.TEST != '1' || vars.unix == '1'  }}
+    runs-on: ubuntu-26.04-arm
+
+    env:
+      FREEBSD: "15.1"
+      OPENBSD: "7.9"
+      NETBSD: "11.0"
+      DFLY: "6.4.2"
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install LLVM
+        run: |
+          {
+          if [ "$LLVM" = "23" ]; then
+              wget https://apt.llvm.org/llvm.sh &>/dev/null
+              chmod +x llvm.sh
+              sudo ./llvm.sh $LLVM &>/dev/null
+          fi
+          for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
+          done
+          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
+          touch ~/llvm.finish
+          } &
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Unix sysroot cache
+        run: |
+            IMAGE="${IMAGE,,}"
+
+            mkdir -p /home/runner/unix;
+            ln -sf /home/runner/unix sysroot
+
+            {
+              curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/$FREEBSD/FreeBSD-${FREEBSD}-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
+              LOOP=$(sudo losetup --find --show --partscan armv7.img)
+              sudo mkdir -p /mnt/freebsd
+              sudo mount -t ufs -o ro,ufstype=ufs2 ${LOOP}p5 /mnt/freebsd
+              mkdir freebsd
+              ln -s /mnt/freebsd freebsd/armv7
+            } &
+
+            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix"); then
+              oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.sysroot &
+            else
+              freebsd=(amd64 arm64 riscv)
+              for arch in "${freebsd[@]}"; do
+                if [ ! -d sysroot/freebsd/$arch ]; then
+                    mkdir -p sysroot/freebsd/$arch
+                    curl -fsSL https://download.freebsd.org/ftp/releases/$arch/${FREEBSD}-RELEASE/base.txz \
+                | tar -xJf - -C sysroot/freebsd/$arch &>/dev/null &
+                fi
+              done
+
+              if [ ! -d sysroot/freebsd/powerpc ]; then
+                mkdir -p sysroot/freebsd/powerpc
+                curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc &>/dev/null &
+              fi
+
+              if [ ! -d sysroot/freebsd/i386 ]; then
+                mkdir -p sysroot/freebsd/i386
+                curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/i386 &>/dev/null &
+              fi
+
+              ppc=(powerpc64 powerpc64le)
+              for arch in "${ppc[@]}"; do
+                if [ ! -d sysroot/freebsd/$arch ]; then
+                  mkdir -p sysroot/freebsd/$arch
+                  curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/${FREEBSD}-RELEASE/base.txz \
+                    | tar -xJf - -C sysroot/freebsd/$arch &>/dev/null &
+                fi
+              done
+
+              openbsd=(amd64 arm64 riscv64 powerpc64)
+              files=(base79 comp79)
+              for arch in "${openbsd[@]}"; do
+                if [ ! -d sysroot/openbsd/$arch ]; then
+                  mkdir -p sysroot/openbsd/$arch
+                  for file in "${files[@]}"; do
+                    curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$OPENBSD/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch &>/dev/null &
+                  done
+                fi
+              done
+
+              netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
+              files=(base comp etc)
+              for arch in "${netbsd[@]}"; do
+                if [ ! -d sysroot/netbsd/$arch ]; then
+                  mkdir -p sysroot/netbsd/$arch
+                  for file in "${files[@]}"; do
+                    for ext in tar.xz tgz; do
+                            url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${NETBSD}/$arch/binary/sets/$file.$ext"
+                            out="sysroot/netbsd/$arch"
+                            if curl -fsSI "$url" &>/dev/null; then
+                                if [ "$ext" = "tar.xz" ]; then
+                                    curl -fsSL "$url" | tar -xJf - -C "$out" &>/dev/null &
+                                else
+                                    curl -fsSL "$url" | tar -xzf - -C "$out" &>/dev/null &
+                                fi
+                            fi
+                        done
+                  done
+                fi
+              done
+
+              if [ ! -f sysroot/dfly-x86_64-${DFLY}_REL.iso ]; then
+                curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-${DFLY}_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-${DFLY}_REL.iso &
+                mkdir -p sysroot/dfly
+              fi
+
+              wait
+              chmod -R u+rwX sysroot
+              touch ~/unix.sysroot
+              tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
+              oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
+            fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
+
+          targets=(
+            x86_64-unknown-dragonfly
+            x86_64-unknown-freebsd
+            aarch64-unknown-freebsd
+            riscv64gc-unknown-freebsd
+            powerpc64-unknown-freebsd
+            powerpc64le-unknown-freebsd
+            powerpc-unknown-freebsd
+            i686-unknown-freebsd
+            armv7-unknown-freebsd
+            x86_64-unknown-openbsd
+            aarch64-unknown-openbsd
+            riscv64gc-unknown-openbsd
+            powerpc64-unknown-openbsd
+            x86_64-unknown-netbsd
+            aarch64-unknown-netbsd
+            aarch64_be-unknown-netbsd
+            riscv64gc-unknown-netbsd
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            x86_64-unknown-dragonfly
+            x86_64-unknown-freebsd
+            aarch64-unknown-freebsd
+            riscv64gc-unknown-freebsd
+            powerpc64-unknown-freebsd
+            powerpc64le-unknown-freebsd
+            powerpc-unknown-freebsd
+            i686-unknown-freebsd
+            armv7-unknown-freebsd
+            x86_64-unknown-openbsd
+            aarch64-unknown-openbsd
+            riscv64gc-unknown-openbsd
+            powerpc64-unknown-openbsd
+            x86_64-unknown-netbsd
+            aarch64-unknown-netbsd
+            aarch64_be-unknown-netbsd
+            riscv64gc-unknown-netbsd
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
+
+  Windows-11-Arm:
+    name: Windows-11-arm
+    if: ${{ vars.TEST != '1' || vars.win11 == '1'  }}
+    runs-on: windows-11-vs2026-arm
+
+    steps:
+      - name: Disable and Stop windows services
+        continue-on-error: true
+        run: |
+          $ErrorActionPreference = 'Ignore'
+
+          $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
+          $services = Get-Service|? DisplayName -match $pattern
+
+          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force
+
+          $services | % {$_.DisplayName; $_.Status}
+
+          reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
+
+          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
+          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
+          # schtasks /delete /tn * /f >NUL
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Install MSYS2 packages
+        shell: pwsh
+        run: |
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-winstorecompat'
+          & 'C:\msys64\usr\bin\bash.exe' -lc '
+            curl -fsSL -o /tmp/winstorecompat.pkg.tar.zst \
+              https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
+            pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
+          '
+
+      - name: Build release
+        continue-on-error: true
+        run: |
+          cargo update
+
+          $targets = @(
+                      "aarch64-pc-windows-msvc",
+                      "aarch64-uwp-windows-msvc",
+                      "arm64ec-pc-windows-msvc",
+                      "x86_64-pc-windows-msvc",
+                      "x86_64-uwp-windows-msvc",
+                      "x86_64-win7-windows-msvc",
+                      "x86_64-uwp-windows-gnu",
+                      "i686-pc-windows-msvc",
+                      "i686-uwp-windows-msvc",
+                      "i686-win7-windows-msvc",
+                      "i686-uwp-windows-gnu"
+                    )
+          foreach ($target in $targets) {
+              Write-Host "Building: $target"
+              Measure-Command { cargo s $target }
+          }
+
+          # cmd /c dir /s target\src\img.exe
+          Get-ChildItem -Path target\*\src\img.exe -File
+          # systeminfo
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+        run: |
+          $targets = @(
+              @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
+              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
+              @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
+              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe"),
+              @("i686-pc-windows-msvc", "Windows-i686.exe"),
+              @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
+              @("i686-win7-windows-msvc", "Windows-i686-win7.exe"),
+              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe"),
+              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp-gnu.exe"),
+              @("i686-uwp-windows-gnu","Windows-i686-uwp-gnu.exe")
+          )
+
+          foreach ($target in $targets) {
+              $arch = $target[0]
+              $name = $target[1]
+              Write-Host "Uploading $name..."
+              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force; $?
+              gh release upload Nightly target/$arch/src/$name --clobber; $?
+          }
+
+  Windows-gnu:
+    name: Windows-gnu
+    if: ${{ vars.TEST != '1' || vars.gnu == '1'  }}
+    runs-on: ubuntu-26.04-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Ubuntu apt update and install
+        run: |
+          (sudo apt install gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish) &>/dev/null &
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+          targets: i686-pc-windows-gnu
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          targets=(
+            i686-pc-windows-gnu
+            i686-win7-windows-gnu
+            x86_64-pc-windows-gnu
+            x86_64-win7-windows-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+
+          wait
+
+          find ./target -iname img.exe -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            i686-pc-windows-gnu
+            i686-win7-windows-gnu
+            x86_64-pc-windows-gnu
+            x86_64-win7-windows-gnu
+          )
+
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            if [[ "$vendor" == "win7" ]]; then
+                name="${os^}-${arch}-${abi}-${vendor}"
+            elif [[ -n "$abi" ]]; then
+                name="${os^}-${arch}-${abi}"
+            else
+                name="${os^}-${arch}"
+            fi
+            name="${name}.exe"
+            echo "Uploading $name..."
+            mv target/$target/src/{img.exe,$name}|| true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
+
+  Windows-2025:
+    name: Windows-2025
+    if: ${{ vars.TEST != '1' || vars.srv == '1'  }}
+    runs-on: windows-2025-vs2026
+
+    steps:
+      - name: Disable and Stop windows services
+        continue-on-error: true
+        run: |
+          $ErrorActionPreference = 'Ignore'
+
+          $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
+          $services = Get-Service|? DisplayName -match $pattern
+
+          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force
+
+          $services | % {$_.DisplayName; $_.Status}
+
+          reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
+
+          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
+          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
+          # schtasks /delete /tn * /f >NUL
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Install MSYS2 packages
+        shell: pwsh
+        run: |
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
+          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-winstorecompat'
+          & 'C:\msys64\usr\bin\bash.exe' -lc '
+            curl -fsSL -o /tmp/winstorecompat.pkg.tar.zst \
+              https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
+            pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
+          '
+
+      - name: Build release
+        run: |
+          cargo update
+
+          $targets = @(
+                      "aarch64-pc-windows-msvc",
+                      "aarch64-uwp-windows-msvc",
+                      "arm64ec-pc-windows-msvc",
+                      "x86_64-pc-windows-msvc",
+                      "x86_64-uwp-windows-msvc",
+                      "x86_64-win7-windows-msvc",
+                      "x86_64-uwp-windows-gnu",
+                      "i686-pc-windows-msvc",
+                      "i686-uwp-windows-msvc",
+                      "i686-win7-windows-msvc",
+                      "i686-uwp-windows-gnu"
+                    )
+          foreach ($target in $targets) {
+              Write-Host "Building: $target"
+              Measure-Command { cargo s $target }
+          }
+
+          # cmd /c dir /s target\src\img.exe
+          Get-ChildItem -Path target\*\src\img.exe -File
+          systeminfo
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+        run: |
+          $targets = @(
+              @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
+              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
+              @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
+              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
+              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe"),
+              @("i686-pc-windows-msvc", "Windows-i686.exe"),
+              @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
+              @("i686-win7-windows-msvc", "Windows-i686-win7.exe"),
+              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe"),
+              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp-gnu.exe"),
+              @("i686-uwp-windows-gnu","Windows-i686-uwp-gnu.exe")
+          )
+
+          foreach ($target in $targets) {
+              $arch = $target[0]
+              $name = $target[1]
+              Write-Host "Uploading $name..."
+              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force; $?
+              gh release upload Nightly target/$arch/src/$name --clobber; $?
+          }
+
+  Windows-thumb:
+    name: Windows-thumb
+    if: ${{ vars.TEST != '1' || vars.thumb == '1'  }}
+    runs-on: windows-2025
+
+    steps:
+      - name: Disable and Stop windows services
+        continue-on-error: true
+        run: |
+          $ErrorActionPreference = 'Ignore'
+
+          $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
+          $services = Get-Service|? DisplayName -match $pattern
+
+          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
+          $services | Stop-Service -Force
+
+          $services | % {$_.DisplayName; $_.Status}
+
+          reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
+          reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
+
+          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
+          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
+          # schtasks /delete /tn * /f >NUL
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: Install Windows ARM32 SDK libraries
+        shell: pwsh
+        run: |
+          $version = '10.0.22621.3233'
+          $root = Join-Path $env:RUNNER_TEMP 'windows-sdk-arm'
+          $nupkg = Join-Path $env:RUNNER_TEMP "windows-sdk-arm.$version.zip"
+          $url = "https://api.nuget.org/v3-flatcontainer/microsoft.windows.sdk.cpp.arm/$version/microsoft.windows.sdk.cpp.arm.$version.nupkg"
+
+          Invoke-WebRequest -Uri $url -OutFile $nupkg
+          New-Item -ItemType Directory -Path $root -Force | Out-Null
+          Expand-Archive -Path $nupkg -DestinationPath $root -Force
+
+          $kernel32 = Get-ChildItem $root -Filter kernel32.lib -Recurse |
+            Where-Object { $_.FullName -match '\\um\\arm\\kernel32\.lib$' } |
+            Select-Object -First 1
+
+          if (-not $kernel32) {
+            throw "The NuGet package did not contain ARM32 um\arm\kernel32.lib"
+          }
+
+          $sdkLibRoot = $kernel32.Directory.Parent.Parent.FullName
+          $umArm = $kernel32.Directory.FullName
+          $ucrtArm = Join-Path $sdkLibRoot 'ucrt\arm'
+
+          Write-Host "ARM32 Windows SDK libraries: $sdkLibRoot"
+          Write-Host "kernel32.lib: $($kernel32.FullName)"
+
+          if (-not (Test-Path $ucrtArm)) {
+            throw "ARM32 UCRT libraries not found: $ucrtArm"
+          }
+
+          $env:LIB = "$umArm;$ucrtArm;$env:LIB"
+          "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Link and Lib search config
+        shell: pwsh
+        run: |
+          $vcBin = Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\*\bin\HostX86\arm\link.exe" |
+          Select-Object -First 1 -ExpandProperty DirectoryName
+          if (-not $vcBin) { throw "MSVC ARM32 linker not found" }
+          $env:PATH = "$vcBin;$env:PATH"
+          "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+
+          $msvcRoot = "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC"
+
+          $armCrt = Get-ChildItem "$msvcRoot\*\lib\arm\msvcrt.lib" -ErrorAction SilentlyContinue |
+              Sort-Object { [version]$_.Directory.Parent.Parent.Name } -Descending |
+              Select-Object -First 1
+
+          if (-not $armCrt) {
+              throw "MSVC ARM32 CRT libraries not found"
+          }
+
+          $armLib = $armCrt.Directory.FullName
+          $env:LIB = "$armLib;$env:LIB"
+          "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+
+          Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
+
+      - name: Build release
+        run: |
+          cargo update
+
+          $targets = @(
+                  "thumbv7a-pc-windows-msvc",
+                  "thumbv7a-uwp-windows-msvc"
+                    )
+          foreach ($target in $targets) {
+              Write-Host "Building: $target"
+              Measure-Command { cargo s $target }
+          }
+
+          # cmd /c dir /s target\src\img.exe
+          Get-ChildItem -Path target\*\src\img.exe -File
+          systeminfo
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        continue-on-error: true
+        run: |
+          $targets = @(
+              @("thumbv7a-pc-windows-msvc","Windows-thumbv7a.exe"),
+              @("thumbv7a-uwp-windows-msvc","Windows-thumbv7a-uwp.exe")
+          )
+
+          foreach ($target in $targets) {
+              $arch = $target[0]
+              $name = $target[1]
+              Write-Host "Uploading $name..."
+              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force; $?
+              gh release upload Nightly target/$arch/src/$name --clobber; $?
+          }
+
+  Yocto:
+    name: Yocto
+    if: ${{ vars.TEST != '1' || vars.yocto == '1'  }}
+    runs-on: ubuntu-26.04
+
+    env:
+      YOCTO: "6.0.3"
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: setup-oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Login GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Toolchain downloads
+        run: |
+          IMAGE="${IMAGE,,}"
+          url=https://downloads.yoctoproject.org/releases/yocto/yocto-${YOCTO}/toolchain/x86_64
+          files=(
+          poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${YOCTO}.sh
+          poky-glibc-x86_64-core-image-sato-core2-32-genericx86-toolchain-${YOCTO}.sh
+          poky-glibc-x86_64-core-image-sato-armv8a-genericarm64-toolchain-${YOCTO}.sh
+          poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-beaglebone-yocto-toolchain-${YOCTO}.sh
+          poky-glibc-x86_64-core-image-sato-riscv64imafdc-qemuriscv64-toolchain-${YOCTO}.sh
+          )
+          set -o pipefail
+          mkdir -p "/opt/poky/$YOCTO"
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO" && touch ~/yocto.finish &
+          else
+            mkdir -p yocto
+            for file in "${files[@]}"; do
+                path="yocto/$file"
+                if [[ ! -f "$path" ]]; then
+                    curl -LsSf "$url/$file" -o "$path" && chmod +x "$path" && echo | "$path" &
+                fi
+            done
+            wait
+            rm -rf yocto
+            touch ~/yocto.finish
+            sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
+          fi
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          targets=(
+            "aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux"
+            "armv7-oe-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
+            "riscv64-oe-linux-gnu environment-setup-riscv64imafdc-poky-linux"
+            "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
+            "i686-oe-linux-gnu environment-setup-core2-32-poky-linux"
+          )
+
+          sdk=/opt/poky/${YOCTO}
+          ln -s $sdk/sysroots sysroots
+
+          time {
+              set +x
+              while [[ ! -e ~/yocto.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          for entry in "${targets[@]}"; do
+            read -r target env <<< "$entry"
+            (
+            source $sdk/$env &>/dev/null
+            unset RUST_TARGET_PATH
+            for v in ${!CARGO_TARGET_@}; do
+                unset "$v"
+            done
+            export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
+            time cargo s $target
+            )
+          done
+
+          find ./target -iname img -type f | xargs ls -hl
+          lscpu
+          free -m
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+                  aarch64-oe-linux-gnu
+                  armv7-oe-linux-gnueabihf
+                  riscv64-oe-linux-gnu
+                  x86_64-oe-linux-gnu
+                  i686-oe-linux-gnu
+          )
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi rest <<< "$target"
+            if [[ -n "$abi" ]]; then
+                if [[ "$vendor" == "openwrt" ]]; then
+                    name="${vendor^}-${arch}-${abi}"
+                elif [[ "$vendor" == "oe" ]]; then
+                    name="OpenEmbedded-${arch}-${abi}"
+                else
+                    if [[ "$abi" == "ohos" ]]; then
+                        name="Android-${arch}-${abi}"
+                    else
+                        name="${os^}-${arch}-${abi}"
+                    fi
+                fi
+            else
+                if [[ "$os" == "androideabi" ]]; then
+                    name="Android-${arch}"
+                else
+                    name="${os^}-${arch}"
+                fi
+            fi
+
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
+            gh release upload Nightly --clobber target/$target/src/$name || true
+          done
+
+  Zig-Mac:
+    name: Zig-Mac
+    if: ${{ vars.TEST != '1' || vars.zig == '1'  }}
+    runs-on: macos-26
+
+    steps:
+      - name: Disable macos spotlight index
+        run: |
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
+          sudo pmset -a powernap 0
+          sudo pmset -a sleep 0
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          cache-workspace-crates: "true"
+
+      - name: Run sccache-cache
+        uses: mozilla-actions/sccache-action@main
+
+      - name: C/C++ sccache wrappers
+        run: |
+          set -euo pipefail
+
+          mkdir -p "sccache-bin"
+
+          for compiler in clang clang++ gcc g++; do
+            cat > "sccache-bin/$compiler" <<EOF
+          #!/bin/bash
+          exec sccache /usr/bin/$compiler "\$@"
+          EOF
+            chmod +x "sccache-bin/$compiler"
+          done
+
+          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+
+      - name: Zig toolchain install
+        uses: mlugg/setup-zig@v2
+        with:
+          version: master
+
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
+
+          # cargo s aarch64_be-unknown-linux-gnu_ilp32
+          # cargo s aarch64-unknown-linux-gnu_ilp32
+          # exit
+
+          targets=(
+            armeb-unknown-linux-gnueabi
+            riscv32gc-unknown-linux-gnu
+            riscv32gc-unknown-linux-musl
+            powerpc-unknown-openbsd
+            powerpc-unknown-netbsd
+            mipsel-unknown-netbsd
+            armv7-unknown-netbsd-eabihf
+            armv6-unknown-netbsd-eabihf
+            i586-unknown-netbsd
+            i686-unknown-netbsd
+            i686-unknown-openbsd
+          )
+
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
+          find ./target -type f -name "img" -exec ls -hl {} \;
+          sw_vers
+          hostinfo
+          sysctl -n machdep.cpu.brand_string
+
+      - name: Rust Versions
+        run: rustup -V; cargo -Vv; rustc -Vv
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: |
+            target/**/img*
+            !target/**/*.d
+          if-no-files-found: ignore
+
+      - name: Upload binaries to a GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          targets=(
+            armeb-unknown-linux-gnueabi
+            riscv32gc-unknown-linux-gnu
+            riscv32gc-unknown-linux-musl
+            powerpc-unknown-openbsd
+            powerpc-unknown-netbsd
+            mipsel-unknown-netbsd
+            armv7-unknown-netbsd-eabihf
+            armv6-unknown-netbsd-eabihf
+            i586-unknown-netbsd
+            i686-unknown-netbsd
+            i686-unknown-openbsd
+          )
+
+          for target in "${targets[@]}"; do
+            IFS='-' read -r arch vendor os abi <<< "$target"
+            first="$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')"
+            rest="${os#?}"
+            os_cap="${first}${rest}"
+            if [[ -n "$abi" ]]; then
+                name="${os_cap}-${arch}-${abi}"
+            else
+                name="${os_cap}-${arch}"
+            fi
+            echo "Uploading $name..."
+            mv target/$target/src/{img,$name} || true
             gh release upload Nightly --clobber target/$target/src/$name || true
           done

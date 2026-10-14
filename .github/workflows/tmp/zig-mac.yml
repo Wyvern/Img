@@ -13,8 +13,9 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  macOS:
+  Zig-Mac:
     name: Zig-Mac
+    if: ${{ vars.TEST != '1' || vars.zig == '1'  }}
     runs-on: macos-26
 
     steps:

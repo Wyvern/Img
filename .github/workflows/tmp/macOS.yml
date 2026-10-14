@@ -15,7 +15,11 @@ env:
 jobs:
   macOS:
     name: macOS-26
+    if: ${{ vars.TEST != '1' || vars.macos == '1'  }}
     runs-on: macos-26
+
+    env:
+      mingw: "20261006"
 
     permissions:
       contents: write

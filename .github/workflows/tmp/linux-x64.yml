@@ -12,8 +12,9 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Linux:
+  Linux-x64:
     name: Linux-x64
+    if: ${{ vars.TEST != '1' || vars.x64 == '1'  }}
     runs-on: ubuntu-24.04-arm
 
     steps:

@@ -14,8 +14,9 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  Linux:
+  Fuchsia:
     name: Hermit+Fuchsia
+    if: ${{ vars.TEST != '1' || vars.fuchsia == '1'  }}
     runs-on: ubuntu-26.04
 
     permissions:

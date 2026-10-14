@@ -14,9 +14,13 @@ env:
   YOCTO: "6.0.3"
 
 jobs:
-  Linux:
-    name: Yocto/OpenEmbedded
+  Yocto:
+    name: Yocto
+    if: ${{ vars.TEST != '1' || vars.yocto == '1'  }}
     runs-on: ubuntu-26.04
+
+    env:
+      YOCTO: "6.0.3"
 
     permissions:
       contents: write

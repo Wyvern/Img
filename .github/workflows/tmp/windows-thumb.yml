@@ -12,8 +12,9 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Windows:
-    name: Windows-2025
+  Windows-thumb:
+    name: Windows-thumb
+    if: ${{ vars.TEST != '1' || vars.thumb == '1'  }}
     runs-on: windows-2025
 
     steps:

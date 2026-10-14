@@ -12,8 +12,9 @@ env:
   RUSTC_WRAPPER: "sccache"
 
 jobs:
-  Windows-arm:
+  Windows-11-Arm:
     name: Windows-11-arm
+    if: ${{ vars.TEST != '1' || vars.win11 == '1'  }}
     runs-on: windows-11-vs2026-arm
 
     steps:

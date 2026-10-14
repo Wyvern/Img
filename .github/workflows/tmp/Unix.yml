@@ -18,9 +18,16 @@ env:
   LLVM: "23"
 
 jobs:
-  Linux:
+  Unix:
     name: Unix
+    if: ${{ vars.TEST != '1' || vars.unix == '1'  }}
     runs-on: ubuntu-26.04-arm
+
+    env:
+      FREEBSD: "15.1"
+      OPENBSD: "7.9"
+      NETBSD: "11.0"
+      DFLY: "6.4.2"
 
     permissions:
       contents: write

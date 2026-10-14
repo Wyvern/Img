@@ -16,9 +16,15 @@ env:
   hexagon: "22.1.8"
 
 jobs:
-  Linux:
-    name: Linux-ppc-sparc
+  PPC-Sparc:
+    name: Linux-PPC-Sparc
+    if: ${{ vars.TEST != '1' || vars.ppc == '1'  }}
     runs-on: ubuntu-24.04
+
+    env:
+      openwrt: "25.12.5"
+      aarch64be: "2026.08-1"
+      hexagon: "22.1.8"
 
     permissions:
       contents: write
