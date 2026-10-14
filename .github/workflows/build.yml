@@ -5,6 +5,12 @@ on:
     branches: ["dev"]
   pull_request:
     branches: ["dev"]
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Run test build'
+        type: boolean
+        default: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -12,12 +18,11 @@ env:
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IMAGE: ghcr.io/${{ github.repository }}
-  TEST: "1"
 
 jobs:
   TEST:
+    if: ${{ inputs.test }}
     name: Zig-Linux
-    if: ${{ env.TEST=="1" }}
     runs-on: ubuntu-26.04-arm
 
     permissions:
