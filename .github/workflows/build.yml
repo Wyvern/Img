@@ -22,7 +22,7 @@ env:
 jobs:
   TEST:
     name: Zig-Linux
-    if: true
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.test }}
     runs-on: ubuntu-26.04-arm
 
     permissions:
