@@ -140,8 +140,8 @@ jobs:
           targets=(
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
-            # powerpc64-unknown-linux-musl
-            # powerpc64-unknown-linux-gnuelfv2
+            powerpc64-unknown-linux-musl
+            powerpc64-unknown-linux-gnuelfv2
             )
           for target in ${targets[@]}; do
             time cargo s $target
