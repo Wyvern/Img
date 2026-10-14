@@ -253,7 +253,7 @@ rustflags = [
 [target.'cfg(all(target_family = "unix", crate_type = "staticlib"))']
 rustflags = ["-Zstaticlib-hide-internal-symbols"]
 
-[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="powerpc64",target_abi="elfv1"),all(target_arch="arm",target_endian="big"),target_arch="riscv32"))))']
+[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="powerpc64",target_env="gnu"),all(target_arch="arm",target_endian="big"),target_arch="riscv32"))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
