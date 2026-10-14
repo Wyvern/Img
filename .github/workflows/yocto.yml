@@ -46,23 +46,18 @@ jobs:
           set -o pipefail
           mkdir -p "/opt/poky/$YOCTO"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO" && touch ~/finish.yocto &
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO" && touch ~/yocto.finish &
           else
-            mkdir -p /home/runner/yocto
+            mkdir -p yocto
             for file in "${files[@]}"; do
-                path="/home/runner/yocto/$file"
+                path="yocto/$file"
                 if [[ ! -f "$path" ]]; then
-                    curl -LsSf "$url/$file" -o "$path" &
+                    curl -LsSf "$url/$file" -o "$path" && chmod +x "$path" && echo | "$path" &
                 fi
             done
             wait
-            for file in "${files[@]}"; do
-                path="/home/runner/yocto/$file"
-                chmod +x "$path"
-                echo | "$path" &
-            done
-            wait
-            rm -f /home/runner/yocto/*
+            rm -rf yocto
+            touch ~/yocto.finish
             sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
             oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
           fi
@@ -114,7 +109,7 @@ jobs:
 
           time {
               set +x
-              while [[ ! -f ~/finish.yocto ]]; do
+              while [[ ! -e ~/yocto.finish ]]; do
                   sleep 1
               done
           }
