@@ -47,8 +47,6 @@ jobs:
 
       - name: Cache aarch64be
         run: |
-          exit
-
           IMAGE="${IMAGE,,}"
 
           path=/home/runner/aarch64be
