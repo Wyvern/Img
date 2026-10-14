@@ -12,7 +12,7 @@ env:
   RUSTC_WRAPPER: "sccache"
   IMAGE: ghcr.io/${{ github.repository }}
   openwrt: "25.12.5"
-  uclibc: "2026.08-1"
+  aarch64be: "2026.08-1"
   hexagon: "22.1.8"
 
 jobs:
@@ -36,12 +36,6 @@ jobs:
           sudo apt install gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-powerpc-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
-          nix build --quiet -o arm64be-musl nixpkgs#pkgsCross.aarch64be-musl.stdenv.cc
-          nix build --quiet -o arm64be-gnu nixpkgs#pkgsCross.aarch64be-gnu.stdenv.cc
-          find arm64be-musl/bin arm64be-gnu/bin \
-            \( -name '*-gcc' -o -name '*-gcc-*' -o -name '*-clang' \) \
-            -print
-          exit
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1 &
 
       - name: setup-oras
@@ -51,67 +45,32 @@ jobs:
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Cache uclibc
+      - name: Cache aarch64be
         run: |
           exit
 
           IMAGE="${IMAGE,,}"
 
-          path=/home/runner/uclibc
+          path=/home/runner/aarch64be
+          mkdir -p $path
 
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
-            mkdir -p $path
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:aarch64be-${aarch64be}"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
-            for target in armv7-eabihf mips32el mips32; do
-                case "$target" in
-                    armv7-eabihf)
-                        dir=armv7
-                        link=armv7
-                        ;;
-                    mips32el)
-                        dir=mips32el
-                        link=mipsel
-                        ;;
-                    mips32)
-                        dir=mips32
-                        link=mips
-                        ;;
-                esac
-                ln -sfn "$path/$dir/${target}--uclibc--bleeding-edge-${uclibc}" "$link"
-            done
+            ln -sfn $path/glibc aarch64be-gnu
+            ln -sfn $path/musl aarch64be-musl
           else
-            for target in armv7-eabihf mips32el mips32; do
-                case "$target" in
-                    armv7-eabihf)
-                        dir=armv7
-                        link=armv7
-                        ;;
-                    mips32el)
-                        dir=mips32el
-                        link=mipsel
-                        ;;
-                    mips32)
-                        dir=mips32
-                        link=mips
-                        ;;
-                esac
-
-                if [ ! -d "$path/$dir" ]; then
-                    mkdir -p "$path/$dir"
-                    curl -LsSf \
-                      "https://toolchains.bootlin.com/downloads/releases/toolchains/$target/tarballs/${target}--uclibc--bleeding-edge-${uclibc}.tar.xz" |
-                      tar -xJ -C "$path/$dir" &
-                fi
-
-                ln -sfn "$path/$dir/${target}--uclibc--bleeding-edge-${uclibc}" "$link"
+            for abi in glibc musl; do
+              url=https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64be/tarballs/aarch64be--${abi}--stable-${aarch64be}.tar.xz
+              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1
             done
-
+              ln -sfn $path/glibc aarch64be-gnu
+              ln -sfn $path/musl aarch64be-musl
             wait
-
-            tar --zstd -C $path -cf /tmp/uclibc-${uclibc}.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:uclibc-${uclibc}" "/tmp/uclibc-${uclibc}.tar.zst:application/vnd.wyvern.uclibc.tar.zstd" &
+            find $path -iname *gcc
+            tar --zstd -C $path -cf /tmp/aarch64be-${aarch64be}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
           fi
-
+          exit
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
