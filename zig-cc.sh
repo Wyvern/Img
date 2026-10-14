@@ -13,8 +13,6 @@ for a in "$@"; do
   fi
 
   case "$a" in
-    -Wl,-z,pack-relative-relocs)
-      ;;
     -Wl,-O*)
       ;;
     *)
