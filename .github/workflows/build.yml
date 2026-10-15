@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' && vars.run == '1' }}
-    runs-on: ubuntu-26.04-arm
+    runs-on: macos-26
 
     permissions:
       contents: write
@@ -37,7 +37,7 @@ jobs:
           # sudo apt install gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy &>/dev/null
 
       - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
+        # uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
