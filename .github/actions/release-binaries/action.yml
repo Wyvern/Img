@@ -100,8 +100,12 @@ runs:
             fi
           }
 
-          if [[ "$vendor" == "win7" ]]; then
-            name="$(cap $os)-${arch}-${abi}-${vendor}"
+          if [[ "$vendor" == "win7" || "$vendor" == "uwp" ]]; then
+            if [[ "$abi"== "msvc" ]]; then
+              name="$(cap $os)-${arch}-${vendor}"
+            else
+              name="$(cap $os)-${arch}-${vendor}-${abi}"
+            fi
           elif [[ "$vendor" == "apple" ]]; then
             if [[ "$os" == "darwin" ]]; then
               os="macOS"
