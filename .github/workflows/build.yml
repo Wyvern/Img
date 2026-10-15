@@ -39,9 +39,6 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: LLVM Setup
-        uses: ./.github/actions/llvm
-
       - name: Build Release
         run: |
           cargo update
@@ -394,20 +391,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install LLVM
-        run: |
-          {
-          if [ "$LLVM" = "23" ]; then
-              wget https://apt.llvm.org/llvm.sh &>/dev/null
-              chmod +x llvm.sh
-              sudo ./llvm.sh $LLVM &>/dev/null
-          fi
-          for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
-          done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
-          touch ~/llvm.finish
-          } &
+      - name: LLVM Setup
+        uses: ./.github/actions/llvm
 
       - name: GHCR Setup
         uses: ./.github/actions/ghcr
@@ -1669,20 +1654,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install LLVM
-        run: |
-          {
-          if [ "$LLVM" = "23" ]; then
-              wget https://apt.llvm.org/llvm.sh &>/dev/null
-              chmod +x llvm.sh
-              sudo ./llvm.sh $LLVM &>/dev/null
-          fi
-          for x in clang clang++ lld; do
-            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-$LLVM" 200
-          done
-          sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-$LLVM 200
-          touch ~/llvm.finish
-          } &
+      - name: LLVM Setup
+        uses: ./.github/actions/llvm
 
       - name: GHCR Setup
         uses: ./.github/actions/ghcr
