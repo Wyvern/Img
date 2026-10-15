@@ -126,7 +126,7 @@ runs:
               elif [[ "$abi" == "msvc" ]]; then
                   name="$(cap $os)-${arch}-${vendor}"
               else
-                  name="$(cap $os)-${arch}-${vendor}-${abi}"
+                  name="$(cap $os)-${arch}-${abi}-${vendor}"
               fi
             fi
           else
@@ -147,6 +147,9 @@ runs:
           if [[ "$os" == "windows" ]]; then
             mv target/$target/src/{$PROJECT.exe,$name.exe} || true
             gh release upload Nightly "target/$target/src/$name.exe" --clobber || true
+          elif [[ "$target" == wasm* ]]; then
+            mv target/$target/src/{$PROJECT.wasm,$name.wasm} || true
+            gh release upload Nightly "target/$target/src/$name.wasm" --clobber || true
           elif [[ "$os" == "espidf" ]]; then
             mv espidf/target/$target/src/{$PROJECT,$name} || true
             gh release upload Nightly "espidf/target/$target/src/$name" --clobber || true
