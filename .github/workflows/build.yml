@@ -66,13 +66,9 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
-            x86_64-fortanix-unknown-sgx
-            wasm32-unknown-emscripten
-            armv7-linux-androideabi
-            thumbv7neon-linux-androideabi
-            x86_64-win7-windows-msvc
-            x86_64-unknown-linux-ohos
-            riscv64-linux-android
+            armv7-oe-linux-gnueabihf
+            riscv64-oe-linux-gnu
+            mips64-openwrt-linux-musl
 
 
   WALI:
