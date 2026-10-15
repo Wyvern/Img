@@ -27,6 +27,7 @@ runs:
 
     - name: Upload binaries to a GitHub release
       if: inputs.targets != ''
+      continue-on-error: true
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
@@ -72,9 +73,8 @@ runs:
             mv espidf/target/$target/src/{$PROJECT,$name} || true
             gh release upload Nightly "espidf/target/$target/src/$name" --clobber || true
           elif [[ "$os" == "emscripten" ]]; then
-            echo "Uploading Wasm32-emscripten..."
-            tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src img.wasm img.js
-            gh release upload Nightly Wasm32-emscripten.tar.xz --clobber
+            tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src img.wasm img.js || true
+            gh release upload Nightly Wasm32-emscripten.tar.xz --clobber || true
           else
             mv target/$target/src/{$PROJECT,$name} || true
             gh release upload Nightly "target/$target/src/$name" --clobber || true
