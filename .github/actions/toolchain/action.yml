@@ -19,6 +19,7 @@ inputs:
   ccw:
     description: Setup C/C++ wrappers
     required: false
+    default: 'true'
 
 runs:
   using: composite

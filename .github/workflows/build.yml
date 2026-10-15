@@ -39,8 +39,6 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-          toolchain: stable
 
       - name: Build Release
         run: |
