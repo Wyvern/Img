@@ -19,6 +19,7 @@ runs:
       uses: mozilla-actions/sccache-action@main
 
     - name: Create C/C++ wrappers
+      shell: bash
       run: |
         set -euo pipefail
 

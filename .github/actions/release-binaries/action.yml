@@ -26,6 +26,7 @@ runs:
         if-no-files-found: ignore
 
     - name: Upload binaries to a GitHub release
+      shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
         PROJECT: ${{ github.event.repository.name }}
