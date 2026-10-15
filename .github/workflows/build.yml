@@ -66,6 +66,13 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
+            x86_64-fortanix-unknown-sgx
+            wasm32-unknown-emscripten
+            armv7-linux-androideabi
+            thumbv7neon-linux-androideabi
+            x86_64-win7-windows-msvc
+            x86_64-unknown-linux-ohos
+            riscv64-linux-android
 
 
   WALI:
@@ -138,9 +145,6 @@ jobs:
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
-        with:
-          targets: |
-
 
   Android:
     name: Android
