@@ -1,0 +1,26 @@
+name: LLVM setup
+description: Install latest version of LLVM
+
+inputs:
+  ver:
+    description: LLVM version to install
+    required: false
+    default: 23
+
+runs:
+  using: composite
+  steps:
+    - name: Install LLVM
+      shell: bash
+      run: |
+        {
+            wget https://apt.llvm.org/llvm.sh &>/dev/null
+            chmod +x llvm.sh
+            sudo ./llvm.sh ${{ inputs.ver }} &>/dev/null
+
+            for x in clang clang++ lld; do
+            sudo update-alternatives --install "/usr/bin/$x" "$x" "/usr/bin/$x-${{ inputs.ver }}" 200
+            done
+            sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-${{ inputs.ver }} 200
+            touch ~/llvm.finish
+        }

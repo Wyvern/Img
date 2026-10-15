@@ -40,6 +40,9 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
+      - name: LLVM Setup
+        uses: ./.github/actions/llvm
+
       - name: Build Release
         run: |
           cargo update
@@ -76,6 +79,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Ubuntu apt update and install
         run: |
@@ -146,12 +154,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Android NDK
         run: |
@@ -282,9 +288,18 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
+      - name: Cache ldproxy
+        uses: actions/cache@v6
+        with:
+          path: ~/.cargo/bin/ldproxy
+          key: ${{ runner.os }}-ldproxy
+          restore-keys: ${{ runner.os }}-ldproxy
+
       - name: Install ldproxy
         run: |
-          cargo install ldproxy -q &
+          if [[ ! -f ~/.cargo/bin/ldproxy ]]; then
+            cargo install ldproxy -q &
+          fi
 
       - name: Rust Toolchain for Xtensa
         uses: esp-rs/xtensa-toolchain@v1.7.0
@@ -395,12 +410,10 @@ jobs:
           touch ~/llvm.finish
           } &
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fuchsia Cache
         run: |
@@ -537,12 +550,10 @@ jobs:
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1 &
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache aarch64be
         run: |
@@ -966,7 +977,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: wasm32-wasip2 wasm32-wasip3
+          targets: wasm32-wasip2,wasm32-wasip3
 
       - name: Cache llvm-mingw
         uses: actions/cache@v6
@@ -1112,15 +1123,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login to GHCR
-        uses: docker/login-action@v4
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Hurd-i686 cache
         run: |
@@ -1355,7 +1361,6 @@ jobs:
       packages: write
 
     env:
-      IMAGE: ghcr.io/${{ github.repository }}
       NETBSD_VERSION: "11.0"
       OPENBSD_VERSION: "7.9"
 
@@ -1393,12 +1398,10 @@ jobs:
               ' "$dockerfile"
             done
 
-      - name: Login to GHCR
-        uses: docker/login-action@v4
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker cross-toolchain images
         working-directory: rust-cross-toolchain
@@ -1682,12 +1685,10 @@ jobs:
           touch ~/llvm.finish
           } &
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Unix sysroot cache
         run: |
@@ -2332,12 +2333,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Toolchain downloads
         run: |
