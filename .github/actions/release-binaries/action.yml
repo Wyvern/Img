@@ -100,13 +100,7 @@ runs:
             fi
           }
 
-          if [[ "$vendor" == "win7" || "$vendor" == "uwp" ]]; then
-            if [[ "$abi" == "msvc" ]]; then
-              name="$(cap $os)-${arch}-${vendor}"
-            else
-              name="$(cap $os)-${arch}-${vendor}-${abi}"
-            fi
-          elif [[ "$vendor" == "apple" ]]; then
+          if [[ "$vendor" == "apple" ]]; then
             if [[ "$os" == "darwin" ]]; then
               os="macOS"
             elif [[ "$os" == *os ]]; then
@@ -118,13 +112,21 @@ runs:
                 name="$(cap $vendor)-${arch}-${abi}"
             elif [[ "$vendor" == "oe" ]]; then
                 name="OpenEmbedded-${arch}-${abi}"
+            elif [[ "$vendor" == "pc" ]]; then
+                if [[ "$abi" == "msvc" ]]; then
+                  name="$(cap $os)-${arch}"
+                else
+                  name="$(cap $os)-${arch}-${abi}"
+                fi
             elif [[ "$os" == "unknown" ]]; then
                 name="$(cap $vendor)-${abi}"
             else
               if [[ "$abi" == "ohos" ]]; then
                   name="Android-${arch}-${abi}"
+              elif [[ "$abi" == "msvc" ]]; then
+                  name="$(cap $os)-${arch}-${vendor}"
               else
-                  name="$(cap $os)-${arch}-${abi}"
+                  name="$(cap $os)-${arch}-${vendor}-${abi}"
               fi
             fi
           else
