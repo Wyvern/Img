@@ -47,7 +47,9 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          which -a gcc
+          file gcc
+          exit
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           targets=(
@@ -82,15 +84,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: setup-oras
-        uses: oras-project/setup-oras@v2
-
-      - name: Login to GHCR
-        uses: docker/login-action@v4
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Ubuntu apt update and install
         run: |
@@ -116,35 +113,8 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
           fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Rust Setup
+        uses: ./.github/actions/rust-setup
 
       - name: Build Release
         run: |
@@ -169,44 +139,11 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
+          targets: |
 
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
-
-          )
-
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ "$vendor" == "win7" ]]; then
-                name="${os^}-${arch}-${abi}-${vendor}"
-            elif [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            else
-                name="${os^}-${arch}"
-            fi
-
-            echo "Uploading $name..."
-            if [[ "$os" == "windows" ]]; then
-              mv target/$target/src/{img.exe,$name.exe}|| true
-              gh release upload Nightly --clobber target/$target/src/$name.exe || true
-            else
-              mv target/$target/src/{img,$name}|| true
-              gh release upload Nightly --clobber target/$target/src/$name || true
-            fi
-          done
 
   Android:
     name: Android
