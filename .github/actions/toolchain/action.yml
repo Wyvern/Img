@@ -1,0 +1,52 @@
+name: Rust, Zig toolchain, cache setup and C/C++ wrappers
+description: Set up nightly Rust, Rust cache, sccache Zig and C/C++ wrappers
+
+inputs:
+  zig:
+    description: Whether to install the Zig master toolchain
+    required: false
+    default: "false"
+  version:
+    description: Zig toolchain version to install
+    required: false
+    default: master
+
+runs:
+  using: composite
+  steps:
+    - name: Rust Toolchain
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        components: rust-src
+
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+        cache-all-crates: "true"
+        cache-workspace-crates: "true"
+
+    - name: Run sccache-cache
+      uses: mozilla-actions/sccache-action@main
+
+    - name: Create C/C++ wrappers
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        mkdir -p sccache-bin
+
+        for compiler in clang clang++ gcc g++; do
+          cat > "sccache-bin/$compiler" <<EOF
+        #!/bin/bash
+        exec sccache /usr/bin/$compiler "\$@"
+        EOF
+          chmod +x "sccache-bin/$compiler"
+        done
+
+        echo "$GITHUB_WORKSPACE/sccache-bin" >> "$GITHUB_PATH"
+
+    - name: Zig toolchain install
+      if: inputs.zig == 'true'
+      uses: mlugg/setup-zig@v2
+      with:
+        version: ${{ inputs.version }}
