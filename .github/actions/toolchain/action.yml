@@ -2,14 +2,16 @@ name: Rust, Zig toolchain, cache setup and C/C++ wrappers
 description: Set up nightly Rust, Rust cache, sccache Zig and C/C++ wrappers
 
 inputs:
-  targets:
-    description: Install Rust targets std
+  toolchain:
+    description: Install Rust toolchain
     required: false
-    default: ""
+    default: nightly
+  targets:
+    description: Install Rust targets
+    required: false
   zig:
     description: Whether to install the Zig master toolchain
     required: false
-    default: "false"
   version:
     description: Zig toolchain version to install
     required: false
@@ -17,7 +19,6 @@ inputs:
   ccw:
     description: Setup C/C++ wrappers
     required: false
-    default: "true"
 
 runs:
   using: composite
@@ -27,6 +28,7 @@ runs:
       with:
         components: rust-src
         targets: ${{ inputs.targets }}
+        toolchain: ${{ inputs.toolchain }}
 
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
