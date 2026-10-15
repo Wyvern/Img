@@ -44,8 +44,18 @@ runs:
                   arch="$vendor"
           fi
 
+          cap() {
+            if (( BASH_VERSINFO[0] >= 4 )); then
+              printf '%s' "${1^}"
+            else
+              printf '%s%s' \
+                "$(printf '%s' "${1:0:1}" | tr '[:lower:]' '[:upper:]')" \
+                "${1:1}"
+            fi
+          }
+
           if [[ "$vendor" == "win7" ]]; then
-            name="${os^}-${arch}-${abi}-${vendor}"
+            name="$(cap $os)-${arch}-${abi}-${vendor}"
           elif [[ "$vendor" == "apple" ]]; then
             if [[ "$os" == "darwin" ]]; then
               os="macOS"
@@ -55,25 +65,25 @@ runs:
             name=Apple-${os}-${arch}
           elif [[ -n "$abi" ]]; then
             if [[ "$vendor" == "openwrt" ]]; then
-                name="${vendor^}-${arch}-${abi}"
+                name="$(cap $vendor)-${arch}-${abi}"
             elif [[ "$vendor" == "oe" ]]; then
                 name="OpenEmbedded-${arch}-${abi}"
             elif [[ "$os" == "unknown" ]]; then
-                name="${vendor^}-${abi}"
+                name="$(cap $vendor)-${abi}"
             else
               if [[ "$abi" == "ohos" ]]; then
                   name="Android-${arch}-${abi}"
               else
-                  name="${os^}-${arch}-${abi}"
+                  name="$(cap $os)-${arch}-${abi}"
               fi
             fi
           else
             if [[ "$os" == "androideabi" ]]; then
                 name="Android-${arch}"
             elif [[ "$arch" == "xtensa" ]]; then
-                name="${os^}-${vendor}"
+                name="$(cap $os)-${vendor}"
             else
-                name="${os^}-${arch}"
+                name="$(cap $os)-${arch}"
             fi
           fi
 
