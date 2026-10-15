@@ -17,11 +17,15 @@ runs:
       shell: bash
       run: rustup -V; cargo -Vv; rustc -Vv
 
+    - name: Set lowercase repository name
+      shell: bash
+      run: echo "PROJECT=$(printf '%s' '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
     - uses: actions/upload-artifact@v7
       with:
         name: ${{ inputs.artifact-name }}
         path: |
-          target/**/${{ github.event.repository.name }}*
+          target/**/${{ env.PROJECT }}*
           !target/**/*.d
         if-no-files-found: ignore
 
@@ -31,7 +35,6 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
-        PROJECT: ${{ github.event.repository.name }}
         TARGETS: ${{ inputs.targets }}
       run: |
         while IFS= read -r target; do
@@ -87,13 +90,10 @@ runs:
             fi
           fi
 
-          if (( BASH_VERSINFO[0] >= 4 )); then
-              PROJECT="${PROJECT,,}"
-          else
-              PROJECT="$(printf '%s' "$PROJECT" | tr '[:upper:]' '[:lower:]')"
-          fi
+          PROJECT=${{ env.PROJECT }}
 
           echo -e "\033[32m::Uploading:: \033[93m $name \033[0m"
+
           if [[ "$os" == "windows" ]]; then
             mv target/$target/src/{$PROJECT.exe,$name.exe} || true
             gh release upload Nightly "target/$target/src/$name.exe" --clobber || true
@@ -101,7 +101,7 @@ runs:
             mv espidf/target/$target/src/{$PROJECT,$name} || true
             gh release upload Nightly "espidf/target/$target/src/$name" --clobber || true
           elif [[ "$os" == "emscripten" ]]; then
-            tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src img.wasm img.js || true
+            tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src $PROJECT.wasm $PROJECT.js || true
             gh release upload Nightly Wasm32-emscripten.tar.xz --clobber || true
           else
             mv target/$target/src/{$PROJECT,$name} || true
