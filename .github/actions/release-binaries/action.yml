@@ -5,7 +5,6 @@ inputs:
   targets:
     description: Newline-separated list of Rust target triples
     required: false
-    default: ""
   artifact-name:
     description: Name of the uploaded artifact
     required: false
