@@ -41,7 +41,6 @@ jobs:
 
       - name: Build Release
         run: |
-
           cargo update
           set +e -x
 

@@ -36,7 +36,9 @@ runs:
       shell: bash
       run: |
         bin=${{ steps.project.outputs.name }}
-        find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} +
+        if [[ -d ./target ]]; then
+          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} +
+        fi
 
     - name: Linux System Info
       if: runner.os == 'Linux'
