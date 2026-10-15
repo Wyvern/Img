@@ -2415,13 +2415,13 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force; $?
-              gh release upload Nightly target/$arch/src/$name --clobber; $?
+              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force -ErrorAction Continue
+              gh release upload Nightly target/$arch/src/$name --clobber
           }
 
   Windows-gnu:
     name: Windows-gnu
-    if: ${{ vars.TEST != '1' || vars.gnu == '1'  }}
+    if: ${{ vars.TEST != '1' || vars.wingnu == '1'  }}
     runs-on: ubuntu-26.04-arm
 
     steps:
@@ -2530,7 +2530,7 @@ jobs:
 
   Windows-2025:
     name: Windows-2025
-    if: ${{ vars.TEST != '1' || vars.srv == '1'  }}
+    if: ${{ vars.TEST != '1' || vars.win2025 == '1'  }}
     runs-on: windows-2025-vs2026
 
     steps:
@@ -2644,8 +2644,8 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force; $?
-              gh release upload Nightly target/$arch/src/$name --clobber; $?
+              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force -ErrorAction Continue
+              gh release upload Nightly target/$arch/src/$name --clobber;
           }
 
   Windows-thumb:
@@ -2794,8 +2794,8 @@ jobs:
               $arch = $target[0]
               $name = $target[1]
               Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force; $?
-              gh release upload Nightly target/$arch/src/$name --clobber; $?
+              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force -ErrorAction Continue
+              gh release upload Nightly target/$arch/src/$name --clobber
           }
 
   Yocto:
