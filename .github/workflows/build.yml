@@ -66,6 +66,7 @@ jobs:
               wasm32-wasip1-threads
               wasm32-wasip2
               wasm64-unknown-unknown
+              x86_64-fortanix-unknown-sgx
               i686-pc-windows-msvc
               i686-uwp-windows-msvc
               i686-win7-windows-msvc

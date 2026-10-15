@@ -85,11 +85,6 @@ runs:
 
           IFS='-' read -r arch vendor os abi <<< "$target"
 
-          if [[ -z "$os" ]]; then
-                  os="$arch"
-                  arch="$vendor"
-          fi
-
           cap() {
             if (( BASH_VERSINFO[0] >= 4 )); then
               printf '%s' "${1^}"
@@ -119,11 +114,7 @@ runs:
                   name="$(cap $os)-${arch}-${abi}"
                 fi
             elif [[ "$os" == "unknown" ]]; then
-                if [[ "$vendor" == "unknown" ]]; then
-                  name="$(cap $arch)-${os}"
-                else
                   name="$(cap $vendor)-${abi}"
-                fi
             elif [[ "$os" == "threads" ]]; then
                 name="$(cap $arch)-${vendor}-${os}"
             else
@@ -140,6 +131,8 @@ runs:
                 name="Android-${arch}"
             elif [[ "$arch" == "xtensa" ]]; then
                 name="$(cap $os)-${vendor}"
+            elif [[ -z "$os" ]]; then
+                name="$(cap $arch)-${vendor}"
             else
                 name="$(cap $os)-${arch}"
             fi
