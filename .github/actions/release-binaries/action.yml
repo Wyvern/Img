@@ -119,7 +119,13 @@ runs:
                   name="$(cap $os)-${arch}-${abi}"
                 fi
             elif [[ "$os" == "unknown" ]]; then
-                name="$(cap $vendor)-${abi}"
+                if [[ "$vendor" == "unknown" ]]; then
+                  name="$(cap $arch)-${os}"
+                else
+                  name="$(cap $vendor)-${abi}"
+                fi
+            elif [[ "$os" == "threads" ]]; then
+                name="$(cap $arch)-${vendor}-${os}"
             else
               if [[ "$abi" == "ohos" ]]; then
                   name="Android-${arch}-${abi}"

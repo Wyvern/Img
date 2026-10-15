@@ -63,10 +63,9 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
-              arm64e-apple-darwin
-              aarch64-apple-ios
-              aarch64-pc-windows-gnullvm
+              wasm32-wasip1-threads
               wasm32-wasip2
+              wasm64-unknown-unknown
               i686-pc-windows-msvc
               i686-uwp-windows-msvc
               i686-win7-windows-msvc
