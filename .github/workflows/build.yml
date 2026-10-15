@@ -63,7 +63,7 @@ jobs:
 
   WALI:
     name: WALI
-    if: ${{ false || vars.wali == '1' }}
+    if: true
     runs-on: ubuntu-24.04-arm
 
     permissions:
