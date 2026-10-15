@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' && vars.run == '1' }}
-    runs-on: macos-26
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: write
@@ -36,12 +36,12 @@ jobs:
         run: |
           # sudo apt install gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy &>/dev/null
 
-      # - name: Toolchain Setup
-      #   uses: ./.github/actions/toolchain
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
-          exit
+
           cargo update
           set +e -x
 
@@ -216,55 +216,18 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
-                  riscv64-linux-android
-                  aarch64-linux-android
-                  armv7-linux-androideabi
-                  thumbv7neon-linux-androideabi
-                  x86_64-linux-android
-                  aarch64-unknown-linux-ohos
-                  armv7-unknown-linux-ohos
-                  x86_64-unknown-linux-ohos
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi rest <<< "$target"
-            if [[ -n "$abi" ]]; then
-                if [[ "$vendor" == "openwrt" ]]; then
-                    name="${vendor^}-${arch}-${abi}"
-                else
-                    if [[ "$abi" == "ohos" ]]; then
-                        name="Android-${arch}-${abi}"
-                    else
-                        name="${os^}-${arch}-${abi}"
-                    fi
-                fi
-            else
-                if [[ "$os" == "androideabi" ]]; then
-                    name="Android-${arch}"
-                else
-                    name="${os^}-${arch}"
-                fi
-            fi
-
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name}|| true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done
+          targets: |
+              riscv64-linux-android
+              aarch64-linux-android
+              armv7-linux-androideabi
+              thumbv7neon-linux-androideabi
+              x86_64-linux-android
+              aarch64-unknown-linux-ohos
+              armv7-unknown-linux-ohos
+              x86_64-unknown-linux-ohos
 
   ESP-IDF:
     name: ESP-IDF
