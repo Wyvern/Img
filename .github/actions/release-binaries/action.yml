@@ -88,7 +88,7 @@ runs:
           fi
 
           # echo "::Uploading:: $name..."
-          echo "::notice title=Uploading:: $name"
+          echo -e "\033[32m::Uploading:: $name ...\033[0m"
           if [[ "$os" == "windows" ]]; then
             mv target/$target/src/{$PROJECT.exe,$name.exe} || true
             gh release upload Nightly "target/$target/src/$name.exe" --clobber || true
