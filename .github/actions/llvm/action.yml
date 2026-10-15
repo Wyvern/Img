@@ -23,4 +23,5 @@ runs:
             done
             sudo update-alternatives --install /usr/bin/ld.lld ld.lld /usr/bin/lld-${{ inputs.ver }} 200
             touch ~/llvm.finish
+            clang --version
         }

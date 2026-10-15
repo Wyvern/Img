@@ -12,7 +12,6 @@ env:
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IMAGE: ghcr.io/${{ github.repository }}
-  LLVM: "23"
 
 jobs:
   TEST:
