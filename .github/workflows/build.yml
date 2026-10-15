@@ -36,8 +36,8 @@ jobs:
         run: |
           # sudo apt install gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy &>/dev/null
 
-      - name: Toolchain Setup
-        # uses: ./.github/actions/toolchain
+      # - name: Toolchain Setup
+      #   uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
