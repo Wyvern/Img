@@ -55,10 +55,6 @@ jobs:
             time cargo s $target
           done
 
-          find target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
-
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
@@ -137,10 +133,6 @@ jobs:
             time cargo s $target
           done
 
-          find target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
-
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
 
@@ -214,10 +206,6 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
-
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -309,9 +297,6 @@ jobs:
           done
           unset s
           wait
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -407,9 +392,6 @@ jobs:
             time cargo s $target &
           done
           wait
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -563,9 +545,6 @@ jobs:
             time cargo s $target &
           done
           wait
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -645,9 +624,6 @@ jobs:
             time cargo s $target &
           done
           wait
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -731,10 +707,6 @@ jobs:
           done
           wait
 
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
-
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
@@ -773,15 +745,11 @@ jobs:
       packages: write
 
     steps:
-      - name: Disable macos spotlight index
-        run: |
-          sudo mdutil -a -i off &
-          sudo mdutil -a -d &
-          sudo pmset -a powernap 0 &
-          sudo pmset -a sleep 0 &
-
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: macOS cleanup
+        uses: ./.github/actions/macos-cleanup
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -832,12 +800,6 @@ jobs:
           done
           wait
           lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
-
-          find ./target -type f -iname 'img.*' ! -iname 'img.d' | xargs ls -hl
-
-          sw_vers
-          hostinfo
-          sysctl -n machdep.cpu.brand_string
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -1048,10 +1010,6 @@ jobs:
           done
 
           wait
-
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -1325,10 +1283,6 @@ jobs:
 
           wait
 
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
-
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
@@ -1501,9 +1455,6 @@ jobs:
             time cargo s $target &
           done
           wait
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -1533,30 +1484,11 @@ jobs:
     runs-on: windows-11-vs2026-arm
 
     steps:
-      - name: Disable and Stop windows services
-        continue-on-error: true
-        run: |
-          $ErrorActionPreference = 'Ignore'
-
-          $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
-          $services = Get-Service|? DisplayName -match $pattern
-
-          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
-          $services | Stop-Service -Force
-
-          $services | % {$_.DisplayName; $_.Status}
-
-          reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
-
-          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
-          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
-          # schtasks /delete /tn * /f >NUL
-
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Windows cleanup
+        uses: ./.github/actions/windows-cleanup
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -1564,80 +1496,48 @@ jobs:
           ccw: false
 
       - name: Install MSYS2 packages
-        shell: pwsh
-        run: |
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-winstorecompat'
-          & 'C:\msys64\usr\bin\bash.exe' -lc '
-            curl -fsSL -o /tmp/winstorecompat.pkg.tar.zst \
-              https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
-            pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
-          '
+        uses: ./.github/actions/msys2-packages
 
       - name: Build release
+        shell: bash
         continue-on-error: true
         run: |
           cargo update
+          set +e -x
 
-          $targets = @(
-                      "aarch64-pc-windows-msvc",
-                      "aarch64-uwp-windows-msvc",
-                      "arm64ec-pc-windows-msvc",
-                      "x86_64-pc-windows-msvc",
-                      "x86_64-uwp-windows-msvc",
-                      "x86_64-win7-windows-msvc",
-                      "x86_64-uwp-windows-gnu",
-                      "i686-pc-windows-msvc",
-                      "i686-uwp-windows-msvc",
-                      "i686-win7-windows-msvc",
-                      "i686-uwp-windows-gnu"
-                    )
-          foreach ($target in $targets) {
-              Write-Host "Building: $target"
-              Measure-Command { cargo s $target }
-          }
-
-          # cmd /c dir /s target\src\img.exe
-          Get-ChildItem -Path target\*\src\img.exe -File
-          # systeminfo
-
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        continue-on-error: true
-        run: |
-          $targets = @(
-              @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
-              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
-              @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
-              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
-              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe"),
-              @("i686-pc-windows-msvc", "Windows-i686.exe"),
-              @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
-              @("i686-win7-windows-msvc", "Windows-i686-win7.exe"),
-              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe"),
-              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp-gnu.exe"),
-              @("i686-uwp-windows-gnu","Windows-i686-uwp-gnu.exe")
+          targets=(
+            aarch64-pc-windows-msvc
+            aarch64-uwp-windows-msvc
+            arm64ec-pc-windows-msvc
+            x86_64-pc-windows-msvc
+            x86_64-uwp-windows-msvc
+            x86_64-win7-windows-msvc
+            x86_64-uwp-windows-gnu
+            i686-pc-windows-msvc
+            i686-uwp-windows-msvc
+            i686-win7-windows-msvc
+            i686-uwp-windows-gnu
           )
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
 
-          foreach ($target in $targets) {
-              $arch = $target[0]
-              $name = $target[1]
-              Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force -ErrorAction Continue
-              gh release upload Nightly target/$arch/src/$name --clobber
-          }
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: |
+            aarch64-pc-windows-msvc
+            aarch64-uwp-windows-msvc
+            arm64ec-pc-windows-msvc
+            x86_64-pc-windows-msvc
+            x86_64-uwp-windows-msvc
+            x86_64-win7-windows-msvc
+            x86_64-uwp-windows-gnu
+            i686-pc-windows-msvc
+            i686-uwp-windows-msvc
+            i686-win7-windows-msvc
+            i686-uwp-windows-gnu
 
   Windows-gnu:
     name: Windows-gnu
@@ -1679,10 +1579,6 @@ jobs:
 
           wait
 
-          find ./target -iname img.exe -type f | xargs ls -hl
-          lscpu
-          free -m
-
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
@@ -1698,30 +1594,11 @@ jobs:
     runs-on: windows-2025-vs2026
 
     steps:
-      - name: Disable and Stop windows services
-        continue-on-error: true
-        run: |
-          $ErrorActionPreference = 'Ignore'
-
-          $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
-          $services = Get-Service|? DisplayName -match $pattern
-
-          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
-          $services | Stop-Service -Force
-
-          $services | % {$_.DisplayName; $_.Status}
-
-          reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
-
-          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
-          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
-          # schtasks /delete /tn * /f >NUL
-
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Windows cleanup
+        uses: ./.github/actions/windows-cleanup
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -1729,79 +1606,48 @@ jobs:
           ccw: false
 
       - name: Install MSYS2 packages
-        shell: pwsh
-        run: |
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -Syu --noconfirm'
-          & 'C:\msys64\usr\bin\bash.exe' -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-winstorecompat'
-          & 'C:\msys64\usr\bin\bash.exe' -lc '
-            curl -fsSL -o /tmp/winstorecompat.pkg.tar.zst \
-              https://mirror.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r14.g4761eabdd-1-any.pkg.tar.zst &&
-            pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
-          '
+        uses: ./.github/actions/msys2-packages
 
       - name: Build release
-        run: |
-          cargo update
-
-          $targets = @(
-                      "aarch64-pc-windows-msvc",
-                      "aarch64-uwp-windows-msvc",
-                      "arm64ec-pc-windows-msvc",
-                      "x86_64-pc-windows-msvc",
-                      "x86_64-uwp-windows-msvc",
-                      "x86_64-win7-windows-msvc",
-                      "x86_64-uwp-windows-gnu",
-                      "i686-pc-windows-msvc",
-                      "i686-uwp-windows-msvc",
-                      "i686-win7-windows-msvc",
-                      "i686-uwp-windows-gnu"
-                    )
-          foreach ($target in $targets) {
-              Write-Host "Building: $target"
-              Measure-Command { cargo s $target }
-          }
-
-          # cmd /c dir /s target\src\img.exe
-          Get-ChildItem -Path target\*\src\img.exe -File
-          systeminfo
-
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
-        with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
+        shell: bash
         continue-on-error: true
         run: |
-          $targets = @(
-              @("aarch64-pc-windows-msvc", "Windows-aarch64.exe"),
-              @("aarch64-uwp-windows-msvc", "Windows-aarch64-uwp.exe"),
-              @("x86_64-pc-windows-msvc", "Windows-x86_64.exe"),
-              @("x86_64-uwp-windows-msvc", "Windows-x86_64-uwp.exe"),
-              @("arm64ec-pc-windows-msvc", "Windows-arm64ec.exe"),
-              @("i686-pc-windows-msvc", "Windows-i686.exe"),
-              @("i686-uwp-windows-msvc", "Windows-i686-uwp.exe"),
-              @("i686-win7-windows-msvc", "Windows-i686-win7.exe"),
-              @("x86_64-win7-windows-msvc", "Windows-x86_64-win7.exe"),
-              @("x86_64-uwp-windows-gnu","Windows-x86_64-uwp-gnu.exe"),
-              @("i686-uwp-windows-gnu","Windows-i686-uwp-gnu.exe")
-          )
+          cargo update
+          set +e -x
 
-          foreach ($target in $targets) {
-              $arch = $target[0]
-              $name = $target[1]
-              Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force -ErrorAction Continue
-              gh release upload Nightly target/$arch/src/$name --clobber;
-          }
+          targets=(
+              aarch64-pc-windows-msvc
+              aarch64-uwp-windows-msvc
+              arm64ec-pc-windows-msvc
+              x86_64-pc-windows-msvc
+              x86_64-uwp-windows-msvc
+              x86_64-win7-windows-msvc
+              x86_64-uwp-windows-gnu
+              i686-pc-windows-msvc
+              i686-uwp-windows-msvc
+              i686-win7-windows-msvc
+              i686-uwp-windows-gnu
+          )
+          for target in ${targets[@]}; do
+            time cargo s $target &
+          done
+          wait
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: |
+            aarch64-pc-windows-msvc
+            aarch64-uwp-windows-msvc
+            arm64ec-pc-windows-msvc
+            x86_64-pc-windows-msvc
+            x86_64-uwp-windows-msvc
+            x86_64-win7-windows-msvc
+            x86_64-uwp-windows-gnu
+            i686-pc-windows-msvc
+            i686-uwp-windows-msvc
+            i686-win7-windows-msvc
+            i686-uwp-windows-gnu
 
   Windows-thumb:
     name: Windows-thumb
@@ -1809,30 +1655,11 @@ jobs:
     runs-on: windows-2025
 
     steps:
-      - name: Disable and Stop windows services
-        continue-on-error: true
-        run: |
-          $ErrorActionPreference = 'Ignore'
-
-          $pattern = "maint|diag|exper|search|logs|assist|report|logg|defend";
-          $services = Get-Service|? DisplayName -match $pattern
-
-          $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
-          $services | Stop-Service -Force
-
-          $services | % {$_.DisplayName; $_.Status}
-
-          reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
-          reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
-
-          Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
-          Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
-          # schtasks /delete /tn * /f >NUL
-
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Windows cleanup
+        uses: ./.github/actions/windows-cleanup
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -1911,38 +1738,12 @@ jobs:
               Measure-Command { cargo s $target }
           }
 
-          # cmd /c dir /s target\src\img.exe
-          Get-ChildItem -Path target\*\src\img.exe -File
-          systeminfo
-
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        continue-on-error: true
-        run: |
-          $targets = @(
-              @("thumbv7a-pc-windows-msvc","Windows-thumbv7a.exe"),
-              @("thumbv7a-uwp-windows-msvc","Windows-thumbv7a-uwp.exe")
-          )
-
-          foreach ($target in $targets) {
-              $arch = $target[0]
-              $name = $target[1]
-              Write-Host "Uploading $name..."
-              Move-Item target/$arch/src/img.exe target/$arch/src/$name -Force -ErrorAction Continue
-              gh release upload Nightly target/$arch/src/$name --clobber
-          }
+          targets: |
+            thumbv7a-pc-windows-msvc
+            thumbv7a-uwp-windows-msvc
 
   Yocto:
     name: Yocto
@@ -2034,10 +1835,6 @@ jobs:
             )
           done
 
-          find ./target -iname img -type f | xargs ls -hl
-          lscpu
-          free -m
-
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
@@ -2054,15 +1851,11 @@ jobs:
     runs-on: macos-26
 
     steps:
-      - name: Disable macos spotlight index
-        run: |
-          sudo mdutil -a -i off
-          sudo mdutil -a -d
-          sudo pmset -a powernap 0
-          sudo pmset -a sleep 0
-
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: macOS cleanup
+        uses: ./.github/actions/macos-cleanup
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -2096,10 +1889,6 @@ jobs:
             time cargo s $target &
           done
           wait
-          find ./target -type f -name "img" -exec ls -hl {} \;
-          sw_vers
-          hostinfo
-          sysctl -n machdep.cpu.brand_string
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries

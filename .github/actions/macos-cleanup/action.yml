@@ -1,0 +1,16 @@
+name: Disable macOS Spotlight Indexing
+description: Disable Spotlight indexing and selected macOS power-saving features
+
+runs:
+  using: composite
+  steps:
+    - name: Disable macOS Spotlight Indexing
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        {
+          sudo mdutil -a -i off
+          sudo mdutil -a -d
+          sudo pmset -a powernap 0
+          sudo pmset -a sleep 0
+        } &
