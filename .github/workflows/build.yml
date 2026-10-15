@@ -40,7 +40,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: wasm32-wasip2,wasm32-wasip3
+          toolchain: stable
 
       - name: Build Release
         run: |
