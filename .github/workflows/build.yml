@@ -40,7 +40,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-            ccw: false
+          targets: wasm32-wasip2 wasm32-wasip3
 
       - name: Build Release
         run: |
@@ -967,6 +967,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: wasm32-wasip2 wasm32-wasip3
 
       - name: Cache llvm-mingw
         uses: actions/cache@v6
