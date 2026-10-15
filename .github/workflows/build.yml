@@ -25,10 +25,12 @@ jobs:
       packages: write
 
     steps:
-      - name: Setup
-        uses: ./.github/actions/common
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
         with:
-         ghcr: true
          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Ubuntu apt update and install
