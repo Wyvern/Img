@@ -37,19 +37,16 @@ jobs:
         run: |
           # sudo apt install gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy &>/dev/null
 
-      - name: Rust Setup
-        uses: ./.github/actions/rust-setup
-
-      - name: Zig setup
-        uses: ./.github/actions/zig-setup
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
+        with:
+            zig: true
 
       - name: Build Release
         run: |
           cargo update
           set +e -x
-          which -a gcc
-          file gcc
-          exit
+
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           targets=(
