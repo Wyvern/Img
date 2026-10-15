@@ -39,8 +39,20 @@ runs:
 
           IFS='-' read -r arch vendor os abi <<< "$target"
 
+          if [[ -z "$os" ]]; then
+                  os="$arch"
+                  arch="$vendor"
+          fi
+
           if [[ "$vendor" == "win7" ]]; then
             name="${os^}-${arch}-${abi}-${vendor}"
+          elif [[ "$vendor" == "apple" ]]; then
+            if [[ "$os" == "darwin" ]]; then
+              os="macOS"
+            elif [[ "$os" == *os ]]; then
+              os="${os%os}OS"
+            fi
+            name=Apple-${os}-${arch}
           elif [[ -n "$abi" ]]; then
             if [[ "$vendor" == "openwrt" ]]; then
                 name="${vendor^}-${arch}-${abi}"
@@ -65,7 +77,7 @@ runs:
             fi
           fi
 
-          echo "Uploading $name..."
+          echo "::Uploading:: $name..."
           if [[ "$os" == "windows" ]]; then
             mv target/$target/src/{$PROJECT.exe,$name.exe} || true
             gh release upload Nightly "target/$target/src/$name.exe" --clobber || true

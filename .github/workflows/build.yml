@@ -63,22 +63,10 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
-              thumbv7neon-linux-androideabi
-              x86_64-linux-android
-              aarch64-unknown-linux-ohos
-              riscv32imc-esp-espidf
-              xtensa-esp32-espidf
-              x86_64-unknown-hermit
-              x86_64-unknown-fuchsia
-              x86_64-fortanix-unknown-sgx
-              powerpc64-unknown-linux-gnuelfv2
-              powerpc64-unknown-linux-musl
+              arm64e-apple-darwin
+              aarch64-apple-ios
               aarch64-pc-windows-gnullvm
-              x86_64h-apple-darwin
-              i686-unknown-hurd-gnu
-              riscv32imac-unknown-xous-elf
-              x86_64-win7-windows-gnu
-              armv7-oe-linux-gnueabihf
+              wasm32-wasip2
 
 
   WALI:
