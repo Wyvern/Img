@@ -64,11 +64,6 @@ jobs:
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
-        with:
-          targets: |
-            armv7-oe-linux-gnueabihf
-            riscv64-oe-linux-gnu
-            mips64-openwrt-linux-musl
 
 
   WALI:
