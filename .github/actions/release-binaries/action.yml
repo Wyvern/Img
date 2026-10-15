@@ -1,0 +1,55 @@
+name: Upload binaries to a GitHub release
+description: Rename and upload cross-compiled binaries to the Nightly release
+
+inputs:
+  targets:
+    description: Newline-separated list of Rust target triples
+    required: true
+  artifact-name:
+    description: Name of the uploaded artifact
+    required: false
+    default: build-output
+
+runs:
+  using: composite
+  steps:
+    - name: Rust Versions
+      shell: bash
+      run: rustup -V; cargo -Vv; rustc -Vv
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: |
+          target/**/${{ github.event.repository.name }}*
+          !target/**/*.d
+        if-no-files-found: ignore
+
+    - name: Upload binaries to a GitHub release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PROJECT: ${{ github.event.repository.name }}
+        TARGETS: ${{ inputs.targets }}
+      run: |
+        while IFS= read -r target; do
+          [[ -z "$target" ]] && continue
+
+          IFS='-' read -r arch vendor os abi <<< "$target"
+
+          if [[ "$vendor" == "win7" ]]; then
+            name="${os^}-${arch}-${abi}-${vendor}"
+          elif [[ -n "$abi" ]]; then
+            name="${os^}-${arch}-${abi}"
+          else
+            name="${os^}-${arch}"
+          fi
+
+          echo "Uploading $name..."
+          if [[ "$os" == "windows" ]]; then
+            mv "target/$target/src/$PROJECT.exe" "target/$target/src/$name.exe" || true
+            gh release upload Nightly "target/$target/src/$name.exe" --clobber || true
+          else
+            mv "target/$target/src/$PROJECT" "target/$target/src/$name" || true
+            gh release upload Nightly "target/$target/src/$name" --clobber || true
+          fi
+        done <<< "$TARGETS"

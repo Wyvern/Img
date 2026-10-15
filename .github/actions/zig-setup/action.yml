@@ -1,0 +1,10 @@
+name: Zig toolchain setup
+description: Install the Zig master toolchain
+
+runs:
+  using: composite
+  steps:
+    - name: Zig toolchain install
+      uses: mlugg/setup-zig@v2
+      with:
+        version: master
