@@ -2,6 +2,10 @@ name: Rust, Zig toolchain, cache setup and C/C++ wrappers
 description: Set up nightly Rust, Rust cache, sccache Zig and C/C++ wrappers
 
 inputs:
+  targets:
+    description: Install Rust targets std
+    required: false
+    default: ""
   zig:
     description: Whether to install the Zig master toolchain
     required: false
@@ -10,6 +14,10 @@ inputs:
     description: Zig toolchain version to install
     required: false
     default: master
+  ccw:
+    description: Setup C/C++ wrappers
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -18,6 +26,7 @@ runs:
       uses: dtolnay/rust-toolchain@nightly
       with:
         components: rust-src
+        targets: ${{ inputs.targets }}
 
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
@@ -29,6 +38,7 @@ runs:
       uses: mozilla-actions/sccache-action@main
 
     - name: Create C/C++ wrappers
+      if: inputs.ccw == 'true'
       shell: bash
       run: |
         set -euo pipefail

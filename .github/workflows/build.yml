@@ -40,7 +40,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-            zig: true
+            ccw: false
 
       - name: Build Release
         run: |
@@ -79,11 +79,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: GHCR Setup
-        uses: ./.github/actions/ghcr
-        with:
-         token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Ubuntu apt update and install
         run: |
           # sudo apt install libxml2-16 -qy &>/dev/null
@@ -108,8 +103,8 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
           fi
 
-      - name: Rust Setup
-        uses: ./.github/actions/rust-setup
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
@@ -176,35 +171,8 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:$file" "/tmp/$file.tar.zst:application/vnd.wyvern.android.tar.zstd" &
           fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
@@ -313,19 +281,8 @@ jobs:
           git clone -b v6.1 --depth=1 https://github.com/espressif/esp-idf.git espidf
           } &>/dev/null &
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Install ldproxy
         run: |
@@ -333,22 +290,6 @@ jobs:
 
       - name: Rust Toolchain for Xtensa
         uses: esp-rs/xtensa-toolchain@v1.7.0
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
 
       - name: Build Release
         run: |
@@ -483,36 +424,8 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
           fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-          targets: x86_64-fortanix-unknown-sgx
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
@@ -656,35 +569,8 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
           fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Cache openwrt
         uses: actions/cache@v6
@@ -850,47 +736,8 @@ jobs:
         run: |
           sudo apt install gcc-i686-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf musl-tools -qy &>/dev/null &
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
-
-      # - name: Zig toolchain install
-      #   uses: mlugg/setup-zig@v2
-      #   with:
-      #     version: master
-
-      - name: Login to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
@@ -999,35 +846,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
@@ -1145,36 +965,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          targets: wasm32-wasip2,wasm32-wasip3
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Cache llvm-mingw
         uses: actions/cache@v6
@@ -1440,35 +1232,8 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:redox" "/tmp/redox.tar.zst:application/vnd.wyvern.redox.tar.zstd" &
           fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         continue-on-error: true
@@ -1782,35 +1547,8 @@ jobs:
               docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
           fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Sccache Action
-        uses: Mozilla-Actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Cache cross-rs
         uses: actions/cache@v6
@@ -2042,35 +1780,8 @@ jobs:
               oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
             fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
@@ -2191,19 +1902,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
         with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+          ccw: false
 
       - name: Install MSYS2 packages
         shell: pwsh
@@ -2294,36 +1996,8 @@ jobs:
         run: |
           (sudo apt install gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish) &>/dev/null &
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-          targets: i686-pc-windows-gnu
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
@@ -2421,19 +2095,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
         with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+          ccw: false
 
       - name: Install MSYS2 packages
         shell: pwsh
@@ -2541,19 +2206,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
         with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
+            ccw: false
 
       - name: Install Windows ARM32 SDK libraries
         shell: pwsh
@@ -2713,35 +2369,8 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
           fi
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
-        with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
@@ -2848,40 +2477,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Rust Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
         with:
-          components: rust-src
-
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          cache-all-crates: "true"
-          cache-workspace-crates: "true"
-
-      - name: Run sccache-cache
-        uses: mozilla-actions/sccache-action@main
-
-      - name: C/C++ sccache wrappers
-        run: |
-          set -euo pipefail
-
-          mkdir -p "sccache-bin"
-
-          for compiler in clang clang++ gcc g++; do
-            cat > "sccache-bin/$compiler" <<EOF
-          #!/bin/bash
-          exec sccache /usr/bin/$compiler "\$@"
-          EOF
-            chmod +x "sccache-bin/$compiler"
-          done
-
-          echo "$PWD/sccache-bin" >> "$GITHUB_PATH"
-
-      - name: Zig toolchain install
-        uses: mlugg/setup-zig@v2
-        with:
-          version: master
+            zig: true
 
       - name: Build Release
         run: |
