@@ -101,7 +101,7 @@ runs:
           }
 
           if [[ "$vendor" == "win7" || "$vendor" == "uwp" ]]; then
-            if [[ "$abi"== "msvc" ]]; then
+            if [[ "$abi" == "msvc" ]]; then
               name="$(cap $os)-${arch}-${vendor}"
             else
               name="$(cap $os)-${arch}-${vendor}-${abi}"
