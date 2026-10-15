@@ -310,43 +310,16 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            espidf/target/**/img*
-            !espidf/target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             riscv32imac-esp-espidf
             riscv32imafc-esp-espidf
             riscv32imc-esp-espidf
             xtensa-esp32-espidf
             xtensa-esp32s2-espidf
             xtensa-esp32s3-espidf
-          )
-
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            elif [[ "$arch" == "xtensa" ]]; then
-                name="${os^}-${vendor}"
-            else
-                name="${os^}-${arch}"
-            fi
-            echo "Uploading $name..."
-            mv espidf/target/$target/src/{img,$name} || true
-            gh release upload Nightly --clobber espidf/target/$target/src/$name || true
-          done
 
   Fuchsia:
     name: Hermit+Fuchsia
@@ -435,22 +408,10 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             aarch64-unknown-hermit
             aarch64_be-unknown-hermit
             riscv64gc-unknown-hermit
@@ -459,22 +420,6 @@ jobs:
             riscv64gc-unknown-fuchsia
             x86_64-unknown-fuchsia
             x86_64-fortanix-unknown-sgx
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ -n "$abi" ]]; then
-                if [[ "$os" == "unknown" ]]; then
-                    name="${vendor^}-${abi}"
-                else
-                    name="${os^}-${arch}-${abi}"
-                fi
-            else
-                name="${os^}-${arch}"
-            fi
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name} || true
-            gh release upload Nightly target/$target/src/$name --clobber || true
-          done
 
   PPC-Sparc:
     name: Linux-PPC-Sparc
@@ -619,68 +564,32 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
+          targets: |
+              aarch64_be-unknown-linux-gnu
+              aarch64_be-unknown-linux-musl
+              hexagon-unknown-linux-musl
+              mips-unknown-linux-uclibc
+              mipsel-unknown-linux-uclibc
+              # aarch64-unknown-l4re-uclibc
+              # x86_64-unknown-l4re-uclibc
+              mipsel-unknown-linux-musl
+              mips-unknown-linux-musl
+              mipsel-unknown-linux-gnu
+              mips-unknown-linux-gnu
+              sparc64-unknown-linux-gnu
+              sparc-unknown-linux-gnu
+              powerpc64-unknown-linux-gnu
+              powerpc64-unknown-linux-gnuelfv2
+              powerpc64-unknown-linux-musl
+              powerpc64le-unknown-linux-gnu
+              powerpc64le-unknown-linux-musl
+              powerpc-unknown-linux-gnu
+              powerpc-unknown-linux-musl
+              mips64-openwrt-linux-musl
 
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
-                  aarch64_be-unknown-linux-gnu
-                  aarch64_be-unknown-linux-musl
-                  hexagon-unknown-linux-musl
-                  mips-unknown-linux-uclibc
-                  mipsel-unknown-linux-uclibc
-                  # aarch64-unknown-l4re-uclibc
-                  # x86_64-unknown-l4re-uclibc
-                  mipsel-unknown-linux-musl
-                  mips-unknown-linux-musl
-                  mipsel-unknown-linux-gnu
-                  mips-unknown-linux-gnu
-                  sparc64-unknown-linux-gnu
-                  sparc-unknown-linux-gnu
-                  powerpc64-unknown-linux-gnu
-                  powerpc64-unknown-linux-gnuelfv2
-                  powerpc64-unknown-linux-musl
-                  powerpc64le-unknown-linux-gnu
-                  powerpc64le-unknown-linux-musl
-                  powerpc-unknown-linux-gnu
-                  powerpc-unknown-linux-musl
-                  mips64-openwrt-linux-musl
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi rest <<< "$target"
-            if [[ -n "$abi" ]]; then
-                if [[ "$vendor" == "openwrt" ]]; then
-                    name="${vendor^}-${arch}-${abi}"
-                else
-                    if [[ "$abi" == "ohos" ]]; then
-                        name="Android-${arch}-${abi}"
-                    else
-                        name="${os^}-${arch}-${abi}"
-                    fi
-                fi
-            else
-                if [[ "$os" == "androideabi" ]]; then
-                    name="Android-${arch}"
-                else
-                    name="${os^}-${arch}"
-                fi
-            fi
-
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name} || true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done
 
   Linux-x32:
     name: Linux-x32
@@ -737,22 +646,10 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             i586-unknown-linux-gnu
             i586-unknown-linux-musl
             i686-unknown-linux-gnu
@@ -772,27 +669,6 @@ jobs:
             arm-unknown-linux-gnueabihf
             arm-unknown-linux-musleabi
             arm-unknown-linux-musleabihf
-          )
-
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ "$vendor" == "win7" ]]; then
-                name="${os^}-${arch}-${abi}-${vendor}"
-            elif [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            else
-                name="${os^}-${arch}"
-            fi
-
-            echo "Uploading $name..."
-            if [[ "$os" == "windows" ]]; then
-              mv target/$target/src/{img.exe,$name.exe}|| true
-              gh release upload Nightly --clobber target/$target/src/$name.exe || true
-            else
-              mv target/$target/src/{img,$name}|| true
-              gh release upload Nightly --clobber target/$target/src/$name || true
-            fi
-          done
 
   Linux-x64:
     name: Linux-x64
@@ -856,22 +732,10 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
             riscv64a23-unknown-linux-gnu
@@ -892,18 +756,6 @@ jobs:
             s390x-unknown-linux-musl
             loongarch64-unknown-linux-gnu
             loongarch64-unknown-linux-musl
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            else
-                name="${os^}-${arch}"
-            fi
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name}|| true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done
 
   macOS:
     name: macOS
@@ -978,27 +830,16 @@ jobs:
           wait
           lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
 
-          find ./target \( -iname img -o -iname img.exe -o -iname img.wasm -o -iname Img-Universal \) -type f | xargs ls -hl
+          find ./target -type f -iname 'img.*' ! -iname 'img.d' | xargs ls -hl
+
           sw_vers
           hostinfo
           sysctl -n machdep.cpu.brand_string
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
               x86_64h-apple-darwin
               aarch64-apple-darwin
               arm64e-apple-darwin
@@ -1015,54 +856,6 @@ jobs:
               i686-pc-windows-gnullvm
               wasm32-wasip2
               wasm32-wasip3
-          )
-
-          for target in "${targets[@]}"; do
-              IFS='-' read -r arch vendor os abi <<< "$target"
-              if [[ -z "$os" ]]; then
-                  os="$arch"
-                  arch="$vendor"
-              fi
-              first=$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')
-              rest=$(printf '%s' "$os" | cut -c2-)
-              os_cap="${first}${rest}"
-
-              if [[ -n "$abi" ]]; then
-                  name="${os_cap}-${arch}-${abi}"
-              elif [[ "$vendor" == "apple" ]]; then
-                  if [[ "$os" == "darwin" ]]; then
-                    os="macOS"
-                  elif [[ "$os" == *os ]]; then
-                    os="${os%os}OS"
-                  fi
-                  name=Apple-${os}-${arch}
-              else
-                  name="${os_cap}-${arch}"
-              fi
-
-              src="target/$target/src/img"
-              ext=""
-              if [[ -f "$src" ]]; then
-                  echo "Uploading $name..."
-                  mv target/$target/src/{img,$name} || true
-                  gh release upload Nightly "target/$target/src/$name" --clobber || true
-              else
-                  for f in "${src}".*; do
-                      if [[ -f "$f" ]]; then
-                          ext=".${f##*.}"
-                          [[ "$ext" == ".d" ]] && continue
-                          name="${name}${ext}"
-                          echo "Uploading $name..."
-                          mv target/$target/src/{img${ext},$name} || true
-                          gh release upload Nightly "target/$target/src/$name" --clobber || true
-                          break
-                      fi
-                  done
-              fi
-          done
-
-          echo "Uploading Apple-macOS-universal..."
-          gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
 
   Redox:
     name: Redox
@@ -1257,23 +1050,10 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
               i586-unknown-redox
               x86_64-unknown-redox
               aarch64-unknown-redox
@@ -1282,28 +1062,6 @@ jobs:
               x86_64-unknown-hurd-gnu
               i686-unknown-hurd-gnu
               riscv32imac-unknown-xous-elf
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi rest <<< "$target"
-            if [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            else
-                name="${os^}-${arch}"
-            fi
-
-            echo "Uploading $name..."
-            for d in src redox; do
-                if [ -d "target/$target/$d" ]; then
-                  mv target/$target/$d/{img,$name}|| true
-                  gh release upload Nightly target/$target/$d/$name --clobber || true
-                  break
-                fi
-            done
-          done
-
-          echo "Uploading Wasm32-emscripten..."
-          tar -cJf Wasm32-emscripten.tar.xz -C target/wasm32-unknown-emscripten/src img.wasm img.js
-          gh release upload Nightly Wasm32-emscripten.tar.xz --clobber
 
   Solaris:
     name: Solaris
@@ -1568,22 +1326,10 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             sparc64-unknown-netbsd
             sparc64-unknown-openbsd
             x86_64-unknown-illumos
@@ -1592,18 +1338,6 @@ jobs:
             x86_64-unknown-haiku
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            else
-                name="${os^}-${arch}"
-            fi
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name} || true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done
 
   Unix:
     name: Unix
@@ -1768,22 +1502,10 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
@@ -1801,18 +1523,6 @@ jobs:
             aarch64-unknown-netbsd
             aarch64_be-unknown-netbsd
             riscv64gc-unknown-netbsd
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            else
-                name="${os^}-${arch}"
-            fi
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name} || true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done
 
   Windows-11-Arm:
     name: Windows-11-arm
@@ -1970,42 +1680,14 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             i686-pc-windows-gnu
             i686-win7-windows-gnu
             x86_64-pc-windows-gnu
             x86_64-win7-windows-gnu
-          )
-
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            if [[ "$vendor" == "win7" ]]; then
-                name="${os^}-${arch}-${abi}-${vendor}"
-            elif [[ -n "$abi" ]]; then
-                name="${os^}-${arch}-${abi}"
-            else
-                name="${os^}-${arch}"
-            fi
-            name="${name}.exe"
-            echo "Uploading $name..."
-            mv target/$target/src/{img.exe,$name}|| true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done
 
   Windows-2025:
     name: Windows-2025
@@ -2280,7 +1962,7 @@ jobs:
         with:
          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Toolchain downloads
+      - name: Yocto downloads
         run: |
           IMAGE="${IMAGE,,}"
           url=https://downloads.yoctoproject.org/releases/yocto/yocto-${YOCTO}/toolchain/x86_64
@@ -2353,54 +2035,15 @@ jobs:
           lscpu
           free -m
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
-                  aarch64-oe-linux-gnu
-                  armv7-oe-linux-gnueabihf
-                  riscv64-oe-linux-gnu
-                  x86_64-oe-linux-gnu
-                  # i686-oe-linux-gnu
-          )
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi rest <<< "$target"
-            if [[ -n "$abi" ]]; then
-                if [[ "$vendor" == "openwrt" ]]; then
-                    name="${vendor^}-${arch}-${abi}"
-                elif [[ "$vendor" == "oe" ]]; then
-                    name="OpenEmbedded-${arch}-${abi}"
-                else
-                    if [[ "$abi" == "ohos" ]]; then
-                        name="Android-${arch}-${abi}"
-                    else
-                        name="${os^}-${arch}-${abi}"
-                    fi
-                fi
-            else
-                if [[ "$os" == "androideabi" ]]; then
-                    name="Android-${arch}"
-                else
-                    name="${os^}-${arch}"
-                fi
-            fi
-
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name} || true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done
+          targets: |
+            aarch64-oe-linux-gnu
+            armv7-oe-linux-gnueabihf
+            riscv64-oe-linux-gnu
+            x86_64-oe-linux-gnu
+            # i686-oe-linux-gnu
 
   Zig-Mac:
     name: Zig-Mac
@@ -2455,22 +2098,10 @@ jobs:
           hostinfo
           sysctl -n machdep.cpu.brand_string
 
-      - name: Rust Versions
-        run: rustup -V; cargo -Vv; rustc -Vv
-
-      - uses: actions/upload-artifact@v7
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
         with:
-          name: build-output
-          path: |
-            target/**/img*
-            !target/**/*.d
-          if-no-files-found: ignore
-
-      - name: Upload binaries to a GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          targets=(
+          targets: |
             armeb-unknown-linux-gnueabi
             riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl
@@ -2482,19 +2113,3 @@ jobs:
             i586-unknown-netbsd
             i686-unknown-netbsd
             i686-unknown-openbsd
-          )
-
-          for target in "${targets[@]}"; do
-            IFS='-' read -r arch vendor os abi <<< "$target"
-            first="$(printf '%s' "$os" | cut -c1 | tr '[:lower:]' '[:upper:]')"
-            rest="${os#?}"
-            os_cap="${first}${rest}"
-            if [[ -n "$abi" ]]; then
-                name="${os_cap}-${arch}-${abi}"
-            else
-                name="${os_cap}-${arch}"
-            fi
-            echo "Uploading $name..."
-            mv target/$target/src/{img,$name} || true
-            gh release upload Nightly --clobber target/$target/src/$name || true
-          done

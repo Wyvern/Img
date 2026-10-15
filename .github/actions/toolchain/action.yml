@@ -37,7 +37,7 @@ runs:
         cache-all-crates: "true"
         cache-workspace-crates: "true"
 
-    - name: Run sccache-cache
+    - name: Sccache cache
       uses: mozilla-actions/sccache-action@main
 
     - name: Create C/C++ wrappers
