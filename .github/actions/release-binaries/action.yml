@@ -115,8 +115,6 @@ runs:
                 fi
             elif [[ "$os" == "unknown" ]]; then
                   name="$(cap $vendor)-${abi}"
-            elif [[ "$os" == "threads" ]]; then
-                name="$(cap $arch)-${vendor}-${os}"
             else
               if [[ "$abi" == "ohos" ]]; then
                   name="Android-${arch}-${abi}"
@@ -131,6 +129,10 @@ runs:
                 name="Android-${arch}"
             elif [[ "$arch" == "xtensa" ]]; then
                 name="$(cap $os)-${vendor}"
+            elif [[ "$os" == "threads" ]]; then
+                name="$(cap $arch)-${vendor}-${os}"
+            elif [[ "$os" == "unknown" ]]; then
+                name="$(cap $arch)-${os}"
             elif [[ -z "$os" ]]; then
                 name="$(cap $arch)-${vendor}"
             else
