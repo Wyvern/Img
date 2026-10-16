@@ -1498,7 +1498,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          time cargo s i686-uwp-windows-gnu
+          time cargo v i686-uwp-windows-gnu
           exit
           targets=(
             aarch64-pc-windows-msvc
