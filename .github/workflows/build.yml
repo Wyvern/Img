@@ -60,11 +60,11 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
-            wasm32-wali-linux-musl
+
 
   WALI:
     name: WALI
-    if: true
+    if: false
     runs-on: ubuntu-24.04-arm
 
     permissions:
@@ -118,21 +118,7 @@ jobs:
                   sleep 1
               done
           }
-          rustc +nightly -Z unstable-options \
-            --print target-spec-json \
-            --target wasm32-wali-linux-musl > /tmp/wali-target.json
 
-          grep -nE 'llvm-target|linker-flavor|pre-link-args|late-link-args|link-self-contained|crt-static|gcc_s' \
-            /tmp/wali-target.json
-            grep -RInE \
-              --exclude-dir=.git \
-              --exclude-dir=build \
-              --exclude-dir=build-dir \
-              --exclude-dir=target \
-              'gcc_s|static-libgcc|linker-flavor|pre-link-args|late-link-args' \
-              .cargo WALI 2>/dev/null || true
-
-          exit
           targets=(
              wasm32-wali-linux-musl
           )
@@ -659,14 +645,15 @@ jobs:
   Linux-x64:
     name: Linux-x64
     if: ${{ vars.TEST != '1' || vars.x64 == '1'  }}
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
 
     steps:
       - name: Ubuntu apt update and install
         run: |
           {
-          sudo apt update --fix-missing -q && sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-14-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu musl-tools -qy && touch ~/apt.finish
-          } &>/dev/null &
+          sudo apt update --fix-missing -q && sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-loongarch64-linux-gnu gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu musl-tools -qy && touch ~/apt.finish
+          } >/dev/null
+          exit
 
       - name: Checkout
         uses: actions/checkout@v7
