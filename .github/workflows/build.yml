@@ -118,14 +118,20 @@ jobs:
                   sleep 1
               done
           }
-          grep -RInE \
-            --exclude-dir=build-dir \
-            --exclude-dir=llvm \
-            --exclude-dir=.git \
-            'gcc_s|static-libgcc|linker-flavor|pre-link-args|late-link-args' .
+          rustc +nightly -Z unstable-options \
+            --print target-spec-json \
+            --target wasm32-wali-linux-musl > /tmp/wali-target.json
 
-          find WALI/build/sysroot -type f \
-              \( -name 'libgcc.a' -o -name 'libgcc_s*' \)
+          grep -nE 'llvm-target|linker-flavor|pre-link-args|late-link-args|link-self-contained|crt-static|gcc_s' \
+            /tmp/wali-target.json
+            grep -RInE \
+              --exclude-dir=.git \
+              --exclude-dir=build \
+              --exclude-dir=build-dir \
+              --exclude-dir=target \
+              'gcc_s|static-libgcc|linker-flavor|pre-link-args|late-link-args' \
+              .cargo WALI 2>/dev/null || true
+
           exit
           targets=(
              wasm32-wali-linux-musl
