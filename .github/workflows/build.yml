@@ -82,7 +82,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install libgcc-s1 -qy &>/dev/null
+          sudo apt install libgcc-s1 -qy >/dev/null
 
       - name: WALI cache
         run: |
