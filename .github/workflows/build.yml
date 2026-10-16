@@ -263,8 +263,6 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
-          cd espidf
-
           targets=(
             riscv32imac-esp-espidf
             riscv32imafc-esp-espidf
@@ -272,12 +270,12 @@ jobs:
           )
 
           for target in "${targets[@]}"; do
-            time cargo s $target &
+            time cargo s $target -Fespidf &
           done
 
           sleep 1
 
-          mv ../.cargo/config.toml ../.cargo/config.toml.bak
+          mv .cargo/config.toml .cargo/config.toml.bak
           targets=(
             xtensa-esp32-espidf
             xtensa-esp32s2-espidf
@@ -285,7 +283,7 @@ jobs:
           )
           s=(b -q --profile src -Zbuild-std=std,panic_abort --target)
           for target in "${targets[@]}"; do
-            time cargo +esp "${s[@]}" $target --config "../.cargo/espidf.toml" &
+            time cargo +esp "${s[@]}" $target -Fespidf --config ".cargo/espidf.toml" &
           done
           unset s
           wait
@@ -1498,8 +1496,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          time cargo v i686-uwp-windows-gnu
-          exit
+
           targets=(
             aarch64-pc-windows-msvc
             aarch64-uwp-windows-msvc

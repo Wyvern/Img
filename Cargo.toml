@@ -24,16 +24,17 @@ serde_json = "*"
 
 [build-dependencies]
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
+embuild = { version = "*", features = ["espidf"], optional = true }
 serde_json = "*"
+
+[target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))))'.dependencies]
+file-format = "*"
 
 [target.'cfg(all(unix, not(target_os = "espidf")))'.build-dependencies]
 libc = "*"
 
 [target.'cfg(all(unix, not(target_os = "espidf")))'.dependencies]
 libc = "*"
-
-[target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))))'.dependencies]
-file-format = "*"
 
 [target.'cfg(target_os = "espidf")'.dependencies]
 esp-idf-sys = "*"
@@ -45,3 +46,4 @@ hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 default = []
 color = []
 download = []
+espidf = ["dep:embuild"]
