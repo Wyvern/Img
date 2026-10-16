@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: xcode-27
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: write
@@ -775,7 +775,6 @@ jobs:
             arm64e-apple-tvos
             aarch64-apple-watchos
             arm64_32-apple-watchos
-            armv7k-apple-watchos
             aarch64-apple-visionos
             aarch64-apple-darwin
             arm64e-apple-darwin
@@ -806,7 +805,6 @@ jobs:
               arm64e-apple-tvos
               aarch64-apple-watchos
               arm64_32-apple-watchos
-              armv7k-apple-watchos
               aarch64-apple-visionos
               aarch64-pc-windows-gnullvm
               x86_64-pc-windows-gnullvm
