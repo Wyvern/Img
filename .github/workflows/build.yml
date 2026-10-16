@@ -1564,19 +1564,7 @@ jobs:
                   sleep 1
               done
           }
-          SYSROOT="$(rustc --print sysroot)"
-          TARGET_LIBDIR="$(rustc --print target-libdir --target i686-pc-windows-gnu)"
 
-          echo '=== Rust startup objects ==='
-          find "$SYSROOT" /usr -type f \
-            \( -name rsbegin.o -o -name rsend.o \) 2>/dev/null
-
-          echo '=== Target library directory ==='
-          ls -lah "$TARGET_LIBDIR"
-
-          echo '=== GCC specs ==='
-          i686-w64-mingw32-gcc -dumpspecs | grep -nE 'rsbegin|rsend|startfile|link:'
-          exit
           targets=(
             i686-pc-windows-gnu
             i686-win7-windows-gnu
