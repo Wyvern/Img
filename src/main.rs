@@ -1241,7 +1241,9 @@ fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        unix => run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz")),
+        all(unix, not(target_os = "espidf")) => {
+            run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
+        }
         windows => run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz")),
         _ => *include_bytes!("../web.cbor"),
     };
