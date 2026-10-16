@@ -117,7 +117,8 @@ jobs:
                   sleep 1
               done
           }
-
+          find WALI -iname *clang*
+          exit
           targets=(
              wasm32-wali-linux-musl
           )

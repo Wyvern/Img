@@ -727,4 +727,4 @@ linker = "l4re/bin/aarch64-l4re-gcc"
 
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/sysroot/bin/musl-gcc"
-rustflags = ["-LWALI/build/sysroot/lib","-Clink-arg=-static-libgcc"]
+# rustflags = ["-LWALI/build/sysroot/lib","-Clink-arg=-static-libgcc"]
