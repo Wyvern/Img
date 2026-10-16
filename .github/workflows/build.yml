@@ -63,7 +63,7 @@ jobs:
 
   WALI:
     name: WALI
-    if: false
+    if: true
     runs-on: ubuntu-24.04-arm
 
     permissions:
@@ -117,7 +117,8 @@ jobs:
                   sleep 1
               done
           }
-
+          find WALI -iname *gcc*
+          exit
           targets=(
              wasm32-wali-linux-musl
           )
