@@ -4,33 +4,30 @@ description: Install MinGW GCC toolchains and Windows Store compatibility librar
 runs:
   using: composite
   steps:
-    - name: Prioritize official MSYS2 mirror
+    - name: Configure MSYS2 mirrors
       shell: pwsh
       run: |
         $dir = 'C:\msys64\etc\pacman.d'
 
-        $mingw = @(
-          'Server = https://repo.msys2.org/mingw/$repo/$arch/'
-        ) + (Get-Content "$dir\mirrorlist.mingw" |
-          Where-Object { $_ -notmatch '^\s*Server\s*=\s*https://repo\.msys2\.org/mingw/' })
+        'Server = https://repo.msys2.org/mingw/$arch/' |
+          Set-Content "$dir\mirrorlist.mingw" -Encoding ascii
 
-        $msys = @(
-          'Server = https://repo.msys2.org/msys/$arch/'
-        ) + (Get-Content "$dir\mirrorlist.msys" |
-          Where-Object { $_ -notmatch '^\s*Server\s*=\s*https://repo\.msys2\.org/msys/' })
+        'Server = https://repo.msys2.org/msys/$arch/' |
+          Set-Content "$dir\mirrorlist.msys" -Encoding ascii
 
-        $mingw | Set-Content "$dir\mirrorlist.mingw" -Encoding ascii
-        $msys | Set-Content "$dir\mirrorlist.msys" -Encoding ascii
+    - name: Synchronize MSYS2 databases
+      shell: pwsh
+      run: |
+        & C:\msys64\usr\bin\bash.exe -lc 'pacman -Syy --noconfirm'
+        if ($LASTEXITCODE -ne 0) {
+          exit $LASTEXITCODE
+        }
 
     - name: Install MSYS2 packages
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        $bash = 'C:\msys64\usr\bin\bash.exe'
-
-        & $bash -lc 'pacman -Syu --noconfirm'
-
-        & $bash -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-winstorecompat mingw-w64-i686-winstorecompat'
+        & C:\msys64\usr\bin\bash.exe -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-winstorecompat mingw-w64-i686-winstorecompat'
 
         # & $bash -lc '
         #   curl -fsSL -o /tmp/winstorecompat.pkg.tar.zst \
