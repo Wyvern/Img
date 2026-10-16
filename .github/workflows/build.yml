@@ -1562,7 +1562,15 @@ jobs:
                   sleep 1
               done
           }
+          find "$(rustc --print sysroot)" \
+            -type f \( -name rsbegin.o -o -name rsend.o \)
 
+          find /usr -type f \( -name rsbegin.o -o -name rsend.o \) 2>/dev/null
+          i686-w64-mingw32-gcc -print-prog-name=ld
+          i686-w64-mingw32-gcc -print-search-dirs
+          rustc --print sysroot
+          rustc --print target-libdir --target i686-pc-windows-gnu
+          exit
           targets=(
             i686-pc-windows-gnu
             i686-win7-windows-gnu
