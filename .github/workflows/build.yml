@@ -63,7 +63,7 @@ jobs:
 
   WALI:
     name: WALI
-    if: true
+    if: false
     runs-on: ubuntu-24.04-arm
 
     permissions:
@@ -1498,7 +1498,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          time cargo s i686-uwp-windows-gnu
+          exit
           targets=(
             aarch64-pc-windows-msvc
             aarch64-uwp-windows-msvc

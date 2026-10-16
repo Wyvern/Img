@@ -32,14 +32,6 @@ runs:
       shell: bash
       run: echo "${{ steps.project.outputs.name }}"
 
-    - name: Show build target binaries
-      shell: bash
-      run: |
-        bin=${{ steps.project.outputs.name }}
-        if [[ -d ./target ]]; then
-          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} +
-        fi
-
     - name: Linux System Info
       if: runner.os == 'Linux'
       shell: bash
@@ -62,6 +54,15 @@ runs:
       run: |
         Get-CimInstance Win32_Processor | Select-Object -ExpandProperty Name
         Get-ComputerInfo | Select-Object WindowsProductName,WindowsVersion,OsBuildNumber
+
+    - name: Show build target binaries
+      if: inputs.targets != ''
+      shell: bash
+      run: |
+        bin=${{ steps.project.outputs.name }}
+        if [[ -d ./target ]]; then
+          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} +
+        fi
 
     - uses: actions/upload-artifact@v7
       if: inputs.targets != ''
