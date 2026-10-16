@@ -117,8 +117,7 @@ jobs:
                   sleep 1
               done
           }
-          find WALI -iname *gcc*
-          exit
+
           targets=(
              wasm32-wali-linux-musl
           )

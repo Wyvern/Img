@@ -726,5 +726,5 @@ rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
 linker = "l4re/bin/aarch64-l4re-gcc"
 
 [target.wasm32-wali-linux-musl]
-linker = "WALI/build/llvm/bin/wasm-ld"
+linker = "WALI/build/sysroot/bin/musl-gcc"
 rustflags = ["-LWALI/build/sysroot/lib","-Clink-arg=-static-libgcc"]
