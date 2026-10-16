@@ -124,7 +124,7 @@ runs:
                 if [[ "$os" == "windows" ]]; then
                   name="$(cap $os)-${arch}-${abi}-${vendor}"
                 else
-                  name="$(cap $os)-${arch}-${abi}
+                  name="$(cap $os)-${arch}-${abi}"
                 fi
               fi
             fi
