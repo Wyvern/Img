@@ -1550,6 +1550,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: i686-pc-windows-gnu
 
       - name: Build Release
         run: |
@@ -1562,14 +1564,18 @@ jobs:
                   sleep 1
               done
           }
-          find "$(rustc --print sysroot)" \
-            -type f \( -name rsbegin.o -o -name rsend.o \)
+          SYSROOT="$(rustc --print sysroot)"
+          TARGET_LIBDIR="$(rustc --print target-libdir --target i686-pc-windows-gnu)"
 
-          find /usr -type f \( -name rsbegin.o -o -name rsend.o \) 2>/dev/null
-          i686-w64-mingw32-gcc -print-prog-name=ld
-          i686-w64-mingw32-gcc -print-search-dirs
-          rustc --print sysroot
-          rustc --print target-libdir --target i686-pc-windows-gnu
+          echo '=== Rust startup objects ==='
+          find "$SYSROOT" /usr -type f \
+            \( -name rsbegin.o -o -name rsend.o \) 2>/dev/null
+
+          echo '=== Target library directory ==='
+          ls -lah "$TARGET_LIBDIR"
+
+          echo '=== GCC specs ==='
+          i686-w64-mingw32-gcc -dumpspecs | grep -nE 'rsbegin|rsend|startfile|link:'
           exit
           targets=(
             i686-pc-windows-gnu
