@@ -5,10 +5,14 @@ inputs:
   targets:
     description: Newline-separated list of Rust target triples
     required: false
-  artifact-name:
+  artifact:
     description: Name of the uploaded artifact
     required: false
     default: build-output
+  tag:
+    description: Tag name the binary upload to
+    required: false
+    default: Nightly
 
 runs:
   using: composite
@@ -67,7 +71,7 @@ runs:
     - uses: actions/upload-artifact@v7
       if: inputs.targets != ''
       with:
-        name: ${{ inputs.artifact-name }}
+        name: ${{ inputs.artifact }}
         path: |
           target/**/${{ env.PROJECT }}*
           !target/**/*.d
@@ -146,26 +150,27 @@ runs:
           fi
 
           # PROJECT=${{ env.PROJECT }}
-          PROJECT=${{ steps.project.outputs.name }}
+          bin=${{ steps.project.outputs.name }}
+          tag=${{ inputs.tag }}
 
           echo -e "\033[32m::Uploading:: \033[93m $name \033[0m"
 
           if [[ "$os" == "windows" ]]; then
-            mv target/$target/src/{$PROJECT.exe,$name.exe} || true
-            gh release upload Nightly "target/$target/src/$name.exe" --clobber || true
+            mv target/$target/src/{$bin.exe,$name.exe} || true
+            gh release upload $tag "target/$target/src/$name.exe" --clobber || true
           elif [[ "$target" == wasm* ]]; then
-            mv target/$target/src/{$PROJECT.wasm,$name.wasm} || true
-            gh release upload Nightly "target/$target/src/$name.wasm" --clobber || true
+            mv target/$target/src/{$bin.wasm,$name.wasm} || true
+            gh release upload $tag "target/$target/src/$name.wasm" --clobber || true
           elif [[ "$os" == "emscripten" ]]; then
-            tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src $PROJECT.wasm $PROJECT.js || true
-            gh release upload Nightly Wasm32-emscripten.tar.xz --clobber || true
+            tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src $bin.wasm $bin.js || true
+            gh release upload $tag Wasm32-emscripten.tar.xz --clobber || true
           else
-            mv target/$target/src/{$PROJECT,$name} || true
-            gh release upload Nightly "target/$target/src/$name" --clobber || true
+            mv target/$target/src/{$bin,$name} || true
+            gh release upload $tag "target/$target/src/$name" --clobber || true
           fi
         done <<< "$TARGETS"
 
         if [[ -f Img-Universal ]]; then
           echo -e "\033[32m::Uploading:: \033[93m Apple-macOS-universal \033[0m"
-          gh release upload Nightly Img-Universal#Apple-macOS-universal --clobber || true
+          gh release upload $tag Img-Universal#Apple-macOS-universal --clobber || true
         fi

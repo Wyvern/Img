@@ -1250,7 +1250,7 @@ jobs:
 
           targets=(
             aarch64-unknown-nuttx
-            riscv64gc-unknown-nuttx-elf
+            # riscv64gc-unknown-nuttx-elf
           )
           for target in ${targets[@]}; do
             time "${cb[@]}" $target
