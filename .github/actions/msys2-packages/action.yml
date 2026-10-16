@@ -7,15 +7,20 @@ runs:
     - name: Prioritize official MSYS2 mirror
       shell: pwsh
       run: |
-        $mirror = 'C:\msys64\etc\pacman.d'
+        $dir = 'C:\msys64\etc\pacman.d'
 
-        @'
-        Server = https://repo.msys2.org/mingw/$repo/$arch/
-        '@ | Set-Content "$mirror\mirrorlist.mingw" -Encoding ascii
+        $mingw = @(
+          'Server = https://repo.msys2.org/mingw/$repo/$arch/'
+        ) + (Get-Content "$dir\mirrorlist.mingw" |
+          Where-Object { $_ -notmatch '^\s*Server\s*=\s*https://repo\.msys2\.org/mingw/' })
 
-        @'
-        Server = https://repo.msys2.org/msys/$arch/
-        '@ | Set-Content "$mirror\mirrorlist.msys" -Encoding ascii
+        $msys = @(
+          'Server = https://repo.msys2.org/msys/$arch/'
+        ) + (Get-Content "$dir\mirrorlist.msys" |
+          Where-Object { $_ -notmatch '^\s*Server\s*=\s*https://repo\.msys2\.org/msys/' })
+
+        $mingw | Set-Content "$dir\mirrorlist.mingw" -Encoding ascii
+        $msys | Set-Content "$dir\mirrorlist.msys" -Encoding ascii
 
     - name: Install MSYS2 packages
       if: runner.os == 'Windows'
