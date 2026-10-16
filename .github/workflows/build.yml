@@ -120,9 +120,6 @@ jobs:
           #     done
           # }
 
-          export CFLAGS="-O3 -pipe -g0 -fvisibility=hidden"
-          export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden"
-          export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
 
             git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
             cd WALI
