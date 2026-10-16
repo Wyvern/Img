@@ -121,7 +121,11 @@ runs:
               elif [[ "$abi" == "msvc" ]]; then
                   name="$(cap $os)-${arch}-${vendor}"
               else
-                  name="$(cap $os)-${arch}-${abi}"
+                if [[ "$os" == "windows" ]]; then
+                  name="$(cap $os)-${arch}-${abi}-${vendor}"
+                else
+                  name="$(cap $os)-${arch}-${abi}
+                fi
               fi
             fi
           else
