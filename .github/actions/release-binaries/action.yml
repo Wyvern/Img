@@ -80,8 +80,7 @@ runs:
         TARGETS: ${{ inputs.targets }}
       run: |
         while IFS= read -r target; do
-          [[ -z "$target" ]] && continue
-          [[ "$target" =~ ^[[:space:]]*# ]] && continue
+          [[ -z "$target" || "$target" =~ ^[[:space:]]*# ]] && continue
 
           IFS='-' read -r arch vendor os abi <<< "$target"
 
