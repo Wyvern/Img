@@ -422,8 +422,8 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-powerpc-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy >/dev/null && touch ~/apt.finish
-          exit
+          sudo apt install gcc-powerpc-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
+
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
@@ -741,10 +741,10 @@ jobs:
             mips-unknown-linux-musl
             mips-unknown-linux-gnu
             mips-unknown-linux-uclibc
-            # mipsisa64r6-unknown-linux-gnuabi64
-            # mipsisa64r6el-unknown-linux-gnuabi64
-            # mipsisa32r6-unknown-linux-gnu
-            # mipsisa32r6el-unknown-linux-gnu
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            mipsisa32r6-unknown-linux-gnu
+            mipsisa32r6el-unknown-linux-gnu
           )
 
           for target in "${targets[@]}"; do
@@ -766,10 +766,10 @@ jobs:
             mips-unknown-linux-musl
             mips-unknown-linux-gnu
             mips-unknown-linux-uclibc
-            # mipsisa64r6-unknown-linux-gnuabi64
-            # mipsisa64r6el-unknown-linux-gnuabi64
-            # mipsisa32r6-unknown-linux-gnu
-            # mipsisa32r6el-unknown-linux-gnu
+            mipsisa64r6-unknown-linux-gnuabi64
+            mipsisa64r6el-unknown-linux-gnuabi64
+            mipsisa32r6-unknown-linux-gnu
+            mipsisa32r6el-unknown-linux-gnu
 
   macOS:
     name: macOS
