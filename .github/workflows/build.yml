@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: ubuntu-26.04-arm
+    runs-on: xcode-27
 
     permissions:
       contents: write
@@ -837,7 +837,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if docker manifest inspect "$IMAGE:hurd-i686" &>/dev/null; then
-            docker pull "$IMAGE:hurd-i686" &>/dev/null &
+            docker pull "$IMAGE:hurd-i686" &>/dev/null && touch ~/hurd.finish &
           else
             mkdir hurd
             cd hurd
@@ -895,6 +895,8 @@ jobs:
                 --progress=plain \
                 -t ghcr.io/wyvern/img:hurd-i686 .
 
+            touch ~/hurd.finish
+
             docker push ghcr.io/wyvern/img:hurd-i686 &
           fi
 
@@ -903,8 +905,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten"); then
-            mkdir -p emsdk
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" && touch ~/ems.finish &
+            mkdir -p emsdk && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" && touch ~/ems.finish &
           else
             git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
             ./emsdk/emsdk install latest &>/dev/null
@@ -951,26 +952,13 @@ jobs:
           cargo update
           set +e -x
 
-          source ./emsdk/emsdk_env.sh &>/dev/null
-
-          cat > i686-gnu-gcc <<'EOF'
-          #!/bin/sh
-          exec docker run --rm \
-            -v "$PWD:$PWD" \
-            -w "$PWD" \
-            ghcr.io/wyvern/img:hurd-i686 \
-            "$@"
-          EOF
-          chmod +x i686-gnu-gcc
-
           targets=(
             x86_64-unknown-motor
             riscv32imac-unknown-xous-elf
             x86_64-unknown-hurd-gnu
-            i686-unknown-hurd-gnu
           )
           for target in ${targets[@]}; do
-            time cargo s $target
+            time cargo s $target &
           done
 
           (
@@ -980,7 +968,27 @@ jobs:
                   sleep 1
               done
             }
+            source ./emsdk/emsdk_env.sh &>/dev/null
             time cargo s wasm32-unknown-emscripten
+          ) &
+
+          (
+            time {
+              set +x
+              while [[ ! -f ~/hurd.finish ]]; do
+                  sleep 1
+              done
+            }
+            cat > i686-gnu-gcc <<'EOF'
+          #!/bin/sh
+          exec docker run --rm \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            ghcr.io/wyvern/img:hurd-i686 \
+            "$@"
+          EOF
+          chmod +x i686-gnu-gcc
+            time cargo s i686-unknown-hurd-gnu
           ) &
 
           time {
