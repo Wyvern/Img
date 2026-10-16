@@ -987,7 +987,7 @@ jobs:
             ghcr.io/wyvern/img:hurd-i686 \
             "$@"
           EOF
-          chmod +x i686-gnu-gcc
+            chmod +x i686-gnu-gcc
             time cargo s i686-unknown-hurd-gnu
           ) &
 
