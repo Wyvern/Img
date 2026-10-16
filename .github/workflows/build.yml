@@ -60,6 +60,7 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
+            wasm32-wali-linux-musl
 
   WALI:
     name: WALI
@@ -117,7 +118,11 @@ jobs:
                   sleep 1
               done
           }
-
+          rg -n --hidden --glob '!build-dir/**' --glob '!build/llvm/**' \
+            'gcc_s|static-libgcc|linker-flavor|pre-link-args|late-link-args' .
+          find WALI/build/sysroot -type f \
+              \( -name 'libgcc.a' -o -name 'libgcc_s*' \)
+          exit
           targets=(
              wasm32-wali-linux-musl
           )
