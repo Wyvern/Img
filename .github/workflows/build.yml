@@ -16,7 +16,7 @@ env:
 jobs:
   TEST:
     name: Test
-    if: ${{ vars.TEST == '1' && vars.run == '1' }}
+    if: ${{ vars.TEST == '1' }}
     runs-on: ubuntu-26.04-arm
 
     permissions:
@@ -59,6 +59,7 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
+            arm-unknown-linux-gnueabi
 
 
   WALI:
@@ -344,6 +345,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: x86_64-fortanix-unknown-sgx
 
       - name: Build Release
         run: |
@@ -1542,7 +1545,9 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          (sudo apt install gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish) &>/dev/null &
+          {
+            sudo apt install gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish
+          } &>/dev/null &
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
