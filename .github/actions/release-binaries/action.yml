@@ -64,6 +64,7 @@ runs:
         Get-ComputerInfo | Select-Object WindowsProductName,WindowsVersion,OsBuildNumber
 
     - uses: actions/upload-artifact@v7
+      if: inputs.targets != ''
       with:
         name: ${{ inputs.artifact-name }}
         path: |
