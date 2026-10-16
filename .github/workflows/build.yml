@@ -118,7 +118,7 @@ jobs:
                   sleep 1
               done
           }
-          find /lib /usr/lib -name 'libgcc_s*' 2>/dev/null
+          find WALI -iname '*gcc_s*'
           exit
           targets=(
              wasm32-wali-linux-musl
