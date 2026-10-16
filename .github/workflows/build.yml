@@ -75,10 +75,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # - name: GHCR Setup
-      #   uses: ./.github/actions/ghcr
-      #   with:
-      #    token: ${{ secrets.GITHUB_TOKEN }}
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Ubuntu apt update and install
         run: |
