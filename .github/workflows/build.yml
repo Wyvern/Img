@@ -702,74 +702,74 @@ jobs:
             loongarch64-unknown-linux-gnu
             loongarch64-unknown-linux-musl
 
-Linux-Mips:
-  name: Linux-Mips
-  if: ${{ vars.TEST != '1' || vars.mips == '1'  }}
-  runs-on: ubuntu-24.04-arm
+  Linux-Mips:
+    name: Linux-Mips
+    if: ${{ vars.TEST != '1' || vars.mips == '1'  }}
+    runs-on: ubuntu-24.04-arm
 
-  steps:
-    - name: Ubuntu apt update and install
-      run: |
-         sudo apt install gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy && touch ~/apt.finish &>/dev/null &
+    steps:
+      - name: Ubuntu apt update and install
+        run: |
+           sudo apt install gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy && touch ~/apt.finish &>/dev/null &
 
-    - name: Checkout
-      uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v7
 
-    - name: Toolchain Setup
-      uses: ./.github/actions/toolchain
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
-    - name: Build Release
-      run: |
-        cargo update
-        set +e -x
+      - name: Build Release
+        run: |
+          cargo update
+          set +e -x
 
-        time {
-            set +x
-            while [[ ! -f ~/apt.finish ]]; do
-                sleep 1
-            done
-        }
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
 
-        targets=(
-          mips64-unknown-linux-gnuabi64
-          mips64-unknown-linux-muslabi64
-          mips64el-unknown-linux-gnuabi64
-          mips64el-unknown-linux-muslabi64
-          mipsel-unknown-linux-musl
-          mipsel-unknown-linux-gnu
-          mipsel-unknown-linux-uclibc
-          mips-unknown-linux-musl
-          mips-unknown-linux-gnu
-          mips-unknown-linux-uclibc
-          # mipsisa64r6-unknown-linux-gnuabi64
-          # mipsisa64r6el-unknown-linux-gnuabi64
-          # mipsisa32r6-unknown-linux-gnu
-          # mipsisa32r6el-unknown-linux-gnu
-        )
+          targets=(
+            mips64-unknown-linux-gnuabi64
+            mips64-unknown-linux-muslabi64
+            mips64el-unknown-linux-gnuabi64
+            mips64el-unknown-linux-muslabi64
+            mipsel-unknown-linux-musl
+            mipsel-unknown-linux-gnu
+            mipsel-unknown-linux-uclibc
+            mips-unknown-linux-musl
+            mips-unknown-linux-gnu
+            mips-unknown-linux-uclibc
+            # mipsisa64r6-unknown-linux-gnuabi64
+            # mipsisa64r6el-unknown-linux-gnuabi64
+            # mipsisa32r6-unknown-linux-gnu
+            # mipsisa32r6el-unknown-linux-gnu
+          )
 
-        for target in "${targets[@]}"; do
-          time cargo s $target &
-        done
-        wait
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+          wait
 
-    - name: Upload release binaries
-      uses: ./.github/actions/release-binaries
-      with:
-        targets: |
-          mips64-unknown-linux-gnuabi64
-          mips64-unknown-linux-muslabi64
-          mips64el-unknown-linux-gnuabi64
-          mips64el-unknown-linux-muslabi64
-          mipsel-unknown-linux-musl
-          mipsel-unknown-linux-gnu
-          mipsel-unknown-linux-uclibc
-          mips-unknown-linux-musl
-          mips-unknown-linux-gnu
-          mips-unknown-linux-uclibc
-          # mipsisa64r6-unknown-linux-gnuabi64
-          # mipsisa64r6el-unknown-linux-gnuabi64
-          # mipsisa32r6-unknown-linux-gnu
-          # mipsisa32r6el-unknown-linux-gnu
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: |
+            mips64-unknown-linux-gnuabi64
+            mips64-unknown-linux-muslabi64
+            mips64el-unknown-linux-gnuabi64
+            mips64el-unknown-linux-muslabi64
+            mipsel-unknown-linux-musl
+            mipsel-unknown-linux-gnu
+            mipsel-unknown-linux-uclibc
+            mips-unknown-linux-musl
+            mips-unknown-linux-gnu
+            mips-unknown-linux-uclibc
+            # mipsisa64r6-unknown-linux-gnuabi64
+            # mipsisa64r6el-unknown-linux-gnuabi64
+            # mipsisa32r6-unknown-linux-gnu
+            # mipsisa32r6el-unknown-linux-gnu
 
   macOS:
     name: macOS
