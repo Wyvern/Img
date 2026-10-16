@@ -118,8 +118,12 @@ jobs:
                   sleep 1
               done
           }
-          rg -n --hidden --glob '!build-dir/**' --glob '!build/llvm/**' \
+          grep -RInE \
+            --exclude-dir=build-dir \
+            --exclude-dir=llvm \
+            --exclude-dir=.git \
             'gcc_s|static-libgcc|linker-flavor|pre-link-args|late-link-args' .
+
           find WALI/build/sysroot -type f \
               \( -name 'libgcc.a' -o -name 'libgcc_s*' \)
           exit
