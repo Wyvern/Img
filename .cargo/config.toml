@@ -351,8 +351,11 @@ linker = "arm-linux-gnueabi-gcc"
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little"))']
-# linker = "powerpc64le-linux-gnu-gcc"
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little",target_env="gnu"))']
+linker = "powerpc64le-linux-gnu-gcc"
+
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little",target_env="musl"))']
+linker = "powerpc64le-linux-musl-gcc"
 
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
 linker = "powerpc64-linux-gnu-gcc"
