@@ -262,6 +262,9 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs"
 ]
 
+[target.'cfg(all(target_os="linux",target_env="musl"))']
+rustflags = ["-Ctarget-feature=-crt-static"]
+
 [target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
 rustflags = [
   "-Clink-arg=-Wl,-O3",
@@ -351,11 +354,8 @@ linker = "arm-linux-gnueabi-gcc"
 [target.'cfg(all(target_arch="s390x",target_os="linux"))']
 linker = "s390x-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little",target_env="gnu"))']
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little"))']
 linker = "powerpc64le-linux-gnu-gcc"
-
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little",target_env="musl"))']
-linker = "powerpc64le-linux-musl-gcc"
 
 [target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
 linker = "powerpc64-linux-gnu-gcc"
