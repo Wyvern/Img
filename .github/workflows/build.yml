@@ -462,12 +462,11 @@ jobs:
           restore-keys: openwrt-${{env.openwrt}}
 
       - name: Cache hexagon
-        if: false
         uses: actions/cache@v6
         with:
           path: /home/runner/hexagon
-          key: hexagon-${{env.hexagon}}
-          restore-keys: hexagon-${{env.hexagon}}
+          key: hexagon${{env.hexagon}}
+          restore-keys: hexagon${{env.hexagon}}
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -497,7 +496,7 @@ jobs:
           cargo update
           set +e -x
           cargo s hexagon-unknown-linux-musl
-          exit 1
+          exit
           targets=(
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
