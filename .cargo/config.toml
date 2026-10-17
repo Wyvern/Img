@@ -195,7 +195,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [target."cfg(all())"]
 rustflags = [
-  # "-Ctarget-feature=-crt-static",
   "-Csymbol-mangling-version=hashed",
   "-Coverflow-checks=no",
   "-Cforce-frame-pointers=no",
@@ -489,9 +488,6 @@ rustflags = [
   "-Clink-arg=--sysroot=sysroot/netbsd/riscv-riscv64",
   "-Clink-arg=--target=riscv64gc--netbsd",
 ]
-
-[target.'cfg(target_os = "openbsd")']
-# rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.x86_64-unknown-openbsd]
 rustflags = [
