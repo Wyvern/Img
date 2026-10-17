@@ -422,7 +422,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-powerpc-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
+          sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
 
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
@@ -515,6 +515,7 @@ jobs:
           targets=(
             powerpc-unknown-linux-gnu
             powerpc-unknown-linux-musl
+            powerpc64-unknown-linux-gnu
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
             sparc64-unknown-linux-gnu
@@ -541,6 +542,7 @@ jobs:
               # x86_64-unknown-l4re-uclibc
               sparc64-unknown-linux-gnu
               sparc-unknown-linux-gnu
+              powerpc64-unknown-linux-gnu
               powerpc64-unknown-linux-gnuelfv2
               powerpc64-unknown-linux-musl
               powerpc-unknown-linux-gnu
@@ -639,8 +641,7 @@ jobs:
     steps:
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-loongarch64-linux-gnu musl-tools -qy >/dev/null && touch ~/apt.finish
-          exit 1
+          sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-loongarch64-linux-gnu musl-tools -qy &>/dev/null && touch ~/apt.finish &
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -668,7 +669,6 @@ jobs:
             x86_64-unknown-linux-gnux32
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
-            powerpc64-unknown-linux-gnu
             riscv64gc-unknown-linux-gnu
             riscv64gc-unknown-linux-musl
             riscv64a23-unknown-linux-gnu
@@ -695,7 +695,6 @@ jobs:
             x86_64-unknown-linux-gnux32
             powerpc64le-unknown-linux-gnu
             powerpc64le-unknown-linux-musl
-            powerpc64-unknown-linux-gnu
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
             s390x-unknown-linux-gnu
