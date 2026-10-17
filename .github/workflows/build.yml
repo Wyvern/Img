@@ -467,7 +467,6 @@ jobs:
             echo "Downloading hexagon SDK ..."
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C $path
             tar --zstd -C $path -cf /tmp/hexagon-${hexagon}.tar.zst .
-            echo "Uploading to GHCR ..."
             oras push --disable-path-validation "${IMAGE}:hexagon-${hexagon}" "/tmp/hexagon-${hexagon}.tar.zst:application/vnd.wyvern.hexagon.tar.zstd" &
           fi
 
@@ -501,8 +500,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s hexagon-unknown-linux-musl
-          exit
+
           targets=(
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
