@@ -562,7 +562,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-i686-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf musl-tools -qy &>/dev/null && touch ~/apt.finish  &
+          sudo apt install gcc-i686-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf musl-dev musl-tools -qy &>/dev/null && touch ~/apt.finish  &
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -638,7 +638,8 @@ jobs:
     steps:
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-loongarch64-linux-gnu musl-dev musl-tools -qy &>/dev/null && touch ~/apt.finish &
+          sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-loongarch64-linux-gnu musl-dev musl-tools -qy >/dev/null && touch ~/apt.finish
+          exit 1
 
       - name: Checkout
         uses: actions/checkout@v7
