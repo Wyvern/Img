@@ -112,7 +112,9 @@ jobs:
           cargo update
           set +e -x
 
-          find WALI -type f -iname '*unwind*'
+          WALI/build/llvm/bin/llvm-nm -u \
+              WALI/build/sysroot/lib/*.a 2>/dev/null |
+              grep -Ei 'unwind|personality|eh_frame' || true
           exit
           targets=(
              wasm32-wali-linux-musl
