@@ -462,11 +462,12 @@ jobs:
           restore-keys: openwrt-${{env.openwrt}}
 
       - name: Cache hexagon
+        if: false
         uses: actions/cache@v6
         with:
           path: /home/runner/hexagon
           key: hexagon-${{env.hexagon}}
-          restore-keys: hexagon
+          restore-keys: hexagon-${{env.hexagon}}
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
