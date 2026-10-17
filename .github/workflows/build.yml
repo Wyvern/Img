@@ -454,6 +454,25 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
           fi
 
+      - name: Cache hexagon
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          path=/home/runner/hexagon
+          mkdir -p $path
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:hexagon-${hexagon}"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
+          else
+            echo "Downloading hexagon SDK ..."
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C $path
+            tar --zstd -C $path -cf /tmp/hexagon-${hexagon}.tar.zst .
+            echo "Uploading to GHCR ..."
+            oras push --disable-path-validation "${IMAGE}:hexagon-${hexagon}" "/tmp/hexagon-${hexagon}.tar.zst:application/vnd.wyvern.hexagon.tar.zstd" &
+          fi
+
+          ln -sf $path/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
+
       - name: Cache openwrt
         uses: actions/cache@v6
         with:
@@ -461,17 +480,7 @@ jobs:
           key: openwrt-${{env.openwrt}}
           restore-keys: openwrt-${{env.openwrt}}
 
-      - name: Cache hexagon
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/hexagon
-          key: hexagon${{env.hexagon}}
-          restore-keys: hexagon${{env.hexagon}}
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-
-      - name: SDK Download and Setup
+      - name: Openwrt Setup
         run: |
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
@@ -479,17 +488,14 @@ jobs:
           fi
           ln -sf /home/runner/openwrt/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
 
-          if [ ! -d /home/runner/hexagon ]; then
-            mkdir -p /home/runner/hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C /home/runner/hexagon &
-          fi
-          ln -sf /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
-
       # - name: Install Nix
       #   uses: DeterminateSystems/nix-installer-action@main
 
       # - name: Install Nix
       #   uses: cachix/install-nix-action@31
+
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Build Release
         run: |
