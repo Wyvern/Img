@@ -724,5 +724,5 @@ rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
 linker = "l4re/bin/aarch64-l4re-gcc"
 
 [target.wasm32-wali-linux-musl]
-linker = "WALI/build/llvm/bin/wasm-ld"
-rustflags = ["-LWALI/build/sysroot/lib","-Ctarget-feature=+crt-static"]
+linker = "WALI/build/llvm/bin/clang"
+rustflags = ["-LWALI/build/sysroot/lib","-Ctarget-feature=+crt-static","-Cpanic=abort"]
