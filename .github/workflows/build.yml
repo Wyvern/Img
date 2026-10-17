@@ -1529,6 +1529,10 @@ jobs:
     if: ${{ vars.TEST != '1' || vars.win11 == '1'  }}
     runs-on: windows-11-vs2026-arm
 
+    permissions:
+      contents: write
+      packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -1590,6 +1594,10 @@ jobs:
     if: ${{ vars.TEST != '1' || vars.wingnu == '1'  }}
     runs-on: ubuntu-26.04-arm
 
+    permissions:
+      contents: write
+      packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -1642,6 +1650,10 @@ jobs:
     name: Windows-2025
     if: ${{ vars.TEST != '1' || vars.win2025 == '1'  }}
     runs-on: windows-2025-vs2026
+
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout
@@ -1703,6 +1715,10 @@ jobs:
     name: Windows-thumb
     if: ${{ vars.TEST != '1' || vars.thumb == '1'  }}
     runs-on: windows-2025
+
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout
