@@ -422,7 +422,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy >&/dev/null && touch ~/apt.finish &
+          sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
@@ -471,7 +471,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: Toolchain downloads
+      - name: SDK Downloads
         run: |
           if [ ! -d /home/runner/openwrt ]; then
             mkdir -p /home/runner/openwrt
@@ -495,8 +495,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s hexagon-unknown-linux-musl
-          exit
+
           targets=(
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
