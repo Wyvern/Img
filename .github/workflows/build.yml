@@ -640,7 +640,7 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64-linux-gnu gcc-powerpc64le-linux-gnu gcc-loongarch64-linux-gnu musl-tools -qy >/dev/null && touch ~/apt.finish
-          exit
+          exit 1
 
       - name: Checkout
         uses: actions/checkout@v7
