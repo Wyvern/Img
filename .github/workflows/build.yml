@@ -423,7 +423,7 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           mkdir -p /home/runner/hexagon
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C /home/runner/hexagon &
+            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C /home/runner/hexagon
             ls -hl /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl
             exit 1
           sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libc++1 libc++abi1 -qy >&/dev/null && touch ~/apt.finish &
@@ -486,7 +486,6 @@ jobs:
           if [ ! -d /home/runner/hexagon ]; then
             mkdir -p /home/runner/hexagon
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C /home/runner/hexagon &
-            ls -hl /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl
           fi
           ln -sf /home/runner/hexagon/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-ubuntu-22.04 hexagon
 
