@@ -112,9 +112,7 @@ jobs:
           cargo update
           set +e -x
 
-          find WALI/build -type f \( \
-              -iname '*unwind*' -o
-          \) -print
+          find WALI -type f -iname '*unwind*'
           exit
           targets=(
              wasm32-wali-linux-musl
