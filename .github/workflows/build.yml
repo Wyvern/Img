@@ -657,7 +657,6 @@ jobs:
                   sleep 1
               done
           }
-          cargo s x86_64-unknown-linux-gnu
           cargo s powerpc64le-unknown-linux-musl
           exit
           targets=(
