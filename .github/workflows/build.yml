@@ -422,8 +422,8 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libunwind8 libc++1 libc++abi1 -qy &>/dev/null && touch ~/apt.finish &
-
+          sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libunwind8 libc++1 libc++abi1 -qy >/dev/null && touch ~/apt.finish
+          exit 1
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
@@ -455,9 +455,6 @@ jobs:
             oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
           fi
 
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-
       - name: Cache openwrt
         uses: actions/cache@v6
         with:
@@ -471,6 +468,9 @@ jobs:
           path: /home/runner/hexagon
           key: hexagon-${{env.hexagon}}
           restore-keys: hexagon-${{env.hexagon}}
+
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
 
       - name: Toolchain downloads
         run: |
