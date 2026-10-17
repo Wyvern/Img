@@ -118,7 +118,8 @@ jobs:
                   sleep 1
               done
           }
-
+          find WALI -iname *unwind*
+          exit
           targets=(
              wasm32-wali-linux-musl
           )
