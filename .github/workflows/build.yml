@@ -64,7 +64,7 @@ jobs:
 
   WALI:
     name: WALI
-    if: true
+    if: false
     runs-on: ubuntu-24.04-arm
 
     permissions:
@@ -85,7 +85,6 @@ jobs:
           sudo apt install libgcc-s1 -qy >/dev/null
 
       - name: WALI cache
-        if: false
         run: |
           IMAGE="${IMAGE,,}"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
@@ -113,19 +112,12 @@ jobs:
           cargo update
           set +e -x
 
-          # time {
-          #     set +x
-          #     while [[ ! -e ~/wali.finish ]]; do
-          #         sleep 1
-          #     done
-          # }
-
-
-            git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
-            cd WALI
-            ./install-deps.sh
-            ./quick_setup.sh
-            cd ..
+          time {
+              set +x
+              while [[ ! -e ~/wali.finish ]]; do
+                  sleep 1
+              done
+          }
 
           targets=(
              wasm32-wali-linux-musl
