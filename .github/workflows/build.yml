@@ -112,11 +112,8 @@ jobs:
           cargo update
           set +e -x
 
-          find WALI -type f \( \
-              -name 'libunwind.a' -o \
-              -name 'libunwind.so' -o \
-              -name 'libunwind.so.*' -o \
-              -name 'libunwind*.a' \
+          find WALI/build -type f \( \
+              -iname '*unwind*' -o
           \) -print
           exit
           targets=(
