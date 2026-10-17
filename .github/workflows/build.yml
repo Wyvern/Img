@@ -423,7 +423,9 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools libunwind8 libc++1 libc++abi1 -qy >/dev/null && touch ~/apt.finish
-          ldconfig -p | grep libunwind.so.1
+          dpkg -L libunwind8 | grep 'libunwind\.so'
+          dpkg -s libunwind8 | grep -E 'Status|Architecture|Version'
+          find /lib /usr/lib -name 'libunwind.so*' 2>/dev/null
           exit 1
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
