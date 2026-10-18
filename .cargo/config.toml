@@ -727,4 +727,4 @@ rustflags = ["-LWALI/build/sysroot/lib","-Ctarget-feature=+crt-static"]
 
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
-rustflags = ["-Crelocation-model=static"]
+# rustflags = ["-Crelocation-model=static"]

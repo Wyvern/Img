@@ -38,8 +38,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-          zig: true
+        # with:
+        #   zig: true
 
       - name: Build Release
         run: |
@@ -50,7 +50,7 @@ jobs:
 
 
           targets=(
-            m68k-unknown-linux-gnu
+            # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
           )
@@ -566,7 +566,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-i686-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf musl-tools -qy &>/dev/null && touch ~/apt.finish  &
+          sudo apt install gcc-i686-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf -qy &>/dev/null && touch ~/apt.finish  &
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
