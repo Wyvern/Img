@@ -47,9 +47,8 @@ jobs:
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/rust-l4re-toolchain.tar.xz | tar -xJf - -C l4re --strip-components=1
-          mkdir musl && curl -fsSL https://github.com/cross-tools/musl-cross/releases/download/20261001/aarch64-unknown-linux-musl.tar.xz | tar -xJf - -C musl --strip-components=1
-          find musl -iname crtend*
-          exit
+          mkdir musl && curl -fsSL https://github.com/cross-tools/musl-cross/releases/download/20261001/aarch64-unknown-linux-musl.tar.xz | tar -xJf - -C musl
+
           targets=(
             aarch64-unknown-linux-musl
             # m68k-unknown-linux-gnu
