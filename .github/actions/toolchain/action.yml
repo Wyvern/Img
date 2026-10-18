@@ -64,11 +64,11 @@ runs:
       with:
         version: ${{ inputs.version }}
 
-    - name: Update libc of rust std
+    - name: Update deps of rust std
       shell: bash
       run: |
         SYSROOT="$(rustc --print sysroot)"
         SRC="$SYSROOT/lib/rustlib/src/rust"
 
-        cargo update --manifest-path "$SRC/library/Cargo.toml" --breaking
+        cargo update --manifest-path "$SRC/library/Cargo.toml"
         grep -A3 '^name = "libc"$' "$SRC/library/Cargo.lock"
