@@ -261,6 +261,8 @@ rustflags = [
   "-Clink-arg=-Wl,--relax",
   "-Clink-arg=-Wl,-z,pack-relative-relocs"
 ]
+[target.'cfg(all(target_os="linux",target_env="musl"))']
+linker = "./zig-cc.sh"
 
 [target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
 rustflags = [
@@ -272,6 +274,7 @@ rustflags = [
   "-Clink-arg=-Wl,--build-id=none",
   "-Clink-arg=-Wl,--strip-all",
 ]
+
 
 [target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",target_arch="csky"))))']
 rustflags = [
@@ -723,7 +726,3 @@ linker = "l4re/bin/aarch64-l4re-gcc"
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/clang"
 rustflags = ["-LWALI/build/sysroot/lib"]
-
-[target.m68k-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=m68k-linux-gnu"]
