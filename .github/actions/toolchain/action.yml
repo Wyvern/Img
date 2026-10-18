@@ -65,6 +65,7 @@ runs:
         version: ${{ inputs.version }}
 
     - name: Update libc of rust std
+      shell: bash
       run: |
         SYSROOT="$(rustc --print sysroot)"
         SRC="$SYSROOT/lib/rustlib/src/rust"
