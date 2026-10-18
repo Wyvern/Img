@@ -63,3 +63,11 @@ runs:
       uses: mlugg/setup-zig@v2
       with:
         version: ${{ inputs.version }}
+
+    - name: Update libc of rust std
+      run: |
+        SYSROOT="$(rustc --print sysroot)"
+        SRC="$SYSROOT/lib/rustlib/src/rust"
+
+        cargo update --manifest-path "$SRC/library/Cargo.toml" -p libc
+        grep -A3 '^name = "libc"$' "$SRC/library/Cargo.lock"
