@@ -13,7 +13,7 @@ for a in "$@"; do
   fi
 
   case "$a" in
-    --fix-cortex-a53-843419)
+    -Wl,--fix-cortex-a53-843419)
     ;;
     -Wl,-O*)
     ;;
