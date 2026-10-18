@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: ubuntu-26.04-arm
+    runs-on: ubuntu-26.04
 
     permissions:
       contents: write
@@ -34,12 +34,10 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install musl-tools -qy &>/dev/null &
+          # sudo apt install musl-tools -qy &>/dev/null &
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-            zig: true
 
       - name: Build Release
         run: |
