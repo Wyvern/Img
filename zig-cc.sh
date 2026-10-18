@@ -13,11 +13,13 @@ for a in "$@"; do
   fi
 
   case "$a" in
+    --fix-cortex-a53-843419)
+    ;;
     -Wl,-O*)
-      ;;
+    ;;
     *)
-      filtered+=("$a")
-      ;;
+    filtered+=("$a")
+    ;;
   esac
 done
 
