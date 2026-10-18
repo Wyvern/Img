@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: ubuntu-26.04-arm
+    runs-on: ubuntu-26.04
 
     permissions:
       contents: write
@@ -48,8 +48,13 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-
+          # https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-gnu.tar.xz
+          # https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-musl.tar.xz
+          mkdir rv32 && curl -fsSL https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-musl.tar.xz | tar -xJf - -C rv32 --strip-components=1
+          find rv32 -iname *gcc*
+          exit
           targets=(
+            riscv32gc-unknown-linux-musl
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
@@ -419,7 +424,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu musl-tools -qy &>/dev/null && touch ~/apt.finish &
+          sudo apt install gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
           nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
           nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
@@ -642,7 +647,7 @@ jobs:
     steps:
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-loongarch64-linux-gnu musl-tools -qy &>/dev/null && touch ~/apt.finish &
+          sudo apt install gcc-x86-64-linux-gnu gcc-x86-64-linux-gnux32 gcc-riscv64-linux-gnu gcc-s390x-linux-gnu gcc-powerpc64le-linux-gnu gcc-loongarch64-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
 
       - name: Checkout
         uses: actions/checkout@v7
@@ -711,7 +716,7 @@ jobs:
     steps:
       - name: Ubuntu apt update and install
         run: |
-           sudo apt install gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu musl-tools -qy &>/dev/null && touch ~/apt.finish &
+           sudo apt install gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
 
       - name: Checkout
         uses: actions/checkout@v7
