@@ -726,4 +726,4 @@ rustflags = ["-LWALI/build/sysroot/lib"]
 
 [target.aarch64-unknown-linux-musl]
 linker = "musl/bin/aarch64-unknown-linux-musl-gcc"
-rustflags = ["-Lmusl/aarch64-unknown-linux-musl/sysroot/usr/lib","Lmusl/lib"]
+rustflags = ["-Lmusl/aarch64-unknown-linux-musl/sysroot/usr/lib","-Lmusl/lib"]
