@@ -34,7 +34,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          # sudo apt install musl-tools -qy &>/dev/null &
+          sudo apt install musl-tools -qy &>/dev/null &
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
