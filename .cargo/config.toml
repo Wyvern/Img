@@ -262,9 +262,6 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs"
 ]
 
-[target.'cfg(all(target_os="linux",target_env="musl"))']
-rustflags = ["-Ctarget-feature=-crt-static"]
-
 [target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
 rustflags = [
   "-Clink-arg=-Wl,-O3",
@@ -725,4 +722,7 @@ linker = "l4re/bin/aarch64-l4re-gcc"
 
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/clang"
-rustflags = ["-LWALI/build/sysroot/lib","-Ctarget-feature=+crt-static"]
+rustflags = ["-LWALI/build/sysroot/lib"]
+
+[target.m68k-unknown-linux-gnu]
+linker = "m68k/bin/m68k-unknown-linux-gnu-gcc"
