@@ -711,8 +711,9 @@ linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
 rustflags = ["-lgcc_eh"]
 
 [target.riscv32gc-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=riscv32-linux-gnu"]
+linker = "rv32-gnu/bin/riscv32gc-unknown-linux-gnu-clang"
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=riscv32-linux-gnu"]
 
 [target.riscv32gc-unknown-linux-musl]
 linker = "rv32-musl/bin/riscv32-unknown-linux-musl-clang"

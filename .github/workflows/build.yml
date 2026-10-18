@@ -48,11 +48,11 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-          # https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-gnu.tar.xz
-          # https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-musl.tar.xz
+          mkdir rv32-gnu && curl -fsSL https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-gnu.tar.xz | tar -xJf - -C rv32-gnu --strip-components=1
           mkdir rv32-musl && curl -fsSL https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-musl.tar.xz | tar -xJf - -C rv32-musl --strip-components=1
 
           targets=(
+            riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
@@ -66,7 +66,6 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
-              riscv32gc-unknown-linux-musl
 
   WALI:
     name: WALI
