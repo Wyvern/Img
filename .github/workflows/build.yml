@@ -48,12 +48,7 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-          mkdir rv32-gnu && curl -fsSL https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-gnu.tar.xz | tar -xJf - -C rv32-gnu --strip-components=1
-          mkdir rv32-musl && curl -fsSL https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-musl.tar.xz | tar -xJf - -C rv32-musl --strip-components=1
-
           targets=(
-            riscv32gc-unknown-linux-gnu
-            riscv32gc-unknown-linux-musl
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
@@ -408,6 +403,7 @@ jobs:
       openwrt: "25.12.5"
       aarch64be: "2026.08-1"
       hexagon: "22.1.8"
+      riscv32: "20261007"
 
     permissions:
       contents: write
@@ -435,23 +431,44 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
-          path=/home/runner/aarch64be
+          path=aarch64be
           mkdir -p $path
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:aarch64be-${aarch64be}"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
-            ln -sfn $path/glibc aarch64be-gnu
-            ln -sfn $path/musl aarch64be-musl
+            ln -sfn $path/glibc $path-glibc
+            ln -sfn $path/musl $path-musl
           else
             for abi in glibc musl; do
               url=https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64be/tarballs/aarch64be--${abi}--stable-${aarch64be}.tar.xz
               mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1 &
+              ln -sfn $path/$abi $path-$abi
             done
-              ln -sfn $path/glibc aarch64be-gnu
-              ln -sfn $path/musl aarch64be-musl
             wait
             tar --zstd -C $path -cf /tmp/aarch64be-${aarch64be}.tar.zst .
             oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
+          fi
+
+      - name: Cache riscv32
+        run: |
+          IMAGE="${IMAGE,,}"
+
+          path=rv32
+          mkdir -p $path
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:riscv32-${$riscv32}"); then
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
+            ln -sfn $path/gnu $path-gnu
+            ln -sfn $path/musl $path-musl
+          else
+            for abi in gnu musl; do
+              url=https://github.com/cross-tools/clang-cross/releases/download/${riscv32}/riscv32-unknown-linux-${abi}.tar.xz
+              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJf -C "$path/$abi" --strip-components=1 &
+              ln -sfn $path/$abi $path-$abi
+            done
+            wait
+            tar --zstd -C $path -cf /tmp/riscv32-${$riscv32}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:riscv32-${$riscv32}" "/tmp/riscv32-${$riscv32}.tar.zst:application/vnd.wyvern.riscv32.tar.zstd" &
           fi
 
       - name: Cache hexagon
@@ -500,7 +517,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          cargo s riscv32gc-unknown-linux-musl
+          exit
           targets=(
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
@@ -528,6 +546,8 @@ jobs:
             # x86_64-unknown-l4re-uclibc
             hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
+            riscv32gc-unknown-linux-gnu
+            riscv32gc-unknown-linux-musl
           )
 
           for target in ${targets[@]}; do
@@ -552,6 +572,8 @@ jobs:
               powerpc-unknown-linux-gnu
               powerpc-unknown-linux-musl
               mips64-openwrt-linux-musl
+              riscv32gc-unknown-linux-gnu
+              riscv32gc-unknown-linux-musl
 
 
   Linux-x32:
@@ -1946,8 +1968,6 @@ jobs:
 
           targets=(
             armeb-unknown-linux-gnueabi
-            riscv32gc-unknown-linux-gnu
-            riscv32gc-unknown-linux-musl
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
@@ -1968,8 +1988,6 @@ jobs:
         with:
           targets: |
             armeb-unknown-linux-gnueabi
-            riscv32gc-unknown-linux-gnu
-            riscv32gc-unknown-linux-musl
             powerpc-unknown-openbsd
             powerpc-unknown-netbsd
             mipsel-unknown-netbsd
