@@ -726,3 +726,6 @@ linker = "l4re/bin/aarch64-l4re-gcc"
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/clang"
 rustflags = ["-LWALI/build/sysroot/lib"]
+
+[target.aarch64-unknown-linux-musl]
+rustflags = ["-Clink-arg=--target=aarch64-linux-musl"]
