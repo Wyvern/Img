@@ -27,9 +27,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Nix Quick Install
-        uses: nixbuild/nix-quick-install-action@v35
-
       # - name: GHCR Setup
       #   uses: ./.github/actions/ghcr
       #   with:
@@ -53,8 +50,6 @@ jobs:
           # sudo mkdir -p /opt/x-tools
           # sudo curl -fsSL https://github.com/cross-tools/musl-cross/releases/download/20261001/aarch64-unknown-linux-musl.tar.xz | tar -xJf - -C /opt/x-tools
 
-          nix build --quiet -o aarch64-musl nixpkgs#pkgsCross.aarch64-multiplatform-musl.stdenv.cc
-
           targets=(
             aarch64-unknown-linux-musl
             # m68k-unknown-linux-gnu
@@ -64,7 +59,6 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
-          file target/aarch64-unknown-linux-musl/src/img
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
