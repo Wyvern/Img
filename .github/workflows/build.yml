@@ -463,7 +463,7 @@ jobs:
           else
             for abi in gnu musl; do
               url=https://github.com/cross-tools/clang-cross/releases/download/${riscv32}/riscv32-unknown-linux-${abi}.tar.xz
-              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1
+              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1 &
               ln -sfn $path/$abi $path-$abi
             done
             wait
@@ -517,8 +517,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s riscv32gc-unknown-linux-musl
-          exit
+
           targets=(
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
