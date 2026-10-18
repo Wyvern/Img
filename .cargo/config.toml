@@ -726,3 +726,4 @@ rustflags = ["-LWALI/build/sysroot/lib"]
 
 [target.aarch64-unknown-linux-musl]
 linker = "musl/bin/aarch64-unknown-linux-musl-gcc"
+rustflags = ["-Clink-arg=--sysroot=musl/aarch64-unknown-linux-musl/sysroot"]
