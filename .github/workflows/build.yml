@@ -463,7 +463,7 @@ jobs:
           else
             for abi in gnu musl; do
               url=https://github.com/cross-tools/clang-cross/releases/download/${riscv32}/riscv32-unknown-linux-${abi}.tar.xz
-              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJf -C "$path/$abi" --strip-components=1 &
+              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1
               ln -sfn $path/$abi $path-$abi
             done
             wait
