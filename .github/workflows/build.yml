@@ -1288,7 +1288,10 @@ jobs:
           cargo update
           set +e -x
 
-          alias cb='cross build -q --profile src -Zbuild-std=std,panic_abort --target'
+          cb()
+          {
+            cross build -q --profile src -Zbuild-std=std,panic_abort --target "$1"
+          }
 
           targets=(
             aarch64-unknown-nuttx
