@@ -456,7 +456,7 @@ jobs:
           path=rv32
           mkdir -p $path
 
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:riscv32-${$riscv32}"); then
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:riscv32-${riscv32}"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
             ln -sfn $path/gnu $path-gnu
             ln -sfn $path/musl $path-musl
@@ -467,8 +467,8 @@ jobs:
               ln -sfn $path/$abi $path-$abi
             done
             wait
-            tar --zstd -C $path -cf /tmp/riscv32-${$riscv32}.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:riscv32-${$riscv32}" "/tmp/riscv32-${$riscv32}.tar.zst:application/vnd.wyvern.riscv32.tar.zstd" &
+            tar --zstd -C $path -cf /tmp/riscv32-${riscv32}.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:riscv32-${riscv32}" "/tmp/riscv32-${riscv32}.tar.zst:application/vnd.wyvern.riscv32.tar.zstd" &
           fi
 
       - name: Cache hexagon
