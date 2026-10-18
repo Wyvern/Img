@@ -64,7 +64,7 @@ runs:
       with:
         version: ${{ inputs.version }}
 
-    - name: Update deps of rust std
+    - name: Update rust std package
       shell: bash
       run: |
         SYSROOT="$(rustc --print sysroot)"
