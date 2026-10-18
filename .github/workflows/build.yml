@@ -27,6 +27,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Nix Quick Install
+        uses: nixbuild/nix-quick-install-action@v35
+
       # - name: GHCR Setup
       #   uses: ./.github/actions/ghcr
       #   with:
@@ -47,9 +50,12 @@ jobs:
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/rust-l4re-toolchain.tar.xz | tar -xJf - -C l4re --strip-components=1
-          sudo mkdir -p /opt/x-tools
-          sudo curl -fsSL https://github.com/cross-tools/musl-cross/releases/download/20261001/aarch64-unknown-linux-musl.tar.xz | tar -xJf - -C /opt/x-tools
+          # sudo mkdir -p /opt/x-tools
+          # sudo curl -fsSL https://github.com/cross-tools/musl-cross/releases/download/20261001/aarch64-unknown-linux-musl.tar.xz | tar -xJf - -C /opt/x-tools
 
+          nix build --quiet -o aarch64-musl nixpkgs#pkgsCross.aarch64-multiplatform-musl.stdenv.cc
+          find aarch64-musl -iname *gcc*
+          exit
           targets=(
             aarch64-unknown-linux-musl
             # m68k-unknown-linux-gnu
