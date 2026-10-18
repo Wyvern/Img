@@ -47,7 +47,6 @@ jobs:
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/rust-l4re-toolchain.tar.xz | tar -xJf - -C l4re --strip-components=1
-          mkdir -p m68k && curl -fsSL https://github.com/cross-tools/gnu-cross/releases/download/20261001/m68k-unknown-linux-gnu.tar.xz | tar -xJf - -C m68k --strip-components=1
 
           targets=(
             m68k-unknown-linux-gnu
@@ -57,7 +56,6 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
-          file target/m68k-unknown-linux-gnu/src/img
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries

@@ -725,4 +725,5 @@ linker = "WALI/build/llvm/bin/clang"
 rustflags = ["-LWALI/build/sysroot/lib"]
 
 [target.m68k-unknown-linux-gnu]
-linker = "m68k/bin/m68k-unknown-linux-gnu-gcc"
+linker = "./zig-cc.sh"
+rustflags = ["-Clink-arg=--target=m68k-linux-gnu"]
