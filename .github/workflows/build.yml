@@ -54,8 +54,7 @@ jobs:
           # sudo curl -fsSL https://github.com/cross-tools/musl-cross/releases/download/20261001/aarch64-unknown-linux-musl.tar.xz | tar -xJf - -C /opt/x-tools
 
           nix build --quiet -o aarch64-musl nixpkgs#pkgsCross.aarch64-multiplatform-musl.stdenv.cc
-          ls -hl aarch64-musl/bin
-          exit
+
           targets=(
             aarch64-unknown-linux-musl
             # m68k-unknown-linux-gnu
