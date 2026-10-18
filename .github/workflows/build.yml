@@ -57,6 +57,7 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target
           done
+          file target/m68k-unknown-linux-gnu/src/img
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
