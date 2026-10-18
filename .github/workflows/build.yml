@@ -51,7 +51,7 @@ jobs:
           # https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-gnu.tar.xz
           # https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-musl.tar.xz
           mkdir rv32 && curl -fsSL https://github.com/cross-tools/clang-cross/releases/download/20261007/riscv32-unknown-linux-musl.tar.xz | tar -xJf - -C rv32 --strip-components=1
-          find rv32 -iname *gcc*
+          find rv32 -iname *clang*
           exit
           targets=(
             riscv32gc-unknown-linux-musl
