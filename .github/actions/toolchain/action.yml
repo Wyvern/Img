@@ -69,6 +69,4 @@ runs:
       run: |
         SYSROOT="$(rustc --print sysroot)"
         SRC="$SYSROOT/lib/rustlib/src/rust"
-
         cargo update --manifest-path "$SRC/library/Cargo.toml"
-        grep -A3 '^name = "libc"$' "$SRC/library/Cargo.lock"
