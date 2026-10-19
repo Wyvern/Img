@@ -112,12 +112,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-          git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
-            cd WALI
-            ./install-deps.sh
-            ./quick_setup.sh
-            make libcxx
-            cd ..
+          find WALI -iname libunwind*
+          exit
           targets=(
              wasm32-wali-linux-musl
           )
