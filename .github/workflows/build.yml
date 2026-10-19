@@ -49,7 +49,6 @@ jobs:
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           targets=(
-            aarch64-unknown-linux-gnu
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
