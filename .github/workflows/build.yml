@@ -1933,7 +1933,7 @@ jobs:
           # cargo s aarch64_be-unknown-linux-gnu_ilp32
           # cargo s aarch64-unknown-linux-gnu_ilp32
           # exit
-          cargo s armeb-unknown-linux-gnueabi
+          zig cc -target armeb-linux-gnueabi -fuse-ld=lld -Wl,--icf=all -### -x c /dev/null -o /tmp/test
           exit
           targets=(
             armeb-unknown-linux-gnueabi
