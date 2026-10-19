@@ -195,7 +195,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [target."cfg(all())"]
 rustflags = [
-  # "-Ctarget-feature=-crt-static",
+  "-Ctarget-feature=-crt-static",
   "-Csymbol-mangling-version=hashed",
   "-Coverflow-checks=no",
   "-Cforce-frame-pointers=no",
@@ -254,14 +254,14 @@ rustflags = [
 rustflags = ["-Zstaticlib-hide-internal-symbols"]
 
 [target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_arch="m68k",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="powerpc64",target_env="gnu"),all(target_arch="arm",target_endian="big")))))']
-# rustflags = [
-#   "-Clink-self-contained=+linker",
-#   "-Clinker-features=+lld",
-#   "-Clinker-plugin-lto",
-#   "-Clink-arg=-Wl,--icf=all",
-#   "-Clink-arg=-Wl,--relax",
-#   "-Clink-arg=-Wl,-z,pack-relative-relocs"
-# ]
+rustflags = [
+  "-Clink-self-contained=+linker",
+  "-Clinker-features=+lld",
+  "-Clinker-plugin-lto",
+  "-Clink-arg=-Wl,--icf=all",
+  "-Clink-arg=-Wl,--relax",
+  "-Clink-arg=-Wl,-z,pack-relative-relocs"
+]
 
 [target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
 rustflags = [
@@ -335,8 +335,7 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 linker = "aarch64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="ohos"),not(target_abi="x32")))']
-# linker = "x86_64-linux-gnu-gcc"
-linker = "./zig-cc.sh"
+linker = "x86_64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32"))']
 linker = "x86_64-linux-gnux32-gcc"
