@@ -624,6 +624,7 @@ jobs:
             armv5te-unknown-linux-uclibceabi
             armv5te-unknown-linux-gnueabi
             armv5te-unknown-linux-musleabi
+            armv4t-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf
             arm-unknown-linux-musleabi
@@ -654,6 +655,7 @@ jobs:
             armv5te-unknown-linux-uclibceabi
             armv5te-unknown-linux-gnueabi
             armv5te-unknown-linux-musleabi
+            armv4t-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf
             arm-unknown-linux-musleabi
