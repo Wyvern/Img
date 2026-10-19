@@ -98,7 +98,7 @@ jobs:
             cd WALI
             sudo ./install-deps.sh
             sudo ./quick_setup.sh
-            make libcxx
+            sudo make libcxx
             cd ..
             touch ~/wali.finish
             tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
