@@ -253,7 +253,7 @@ rustflags = [
 [target.'cfg(all(target_family = "unix", crate_type = "staticlib"))']
 rustflags = ["-Zstaticlib-hide-internal-symbols"]
 
-[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_abi="abin32",target_abi="ilp32",target_arch="csky",target_arch="m68k",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="powerpc64",target_env="gnu"),all(target_arch="arm",target_endian="big")))))']
+[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_abi="ilp32",target_arch="csky",target_arch="m68k",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="powerpc64",target_env="gnu"),all(target_arch="arm",target_endian="big")))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -388,7 +388,7 @@ linker = "mipsel-linux-gnu-gcc"
 [target.'cfg(all(target_arch="mips",target_os="linux",target_env="musl"))']
 rustflags = ["-Ctarget-feature=-soft-float"]
 
-[target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6",target_arch="mips",target_arch="mipsel"),target_os="linux",not(target_abi="abin32")))']
+[target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6",target_arch="mips",target_arch="mipsel"),target_os="linux"))']
 rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 
 [target.'cfg(all(target_arch="mips64r6",target_os="linux",target_endian = "big"))']
@@ -730,6 +730,3 @@ rustflags = ["-LWALI/build/sysroot/lib","-LWALI/build/libcxx/lib/","-Ctarget-fea
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 # rustflags = ["-Crelocation-model=static"]
-
-[target.mips64-linux-gnuabin32]
-linker = "./zig-cc.sh"

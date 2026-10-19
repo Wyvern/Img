@@ -38,8 +38,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-          zig: true
+        # with:
+        #   zig: true
 
       - name: Build Release
         run: |
@@ -49,10 +49,7 @@ jobs:
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           targets=(
-              mips64-linux-gnuabin32.json
-              # mips64-linux-muslabin32
-              # mips64el-linux-gnuabin32
-              # mips64el-linux-muslabin32
+            armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
