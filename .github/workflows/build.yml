@@ -65,7 +65,7 @@ jobs:
   WALI:
     name: WALI
     if: true
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: write
