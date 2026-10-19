@@ -111,15 +111,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          dpkg -L libunwind-dev | grep -E 'libunwind\.(a|so)$' || true
 
-          find WALI/build/sysroot -type f \
-            \( -name 'libunwind.a' -o -name 'libunwind.so' \) -print
-
-          WALI/build/llvm/bin/clang \
-            --target=wasm32-linux-muslwali \
-            -print-search-dirs
-            exit
           targets=(
              wasm32-wali-linux-musl
           )
