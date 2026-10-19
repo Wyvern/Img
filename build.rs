@@ -13,7 +13,7 @@ fn main() {
     let target_family = std::env::var("CARGO_CFG_TARGET_FAMILY");
 
     if target_env.is_ok_and(|e| e.starts_with("musl")) {
-        println!("cargo::rustc-link-lib=m");
+        // println!("cargo::rustc-link-lib=m");
     }
 
     #[cfg(feature = "espidf")]
