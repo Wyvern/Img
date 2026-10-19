@@ -725,7 +725,7 @@ linker = "l4re/bin/aarch64-l4re-gcc"
 
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/clang"
-rustflags = ["-Ctarget-feature=+crt-static"]
+rustflags = ["-LWALI/build/sysroot/lib","-Ctarget-feature=+crt-static"]
 
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
