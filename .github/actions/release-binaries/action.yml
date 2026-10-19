@@ -67,8 +67,9 @@ runs:
       shell: bash
       run: |
         bin=${{ steps.project.outputs.name }}
+        tag=${{ inputs.tag }}
         if [[ -d ./target ]]; then
-          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl --color=always {} + | grep --color=always -E "$bin.*" || true
+          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | grep -E "target/.*/$tag/ | $bin.*" || true
         fi
 
     - uses: actions/upload-artifact@v7
