@@ -1608,8 +1608,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s wasm32-wali-linux-musl
-          exit
+
           time {
               set +x
               while [[ ! -f ~/apt.finish ]]; do
