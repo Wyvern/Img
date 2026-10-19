@@ -85,14 +85,13 @@ jobs:
           # sudo apt install  libunwind-dev libunwind8 -qy >/dev/null &
 
       - name: WALI cache
-        if: false
         run: |
           IMAGE="${IMAGE,,}"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
             mkdir -p WALI && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "WALI" && touch ~/wali.finish &
           else
             export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden"
-            export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden -fno-exceptions -fno-rtti"
+            export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden"
             export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
 
             git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
@@ -113,14 +112,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
-            cd WALI
-            ./install-deps.sh
-            ./quick_setup.sh
-            make libcxx
-            cd ..
-          find WALI -iname libunwind*
-          exit
+
           targets=(
              wasm32-wali-linux-musl
           )
