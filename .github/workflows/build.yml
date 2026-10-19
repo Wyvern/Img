@@ -64,7 +64,7 @@ jobs:
 
   WALI:
     name: WALI
-    if: true
+    if: false
     runs-on: ubuntu-26.04-arm
 
     permissions:
@@ -1633,11 +1633,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Ubuntu apt update and install
         run: |
           {
             sudo apt install gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish
           } &>/dev/null &
+
+      - name: WALI cache
+        run: |
+          IMAGE="${IMAGE,,}"
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
+            mkdir -p WALI && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "WALI" && touch ~/wali.finish &
+          else
+            export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden"
+            export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden -fno-exceptions -fno-rtti"
+            export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
+
+            git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
+            cd WALI
+            sudo ./install-deps.sh
+            ./quick_setup.sh
+            make libcxx
+            cd ..
+            touch ~/wali.finish
+            tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
+            oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
+          fi
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -1657,6 +1683,7 @@ jobs:
           }
 
           targets=(
+            wasm32-wali-linux-musl
             i686-pc-windows-gnu
             i686-win7-windows-gnu
             x86_64-pc-windows-gnu
@@ -1672,6 +1699,7 @@ jobs:
         uses: ./.github/actions/release-binaries
         with:
           targets: |
+            wasm32-wali-linux-musl
             i686-pc-windows-gnu
             i686-win7-windows-gnu
             x86_64-pc-windows-gnu
