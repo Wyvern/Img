@@ -85,6 +85,7 @@ jobs:
           # sudo apt install  libunwind-dev libunwind8 -qy >/dev/null &
 
       - name: WALI cache
+        if: false
         run: |
           IMAGE="${IMAGE,,}"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
@@ -96,9 +97,9 @@ jobs:
 
             git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
             cd WALI
-            sudo ./install-deps.sh
-            sudo ./quick_setup.sh
-            sudo make libcxx
+            ./install-deps.sh
+            ./quick_setup.sh
+            make libcxx
             cd ..
             touch ~/wali.finish
             tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
@@ -112,6 +113,12 @@ jobs:
         run: |
           cargo update
           set +e -x
+          git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
+            cd WALI
+            ./install-deps.sh
+            ./quick_setup.sh
+            make libcxx
+            cd ..
           find WALI -iname libunwind*
           exit
           targets=(
