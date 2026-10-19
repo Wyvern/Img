@@ -1578,6 +1578,7 @@ jobs:
           } &>/dev/null &
 
       - name: WALI cache
+        if: false
         run: |
           IMAGE="${IMAGE,,}"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
