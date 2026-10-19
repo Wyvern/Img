@@ -96,7 +96,7 @@ jobs:
 
             git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
             cd WALI
-            ./install-deps.sh
+            sudo ./install-deps.sh
             ./quick_setup.sh
             make libcxx
             cd ..
