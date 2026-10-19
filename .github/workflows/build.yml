@@ -1578,7 +1578,6 @@ jobs:
           } &>/dev/null &
 
       - name: WALI cache
-        if: false
         run: |
           IMAGE="${IMAGE,,}"
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
@@ -1590,6 +1589,7 @@ jobs:
 
             git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
             cd WALI
+            sed -i '/^\[llvm\]/,/^\[/ s/^version = ".*"/version = "22.1.8"/' toolchains/wali.toml
             sudo ./install-deps.sh
             ./quick_setup.sh
             make libcxx
@@ -1608,7 +1608,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          cargo s wasm32-wali-linux-musl
+          exit
           time {
               set +x
               while [[ ! -f ~/apt.finish ]]; do
@@ -1616,15 +1617,6 @@ jobs:
               done
           }
 
-          git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
-            cd WALI
-             sed -i '/^\[llvm\]/,/^\[/ s/^version = ".*"/version = "22.1.8"/' toolchains/wali.toml
-            sudo ./install-deps.sh
-            ./quick_setup.sh
-            make libcxx
-            cd ..
-          cargo s wasm32-wali-linux-musl
-          exit
           targets=(
             i586-unknown-linux-gnu
             i586-unknown-linux-musl
