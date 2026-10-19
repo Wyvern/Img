@@ -1615,6 +1615,15 @@ jobs:
               done
           }
 
+          git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
+            cd WALI
+             sed -i '/^\[llvm\]/,/^\[/ s/^version = ".*"/version = "22.1.8"/' toolchains/wali.toml
+            sudo ./install-deps.sh
+            ./quick_setup.sh
+            make libcxx
+            cd ..
+          cargo s wasm32-wali-linux-musl
+          exit
           targets=(
             i586-unknown-linux-gnu
             i586-unknown-linux-musl
