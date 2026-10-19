@@ -64,20 +64,11 @@ runs:
         & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -all -products *
 
     - name: Show build target binaries
-      if: false
       shell: bash
       run: |
         bin=${{ steps.project.outputs.name }}
         if [[ -d ./target ]]; then
-          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | grep --color=always -P "(?<=target/)[^/]*(?=/src/)|$bin.*" || true
-        fi
-
-    - name: Show build target binaries
-      shell: bash
-      run: |
-        bin=${{ steps.project.outputs.name }}
-        if [[ -d ./target ]]; then
-          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | perl -pe 's{(target/)([^/]*)(/src/)}{$1 . "\e[1;32m" . $2 . "\e[0m" . $3}ge; s{(\Q'"$bin"'\E[^\s]*)}{"\e[1;93m$1\e[0m"}ge'  || true
+          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | perl -pe 's{(target/)([^/]*)(/src/)}{$1 . "\e[1;32m" . $2 . "\e[0m" . $3}ge; s{(\Q'"$bin"'\E[^\s]*)}{"\e[1;93m$1\e[0m"}ge' || true
         fi
 
     - uses: actions/upload-artifact@v7
