@@ -68,7 +68,7 @@ runs:
       run: |
         bin=${{ steps.project.outputs.name }}
         if [[ -d ./target ]]; then
-          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | grep -E "target/.*/src/ | $bin.*" || true
+          find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | grep -E "target/.*/src|$bin.*" || true
         fi
 
     - uses: actions/upload-artifact@v7
