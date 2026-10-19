@@ -1627,7 +1627,6 @@ jobs:
           for target in ${targets[@]}; do
             time cargo s $target &
           done
-
           wait
 
       - name: Upload release binaries
@@ -1934,7 +1933,8 @@ jobs:
           # cargo s aarch64_be-unknown-linux-gnu_ilp32
           # cargo s aarch64-unknown-linux-gnu_ilp32
           # exit
-
+          cargo s armeb-unknown-linux-gnueabi
+          exit
           targets=(
             armeb-unknown-linux-gnueabi
             powerpc-unknown-openbsd
