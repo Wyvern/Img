@@ -656,7 +656,7 @@ linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
 
 [target.armeb-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi","-Clink-arg=-Wl,--icf=all"]
+rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
 
 [target.i586-unknown-redox]
 linker = "redox/i586-unknown-redox/bin/i586-unknown-redox-gcc"
