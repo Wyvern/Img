@@ -21,4 +21,7 @@ for a in "$@"; do
   esac
 done
 
-exec zig cc "${filtered[@]}"
+printf 'arg: <%s>\n' "${filtered[@]}" >&2
+exec zig cc -fuse-ld=lld "${filtered[@]}"
+
+# exec zig cc "${filtered[@]}"
