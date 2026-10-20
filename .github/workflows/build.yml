@@ -1758,6 +1758,7 @@ jobs:
          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Yocto downloads
+        if: false
         run: |
           IMAGE="${IMAGE,,}"
           url=https://downloads.yoctoproject.org/releases/yocto/yocto-${YOCTO}/toolchain/x86_64
@@ -1810,13 +1811,15 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-          time waitfor ~/yocto.finish
+          # time waitfor ~/yocto.finish
 
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
 
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
+            echo $target $env
+            continue
             {
               source $sdk/$env &>/dev/null
               unset RUST_TARGET_PATH
@@ -1833,7 +1836,12 @@ jobs:
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
-          targets: ${{ steps.targets.outputs.targets }}
+          targets: |
+            aarch64-oe-linux-gnu
+            armv7-oe-linux-gnueabihf
+            # i686-oe-linux-gnu
+            riscv64-oe-linux-gnu
+            x86_64-oe-linux-gnu
 
   Zig-Mac:
     name: Zig-Mac
