@@ -22,6 +22,6 @@ runs:
       run: |
         {
           echo "targets<<EOF"
-          printf '%s\n' "$TARGETS"
+          printf '%s\n' "$TARGETS" | sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d'
           echo "EOF"
         } >> "$GITHUB_OUTPUT"
