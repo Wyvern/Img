@@ -21,3 +21,21 @@ waitfor() {
   done
   { set -x; } 2>/dev/null
 }
+
+cross()
+{
+  cross build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
+}
+
+docker_linker() {
+  local linker="$1" image="$2"
+  cat > "$linker" <<EOF
+#!/bin/sh
+exec docker run --rm \\
+  -v "\$PWD:\$PWD" \\
+  -w "\$PWD" \\
+  "$image" \\
+  "\$@"
+EOF
+  chmod +x "$linker"
+}

@@ -68,7 +68,7 @@ jobs:
           done
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: |
 
@@ -154,7 +154,7 @@ jobs:
           done
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -243,7 +243,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -342,7 +342,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -508,7 +508,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -572,7 +572,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -630,7 +630,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -687,7 +687,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -770,7 +770,7 @@ jobs:
           lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -937,21 +937,15 @@ jobs:
 
           (
             time waitfor ~/ems.finish
+            set +x
             source ./emsdk/emsdk_env.sh &>/dev/null
+            set -x
             time cargo s ${targets[3]}
           ) &
 
           (
             time waitfor ~/hurd.finish
-            cat > i686-gnu-gcc <<'EOF'
-          #!/bin/sh
-          exec docker run --rm \
-            -v "$PWD:$PWD" \
-            -w "$PWD" \
-            ghcr.io/wyvern/img:hurd-i686 \
-            "$@"
-          EOF
-            chmod +x i686-gnu-gcc
+            docker_linker i686-gnu-gcc ghcr.io/wyvern/img:hurd-i686
             time cargo s ${targets[4]}
           ) &
 
@@ -964,7 +958,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -1207,38 +1201,24 @@ jobs:
           cargo update
           set +e -x
 
-          cb()
-          {
-            cross build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
-          }
-
           source .github/scripts/util.sh
           targets_from_env
 
           for target in "${targets[@]:0:2}"; do
-            time cb $target
+            time cross $target
           done
 
           for target in "${targets[@]:2:9}"; do
-            time cb $target &
+            time cross $target &
           done
 
-          cat > x86_64-unknown-haiku-gcc <<'EOF'
-          #!/bin/sh
-          exec docker run --rm \
-            -v "$PWD:$PWD" \
-            -w "$PWD" \
-            ghcr.io/wyvern/img:haiku-cross \
-            "$@"
-          EOF
-
-          chmod +x x86_64-unknown-haiku-gcc
+          docker_linker x86_64-unknown-haiku-gcc ghcr.io/wyvern/img:haiku-cross
           time cargo s ${targets[9]} &
 
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -1406,7 +1386,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -1431,9 +1411,6 @@ jobs:
         with:
           ccw: false
 
-      - name: Install MSYS2 packages
-        uses: ./.github/actions/msys2-packages
-
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
@@ -1445,11 +1422,9 @@ jobs:
             x86_64-pc-windows-msvc
             x86_64-uwp-windows-msvc
             x86_64-win7-windows-msvc
-            x86_64-uwp-windows-gnu
             i686-pc-windows-msvc
             i686-uwp-windows-msvc
             i686-win7-windows-msvc
-            i686-uwp-windows-gnu
 
       - name: Build release
         shell: bash
@@ -1470,7 +1445,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -1558,7 +1533,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -1583,9 +1558,6 @@ jobs:
         with:
           ccw: false
 
-      - name: Install MSYS2 packages
-        uses: ./.github/actions/msys2-packages
-
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
@@ -1597,11 +1569,9 @@ jobs:
             x86_64-pc-windows-msvc
             x86_64-uwp-windows-msvc
             x86_64-win7-windows-msvc
-            x86_64-uwp-windows-gnu
             i686-pc-windows-msvc
             i686-uwp-windows-msvc
             i686-win7-windows-msvc
-            i686-uwp-windows-gnu
 
       - name: Build release
         shell: bash
@@ -1622,12 +1592,12 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
-  Windows-thumb:
-    name: Windows-thumb
+  Thumb-msys2:
+    name: Thumb-msys2
     if: ${{ vars.TEST != '1' || vars.thumb == '1'  }}
     runs-on: windows-2025
 
@@ -1706,6 +1676,9 @@ jobs:
 
           Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
 
+      - name: Install MSYS2 packages
+        uses: ./.github/actions/msys2
+
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
@@ -1713,6 +1686,8 @@ jobs:
           targets: |
             thumbv7a-pc-windows-msvc
             thumbv7a-uwp-windows-msvc
+            i686-uwp-windows-gnu
+            x86_64-uwp-windows-gnu
 
       - name: Build release
         env:
@@ -1732,7 +1707,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
@@ -1833,7 +1808,7 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: |
             aarch64-oe-linux-gnu
@@ -1896,6 +1871,6 @@ jobs:
           wait
 
       - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+        uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
