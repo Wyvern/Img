@@ -935,19 +935,17 @@ jobs:
             time cargo s $target &
           done
 
-          (
+          {
             time waitfor ~/ems.finish
-            set +x
             source ./emsdk/emsdk_env.sh &>/dev/null
-            set -x
             time cargo s ${targets[3]}
-          ) &
+          } &
 
-          (
+          {
             time waitfor ~/hurd.finish
             docker_linker i686-gnu-gcc ghcr.io/wyvern/img:hurd-i686
             time cargo s ${targets[4]}
-          ) &
+          } &
 
           time waitfor ~/redox.finish
 
@@ -1793,14 +1791,12 @@ jobs:
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
             {
-              { set +x; } 2>/dev/null
               source $sdk/$env &>/dev/null
               unset RUST_TARGET_PATH
               for v in ${!CARGO_TARGET_@}; do
                   unset "$v"
               done
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-              { set -x; } 2>/dev/null
               time cargo s $target
             } &
           done
