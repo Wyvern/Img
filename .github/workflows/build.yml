@@ -46,8 +46,8 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            armv7-sony-vita-newlibeabihf
-            m68k-unknown-linux-gnu
+            # armv7-sony-vita-newlibeabihf
+            # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
 
@@ -60,11 +60,16 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-          source .github/scripts/targets.sh && targets_from_env
+          source .github/scripts/util.sh
+          targets_from_env
+          {
+            sleep 5
+            touch file.test
+          } &
+          time waitfor file.test
 
           for target in "${targets[@]}"; do
-            echo $target
-            # time cargo s $target
+            time cargo s $target
           done
 
       - name: Upload release binaries
@@ -146,16 +151,8 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]}"; do
             time cargo s $target
@@ -231,16 +228,8 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]:0:3}"; do
             time cargo s "$target" -Fespidf &
@@ -332,16 +321,8 @@ jobs:
 
           mv .cargo/config.toml .cargo/config.toml.bak
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           cb() {
             cargo build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
@@ -357,12 +338,7 @@ jobs:
 
           time cargo s "${targets[4]}" &
 
-          time {
-            set +x
-            while [[ ! -f ~/fuchsia.finish || ! -f ~/llvm.finish ]]; do
-              sleep 1
-            done
-          }
+          time waitfor ~/fuchsia.finish ~/llvm.finish
 
           for target in "${targets[@]:5}"; do
             time cargo s "$target" &
@@ -522,27 +498,14 @@ jobs:
           cargo update
           set +e -x
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]:0:2}"; do
             time cargo s "$target"
           done
 
-          time {
-            set +x
-            while [[ ! -f ~/apt.finish ]]; do
-              sleep 1
-            done
-          }
+          time waitfor ~/apt.finish
 
           for target in "${targets[@]:2}"; do
             time cargo s "$target" &
@@ -604,23 +567,9 @@ jobs:
           cargo update
           set +e -x
 
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
+          time waitfor ~/apt.finish
 
           for target in ${targets[@]}; do
             time cargo s $target &
@@ -676,23 +625,9 @@ jobs:
           cargo update
           set +e -x
 
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
+          time waitfor ~/apt.finish
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -747,23 +682,9 @@ jobs:
           cargo update
           set +e -x
 
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
+          time waitfor ~/apt.finish
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -842,16 +763,8 @@ jobs:
           cargo update
           set +e -x
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1020,39 +933,21 @@ jobs:
           cargo update
           set +e -x
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]:0:3}"; do
             time cargo s $target &
           done
 
           (
-            time {
-              set +x
-              while [[ ! -f ~/ems.finish ]]; do
-                  sleep 1
-              done
-            }
+            time waitfor ~/ems.finish
             source ./emsdk/emsdk_env.sh &>/dev/null
             time cargo s ${targets[3]}
           ) &
 
           (
-            time {
-              set +x
-              while [[ ! -f ~/hurd.finish ]]; do
-                  sleep 1
-              done
-            }
+            time waitfor ~/hurd.finish
             cat > i686-gnu-gcc <<'EOF'
           #!/bin/sh
           exec docker run --rm \
@@ -1065,12 +960,7 @@ jobs:
             time cargo s ${targets[4]}
           ) &
 
-          time {
-            set +x
-            while [[ ! -f ~/redox.finish ]]; do
-                sleep 1
-            done
-          }
+          time waitfor ~/redox.finish
 
           for target in "${targets[@]:5}"; do
               time cargo s "$target" &
@@ -1327,16 +1217,8 @@ jobs:
             cross build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
           }
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]:0:2}"; do
             time cb $target
@@ -1516,25 +1398,12 @@ jobs:
           cargo update
           set +e -x
 
-          time {
-              set +x
-              while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
-                  sleep 1
-              done
-          }
+          source .github/scripts/util.sh
+          targets_from_env
+
+          time waitfor ~/unix.sysroot ~/llvm.finish
 
           sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
-
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1596,16 +1465,8 @@ jobs:
           cargo update
           set +e -x
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1691,23 +1552,9 @@ jobs:
           cargo update
           set +e -x
 
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
+          time waitfor ~/apt.finish
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1770,16 +1617,8 @@ jobs:
           cargo update
           set +e -x
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1888,16 +1727,8 @@ jobs:
           cargo update
           set +e -x
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1980,26 +1811,12 @@ jobs:
           cargo update
           set +e -x
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
+          time waitfor ~/yocto.finish
 
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
-
-          time {
-              set +x
-              while [[ ! -e ~/yocto.finish ]]; do
-                  sleep 1
-              done
-          }
 
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
@@ -2070,16 +1887,8 @@ jobs:
           # exit
           # zig cc -target armeb-linux-gnueabi -fuse-ld=lld -Wl,--icf=all -### -x c /dev/null -o /tmp/test
 
-          {
-            set +x &>/dev/null
-            targets=()
-            if [[ -n "$TARGETS" ]]; then
-              while IFS= read -r line; do
-                targets+=("$line")
-              done <<< "$TARGETS"
-            fi
-            set -x
-          }
+          source .github/scripts/util.sh
+          targets_from_env
 
           for target in "${targets[@]}"; do
             time cargo s $target &
