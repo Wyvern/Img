@@ -804,7 +804,7 @@ jobs:
           set +e -x
 
           {
-            set +x
+            set +x &>/dev/null
             targets=()
             if [[ -n "$TARGETS" ]]; then
               while IFS= read -r line; do
