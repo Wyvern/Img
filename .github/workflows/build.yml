@@ -802,15 +802,19 @@ jobs:
         run: |
           cargo update
           set +e -x
+          {
+            set +x
+            targets=()
+            if [[ -n "$TARGETS" ]]; then
+              while IFS= read -r line; do
+                targets+=("$line")
+              done <<< "$TARGETS"
+            fi
+            set -x
+            echo "$TARGETS"
+            exit
+          }
 
-          targets=()
-          if [[ -n "$TARGETS" ]]; then
-            while IFS= read -r line; do
-              targets+=("$line")
-            done <<< "$TARGETS"
-          fi
-          echo "$TARGETS"
-          exit
           for target in "${targets[@]}"; do
             time cargo s $target &
           done
