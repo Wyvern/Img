@@ -522,7 +522,7 @@ rustflags = [
 
 [target.'cfg(target_os = "android")']
 rustflags = ["-Clink-arg=--sysroot=ndk/sysroot","-Clink-arg=-Wl,--icf=all",
-"-Clink-arg=-Wl,--relax"]
+"-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs"]
 
 [target.riscv64-linux-android]
 linker = "ndk/bin/riscv64-linux-android37-clang"
