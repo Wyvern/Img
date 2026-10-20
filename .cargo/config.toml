@@ -533,7 +533,13 @@ linker = "ndk/bin/aarch64-linux-android37-clang"
 [target.x86_64-linux-android]
 linker = "ndk/bin/x86_64-linux-android37-clang"
 
+[target.i686-linux-android]
+linker = "ndk/bin/i686-linux-android37-clang"
+
 [target.armv7-linux-androideabi]
+linker = "ndk/bin/armv7a-linux-androideabi37-clang"
+
+[target.arm-linux-androideabi]
 linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 
 [target.thumbv7neon-linux-androideabi]
