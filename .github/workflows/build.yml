@@ -295,7 +295,7 @@ jobs:
       - name: Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos
+          targets: x86_64-apple-darwin,aarch64-apple-ios,wasm32-wasip2,wasm32-wasip3,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,x86_64-fortanix-unknown-sgx,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -335,10 +335,11 @@ jobs:
             aarch64-apple-visionos
             aarch64-apple-watchos
             wasm32-wasip2
+            wasm32-wasip3
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
           )
-          # wasm32-wasip3
+
           for target in ${targets[@]}; do
             time cargo l $target
           done
