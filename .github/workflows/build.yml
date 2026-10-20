@@ -810,11 +810,9 @@ jobs:
                 targets+=("$line")
               done <<< "$TARGETS"
             fi
-            set -x
             echo "$TARGETS"
-            exit
           }
-
+          exit
           for target in "${targets[@]}"; do
             time cargo s $target &
           done
