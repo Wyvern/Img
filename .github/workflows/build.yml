@@ -777,7 +777,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          echo "$TARGETS"
+          exit
           mapfile -t targets <<< "$TARGETS"
 
           for target in "${targets[@]}"; do
