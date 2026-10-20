@@ -22,6 +22,15 @@ runs:
       run: |
         {
           echo "targets<<EOF"
-          printf '%s\n' "$TARGETS" | sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d'
+          printf '%s\n' "$TARGETS" |
+            awk '
+              /^[[:space:]]*#/ { next }
+              /^"/ {
+                split(substr($0, 2), a, /[[:space:]"]+/)
+                print a[1]
+                next
+              }
+              /^[^[:space:]"]+$/ { print }
+            '
           echo "EOF"
         } >> "$GITHUB_OUTPUT"

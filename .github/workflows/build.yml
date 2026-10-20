@@ -49,7 +49,10 @@ jobs:
             # armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
-            # x86_64-unknown-l4re-uclibc
+            x86_64-unknown-l4re-uclibc
+            "riscv64-oe-linux-gnu environment-setup-riscv64imafdc-poky-linux"
+            "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
+            # "i686-oe-linux-gnu environment-setup-core2-32-poky-linux"
 
       - name: Build Release
         env:
@@ -57,10 +60,14 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          echo $TARGETS
+          exit
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target
@@ -145,7 +152,10 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target
@@ -221,7 +231,10 @@ jobs:
           . espidf/export.sh
           } &>/dev/null
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]:0:3}"; do
             time cargo s "$target" -Fespidf &
@@ -313,7 +326,10 @@ jobs:
 
           mv .cargo/config.toml .cargo/config.toml.bak
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           cb() {
             cargo build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
@@ -494,7 +510,10 @@ jobs:
           cargo update
           set +e -x
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]:0:2}"; do
             time cargo s "$target"
@@ -574,7 +593,10 @@ jobs:
               done
           }
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in ${targets[@]}; do
             time cargo s $target &
@@ -637,7 +659,10 @@ jobs:
               done
           }
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -699,7 +724,10 @@ jobs:
               done
           }
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -777,9 +805,11 @@ jobs:
         run: |
           cargo update
           set +e -x
-          echo "$TARGETS"
-          exit
-          mapfile -t targets <<< "$TARGETS"
+
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -948,7 +978,10 @@ jobs:
           cargo update
           set +e -x
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]:0:3}"; do
             time cargo s $target &
@@ -1246,7 +1279,10 @@ jobs:
             cross build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
           }
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]:0:2}"; do
             time cb $target
@@ -1435,7 +1471,10 @@ jobs:
 
           sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1497,7 +1536,10 @@ jobs:
           cargo update
           set +e -x
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1590,7 +1632,10 @@ jobs:
               done
           }
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1653,7 +1698,10 @@ jobs:
           cargo update
           set +e -x
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1762,7 +1810,10 @@ jobs:
           cargo update
           set +e -x
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -1845,7 +1896,10 @@ jobs:
           cargo update
           set +e -x
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
@@ -1926,7 +1980,10 @@ jobs:
           # exit
           # zig cc -target armeb-linux-gnueabi -fuse-ld=lld -Wl,--icf=all -### -x c /dev/null -o /tmp/test
 
-          mapfile -t targets <<< "$TARGETS"
+          targets=()
+          if [[ -n "$TARGETS" ]]; then
+            mapfile -t targets <<< "$TARGETS"
+          fi
 
           for target in "${targets[@]}"; do
             time cargo s $target &
