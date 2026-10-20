@@ -802,6 +802,7 @@ jobs:
         run: |
           cargo update
           set +e -x
+
           {
             set +x
             targets=()
@@ -810,9 +811,10 @@ jobs:
                 targets+=("$line")
               done <<< "$TARGETS"
             fi
-            echo "$TARGETS"
+            set -x
           }
           exit
+
           for target in "${targets[@]}"; do
             time cargo s $target &
           done
