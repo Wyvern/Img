@@ -1811,7 +1811,7 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-          time waitfor ~/yocto.finish
+          # time waitfor ~/yocto.finish
 
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
@@ -1819,7 +1819,7 @@ jobs:
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
             echo $target $env
-            exit
+            continue
             {
               source $sdk/$env &>/dev/null
               unset RUST_TARGET_PATH
