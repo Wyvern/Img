@@ -329,7 +329,8 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_os="freebsd",target_os="netbsd",target_os="openbsd",target_os="dragonfly",target_os="fuchsia"))']
 linker = "clang"
-rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clinker-plugin-lto"]
+rustflags = ["-Clink-arg=-fuse-ld=lld","-Clink-arg=-Wl,--icf=all",
+"-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs","-Clinker-plugin-lto"]
 
 [target.x86_64-unknown-freebsd]
 rustflags = [
@@ -405,32 +406,28 @@ rustflags = [
 ]
 
 [target.'cfg(target_os = "android")']
-rustflags = ["-Clink-arg=--sysroot=ndk/sysroot"]
+rustflags = ["-Clink-arg=--sysroot=ndk/sysroot","-Clink-arg=-Wl,--icf=all",
+"-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs"]
 
 [target.riscv64-linux-android]
-ar = "ndk/bin/riscv64-linux-android-ar"
 linker = "ndk/bin/riscv64-linux-android37-clang"
 
 [target.aarch64-linux-android]
-ar = "ndk/bin/aarch64-linux-android-ar"
 linker = "ndk/bin/aarch64-linux-android37-clang"
 
 [target.x86_64-linux-android]
-ar = "ndk/bin/x86_64-linux-android-ar"
 linker = "ndk/bin/x86_64-linux-android37-clang"
 
 [target.armv7-linux-androideabi]
-ar = "ndk/bin/arm-linux-androideabi-ar"
 linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 
 [target.thumbv7neon-linux-androideabi]
-ar = "ndk/bin/arm-linux-androideabi-ar"
 linker = "ndk/bin/armv7a-linux-androideabi37-clang"
-
 
 [target.'cfg(target_env="ohos")']
 linker = "ohos/bin/clang"
-rustflags = ["-Clink-arg=--sysroot=ohos-root"]
+rustflags = ["-Clink-arg=--sysroot=ohos-root","-Clink-arg=-Wl,--icf=all",
+"-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs"]
 
 [target.aarch64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=aarch64--linux-ohos"]
