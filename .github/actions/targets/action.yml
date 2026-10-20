@@ -1,0 +1,27 @@
+name: Set Targets
+description: Accepts a multiline list of Rust targets and exposes it as an output
+
+inputs:
+  targets:
+    description: Newline-separated Rust target triples
+    required: true
+
+outputs:
+  targets:
+    description: Newline-separated Rust target triples
+    value: ${{ steps.set-targets.outputs.targets }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set targets
+      id: set-targets
+      shell: bash
+      env:
+        TARGETS: ${{ inputs.targets }}
+      run: |
+        {
+          echo "targets<<EOF"
+          printf '%s\n' "$TARGETS"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
