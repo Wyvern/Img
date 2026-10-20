@@ -542,7 +542,7 @@ linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 [target.'cfg(target_env="ohos")']
 linker = "ohos/bin/clang"
 rustflags = ["-Clink-arg=--sysroot=ohos-root","-Clink-arg=-Wl,--icf=all",
-"-Clink-arg=-Wl,--relax"]
+"-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs"]
 
 [target.aarch64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=aarch64--linux-ohos"]
