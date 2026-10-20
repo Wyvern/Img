@@ -138,7 +138,7 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           mapfile -t targets <<< "$TARGETS"
-          echo targets
+          echo "$TARGETS"
           exit
 
           for target in "${targets[@]}"; do
