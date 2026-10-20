@@ -1824,11 +1824,9 @@ jobs:
                 unset "$v"
             done
             export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-            time cargo s $target &
+            time cargo s $target
             )
           done
-
-          wait
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
