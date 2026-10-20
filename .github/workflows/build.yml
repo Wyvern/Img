@@ -52,6 +52,8 @@ jobs:
             # x86_64-unknown-l4re-uclibc
 
       - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
         run: |
           cargo update
           set +e -x
@@ -59,8 +61,10 @@ jobs:
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
           mapfile -t targets <<< "$TARGETS"
+
           echo "$TARGETS"
           exit
+
           for target in "${targets[@]}"; do
             time cargo s $target
           done
