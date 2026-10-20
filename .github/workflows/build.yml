@@ -813,7 +813,6 @@ jobs:
             fi
             set -x
           }
-          exit
 
           for target in "${targets[@]}"; do
             time cargo s $target &
