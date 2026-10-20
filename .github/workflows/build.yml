@@ -41,6 +41,16 @@ jobs:
         # with:
         #   zig: true
 
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
+            # armv7-sony-vita-newlibeabihf
+            # m68k-unknown-linux-gnu
+            # aarch64-unknown-l4re-uclibc
+            # x86_64-unknown-l4re-uclibc
+
       - name: Build Release
         run: |
           cargo update
@@ -48,13 +58,10 @@ jobs:
 
           # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
 
-          targets=(
-            # armv7-sony-vita-newlibeabihf
-            # m68k-unknown-linux-gnu
-            # aarch64-unknown-l4re-uclibc
-            # x86_64-unknown-l4re-uclibc
-          )
-          for target in ${targets[@]}; do
+          mapfile -t targets <<< "$TARGETS"
+          echo "$TARGETS"
+          exit
+          for target in "${targets[@]}"; do
             time cargo s $target
           done
 
@@ -138,8 +145,6 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           mapfile -t targets <<< "$TARGETS"
-          echo "$TARGETS"
-          exit
 
           for target in "${targets[@]}"; do
             time cargo s $target
@@ -193,18 +198,15 @@ jobs:
 
       - name: Set targets
         id: targets
-        shell: bash
-        run: |
-          cat >> "$GITHUB_OUTPUT" <<'EOF'
-          targets<<TARGETS
-          riscv32imac-esp-espidf
-          riscv32imafc-esp-espidf
-          riscv32imc-esp-espidf
-          xtensa-esp32-espidf
-          xtensa-esp32s2-espidf
-          xtensa-esp32s3-espidf
-          TARGETS
-          EOF
+        uses: ./.github/actions/targets
+        with:
+          targets: |
+            riscv32imac-esp-espidf
+            riscv32imafc-esp-espidf
+            riscv32imc-esp-espidf
+            xtensa-esp32-espidf
+            xtensa-esp32s2-espidf
+            xtensa-esp32s3-espidf
 
       - name: Build Release
         env:
@@ -289,20 +291,17 @@ jobs:
 
       - name: Set targets
         id: targets
-        shell: bash
-        run: |
-          cat >> "$GITHUB_OUTPUT" <<'EOF'
-          targets<<TARGETS
-          aarch64-unknown-hermit
-          aarch64_be-unknown-hermit
-          riscv64gc-unknown-hermit
-          x86_64-unknown-hermit
-          x86_64-fortanix-unknown-sgx
-          aarch64-unknown-fuchsia
-          riscv64gc-unknown-fuchsia
-          x86_64-unknown-fuchsia
-          TARGETS
-          EOF
+        uses: ./.github/actions/targets
+        with:
+          targets: |
+            aarch64-unknown-hermit
+            aarch64_be-unknown-hermit
+            riscv64gc-unknown-hermit
+            x86_64-unknown-hermit
+            x86_64-fortanix-unknown-sgx
+            aarch64-unknown-fuchsia
+            riscv64gc-unknown-fuchsia
+            x86_64-unknown-fuchsia
 
       - name: Build Release
         env:
@@ -324,6 +323,7 @@ jobs:
           done
 
           sleep 1
+
           mv .cargo/config.toml.bak .cargo/config.toml
 
           time cargo s "${targets[4]}" &
@@ -465,14 +465,11 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: Build Release
-        id: build
-        shell: bash
-        run: |
-          cargo update
-          set +e -x
-
-          targets=(
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
             powerpc-unknown-linux-gnu
@@ -488,13 +485,15 @@ jobs:
             mips64-openwrt-linux-musl
             riscv32gc-unknown-linux-gnu
             riscv32gc-unknown-linux-musl
-          )
 
-          {
-            echo "targets<<EOF"
-            printf '%s\n' "${targets[@]}"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          mapfile -t targets <<< "$TARGETS"
 
           for target in "${targets[@]:0:2}"; do
             time cargo s "$target"
@@ -515,7 +514,7 @@ jobs:
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
-          targets: ${{ steps.build.outputs.targets }}
+          targets: ${{ steps.targets.outputs.targets }}
 
 
   Linux-arm:
@@ -538,21 +537,11 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: Build Release
-        id: build
-        shell: bash
-        run: |
-          cargo update
-          set +e -x
-
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          targets=(
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
             thumbv7neon-unknown-linux-gnueabihf
             thumbv7neon-unknown-linux-musleabihf
             armv7-unknown-linux-musleabi
@@ -569,12 +558,23 @@ jobs:
             arm-unknown-linux-gnueabihf
             arm-unknown-linux-musleabi
             arm-unknown-linux-musleabihf
-          )
-          {
-            echo "targets<<EOF"
-            printf '%s\n' "${targets[@]}"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          mapfile -t targets <<< "$TARGETS"
+
           for target in ${targets[@]}; do
             time cargo s $target &
           done
@@ -583,7 +583,7 @@ jobs:
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
-          targets: ${{ steps.build.outputs.targets }}
+          targets: ${{ steps.targets.outputs.targets }}
 
   Linux-x64:
     name: Linux-x64
@@ -601,19 +601,11 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: Build Release
-        run: |
-          cargo update
-          set +e -x
-
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          targets=(
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
             aarch64-unknown-linux-gnu
             aarch64-unknown-linux-musl
             x86_64-unknown-linux-gnu
@@ -629,7 +621,22 @@ jobs:
             s390x-unknown-linux-musl
             loongarch64-unknown-linux-gnu
             loongarch64-unknown-linux-musl
-          )
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          mapfile -t targets <<< "$TARGETS"
 
           for target in "${targets[@]}"; do
             time cargo s $target &
@@ -639,22 +646,7 @@ jobs:
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
-          targets: |
-            riscv64gc-unknown-linux-gnu
-            riscv64gc-unknown-linux-musl
-            riscv64a23-unknown-linux-gnu
-            x86_64-unknown-linux-gnu
-            x86_64-unknown-linux-musl
-            x86_64-unknown-linux-gnux32
-            x86_64-unknown-linux-muslx32
-            powerpc64le-unknown-linux-gnu
-            powerpc64le-unknown-linux-musl
-            aarch64-unknown-linux-gnu
-            aarch64-unknown-linux-musl
-            s390x-unknown-linux-gnu
-            s390x-unknown-linux-musl
-            loongarch64-unknown-linux-gnu
-            loongarch64-unknown-linux-musl
+          targets: ${{ steps.targets.outputs.targets }}
 
   Linux-Mips:
     name: Linux-Mips
@@ -672,42 +664,9 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: Build Release
-        run: |
-          cargo update
-          set +e -x
-
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          targets=(
-            mips64-unknown-linux-gnuabi64
-            mips64-unknown-linux-muslabi64
-            mips64el-unknown-linux-gnuabi64
-            mips64el-unknown-linux-muslabi64
-            mipsel-unknown-linux-musl
-            mipsel-unknown-linux-gnu
-            mipsel-unknown-linux-uclibc
-            mips-unknown-linux-musl
-            mips-unknown-linux-gnu
-            mips-unknown-linux-uclibc
-            # mipsisa64r6-unknown-linux-gnuabi64
-            # mipsisa64r6el-unknown-linux-gnuabi64
-            # mipsisa32r6-unknown-linux-gnu
-            # mipsisa32r6el-unknown-linux-gnu
-          )
-
-          for target in "${targets[@]}"; do
-            time cargo s $target &
-          done
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
         with:
           targets: |
             mips64-unknown-linux-gnuabi64
@@ -724,6 +683,32 @@ jobs:
             # mipsisa64r6el-unknown-linux-gnuabi64
             # mipsisa32r6-unknown-linux-gnu
             # mipsisa32r6el-unknown-linux-gnu
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+          wait
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: ${{ steps.targets.outputs.targets }}
 
   macOS:
     name: macOS
@@ -764,12 +749,11 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
-      - name: Build Release
-        run: |
-          cargo update
-          set +e -x
-
-          targets=(
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
             aarch64-apple-ios
             arm64e-apple-ios
             aarch64-apple-tvos
@@ -785,33 +769,28 @@ jobs:
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             i686-pc-windows-gnullvm
-          )
 
-          for target in ${targets[@]}; do
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
             time cargo s $target &
           done
+
           wait
+
           lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
-          targets: |
-              x86_64h-apple-darwin
-              aarch64-apple-darwin
-              arm64e-apple-darwin
-              aarch64-apple-ios
-              arm64e-apple-ios
-              aarch64-apple-tvos
-              arm64e-apple-tvos
-              aarch64-apple-watchos
-              arm64_32-apple-watchos
-              aarch64-apple-visionos
-              aarch64-pc-windows-gnullvm
-              x86_64-pc-windows-gnullvm
-              i686-pc-windows-gnullvm
-              wasm32-wasip2
-              wasm32-wasip3
+          targets: ${{ steps.targets.outputs.targets }}
 
   Redox:
     name: Redox
@@ -945,18 +924,31 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
+            x86_64-unknown-motor
+            riscv32imac-unknown-xous-elf
+            x86_64-unknown-hurd-gnu
+            wasm32-unknown-emscripten
+            i686-unknown-hurd-gnu
+            aarch64-unknown-redox
+            riscv64gc-unknown-redox
+            x86_64-unknown-redox
+            i586-unknown-redox
+
       - name: Build Release
-        continue-on-error: true
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
         run: |
           cargo update
           set +e -x
 
-          targets=(
-            x86_64-unknown-motor
-            riscv32imac-unknown-xous-elf
-            x86_64-unknown-hurd-gnu
-          )
-          for target in ${targets[@]}; do
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]:0:3}"; do
             time cargo s $target &
           done
 
@@ -968,7 +960,7 @@ jobs:
               done
             }
             source ./emsdk/emsdk_env.sh &>/dev/null
-            time cargo s wasm32-unknown-emscripten
+            time cargo s ${targets[3]}
           ) &
 
           (
@@ -987,7 +979,7 @@ jobs:
             "$@"
           EOF
             chmod +x i686-gnu-gcc
-            time cargo s i686-unknown-hurd-gnu
+            time cargo s ${targets[4]}
           ) &
 
           time {
@@ -997,14 +989,7 @@ jobs:
             done
           }
 
-          targets=(
-              aarch64-unknown-redox
-              riscv64gc-unknown-redox
-              x86_64-unknown-redox
-              i586-unknown-redox
-          )
-
-          for target in "${targets[@]}"; do
+          for target in "${targets[@]:5}"; do
               time cargo s "$target" &
           done
 
@@ -1013,16 +998,7 @@ jobs:
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
-          targets: |
-              i586-unknown-redox
-              x86_64-unknown-redox
-              aarch64-unknown-redox
-              riscv64gc-unknown-redox
-              x86_64-unknown-motor
-              x86_64-unknown-hurd-gnu
-              i686-unknown-hurd-gnu
-              riscv32imac-unknown-xous-elf
-              wasm32-unknown-emscripten
+          targets: ${{ steps.targets.outputs.targets }}
 
   Solaris:
     name: Solaris
@@ -1240,7 +1216,25 @@ jobs:
           fi
           # cross --version
 
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
+            aarch64-unknown-nuttx
+            # riscv64gc-unknown-nuttx-elf
+            csky-unknown-linux-gnuabiv2
+            csky-unknown-linux-gnuabiv2hf
+            sparc64-unknown-netbsd
+            sparc64-unknown-openbsd
+            x86_64-unknown-illumos
+            sparcv9-sun-solaris
+            x86_64-pc-solaris
+            x86_64-unknown-haiku
+
       - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
         run: |
           cargo update
           set +e -x
@@ -1250,25 +1244,13 @@ jobs:
             cross build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
           }
 
-          targets=(
-            aarch64-unknown-nuttx
-            riscv64gc-unknown-nuttx-elf
-          )
-          for target in ${targets[@]}; do
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]:0:2}"; do
             time cb $target
           done
 
-          targets=(
-            csky-unknown-linux-gnuabiv2
-            csky-unknown-linux-gnuabiv2hf
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
-            x86_64-unknown-illumos
-            sparcv9-sun-solaris
-            x86_64-pc-solaris
-          )
-
-          for target in ${targets[@]}; do
+          for target in "${targets[@]:2:9}"; do
             time cb $target &
           done
 
@@ -1282,22 +1264,14 @@ jobs:
           EOF
 
           chmod +x x86_64-unknown-haiku-gcc
-          time cargo s x86_64-unknown-haiku &
+          time cargo s ${targets[9]} &
 
           wait
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
         with:
-          targets: |
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
-            x86_64-unknown-illumos
-            sparcv9-sun-solaris
-            x86_64-pc-solaris
-            x86_64-unknown-haiku
-            csky-unknown-linux-gnuabiv2
-            csky-unknown-linux-gnuabiv2hf
+          targets: ${{ steps.targets.outputs.targets }}
 
   Unix:
     name: Unix
@@ -1420,47 +1394,9 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: Build Release
-        run: |
-          cargo update
-          set +e -x
-
-          time {
-              set +x
-              while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
-
-          targets=(
-            x86_64-unknown-dragonfly
-            x86_64-unknown-freebsd
-            aarch64-unknown-freebsd
-            riscv64gc-unknown-freebsd
-            powerpc64-unknown-freebsd
-            powerpc64le-unknown-freebsd
-            powerpc-unknown-freebsd
-            i686-unknown-freebsd
-            armv7-unknown-freebsd
-            x86_64-unknown-openbsd
-            aarch64-unknown-openbsd
-            riscv64gc-unknown-openbsd
-            powerpc64-unknown-openbsd
-            x86_64-unknown-netbsd
-            aarch64-unknown-netbsd
-            aarch64_be-unknown-netbsd
-            riscv64gc-unknown-netbsd
-          )
-
-          for target in ${targets[@]}; do
-            time cargo s $target &
-          done
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
         with:
           targets: |
             x86_64-unknown-dragonfly
@@ -1480,6 +1416,34 @@ jobs:
             aarch64-unknown-netbsd
             aarch64_be-unknown-netbsd
             riscv64gc-unknown-netbsd
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/unix.sysroot || ! -f ~/llvm.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+          wait
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: ${{ steps.targets.outputs.targets }}
 
   Windows-11-Arm:
     name: Windows-11-arm
@@ -1505,33 +1469,9 @@ jobs:
       - name: Install MSYS2 packages
         uses: ./.github/actions/msys2-packages
 
-      - name: Build release
-        shell: bash
-        continue-on-error: true
-        run: |
-          cargo update
-          set +e -x
-
-          targets=(
-            aarch64-pc-windows-msvc
-            aarch64-uwp-windows-msvc
-            arm64ec-pc-windows-msvc
-            x86_64-pc-windows-msvc
-            x86_64-uwp-windows-msvc
-            x86_64-win7-windows-msvc
-            x86_64-uwp-windows-gnu
-            i686-pc-windows-msvc
-            i686-uwp-windows-msvc
-            i686-win7-windows-msvc
-            i686-uwp-windows-gnu
-          )
-          for target in ${targets[@]}; do
-            time cargo s $target &
-          done
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
         with:
           targets: |
             aarch64-pc-windows-msvc
@@ -1545,6 +1485,28 @@ jobs:
             i686-uwp-windows-msvc
             i686-win7-windows-msvc
             i686-uwp-windows-gnu
+
+      - name: Build release
+        shell: bash
+        continue-on-error: true
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+
+          wait
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: ${{ steps.targets.outputs.targets }}
 
   Windows-gnu:
     name: Windows-gnu
@@ -1597,36 +1559,9 @@ jobs:
         with:
           targets: i686-pc-windows-gnu
 
-      - name: Build Release
-        run: |
-          cargo update
-          set +e -x
-
-          time {
-              set +x
-              while [[ ! -f ~/apt.finish ]]; do
-                  sleep 1
-              done
-          }
-
-          targets=(
-            i586-unknown-linux-gnu
-            i586-unknown-linux-musl
-            i686-unknown-linux-gnu
-            i686-unknown-linux-musl
-            wasm32-wali-linux-musl
-            i686-pc-windows-gnu
-            i686-win7-windows-gnu
-            x86_64-pc-windows-gnu
-            x86_64-win7-windows-gnu
-          )
-          for target in ${targets[@]}; do
-            time cargo s $target &
-          done
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
         with:
           targets: |
             i586-unknown-linux-gnu
@@ -1638,6 +1573,33 @@ jobs:
             i686-win7-windows-gnu
             x86_64-pc-windows-gnu
             x86_64-win7-windows-gnu
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          time {
+              set +x
+              while [[ ! -f ~/apt.finish ]]; do
+                  sleep 1
+              done
+          }
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+
+          wait
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: ${{ steps.targets.outputs.targets }}
 
   Windows-2025:
     name: Windows-2025
@@ -1663,33 +1625,9 @@ jobs:
       - name: Install MSYS2 packages
         uses: ./.github/actions/msys2-packages
 
-      - name: Build release
-        shell: bash
-        continue-on-error: true
-        run: |
-          cargo update
-          set +e -x
-
-          targets=(
-              aarch64-pc-windows-msvc
-              aarch64-uwp-windows-msvc
-              arm64ec-pc-windows-msvc
-              x86_64-pc-windows-msvc
-              x86_64-uwp-windows-msvc
-              x86_64-win7-windows-msvc
-              x86_64-uwp-windows-gnu
-              i686-pc-windows-msvc
-              i686-uwp-windows-msvc
-              i686-win7-windows-msvc
-              i686-uwp-windows-gnu
-          )
-          for target in ${targets[@]}; do
-            time cargo s $target &
-          done
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
         with:
           targets: |
             aarch64-pc-windows-msvc
@@ -1703,6 +1641,28 @@ jobs:
             i686-uwp-windows-msvc
             i686-win7-windows-msvc
             i686-uwp-windows-gnu
+
+      - name: Build release
+        shell: bash
+        continue-on-error: true
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+
+          wait
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: ${{ steps.targets.outputs.targets }}
 
   Windows-thumb:
     name: Windows-thumb
@@ -1784,25 +1744,32 @@ jobs:
 
           Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
 
-      - name: Build release
-        run: |
-          cargo update
-
-          $targets = @(
-                  "thumbv7a-pc-windows-msvc",
-                  "thumbv7a-uwp-windows-msvc"
-                    )
-          foreach ($target in $targets) {
-              Write-Host "Building: $target"
-              Measure-Command { cargo s $target }
-          }
-
-      - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
         with:
           targets: |
             thumbv7a-pc-windows-msvc
             thumbv7a-uwp-windows-msvc
+
+      - name: Build release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        shell: bash
+        run: |
+          cargo update
+          set +e -x
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: ${{ steps.targets.outputs.targets }}
 
   Yocto:
     name: Yocto
@@ -1858,18 +1825,25 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
-      - name: Build Release
-        run: |
-          cargo update
-          set +e -x
-
-          targets=(
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
             "aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux"
             "armv7-oe-linux-gnueabihf environment-setup-cortexa8hf-neon-poky-linux-gnueabi"
             "riscv64-oe-linux-gnu environment-setup-riscv64imafdc-poky-linux"
             "x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux"
             # "i686-oe-linux-gnu environment-setup-core2-32-poky-linux"
-          )
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          mapfile -t targets <<< "$TARGETS"
 
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
@@ -1890,9 +1864,11 @@ jobs:
                 unset "$v"
             done
             export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-            time cargo s $target
+            time cargo s $target &
             )
           done
+
+          wait
 
       - name: Upload release binaries
         uses: ./.github/actions/release-binaries
@@ -1900,9 +1876,9 @@ jobs:
           targets: |
             aarch64-oe-linux-gnu
             armv7-oe-linux-gnueabihf
-            riscv64-oe-linux-gnu
+            i686-oe-linux-gnu
             x86_64-oe-linux-gnu
-            # i686-oe-linux-gnu
+            riscv64-oe-linux-gnu
 
   Zig-Mac:
     name: Zig-Mac
@@ -1921,35 +1897,9 @@ jobs:
         with:
             zig: true
 
-      - name: Build Release
-        run: |
-          cargo update
-          set +e -x
-
-          # cargo s aarch64_be-unknown-linux-gnu_ilp32
-          # cargo s aarch64-unknown-linux-gnu_ilp32
-          # exit
-          # zig cc -target armeb-linux-gnueabi -fuse-ld=lld -Wl,--icf=all -### -x c /dev/null -o /tmp/test
-
-          targets=(
-            armeb-unknown-linux-gnueabi
-            powerpc-unknown-openbsd
-            powerpc-unknown-netbsd
-            mipsel-unknown-netbsd
-            armv7-unknown-netbsd-eabihf
-            armv6-unknown-netbsd-eabihf
-            i586-unknown-netbsd
-            i686-unknown-netbsd
-            i686-unknown-openbsd
-          )
-
-          for target in ${targets[@]}; do
-            time cargo s $target &
-          done
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/release-binaries
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
         with:
           targets: |
             armeb-unknown-linux-gnueabi
@@ -1961,3 +1911,28 @@ jobs:
             i586-unknown-netbsd
             i686-unknown-netbsd
             i686-unknown-openbsd
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          # cargo s aarch64_be-unknown-linux-gnu_ilp32
+          # cargo s aarch64-unknown-linux-gnu_ilp32
+          # exit
+          # zig cc -target armeb-linux-gnueabi -fuse-ld=lld -Wl,--icf=all -### -x c /dev/null -o /tmp/test
+
+          mapfile -t targets <<< "$TARGETS"
+
+          for target in "${targets[@]}"; do
+            time cargo s $target &
+          done
+
+          wait
+
+      - name: Upload release binaries
+        uses: ./.github/actions/release-binaries
+        with:
+          targets: ${{ steps.targets.outputs.targets }}
