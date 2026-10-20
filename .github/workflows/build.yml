@@ -1043,7 +1043,7 @@ jobs:
 
     env:
       NETBSD_VERSION: "11.0"
-      OPENBSD_VERSION: "7.9"
+      OPENBSD_VERSION: "8.0"
 
     steps:
       - name: Checkout
@@ -1314,7 +1314,7 @@ jobs:
 
     env:
       FREEBSD: "15.1"
-      OPENBSD: "7.9"
+      OPENBSD: "8.0"
       NETBSD: "11.0"
       DFLY: "6.4.2"
 
@@ -1382,7 +1382,7 @@ jobs:
               done
 
               openbsd=(amd64 arm64 riscv64 powerpc64)
-              files=(base79 comp79)
+              files=(base80 comp80)
               for arch in "${openbsd[@]}"; do
                 if [ ! -d sysroot/openbsd/$arch ]; then
                   mkdir -p sysroot/openbsd/$arch

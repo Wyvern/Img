@@ -161,12 +161,12 @@ runs:
           if [[ "$os" == "windows" ]]; then
             mv target/$target/src/{$bin.exe,$name.exe} || true
             gh release upload $tag "target/$target/src/$name.exe" --clobber || true
-          elif [[ "$target" == wasm* ]]; then
-            mv target/$target/src/{$bin.wasm,$name.wasm} || true
-            gh release upload $tag "target/$target/src/$name.wasm" --clobber || true
           elif [[ "$os" == "emscripten" ]]; then
             tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src $bin.wasm $bin.js || true
             gh release upload $tag Wasm32-emscripten.tar.xz --clobber || true
+          elif [[ "$target" == wasm* ]]; then
+            mv target/$target/src/{$bin.wasm,$name.wasm} || true
+            gh release upload $tag "target/$target/src/$name.wasm" --clobber || true
           else
             mv target/$target/src/{$bin,$name} || true
             gh release upload $tag "target/$target/src/$name" --clobber || true
