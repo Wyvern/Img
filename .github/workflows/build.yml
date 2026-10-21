@@ -1698,9 +1698,6 @@ jobs:
           Write-Host "Using MSVC linker: $linker"
           Write-Host "Using MSVC ARM32 CRT: $armCrt"
 
-          where.exe link.exe
-          & $linker /?
-
       # - name: Install MSYS2 packages
       #   uses: ./.github/actions/msys2
 
