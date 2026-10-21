@@ -1215,7 +1215,7 @@ jobs:
           # /tools/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
 
           docker_linker nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest riscv-none-elf-gcc
-          time cargo s riscv64gc-unknown-nuttx-elf \
+          time cargo s riscv64gc-unknown-nuttx-elf.json \
             --config 'target.riscv64gc-unknown-nuttx-elf.linker="./nuttx"'
 
           exit
