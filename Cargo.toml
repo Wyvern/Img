@@ -30,10 +30,10 @@ serde_json = "*"
 [target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))))'.dependencies]
 file-format = "*"
 
-[target.'cfg(all(unix, not(target_os = "espidf")))'.build-dependencies]
+[target.'cfg(all(unix, not(any(target_os = "espidf",target_os="nuttx"))))'.dependencies]
 libc = "*"
 
-[target.'cfg(all(unix, not(target_os = "espidf")))'.dependencies]
+[target.'cfg(all(unix, not(any(target_os = "espidf",target_os="nuttx"))))'.build-dependencies]
 libc = "*"
 
 [target.'cfg(target_os = "espidf")'.dependencies]
