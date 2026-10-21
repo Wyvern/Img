@@ -1182,7 +1182,6 @@ jobs:
         with:
           targets: |
             aarch64-unknown-nuttx
-            # riscv64gc-unknown-nuttx-elf
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
             sparc64-unknown-netbsd
@@ -1202,16 +1201,16 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]:0:2}"; do
+          for target in "${targets[@]:0:1}"; do
             time cr $target
           done
 
-          for target in "${targets[@]:2:9}"; do
+          for target in "${targets[@]:1:8}"; do
             time cr $target &
           done
 
           docker_linker x86_64-unknown-haiku-gcc ghcr.io/wyvern/img:haiku-cross
-          time cargo s ${targets[9]} &
+          time cargo s ${targets[8]} &
 
           wait
 
@@ -1699,23 +1698,23 @@ jobs:
             time cargo s $target
           done
 
-      - name: Install MSYS2 packages
-        uses: ./.github/actions/msys2
-
-      - name: Build msys2 uwp
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        shell: bash
-        run: |
-          cargo update
-          set +e -x
-
-          source .github/scripts/util.sh
-          targets_from_env
-
-          for target in "${targets[@]:2}"; do
-            time cargo s $target
-          done
+#       - name: Install MSYS2 packages
+#         uses: ./.github/actions/msys2
+#
+#       - name: Build msys2 uwp
+#         env:
+#           TARGETS: ${{ steps.targets.outputs.targets }}
+#         shell: bash
+#         run: |
+#           cargo update
+#           set +e -x
+#
+#           source .github/scripts/util.sh
+#           targets_from_env
+#
+#           for target in "${targets[@]:2}"; do
+#             time cargo s $target
+#           done
 
       - name: Upload release binaries
         uses: ./.github/actions/upload

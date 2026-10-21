@@ -2,7 +2,7 @@
 image = "ghcr.io/wyvern/img:sparc64-unknown-netbsd11.0"
 
 [target.sparc64-unknown-openbsd]
-image = "ghcr.io/wyvern/img:sparc64-unknown-openbsd7.9"
+image = "ghcr.io/wyvern/img:sparc64-unknown-openbsd8.0"
 
 [target.sparcv9-sun-solaris]
 image = "ghcr.io/cross-rs/sparcv9-sun-solaris:main"
