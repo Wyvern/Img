@@ -1769,19 +1769,66 @@ jobs:
             done
             wait
             rm -rf yocto
-            sudo rm -rf /usr/local/lib/android
-            sudo rm -rf /usr/share/dotnet
-            sudo rm -rf /opt/ghc
-            sudo rm -rf /usr/local/share/powershell
-            sudo rm -rf /usr/local/share/chromium
-            sudo apt-get clean
-            sudo rm -rf /var/lib/apt/lists/*
-            sudo rm -rf /tmp/* /var/tmp/*
-            docker system prune -af
-            docker volume prune -f
             touch ~/yocto.finish
-            sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
-            oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
+            # sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
+            # oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
+
+            root="/opt/poky/$YOCTO"
+            ref="${IMAGE}:yocto${YOCTO}"
+            layer_type="application/vnd.wyvern.yocto.tar.zstd"
+            config_digest="sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+
+            # Pass 1: calculate the exact compressed size and digest.
+            metadata=$(
+              sudo tar --zstd -C "$root" -cf - . |
+                python3 -c '
+            import hashlib
+            import sys
+
+            h = hashlib.sha256()
+            size = 0
+            while True:
+                chunk = sys.stdin.buffer.read(1024 * 1024)
+                if not chunk:
+                    break
+                h.update(chunk)
+                size += len(chunk)
+
+            print(size, "sha256:" + h.hexdigest())
+            '
+            )
+            read -r size digest <<< "$metadata"
+
+            # Upload the empty OCI config blob required by the manifest.
+            printf '{}' |
+              oras blob push --size 2 "${IMAGE}@${config_digest}" -
+
+            # Pass 2: stream the archive directly to the registry.
+            sudo tar --zstd -C "$root" -cf - . |
+              oras blob push --size "$size" "${IMAGE}@${digest}" -
+
+            # Publish a tagged OCI manifest referencing the uploaded blob.
+            printf '{
+              "schemaVersion": 2,
+              "mediaType": "application/vnd.oci.image.manifest.v1+json",
+              "config": {
+                "mediaType": "application/vnd.oci.image.config.v1+json",
+                "digest": "%s",
+                "size": 2
+              },
+              "layers": [{
+                "mediaType": "%s",
+                "digest": "%s",
+                "size": %s,
+                "annotations": {
+                  "org.opencontainers.image.title": "yocto%s.tar.zst"
+                }
+              }]
+            }\n' "$config_digest" "$layer_type" "$digest" "$size" "$YOCTO" |
+              oras manifest push \
+                --media-type application/vnd.oci.image.manifest.v1+json \
+                "$ref" -
+
           fi
 
       - name: Toolchain Setup
