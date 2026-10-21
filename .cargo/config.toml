@@ -645,11 +645,11 @@ rustflags = ["-Clink-arg=--sysroot=sysroots/armv8a-poky-linux"]
 
 [target.armv7-oe-linux-gnueabihf]
 linker = "arm-poky-linux-gnueabi-gcc"
-rustflags = ["-Clink-arg=--sysroot=sysroots/cortexa8hf-neon-poky-linux-gnueabi"]
+rustflags = ["-Clink-arg=--sysroot=sysroots/cortexa8t2hf-neon-poky-linux-gnueabi"]
 
 [target.riscv64-oe-linux-gnu]
 linker = "riscv64-poky-linux-gcc"
-rustflags = ["-Clink-arg=--sysroot=sysroots/riscv64imafdc-poky-linux"]
+rustflags = ["-Clink-arg=--sysroot=sysroots/riscv64imafdc_zicsr_zifencei-poky-linux"]
 
 [target.x86_64-oe-linux-gnu]
 linker = "x86_64-poky-linux-gcc"
