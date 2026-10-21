@@ -862,10 +862,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 
     let mut no_ext = collections::HashMap::new();
     cfg_select! {
-        not(all(
-            unix,
-            not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
-        )) => {
+        not(all(unix, not(embedded_unix))) => {
             let mut no_ext_curl = process::Command::new("curl");
             no_ext_curl.args([
                 "-Z",
@@ -925,10 +922,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         if has_ext.is_none() {
             lr.map_or_else(
                 || {
-                    #[cfg(not(all(
-                        unix,
-                        not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
-                    )))]
+                    #[cfg(not(all(unix, not(embedded_unix))))]
                     no_ext_curl.arg(&url);
                     no_ext.insert(url.clone(), name.to_owned());
                 },
@@ -976,10 +970,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             curl.current_dir(path);
         }
 
-        #[cfg(all(
-            unix,
-            not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
-        ))]
+        #[cfg(all(unix, not(embedded_unix)))]
         {
             fn fork() -> io::Result<libc::pid_t> {
                 let pid = unsafe { libc::fork() };
@@ -1005,10 +996,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 Err(e) => quit!("Fork process failed: {e}"),
             }
         }
-        #[cfg(not(all(
-            unix,
-            not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
-        )))]
+        #[cfg(not(all(unix, not(embedded_unix))))]
         {
             no_ext_curl.output().map_or_else(
                 |e| pl!("Query content-type info failed: {}", e),
@@ -1049,10 +1037,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Infer file type through magic number
-#[cfg(all(
-    unix,
-    not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))
-))]
+#[cfg(all(unix, not(embedded_unix)))]
 fn magic_number_type(pb: path::PathBuf) {
     let t = file_format::FileFormat::from_file(&pb);
     fs::rename(
@@ -1241,7 +1226,7 @@ fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        all(unix, not(target_os = "espidf")) => {
+        all(unix, not(embedded_unix)) => {
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
         windows => run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz")),

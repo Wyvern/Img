@@ -16,6 +16,14 @@ fn main() {
         println!("cargo::rustc-link-lib=m");
     }
 
+    println!("cargo::rustc-check-cfg=cfg(embedded_unix)");
+    if matches!(
+        target_os.as_deref(),
+        Ok("espidf") | Ok("nuttx") | Ok("tvos") | Ok("watchos")
+    ) {
+        println!("cargo::rustc-cfg=embedded_unix")
+    }
+
     #[cfg(feature = "espidf")]
     if target_os.as_deref() == Ok("espidf") {
         embuild::espidf::sysenv::output();

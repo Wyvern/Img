@@ -27,7 +27,7 @@ cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 embuild = { version = "*", features = ["espidf"], optional = true }
 serde_json = "*"
 
-[target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "tvos", target_os = "watchos"))))'.dependencies]
+[target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "nuttx",target_os = "tvos", target_os = "watchos"))))'.dependencies]
 file-format = "*"
 
 [target.'cfg(all(unix, not(any(target_os = "espidf",target_os="nuttx"))))'.dependencies]
