@@ -744,6 +744,3 @@ rustflags = ["-LWALI/build/sysroot/lib","-LWALI/build/libcxx/lib/","-Ctarget-fea
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 # rustflags = ["-Crelocation-model=static"]
-
-[target.aarch64-unknown-nuttx]
-linker = "./aarch64-nuttx"

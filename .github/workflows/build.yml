@@ -1214,12 +1214,11 @@ jobs:
           # /tools/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc
           # /tools/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
 
-          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest ld.lld
-          time cargo s aarch64-unknown-nuttx
+          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
+          time cargo s aarch64-unknown-nuttx \
+            --config 'target.aarch64-unknown-nuttx.linker="./aarch64-nuttx"' \
+            --config 'target.aarch64-unknown-nuttx.linker-flavor="gcc"'
 
-          docker run --rm --entrypoint /bin/sh \
-            ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest \
-            -c 'find / -type d -name bin -exec find {} -maxdepth 1 -type f -name "*ld*" \; 2>/dev/null'
           exit
 
           for target in "${targets[@]:1:8}"; do
