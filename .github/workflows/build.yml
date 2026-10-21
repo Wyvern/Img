@@ -1204,6 +1204,11 @@ jobs:
 
           docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-ld
           time cargo s aarch64-unknown-nuttx
+
+          docker run --rm --entrypoint /bin/sh \
+            ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest \
+            -c 'find / -type f -name "*-ld" 2>/dev/null'
+
           exit
 
           for target in "${targets[@]:0:1}"; do
