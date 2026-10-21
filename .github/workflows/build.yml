@@ -1651,27 +1651,56 @@ jobs:
       - name: Link and Lib search config
         shell: pwsh
         run: |
-          $vcBin = Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\*\bin\HostX86\arm\link.exe" |
-          Select-Object -First 1 -ExpandProperty DirectoryName
-          if (-not $vcBin) { throw "MSVC ARM32 linker not found" }
-          $env:PATH = "$vcBin;$env:PATH"
-          "$vcBin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
-
           $msvcRoot = "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC"
 
-          $armCrt = Get-ChildItem "$msvcRoot\*\lib\arm\msvcrt.lib" -ErrorAction SilentlyContinue |
-              Sort-Object { [version]$_.Directory.Parent.Parent.Name } -Descending |
-              Select-Object -First 1
+          # Prefer the x64-hosted ARM32 linker; fall back to the x86-hosted linker.
+          $linker = $null
+          $toolsetRoot = $null
 
-          if (-not $armCrt) {
-              throw "MSVC ARM32 CRT libraries not found"
+          $toolsets = Get-ChildItem $msvcRoot -Directory |
+              Sort-Object {
+                  try { [version]$_.Name }
+                  catch { [version]'0.0' }
+              } -Descending
+
+          foreach ($toolset in $toolsets) {
+              foreach ($hostArch in @('Hostx64', 'HostX86')) {
+                  $candidate = Join-Path $toolset.FullName "bin\$hostArch\arm\link.exe"
+
+                  if (Test-Path $candidate) {
+                      $linker = $candidate
+                      $toolsetRoot = $toolset.FullName
+                      break
+                  }
+              }
+
+              if ($linker) { break }
           }
 
-          $armLib = $armCrt.Directory.FullName
+          if (-not $linker) {
+              throw "MSVC ARM32 linker not found under $msvcRoot"
+          }
+
+          $vcBin = Split-Path $linker
+          $armCrt = Join-Path $toolsetRoot 'lib\arm\msvcrt.lib'
+
+          if (-not (Test-Path $armCrt)) {
+              throw "MSVC ARM32 CRT not found for toolset $toolsetRoot"
+          }
+
+          $env:PATH = "$vcBin;$env:PATH"
+          $vcBin | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+
+          $armLib = Split-Path $armCrt
           $env:LIB = "$armLib;$env:LIB"
           "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
 
-          Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
+          Write-Host "Using MSVC linker: $linker"
+          Write-Host "Using MSVC ARM32 CRT: $armCrt"
+
+          where.exe link.exe
+          & $linker /?
+          exit 1
 
       # - name: Install MSYS2 packages
       #   uses: ./.github/actions/msys2
