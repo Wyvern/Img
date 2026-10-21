@@ -1698,8 +1698,8 @@ jobs:
           Write-Host "Using MSVC linker: $linker"
           Write-Host "Using MSVC ARM32 CRT: $armCrt"
 
-      # - name: Install MSYS2 packages
-      #   uses: ./.github/actions/msys2
+      - name: Install MSYS2 packages
+        uses: ./.github/actions/msys2
 
       - name: Set targets
         id: targets
@@ -1718,11 +1718,9 @@ jobs:
           cargo update
 
           $targets = @($env:TARGETS -split '\s+' | Where-Object { $_ })
-          foreach ($target in ($targets | Select-Object -First 2)) {
-            $timer = [System.Diagnostics.Stopwatch]::StartNew()
-            cargo s $target
-            $timer.Stop()
-            Write-Host ("Elapsed: {0}" -f $timer.Elapsed)
+          foreach ($target in $targets) {
+            Write-Host "`n+ Building $target"
+            Measure-Command { cargo s $target }
           }
 
       - name: Upload release binaries
