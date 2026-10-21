@@ -1721,7 +1721,9 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-
+          where.exe link.exe
+          where.exe link
+          exit
           for target in "${targets[@]:0:2}"; do
             time cargo s $target
           done
