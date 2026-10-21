@@ -263,7 +263,7 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs"
 ]
 
-[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",target_os="nuttx"))))']
+[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
 rustflags = [
   "-Clink-arg=-Wl,-O3",
   "-Clink-arg=-Wl,--gc-sections",
@@ -274,12 +274,12 @@ rustflags = [
   "-Clink-arg=-Wl,--strip-all",
 ]
 
-[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",target_os="nuttx",target_arch="csky"))))']
+[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",target_arch="csky"))))']
 rustflags = [
   "-Clink-arg=-Wl,--no-eh-frame-hdr"
 ]
 
-[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",target_os="nuttx",all(target_arch="aarch64",target_endian="big",target_os="linux"),all(target_arch="arm",target_endian="big",target_os="linux"))))']
+[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",all(target_arch="aarch64",target_endian="big",target_os="linux"),all(target_arch="arm",target_endian="big",target_os="linux"))))']
 rustflags = ["-Clink-arg=-Wl,-z,noseparate-code"]
 
 [target.'cfg(target_family="windows")']
