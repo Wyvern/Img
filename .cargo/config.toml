@@ -744,3 +744,9 @@ rustflags = ["-LWALI/build/sysroot/lib","-LWALI/build/libcxx/lib/","-Ctarget-fea
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 # rustflags = ["-Crelocation-model=static"]
+
+[target.thumbv7a-pc-windows-msvc]
+linker = 'C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.29.30133\bin\Hostx64\arm\link.exe'
+
+[target.thumbv7a-uwp-windows-msvc]
+linker = 'C:\Program Files\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC\14.29.30133\bin\Hostx64\arm\link.exe'
