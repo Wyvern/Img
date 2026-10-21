@@ -1769,9 +1769,18 @@ jobs:
             done
             wait
             rm -rf yocto
+            sudo rm -rf /usr/local/lib/android
+            sudo rm -rf /usr/share/dotnet
+            sudo rm -rf /opt/ghc
+            sudo rm -rf /usr/local/share/powershell
+            sudo rm -rf /usr/local/share/chromium
+            sudo apt-get clean
+            sudo rm -rf /var/lib/apt/lists/*
+            sudo rm -rf /tmp/* /var/tmp/*
+            docker system prune -af
+            docker volume prune -f
             touch ~/yocto.finish
             sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
-            rm -rf /opt/poky
             oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
           fi
 
