@@ -1214,7 +1214,7 @@ jobs:
           # /tools/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc
           # /tools/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
 
-          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest
+          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest rust-lld
           time cargo s aarch64-unknown-nuttx \
             --config 'target.aarch64-unknown-nuttx.linker="./aarch64-nuttx"'
 
