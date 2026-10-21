@@ -1771,6 +1771,7 @@ jobs:
             rm -rf yocto
             touch ~/yocto.finish
             sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
+            rm -rf /opt/poky
             oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
           fi
 
