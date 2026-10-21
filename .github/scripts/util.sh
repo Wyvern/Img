@@ -28,14 +28,15 @@ cr()
 }
 
 docker_linker() {
-  local linker="$1" image="$2"
+  local linker="$1" image="$2" exec_cmd="$3"
   cat > "$linker" <<EOF
 #!/bin/sh
 exec docker run --rm \\
   -v "\$PWD:\$PWD" \\
   -w "\$PWD" \\
   "$image" \\
-  "\$@"
+  ${exec_cmd:+$exec_cmd \\
+  }"\$@"
 EOF
   chmod +x "$linker"
 }

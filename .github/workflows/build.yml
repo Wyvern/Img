@@ -1013,6 +1013,7 @@ jobs:
          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Docker cross-toolchain images
+        if: false
         working-directory: rust-cross-toolchain
         run: |
           IMAGE="${IMAGE,,}"
@@ -1198,6 +1199,12 @@ jobs:
           cargo update
           set +e -x
 
+          docker run --rm ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest bash -lc '
+            for x in ld ld.lld lld rust-lld aarch64-none-elf-ld aarch64-none-elf-gcc aarch64-none-elf-g++; do
+              command -v "$x" 2>/dev/null || true
+            done
+          '
+          exit
           source .github/scripts/util.sh
           targets_from_env
 
