@@ -1714,19 +1714,16 @@ jobs:
       - name: Build release
         env:
           TARGETS: ${{ steps.targets.outputs.targets }}
-        shell: bash
         run: |
           cargo update
-          set +e -x
 
-          source .github/scripts/util.sh
-          targets_from_env
-          where.exe link.exe
-          where.exe link
-          exit
-          for target in "${targets[@]:0:2}"; do
-            time cargo s $target
-          done
+          $targets = @($env:TARGETS -split '\s+' | Where-Object { $_ })
+          foreach ($target in ($targets | Select-Object -First 2)) {
+            $timer = [System.Diagnostics.Stopwatch]::StartNew()
+            cargo s $target
+            $timer.Stop()
+            Write-Host ("Elapsed: {0}" -f $timer.Elapsed)
+          }
 
       - name: Upload release binaries
         uses: ./.github/actions/upload
