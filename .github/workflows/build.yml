@@ -1207,7 +1207,7 @@ jobs:
 
           docker run --rm --entrypoint /bin/sh \
             ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest \
-            -c 'find / -type f -name "*-ld" 2>/dev/null'
+            -c 'find / -type f -name "*-gcc" 2>/dev/null'
 
           exit
 
