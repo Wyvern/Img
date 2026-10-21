@@ -22,7 +22,7 @@ waitfor() {
   { set -x; } &>/dev/null
 }
 
-cross()
+cr()
 {
   cross build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
 }

@@ -1203,11 +1203,11 @@ jobs:
           targets_from_env
 
           for target in "${targets[@]:0:2}"; do
-            time cross $target
+            time cr $target
           done
 
           for target in "${targets[@]:2:9}"; do
-            time cross $target &
+            time cr $target &
           done
 
           docker_linker x86_64-unknown-haiku-gcc ghcr.io/wyvern/img:haiku-cross
@@ -1674,9 +1674,6 @@ jobs:
 
           Write-Host "Using MSVC ARM32 CRT: $($armCrt.FullName)"
 
-      - name: Install MSYS2 packages
-        uses: ./.github/actions/msys2
-
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
@@ -1687,7 +1684,7 @@ jobs:
             i686-uwp-windows-gnu
             x86_64-uwp-windows-gnu
 
-      - name: Build release
+      - name: Build thumb
         env:
           TARGETS: ${{ steps.targets.outputs.targets }}
         shell: bash
@@ -1698,11 +1695,27 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]}"; do
-            time cargo s $target &
+          for target in "${targets[@]:0:2}"; do
+            time cargo s $target
           done
 
-          wait
+      - name: Install MSYS2 packages
+        uses: ./.github/actions/msys2
+
+      - name: Build msys2 uwp
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        shell: bash
+        run: |
+          cargo update
+          set +e -x
+
+          source .github/scripts/util.sh
+          targets_from_env
+
+          for target in "${targets[@]:2}"; do
+            time cargo s $target
+          done
 
       - name: Upload release binaries
         uses: ./.github/actions/upload
