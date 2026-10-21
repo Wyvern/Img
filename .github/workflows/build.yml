@@ -1202,13 +1202,20 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-ld
+          # /tools/xtensa-esp-elf-gcc/bin/xtensa-esp32s2-elf-gcc
+          # /tools/xtensa-esp-elf-gcc/bin/xtensa-esp-elf-gcc
+          # /tools/xtensa-esp-elf-gcc/bin/xtensa-esp32-elf-gcc
+          # /tools/xtensa-esp-elf-gcc/bin/xtensa-esp32s3-elf-gcc
+          # /tools/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc
+          # /tools/riscv-none-elf-gcc/bin/riscv-none-elf-gcc
+          # /tools/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc
+          # /tools/pinguino-compilers/p32/bin/p32-gcc
+          # /tools/gcc-avr32-gnu/bin/avr32-gcc
+          # /tools/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc
+          # /tools/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
+
+          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           time cargo s aarch64-unknown-nuttx
-
-          docker run --rm --entrypoint /bin/sh \
-            ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest \
-            -c 'find / -type f -name "*-gcc" 2>/dev/null'
-
           exit
 
           for target in "${targets[@]:0:1}"; do
