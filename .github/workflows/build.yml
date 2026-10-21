@@ -1202,7 +1202,7 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
+          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-ld
           time cargo s aarch64-unknown-nuttx
           exit
 
