@@ -1700,7 +1700,6 @@ jobs:
 
           where.exe link.exe
           & $linker /?
-          exit 1
 
       # - name: Install MSYS2 packages
       #   uses: ./.github/actions/msys2
