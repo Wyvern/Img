@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: ubuntu-26.04-arm
+    runs-on: xcode-27
 
     permissions:
       contents: write
@@ -46,6 +46,9 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
+            aarch64-unknown-uefi
+            i686-unknown-uefi
+            x86_64-unknown-uefi
             # armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
@@ -1502,7 +1505,7 @@ jobs:
         with:
           targets: |
             aarch64-unknown-uefi
-            # i686-unknown-uefi
+            i686-unknown-uefi
             x86_64-unknown-uefi
             i586-unknown-linux-gnu
             i586-unknown-linux-musl
