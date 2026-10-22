@@ -1445,9 +1445,9 @@ jobs:
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
-  Windows-gnu:
-    name: Windows-gnu
-    if: ${{ vars.TEST != '1' || vars.wingnu == '1'  }}
+  Gnu-uefi-wali:
+    name: Gnu-uefi-wali
+    if: ${{ vars.TEST != '1' || vars.gnu == '1'  }}
     runs-on: ubuntu-26.04-arm
 
     permissions:
