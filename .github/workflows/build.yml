@@ -1333,7 +1333,7 @@ jobs:
               # oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
 
               source .github/scripts/util.sh
-              push_docker /home/runner/unix "${IMAGE}:unix" unix
+              push_docker /home/runner/unix "${IMAGE}:unix" unix &
             fi
 
       - name: Toolchain Setup
@@ -1501,6 +1501,9 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
+            aarch64-unknown-uefi
+            i686-unknown-uefi
+            x86_64-unknown-uefi
             i586-unknown-linux-gnu
             i586-unknown-linux-musl
             i686-unknown-linux-gnu
@@ -1517,7 +1520,8 @@ jobs:
         run: |
           cargo update
           set +e -x
-
+          cargo s aarch64-unknown-uefi
+          exit
           source .github/scripts/util.sh
           targets_from_env
           time waitfor ~/apt.finish
