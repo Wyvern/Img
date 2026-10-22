@@ -8,8 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SCCACHE_GHA_ENABLED: "on"
-  RUSTC_WRAPPER: "sccache"
+  # SCCACHE_GHA_ENABLED: "on"
+  # RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IMAGE: ghcr.io/${{ github.repository }}
 
@@ -66,7 +66,7 @@ jobs:
           targets_from_env
 
           for target in "${targets[@]}"; do
-            time cargo v $target
+            time cargo s $target
           done
 
       - name: Upload release binaries
