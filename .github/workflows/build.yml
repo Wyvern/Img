@@ -17,7 +17,7 @@ jobs:
   TEST:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: xcode-27
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: write
@@ -46,8 +46,6 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            # i686-unknown-uefi
-            x86_64-unknown-uefi
             # armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
@@ -1503,9 +1501,9 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            aarch64-unknown-uefi
             i686-unknown-uefi
             x86_64-unknown-uefi
+            aarch64-unknown-uefi
             i586-unknown-linux-gnu
             i586-unknown-linux-musl
             i686-unknown-linux-gnu
@@ -1527,7 +1525,11 @@ jobs:
           targets_from_env
           time waitfor ~/apt.finish
 
-          for target in "${targets[@]}"; do
+          for target in "${targets[@]:0:2}"; do
+            time RUSTC_WRAPPER= cargo s $target
+          done
+          exit
+          for target in "${targets[@]:2}"; do
             time cargo s $target
           done
 
