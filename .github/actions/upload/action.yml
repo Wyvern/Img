@@ -78,6 +78,7 @@ runs:
         path: |
           target/**/${{ env.PROJECT }}*
           !target/**/*.d
+          !target/**/*.pdb
         if-no-files-found: ignore
 
     - name: Upload binaries to a GitHub release
@@ -161,6 +162,9 @@ runs:
           if [[ "$os" == "windows" ]]; then
             mv target/$target/src/{$bin.exe,$name.exe} || true
             gh release upload $tag "target/$target/src/$name.exe" --clobber || true
+          elif [[ "$os" == "uefi" ]]; then
+            mv target/$target/src/{$bin.efi,$name.efi} || true
+            gh release upload $tag "target/$target/src/$name.efi" --clobber || true
           elif [[ "$os" == "emscripten" ]]; then
             tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src $bin.wasm $bin.js || true
             gh release upload $tag Wasm32-emscripten.tar.xz --clobber || true

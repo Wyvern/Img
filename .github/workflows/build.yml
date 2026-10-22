@@ -1520,8 +1520,7 @@ jobs:
         run: |
           cargo update
           set +e -x
-          cargo s aarch64-unknown-uefi
-          exit
+
           source .github/scripts/util.sh
           targets_from_env
           time waitfor ~/apt.finish
