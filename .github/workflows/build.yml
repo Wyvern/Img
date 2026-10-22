@@ -677,9 +677,12 @@ jobs:
           cargo update
           set +e -x
 
+          time waitfor ~/apt.finish
+          cargo s mipsisa64r6-unknown-linux-gnuabi64
+          exit
+
           source .github/scripts/util.sh
           targets_from_env
-          time waitfor ~/apt.finish
 
           for target in "${targets[@]}"; do
             time cargo s $target &
