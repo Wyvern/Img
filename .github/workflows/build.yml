@@ -1502,7 +1502,7 @@ jobs:
         with:
           targets: |
             aarch64-unknown-uefi
-            i686-unknown-uefi
+            # i686-unknown-uefi
             x86_64-unknown-uefi
             i586-unknown-linux-gnu
             i586-unknown-linux-musl
