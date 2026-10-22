@@ -1328,8 +1328,12 @@ jobs:
               wait
               chmod -R u+rwX sysroot
               touch ~/unix.sysroot
-              tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
-              oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
+
+              # tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
+              # oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
+
+              source .github/scripts/util.sh
+              push_docker /home/runner/unix "${IMAGE}:unix" unix
             fi
 
       - name: Toolchain Setup
