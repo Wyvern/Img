@@ -12,15 +12,16 @@ fn main() {
     let target_env = std::env::var("CARGO_CFG_TARGET_ENV");
     let target_family = std::env::var("CARGO_CFG_TARGET_FAMILY");
 
-    if target_env.is_ok_and(|e| e.starts_with("musl")) {
+    if matches!(target_env.as_deref(), Ok("musl")) {
         println!("cargo::rustc-link-lib=m");
     }
 
     println!("cargo::rustc-check-cfg=cfg(embedded_unix)");
-    if matches!(
+    let embed_unix = matches!(
         target_os.as_deref(),
         Ok("espidf") | Ok("nuttx") | Ok("tvos") | Ok("watchos")
-    ) {
+    );
+    if embed_unix {
         println!("cargo::rustc-cfg=embedded_unix")
     }
 
@@ -46,7 +47,7 @@ fn main() {
             c.args(["-czf", "web.tar.gz", output]);
             c
         }
-        Ok(t) if t.contains("unix") && target_os.as_deref() != Ok("espidf") => {
+        Ok("unix") if !embed_unix => {
             let mut c = process::Command::new("gzip");
             c.args(["-kf", output]);
             c
@@ -54,9 +55,4 @@ fn main() {
         _ => return,
     };
     assert!(cmd.status().unwrap().success());
-}
-
-#[test]
-fn build() {
-    main();
 }

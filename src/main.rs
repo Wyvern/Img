@@ -828,7 +828,9 @@ fn normarlize(url: &str, addr: &str) -> String {
 fn sanitize_path(name: &str) -> String {
     cfg_select! {
         target_vendor = "apple" => name.replace(":", "|"),
-        any(all(unix, not(target_vendor = "apple")), target_family = "wasm") => name.replace("/", "_"),
+        any(all(unix, not(target_vendor = "apple")), target_family = "wasm") => {
+            name.replace("/", "_")
+        }
         target_family = "windows" => name
             .chars()
             .map(|c| match c {
