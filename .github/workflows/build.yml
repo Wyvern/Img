@@ -1488,7 +1488,7 @@ jobs:
         run: |
           {
             sudo apt install gcc-i686-linux-gnu gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish
-          } &>/dev/null &
+          } >/dev/null &
 
       - name: WALI cache
         run: |
