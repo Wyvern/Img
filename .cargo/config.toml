@@ -241,6 +241,7 @@ rustflags = [
   "-Zcache-proc-macros",
   "-Zvalidate-mir=no",
   "-Zmir-move-elimination=y",
+  "-Zasync-panic=y",
   # "-Zwasm-proc-macros",
   # "-Zoffload=Device",
   # "-Zassumptions-on-binders",
