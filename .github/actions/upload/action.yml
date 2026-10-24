@@ -90,6 +90,7 @@ runs:
       run: |
         while IFS= read -r target; do
           [[ -z "$target" || "$target" =~ ^[[:space:]]*# ]] && continue
+          target="${target%% *}"
           target="${target%.json}"
           IFS='-' read -r arch vendor os abi <<< "$target"
 

@@ -14,8 +14,8 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  Zig-Musl:
-    name: Zig-Musl
+  Test:
+    name: Test
     if: ${{ vars.TEST == '1' }}
     runs-on: ubuntu-26.04-arm
 
@@ -38,36 +38,14 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-          zig: true
+        # with:
+        #   zig: true
 
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
         with:
           targets: |
-            i586-unknown-linux-musl x86-linux-musl
-            i686-unknown-linux-musl x86-linux-musl
-
-            # mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
-            # mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
-            # mipsel-unknown-linux-musl mipsel-linux-musleabi
-            # mips-unknown-linux-musl mips-linux-musleabi
-            # aarch64-unknown-linux-musl aarch64-linux-musl
-            # x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
-            # powerpc64le-unknown-linux-musl powerpc64le-linux-musl
-            # riscv64gc-unknown-linux-musl riscv64-linux-musl
-            # s390x-unknown-linux-musl s390x-linux-musl
-            # loongarch64-unknown-linux-musl loongarch64-linux-musl
-            # armv5te-unknown-linux-musleabi arm-linux-musleabi
-            # arm-unknown-linux-musleabi arm-linux-musleabi
-            # arm-unknown-linux-musleabihf arm-linux-musleabihf
-            # thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
-            # armv7-unknown-linux-musleabi arm-linux-musleabi
-            # armv7-unknown-linux-musleabihf arm-linux-musleabihf
-            # powerpc-unknown-linux-musl powerpc-linux-musleabi
-            # x86_64-unknown-linux-musl x86_64-linux-musl
-
             # x86_64-unikraft-linux-musl
             # armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
@@ -87,6 +65,69 @@ jobs:
           targets_from_env
 
           for entry in "${targets[@]}"; do
+            time cargo s $target
+          done
+
+      - name: Upload release binaries
+        uses: ./.github/actions/upload
+        with:
+          targets: |
+
+  Zig-Musl:
+    name: Zig-Musl
+    if: ${{ vars.TEST != '1' || vars.musl == '1'  }}
+    runs-on: ubuntu-26.04-arm
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
+        with:
+          zig: true
+
+      - name: Set targets
+        id: targets
+        uses: ./.github/actions/targets
+        with:
+          targets: |
+            i586-unknown-linux-musl x86-linux-musl
+            # i686-unknown-linux-musl x86-linux-musl
+            # x86_64-unknown-linux-musl x86_64-linux-musl
+            # x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
+            # powerpc64le-unknown-linux-musl powerpc64le-linux-musl
+            # powerpc-unknown-linux-musl powerpc-linux-musleabi
+            # riscv64gc-unknown-linux-musl riscv64-linux-musl
+            # s390x-unknown-linux-musl s390x-linux-musl
+            # loongarch64-unknown-linux-musl loongarch64-linux-musl
+            # aarch64-unknown-linux-musl aarch64-linux-musl
+            # armv5te-unknown-linux-musleabi arm-linux-musleabi
+            # arm-unknown-linux-musleabi arm-linux-musleabi
+            # arm-unknown-linux-musleabihf arm-linux-musleabihf
+            # thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
+            # armv7-unknown-linux-musleabi arm-linux-musleabi
+            # armv7-unknown-linux-musleabihf arm-linux-musleabihf
+            # mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
+            # mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
+            # mipsel-unknown-linux-musl mipsel-linux-musleabi
+            # mips-unknown-linux-musl mips-linux-musleabi
+
+      - name: Build Release
+        env:
+          TARGETS: ${{ steps.targets.outputs.targets }}
+        run: |
+          cargo update
+          set +e -x
+
+          source .github/scripts/util.sh
+          targets_from_env
+
+          for entry in "${targets[@]}"; do
             read -r target zig <<< "$entry"
             time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']"
           done
@@ -94,7 +135,7 @@ jobs:
       - name: Upload release binaries
         uses: ./.github/actions/upload
         with:
-          targets: |
+          targets: ${{ steps.targets.outputs.targets }}
 
   Android:
     name: Android
@@ -1863,12 +1904,7 @@ jobs:
       - name: Upload release binaries
         uses: ./.github/actions/upload
         with:
-          targets: |
-            aarch64-oe-linux-gnu
-            armv7-oe-linux-gnueabihf
-            i686-oe-linux-gnu
-            riscv64-oe-linux-gnu
-            x86_64-oe-linux-gnu
+          targets: ${{ steps.targets.outputs.targets }}
 
   Zig-BSD:
     name: Zig-BSD
