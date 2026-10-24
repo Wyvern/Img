@@ -87,10 +87,6 @@ jobs:
             push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc
           fi
 
-          find uclibc -type f -path '*-gcc'
-          exit
-
-
           for target in "${targets[@]}"; do
             time cargo s $target
           done

@@ -737,19 +737,19 @@ linker = "WALI/build/llvm/bin/clang"
 rustflags = ["-LWALI/build/sysroot/lib","-LWALI/build/libcxx/lib/","-Ctarget-feature=+crt-static"]
 
 [target.mipsel-unknown-linux-uclibc]
-linker = "mipsel-buildroot-linux-uclibc-gcc"
+linker = "uclibc/mips32el/bin/mipsel-buildroot-linux-uclibc-gcc.br_real"
 # rustflags = ["-Ctarget-feature=-soft-float"]
 [target.mips-unknown-linux-uclibc]
-linker = "mips-buildroot-linux-uclibc-gcc"
+linker = "uclibc/mips32/bin/mips-buildroot-linux-uclibc-gcc.br_real"
 # rustflags = ["-Ctarget-feature=-soft-float"]
 [target.armv7-unknown-linux-uclibceabi]
-linker = "arm-buildroot-linux-uclibceabi-gcc"
+linker = "uclibc/armv7-eabihf/bin/arm-buildroot-linux-uclibcgnueabihf-gcc.br_real"
 
 [target.armv7-unknown-linux-uclibceabihf]
-linker = "arm-buildroot-linux-uclibceabihf-gcc"
+linker = "uclibc/armv7-eabihf/bin/arm-buildroot-linux-uclibcgnueabihf-gcc.br_real"
 
 [target.armv5te-unknown-linux-uclibceabi]
-linker = "arm-buildroot-linux-uclibceabi-gcc"
+linker = "uclibc/armv5-eabi/bin/arm-buildroot-linux-uclibcgnueabi-gcc.br_real"
 
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
