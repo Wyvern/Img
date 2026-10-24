@@ -72,7 +72,6 @@ runs:
         fi
 
     - uses: actions/upload-artifact@v7
-      if: inputs.targets != ''
       with:
         name: ${{ inputs.artifact }}
         path: |

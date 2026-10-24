@@ -46,10 +46,13 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
-            armv7-unknown-linux-musleabi arm-linux-musleabi
-            armv7-unknown-linux-musleabihf arm-linux-musleabihf
+            armv5te-unknown-linux-musleabi arm-linux-musleabi
+            arm-unknown-linux-musleabi arm-linux-musleabi
+            arm-unknown-linux-musleabihf arm-linux-musleabihf
 
+            # thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
+            # armv7-unknown-linux-musleabi arm-linux-musleabi
+            # armv7-unknown-linux-musleabihf arm-linux-musleabihf
             # powerpc-unknown-linux-musl powerpc-linux-musleabi
             # x86_64-unknown-linux-musl x86_64-linux-musl
 
