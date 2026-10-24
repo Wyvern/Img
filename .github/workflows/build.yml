@@ -69,8 +69,8 @@ jobs:
           exec docker run --rm \
             -v "$PWD:$PWD" \
             -w "$PWD" \
-            "kraftkit.sh/base:latest" \
             --entrypoint x86_64-linux-gnu-gcc-12 \
+            "kraftkit.sh/base:latest" \
             "$@"
           EOF
             chmod +x "unikraft"
