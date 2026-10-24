@@ -46,9 +46,10 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            powerpc-unknown-linux-musl
+            powerpc-unknown-linux-musl powerpc-linux-musleabi
 
-            # x86_64-unknown-linux-musl
+            # x86_64-unknown-linux-musl x86_64-linux-musl
+
             # x86_64-unikraft-linux-musl
             # armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
@@ -67,9 +68,9 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]}"; do
-            zig="${target/-unknown/}"
-            time cargo s $target --config "target.${target}.rustflags = ['-Clink-arg=--target=${zig}eabi']"
+          for entry in "${targets[@]}"; do
+            read -r target zig <<< "$entry"
+            time cargo s $target --config "target.${target}.rustflags = ['-Clink-arg=--target=${zig}']"
           done
 
       - name: Upload release binaries
