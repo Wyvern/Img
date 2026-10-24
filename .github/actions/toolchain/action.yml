@@ -39,6 +39,8 @@ runs:
 
     - name: Sccache cache
       uses: mozilla-actions/sccache-action@main
+      with:
+          version: "v0.18.0"
 
     - name: Create C/C++ wrappers
       if: inputs.ccw == 'true'
