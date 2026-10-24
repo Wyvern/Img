@@ -35,7 +35,7 @@ exec docker run --rm \\
   -v "\$PWD:\$PWD" \\
   -w "\$PWD" \\
   "$image" \\
-  ${exec_cmd:+$exec_cmd \\
+  ${exec_cmd:+--entrypoint "$exec_cmd" \\
   }"\$@"
 EOF
   chmod +x "$linker"
