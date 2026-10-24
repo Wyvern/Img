@@ -64,7 +64,17 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
+          cat > "unikraft" <<EOF
+          #!/bin/sh
+          exec docker run --rm \
+            -v "$PWD:$PWD" \
+            -w "$PWD" \
+            "kraftkit.sh/base:latest" \
+            --entrypoint x86_64-linux-gnu-gcc-12 \
+            "$@"
+          EOF
+            chmod +x "unikraft"
+          # docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
 
           for target in "${targets[@]}"; do
             time cargo s $target --config "target.${target}.linker = './unikraft'"
