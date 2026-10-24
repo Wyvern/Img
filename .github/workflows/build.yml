@@ -66,8 +66,8 @@ jobs:
           targets_from_env
 
           for target in "${targets[@]}"; do
-            time cargo s $target
-            file target/$target/src/img
+            zig="${target/-unknown/}"
+            time cargo s $target --config 'target.$target.rustflags = ["-Clink-arg=--target=$zig"]'
           done
 
       - name: Upload release binaries
