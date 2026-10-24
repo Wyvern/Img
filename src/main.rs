@@ -985,7 +985,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             match fork() {
                 Ok(0) => {
                     curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
-                    curl.args(curl_args()).args(opts).status().unwrap();
+                    curl.args(curl_args())
+                        .args(opts)
+                        .status()
+                        .unwrap_or_else(|e| quit!("curl: {e}"));
                     for (_, f) in no_ext {
                         let file = path.join(&f);
                         if file.is_file() {
@@ -1211,7 +1214,7 @@ fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
         .stdin(process::Stdio::piped())
         .stdout(process::Stdio::piped())
         .spawn()
-        .unwrap_or_else(|e| quit!("Command {} error: {}", cmd, e));
+        .unwrap_or_else(|e| quit!("Run {} error: {}", cmd, e));
 
     if !input.is_empty() {
         use std::io::Write;

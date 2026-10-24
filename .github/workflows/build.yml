@@ -46,6 +46,7 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
+            x86_64-unikraft-linux-musl
             # armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
