@@ -236,7 +236,6 @@ rustflags = [
   "-Zshell-argfiles",
   "-Zchecksum-hash-algorithm=blake3",
   "-Zmir-strip-debuginfo=all-locals",
-  # "-Ztyping-mode-post-typeck-until-borrowck",
   # "-Zexperimental-default-bounds",
   # "-Zhigher-ranked-assumptions",
   # "-Zmir-move-elimination=y",
