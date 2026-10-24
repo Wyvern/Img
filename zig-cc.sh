@@ -13,6 +13,8 @@ for a in "$@"; do
   fi
 
   case "$a" in
+    -Wl,-melf_i386)
+    ;;
     -Wl,--fix-cortex-a53-843419)
     ;;
     -Wl,--no-rosegment)
