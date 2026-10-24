@@ -121,6 +121,8 @@ jobs:
             time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
           done
 
+          wait
+
       - name: Upload release binaries
         uses: ./.github/actions/upload
         with:
@@ -175,6 +177,8 @@ jobs:
               read -r target zig <<< "$entry"
               time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
             done
+
+            wait
 
         - name: Upload release binaries
           uses: ./.github/actions/upload
@@ -1046,14 +1050,6 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-
-          {
-            time waitfor ~/kraft.finish
-            docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
-            target="${targets[@]:9}"
-            time cargo s $target --config "target.${target}.linker = './unikraft'"
-          }
-          exit
 
           for target in "${targets[@]:0:3}"; do
             time cargo s $target &
