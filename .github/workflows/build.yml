@@ -69,7 +69,7 @@ jobs:
           exec docker run --rm \
             -v "$PWD:$PWD" \
             -w "$PWD" \
-            --entrypoint x86_64-linux-gnu-gcc-12 \
+            --entrypoint /usr/bin/x86_64-linux-gnu-gcc-12 \
             "kraftkit.sh/base:latest" \
             "$@"
           EOF
