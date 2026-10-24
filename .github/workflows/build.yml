@@ -69,7 +69,7 @@ jobs:
 
           for target in "${targets[@]}"; do
             zig="${target/-unknown/}"
-            time cargo s $target --config "target.${target}.rustflags = ['-Clink-arg=--target=${zig}']"
+            time cargo s $target --config "target.${target}.rustflags = ['-Clink-arg=--target=${zig}eabi']"
           done
 
       - name: Upload release binaries
@@ -493,6 +493,7 @@ jobs:
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
             powerpc-unknown-linux-gnu
+            powerpc-unknown-linux-musl
             powerpc64-unknown-linux-gnu
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
