@@ -48,7 +48,7 @@ jobs:
           targets: |
             mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
             mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
-            mipsel-unknown-linux-musl mipsel-unknown-linux-musleabi
+            mipsel-unknown-linux-musl mipsel-linux-musleabi
             mips-unknown-linux-musl mips-linux-musleabi
 
             # aarch64-unknown-linux-musl aarch64-linux-musl
