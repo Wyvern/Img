@@ -17,7 +17,7 @@ jobs:
   Test:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: write
@@ -46,7 +46,6 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            x86_64-unikraft-linux-musl
             # armv7-sony-vita-newlibeabihf
             # m68k-unknown-linux-gnu
             # aarch64-unknown-l4re-uclibc
@@ -64,10 +63,9 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
 
           for target in "${targets[@]}"; do
-            time cargo s $target --config "target.${target}.linker = './unikraft'"
+            time cargo s $target
           done
 
       - name: Upload release binaries
@@ -905,6 +903,8 @@ jobs:
         run: |
           IMAGE="${IMAGE,,}"
 
+          docker pull kraftkit.sh/base:latest >/dev/null && touch ~/kraft.finish &
+
           if docker manifest inspect "$IMAGE:hurd-i686" &>/dev/null; then
             docker pull "$IMAGE:hurd-i686" &>/dev/null && touch ~/hurd.finish &
           else
@@ -1035,6 +1035,7 @@ jobs:
             riscv64gc-unknown-redox
             x86_64-unknown-redox
             i586-unknown-redox
+            x86_64-unikraft-linux-musl
 
       - name: Build Release
         env:
@@ -1045,6 +1046,14 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
+
+          {
+            time waitfor ~/kraft.finish
+            docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
+            target="${targets[@]:9}"
+            time cargo s $target --config "target.${target}.linker = './unikraft'"
+          }
+          exit
 
           for target in "${targets[@]:0:3}"; do
             time cargo s $target &
@@ -1062,9 +1071,16 @@ jobs:
             time cargo s ${targets[4]}
           } &
 
+          {
+            time waitfor ~/kraft.finish
+            docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
+            target="${targets[@]:9}"
+            time cargo s $target --config "target.${target}.linker = './unikraft'"
+          } &
+
           time waitfor ~/redox.finish
 
-          for target in "${targets[@]:5}"; do
+          for target in "${targets[@]:5:9}"; do
               time cargo s "$target" &
           done
 
