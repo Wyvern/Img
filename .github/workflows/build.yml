@@ -46,8 +46,11 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            powerpc-unknown-linux-musl powerpc-linux-musleabi
+            thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
+            armv7-unknown-linux-musleabi arm-linux-musleabi
+            armv7-unknown-linux-musleabihf arm-linux-musleabihf
 
+            # powerpc-unknown-linux-musl powerpc-linux-musleabi
             # x86_64-unknown-linux-musl x86_64-linux-musl
 
             # x86_64-unikraft-linux-musl
@@ -494,7 +497,6 @@ jobs:
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
             powerpc-unknown-linux-gnu
-            powerpc-unknown-linux-musl
             powerpc64-unknown-linux-gnu
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl
@@ -560,21 +562,21 @@ jobs:
         with:
           targets: |
             thumbv7neon-unknown-linux-gnueabihf
-            thumbv7neon-unknown-linux-musleabihf
-            armv7-unknown-linux-musleabi
-            armv7-unknown-linux-musleabihf
+            thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
+            armv7-unknown-linux-musleabi arm-linux-musleabi
+            armv7-unknown-linux-musleabihf arm-linux-musleabihf
             armv7-unknown-linux-gnueabi
             armv7-unknown-linux-gnueabihf
             armv7-unknown-linux-uclibceabi
             armv7-unknown-linux-uclibceabihf
             armv5te-unknown-linux-uclibceabi
             armv5te-unknown-linux-gnueabi
-            armv5te-unknown-linux-musleabi
+            armv5te-unknown-linux-musleabi arm-linux-musleabi
             armv4t-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf
-            arm-unknown-linux-musleabi
-            arm-unknown-linux-musleabihf
+            arm-unknown-linux-musleabi arm-linux-musleabi
+            arm-unknown-linux-musleabihf arm-linux-musleabihf
 
       - name: Build Release
         env:
@@ -1872,9 +1874,9 @@ jobs:
             riscv64-oe-linux-gnu
             x86_64-oe-linux-gnu
 
-  Zig-Mac:
-    name: Zig-Mac
-    if: ${{ vars.TEST != '1' || vars.zig == '1'  }}
+  Zig-BSD:
+    name: Zig-BSD
+    if: ${{ vars.TEST != '1' || vars.bsd == '1'  }}
     runs-on: xcode-27
 
     steps:
