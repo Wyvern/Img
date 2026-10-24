@@ -634,12 +634,6 @@ rustflags = ["-lc"]
 [target.sparc64-unknown-netbsd]
 linker = "sparc64-unknown-netbsd-gcc"
 
-[target.mips-unknown-linux-uclibc]
-# rustflags = ["-Ctarget-feature=-soft-float"]
-
-[target.mipsel-unknown-linux-uclibc]
-# rustflags = ["-Ctarget-feature=-soft-float"]
-
 [target.aarch64-oe-linux-gnu]
 linker = "aarch64-poky-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=sysroots/armv8a-poky-linux"]
@@ -744,10 +738,10 @@ rustflags = ["-LWALI/build/sysroot/lib","-LWALI/build/libcxx/lib/","-Ctarget-fea
 
 [target.mipsel-unknown-linux-uclibc]
 linker = "mipsel-buildroot-linux-uclibc-gcc"
-
+# rustflags = ["-Ctarget-feature=-soft-float"]
 [target.mips-unknown-linux-uclibc]
 linker = "mips-buildroot-linux-uclibc-gcc"
-
+# rustflags = ["-Ctarget-feature=-soft-float"]
 [target.armv7-unknown-linux-uclibceabi]
 linker = "arm-buildroot-linux-uclibceabi-gcc"
 
