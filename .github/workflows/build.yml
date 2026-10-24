@@ -76,18 +76,18 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
-            mkdir uclibc && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C uclibc &
+            mkdir uclibc && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C uclibc >/dev/null
           else
             arch=(mips32 mips32el armv5-eabi armv7-eabihf)
             for a in "${arch[@]}"; do
               url="https://toolchains.bootlin.com/downloads/releases/toolchains/$a/tarballs/${a}--uclibc--stable-${uclibc}.tar.xz"
-              mkdir -p "uclibc/$a" && curl -fsSL "$url" | tar -xJf - -C "uclibc/$a"
-              ln -s "uclibc/$a" $a
+              mkdir -p "uclibc/$a" && curl -fsSL "$url" | tar -xJf - -C "uclibc/$a" &
             done
+            wait
             push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc
           fi
 
-          find uclibc/ -iname "*gcc*"
+          find uclibc -type f -path '*/bin/*' -iname '*-gcc'
           exit
 
 
