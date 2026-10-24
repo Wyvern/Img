@@ -86,8 +86,8 @@ jobs:
             wait
             push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc
           fi
-          ls -hl uclibc
-          find uclibc -type f -iname '*-gcc*'
+
+          find uclibc -type f -path '*/bin/*-gcc'
           exit
 
 
