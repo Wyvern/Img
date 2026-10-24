@@ -324,11 +324,7 @@ rustflags = [
 
 [target.'cfg(all(target_os="linux",target_env="musl",not(target_vendor="wali"),not(target_vendor="unikraft")))']
 linker = "./zig-cc.sh"
-rustflags = [
-  "-Clink-arg=-Wl,--icf=all",
-  "-Clink-arg=-Wl,--relax",
-  "-Clink-arg=-Wl,-z,pack-relative-relocs"
-]
+rustflags = ["-Clink-arg=-fuse-ld=lld"]
 
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=broadwell", "-Ztune-cpu=broadwell"]
