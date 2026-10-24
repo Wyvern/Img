@@ -76,7 +76,7 @@ jobs:
           IMAGE="${IMAGE,,}"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
-            mkdir uclibc && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C uclibc >/dev/null
+            mkdir uclibc && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C uclibc && ~/uclibc.finish
           else
             arch=(mips32 mips32el armv5-eabi armv7-eabihf)
             for a in "${arch[@]}"; do
