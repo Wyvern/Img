@@ -116,6 +116,8 @@ runs:
                 name="$(cap $vendor)-${arch}-${abi}"
             elif [[ "$vendor" == "oe" ]]; then
                 name="OpenEmbedded-${arch}-${abi}"
+            elif [[ "$vendor" == "unikraft" ]]; then
+                name="Unikraft-${arch}-${abi}"
             elif [[ "$vendor" == "pc" ]]; then
                 if [[ "$abi" == "msvc" ]]; then
                   name="$(cap $os)-${arch}"
