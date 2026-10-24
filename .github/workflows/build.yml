@@ -17,7 +17,7 @@ jobs:
   Test:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-26.04-arm
 
     permissions:
       contents: write
@@ -65,7 +65,7 @@ jobs:
           targets_from_env
 
           docker run --rm --entrypoint sh kraftkit.sh/base:latest -c '
-          find /usr/bin /usr/local/bin /usr/local /opt /tools \
+          find /usr/bin /usr/local/bin /bin /opt /tools \
             -type f -executable \
             \( -name "ld" -o -name "ld.*" \
                -o -name "*lld*"  \
@@ -75,8 +75,10 @@ jobs:
                -o -name "gold" \) \
             -print 2>/dev/null | sort -u
           '
-          for entry in "${targets[@]}"; do
-            time cargo s $target
+          docker_linker unikraft kraftkit.sh/base:latest aarch64-linux-gnu-gcc-12
+
+          for target in "${targets[@]}"; do
+            time cargo s $target --config "target.${target}.linker = unikraft"
           done
 
       - name: Upload release binaries
@@ -645,8 +647,8 @@ jobs:
           targets: ${{ steps.targets.outputs.targets }}
 
 
-  Linux-arm:
-    name: Linux-arm
+  Linux-Arm:
+    name: Linux-Arm
     if: ${{ vars.TEST != '1' || vars.arm == '1'  }}
     runs-on: ubuntu-26.04-arm
 
