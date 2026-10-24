@@ -14,8 +14,8 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  TEST:
-    name: Test
+  Zig-Musl:
+    name: Zig-Musl
     if: ${{ vars.TEST == '1' }}
     runs-on: ubuntu-26.04-arm
 
@@ -46,10 +46,7 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            powerpc64-unknown-linux-musl
             powerpc-unknown-linux-musl
-            mips64-unknown-linux-musl
-            aarch64_be-unknown-linux-musl
 
             # x86_64-unknown-linux-musl
             # x86_64-unikraft-linux-musl
@@ -496,7 +493,6 @@ jobs:
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
             powerpc-unknown-linux-gnu
-            powerpc-unknown-linux-musl
             powerpc64-unknown-linux-gnu
             aarch64_be-unknown-linux-gnu
             aarch64_be-unknown-linux-musl

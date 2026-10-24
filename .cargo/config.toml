@@ -332,58 +332,58 @@ rustflags = ["-Ctarget-cpu=broadwell", "-Ztune-cpu=broadwell"]
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
-[target.'cfg(all(target_arch="aarch64",target_os="linux",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="aarch64",target_os="linux",not(target_env="musl"),not(target_env="ohos")))']
 linker = "aarch64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="musl"),not(target_env="ohos"),not(target_abi="x32")))']
 linker = "x86_64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32"))']
+[target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32",not(target_env="musl")))']
 linker = "x86_64-linux-gnux32-gcc"
 
-[target.'cfg(all(target_arch="x86",target_os="linux"))']
+[target.'cfg(all(target_arch="x86",target_os="linux",not(target_env="musl")))']
 linker = "i686-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="arm",target_os="linux",target_abi="eabihf",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="arm",target_os="linux",not(target_env="musl"),target_abi="eabihf",not(target_env="ohos")))']
 linker = "arm-linux-gnueabihf-gcc"
 
-[target.'cfg(all(target_arch="arm",target_os="linux",target_abi="eabi",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="arm",target_os="linux",not(target_env="musl"),target_abi="eabi",not(target_env="ohos")))']
 linker = "arm-linux-gnueabi-gcc"
 
-[target.'cfg(all(target_arch="s390x",target_os="linux"))']
+[target.'cfg(all(target_arch="s390x",target_os="linux",not(target_env="musl")))']
 linker = "s390x-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little",not(target_env="musl")))']
 linker = "powerpc64le-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big",not(target_env="musl")))']
 linker = "powerpc64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little",not(target_env="musl")))']
 linker = "powerpcle-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "big",not(target_env="musl")))']
 linker = "powerpc-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="riscv64",target_os="linux"))']
+[target.'cfg(all(target_arch="riscv64",target_os="linux",not(target_env="musl")))']
 linker = "riscv64-linux-gnu-gcc"
 
-[target.'cfg(all(any(target_arch="sparc64",target_arch="sparc"),target_os="linux"))']
+[target.'cfg(all(any(target_arch="sparc64",target_arch="sparc"),target_os="linux",not(target_env="musl")))']
 linker = "sparc64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="loongarch64",target_os="linux",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="loongarch64",target_os="linux",not(target_env="musl"),not(target_env="ohos")))']
 linker = "loongarch64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips64",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mips64-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips64",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mips64el-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mips-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mipsel-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="mips",target_os="linux",target_env="musl"))']
@@ -392,16 +392,16 @@ rustflags = ["-Ctarget-feature=-soft-float"]
 [target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6",target_arch="mips",target_arch="mipsel"),target_os="linux"))']
 rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 
-[target.'cfg(all(target_arch="mips64r6",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips64r6",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mipsisa64r6-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips64r6",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips64r6",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mipsisa64r6el-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips32r6",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips32r6",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mipsisa32r6-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips32r6",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips32r6",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mipsisa32r6el-linux-gnu-gcc"
 
 [target.'cfg(all(any(target_arch="x86_64",target_arch="x86"),any(target_os="linux",target_os="android")))']
