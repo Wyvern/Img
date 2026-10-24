@@ -38,8 +38,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        # with:
-        #   zig: true
+        with:
+          zig: true
 
       - name: Set targets
         id: targets

@@ -325,6 +325,9 @@ rustflags = [
   "-Clink-arg=-Wl,-no_exported_symbols"
 ]
 
+[target.'cfg(all(target_os="linux",target_env="musl"))']
+linker = "./zig-cc.sh"
+
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=broadwell", "-Ztune-cpu=broadwell"]
 
@@ -334,7 +337,7 @@ rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 [target.'cfg(all(target_arch="aarch64",target_os="linux",not(target_env="ohos")))']
 linker = "aarch64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="ohos"),not(target_abi="x32")))']
+[target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="musl"),not(target_env="ohos"),not(target_abi="x32")))']
 linker = "x86_64-linux-gnu-gcc"
 
 [target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32"))']
