@@ -87,7 +87,7 @@ jobs:
             push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc
           fi
 
-          find uclibc -type f -path '*/bin/*-gcc'
+          find uclibc -type f -path '*/bin/*-gcc*'
           exit
 
 
