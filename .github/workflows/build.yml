@@ -46,13 +46,17 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            aarch64-unknown-linux-musl aarch64-linux-musl
-            x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
-            powerpc64le-unknown-linux-musl powerpc64le-linux-musl
-            riscv64gc-unknown-linux-musl riscv64-linux-musl
-            s390x-unknown-linux-musl s390x-linux-musl
-            loongarch64-unknown-linux-musl loongarch64-linux-musl
+            mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
+            mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
+            mipsel-unknown-linux-musl mipsel-unknown-linux-musleabi
+            mips-unknown-linux-musl mips-linux-musleabi
 
+            # aarch64-unknown-linux-musl aarch64-linux-musl
+            # x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
+            # powerpc64le-unknown-linux-musl powerpc64le-linux-musl
+            # riscv64gc-unknown-linux-musl riscv64-linux-musl
+            # s390x-unknown-linux-musl s390x-linux-musl
+            # loongarch64-unknown-linux-musl loongarch64-linux-musl
             # armv5te-unknown-linux-musleabi arm-linux-musleabi
             # arm-unknown-linux-musleabi arm-linux-musleabi
             # arm-unknown-linux-musleabihf arm-linux-musleabihf
@@ -624,19 +628,13 @@ jobs:
         with:
           targets: |
             aarch64-unknown-linux-gnu
-            aarch64-unknown-linux-musl aarch64-linux-musl
             x86_64-unknown-linux-gnu
             x86_64-unknown-linux-gnux32
-            x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
             powerpc64le-unknown-linux-gnu
-            powerpc64le-unknown-linux-musl powerpc64le-linux-musl
             riscv64gc-unknown-linux-gnu
-            riscv64gc-unknown-linux-musl riscv64-linux-musl
             riscv64a23-unknown-linux-gnu
             s390x-unknown-linux-gnu
-            s390x-unknown-linux-musl s390x-linux-musl
             loongarch64-unknown-linux-gnu
-            loongarch64-unknown-linux-musl loongarch64-linux-musl
 
       - name: Build Release
         env:
@@ -681,13 +679,13 @@ jobs:
         with:
           targets: |
             mips64-unknown-linux-gnuabi64
-            mips64-unknown-linux-muslabi64
+            mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
             mips64el-unknown-linux-gnuabi64
-            mips64el-unknown-linux-muslabi64
-            mipsel-unknown-linux-musl
+            mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
+            mipsel-unknown-linux-musl mipsel-unknown-linux-musleabi
             mipsel-unknown-linux-gnu
             mipsel-unknown-linux-uclibc
-            mips-unknown-linux-musl
+            mips-unknown-linux-musl mips-linux-musleabi
             mips-unknown-linux-gnu
             mips-unknown-linux-uclibc
             # mipsisa64r6-unknown-linux-gnuabi64
