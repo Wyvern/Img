@@ -67,7 +67,7 @@ jobs:
           docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
 
           for target in "${targets[@]}"; do
-            time cargo s $target --config "target.${target}.linker = 'unikraft'"
+            time cargo s $target --config "target.${target}.linker = './unikraft'"
           done
 
       - name: Upload release binaries
