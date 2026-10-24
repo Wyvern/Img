@@ -64,21 +64,10 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          docker run --rm --entrypoint sh kraftkit.sh/base:latest -c '
-          find /usr/bin /usr/local/bin /bin /opt /tools \
-            -type f -executable \
-            \( -name "ld" -o -name "ld.*" \
-               -o -name "*lld*"  \
-               -o -name "*-ld*"  \
-               -o -name "kraftld" -o -name "mold" \
-               -o -name "*gcc*" -o -name "*clang*" \
-               -o -name "gold" \) \
-            -print 2>/dev/null | sort -u
-          '
           docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
 
           for target in "${targets[@]}"; do
-            time cargo s $target --config 'target.${target}.linker = "unikraft"'
+            time cargo s $target --config "target.${target}.linker = 'unikraft'"
           done
 
       - name: Upload release binaries
