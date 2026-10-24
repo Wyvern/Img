@@ -17,7 +17,10 @@ jobs:
   Test:
     name: Test
     if: ${{ vars.TEST == '1' }}
-    runs-on: ubuntu-26.04-arm
+    runs-on: ubuntu-26.04
+
+    env:
+      uclibc: "2026.08-1"
 
     permissions:
       contents: write
@@ -27,10 +30,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # - name: GHCR Setup
-      #   uses: ./.github/actions/ghcr
-      #   with:
-      #    token: ${{ secrets.GITHUB_TOKEN }}
+      - name: GHCR Setup
+        uses: ./.github/actions/ghcr
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Ubuntu apt update and install
         run: |
@@ -46,10 +49,16 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            # armv7-sony-vita-newlibeabihf
-            # m68k-unknown-linux-gnu
+            mipsel-unknown-linux-uclibc
+            mips-unknown-linux-uclibc
+            armv7-unknown-linux-uclibceabi
+            armv7-unknown-linux-uclibceabihf
+            armv5te-unknown-linux-uclibceabi
+
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
+            # armv7-sony-vita-newlibeabihf
+            # m68k-unknown-linux-gnu
 
       - name: Build Release
         env:
@@ -58,10 +67,28 @@ jobs:
           cargo update
           set +e -x
 
-          # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
-
           source .github/scripts/util.sh
           targets_from_env
+
+          # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-arm64-gcc-15.tar.xz | tar -xJf - -C l4re --strip-components=1
+
+
+          IMAGE="${IMAGE,,}"
+
+          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
+            mkdir uclibc && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C uclibc &
+          else
+            arch=(mips32 mips32el armv5-eabi armv7-eabihf)
+            for a in "${arch[@]}"; do
+              url="https://toolchains.bootlin.com/downloads/releases/toolchains/$a/tarballs/${a}--uclibc--stable-${uclibc}.tar.xz"
+              mkdir -p "uclibc/$a" && curl -fsSL "$url" | tar -xJf - -C "uclibc/$a"
+              ln -s "uclibc/$a" $a
+            done
+            push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc
+          fi
+
+          find uclibc/ -iname "*gcc*"
+          exit
 
 
           for target in "${targets[@]}"; do
@@ -97,14 +124,14 @@ jobs:
         with:
           targets: |
             x86_64-unknown-linux-musl x86_64-linux-musl
-            # x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
-            # powerpc64le-unknown-linux-musl powerpc64le-linux-musl
-            # riscv64gc-unknown-linux-musl riscv64-linux-musl
-            # s390x-unknown-linux-musl s390x-linux-musl
-            # loongarch64-unknown-linux-musl loongarch64-linux-musl
-            # aarch64-unknown-linux-musl aarch64-linux-musl
-            # mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
-            # mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
+            x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
+            powerpc64le-unknown-linux-musl powerpc64le-linux-musl
+            riscv64gc-unknown-linux-musl riscv64-linux-musl
+            s390x-unknown-linux-musl s390x-linux-musl
+            loongarch64-unknown-linux-musl loongarch64-linux-musl
+            aarch64-unknown-linux-musl aarch64-linux-musl
+            mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
+            mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
 
       - name: Build Release
         env:

@@ -635,10 +635,10 @@ rustflags = ["-lc"]
 linker = "sparc64-unknown-netbsd-gcc"
 
 [target.mips-unknown-linux-uclibc]
-rustflags = ["-Ctarget-feature=-soft-float"]
+# rustflags = ["-Ctarget-feature=-soft-float"]
 
 [target.mipsel-unknown-linux-uclibc]
-rustflags = ["-Ctarget-feature=-soft-float"]
+# rustflags = ["-Ctarget-feature=-soft-float"]
 
 [target.aarch64-oe-linux-gnu]
 linker = "aarch64-poky-linux-gcc"
@@ -741,6 +741,21 @@ linker = "l4re/bin/aarch64-l4re-gcc"
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/clang"
 rustflags = ["-LWALI/build/sysroot/lib","-LWALI/build/libcxx/lib/","-Ctarget-feature=+crt-static"]
+
+[target.mipsel-unknown-linux-uclibc]
+linker = "mipsel-buildroot-linux-uclibc-gcc"
+
+[target.mips-unknown-linux-uclibc]
+linker = "mips-buildroot-linux-uclibc-gcc"
+
+[target.armv7-unknown-linux-uclibceabi]
+linker = "arm-buildroot-linux-uclibceabi-gcc"
+
+[target.armv7-unknown-linux-uclibceabihf]
+linker = "arm-buildroot-linux-uclibceabihf-gcc"
+
+[target.armv5te-unknown-linux-uclibceabi]
+linker = "arm-buildroot-linux-uclibceabi-gcc"
 
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
