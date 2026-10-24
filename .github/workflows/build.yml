@@ -67,6 +67,7 @@ jobs:
 
           for target in "${targets[@]}"; do
             time cargo s $target
+            file target/$target/src/img
           done
 
       - name: Upload release binaries
