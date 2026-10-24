@@ -82,7 +82,7 @@ jobs:
 
           for entry in "${targets[@]}"; do
             read -r target zig <<< "$entry"
-            time cargo s $target --config "target.${target}.rustflags = ['-Clink-arg=--target=${zig}']"
+            time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']"
           done
 
       - name: Upload release binaries
