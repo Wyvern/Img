@@ -81,13 +81,13 @@ jobs:
             arch=(mips32 mips32el armv5-eabi armv7-eabihf)
             for a in "${arch[@]}"; do
               url="https://toolchains.bootlin.com/downloads/releases/toolchains/$a/tarballs/${a}--uclibc--stable-${uclibc}.tar.xz"
-              mkdir -p "uclibc/$a" && curl -fsSL "$url" | tar -xJf - -C "uclibc/$a" &
+              mkdir -p uclibc/$a && curl -fsSL "$url" | tar -xJ -C "uclibc/$a" --strip-components=1 &
             done
             wait
             push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc
           fi
 
-          find uclibc -type f -path '*/bin/*-gcc*'
+          find uclibc -type f -path '*/bin/*-gcc'
           exit
 
 
