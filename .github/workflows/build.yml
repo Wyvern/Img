@@ -510,14 +510,14 @@ jobs:
           {
             time waitfor ~/aarch64be.finish
             for target in "${targets[@]:2:4}"; do
-              time cargo s "$target" &
+              time cargo s "$target"
             done
           } &
 
           {
             time waitfor ~/apt.finish
             for target in "${targets[@]:4:7}"; do
-              time cargo s "$target" &
+              time cargo s "$target"
             done
           } &
 
@@ -531,7 +531,7 @@ jobs:
           {
             time waitfor ~/rv32.finish
             for target in "${targets[@]:9}"; do
-              time cargo s "$target" &
+              time cargo s "$target"
             done
           } &
 
