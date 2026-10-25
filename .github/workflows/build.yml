@@ -496,12 +496,12 @@ jobs:
 
           {
             time waitfor ~/ppc64musl.finish
-            time cargo s "$targets[0]"
+            time cargo s "${targets[0]}"
           } &
 
           {
             time waitfor ~/ppc64gnu.finish
-            time cargo s "$targets[1]"
+            time cargo s "${targets[1]}"
           } &
 
           {
