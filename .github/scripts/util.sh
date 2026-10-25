@@ -11,15 +11,22 @@ targets_from_env() {
 
 waitfor() {
   { set +x; } &>/dev/null
+  local start=$SECONDS timeout=100 file ready
   while :; do
-    local file ready=1
+    ready=1
     for file in "$@"; do
-      [[ -e "$file" ]] || { ready=0; break; }
+      [[ -f "$file" ]] || { ready=0; break; }
     done
-    (( ready )) && break
+    if (( ready )); then
+      { set -x; } &>/dev/null
+      return 0
+    fi
+    if (( SECONDS - start >= timeout )); then
+      { set -x; } &>/dev/null
+      return 1
+    fi
     sleep 1
   done
-  { set -x; } &>/dev/null
 }
 
 cr()
