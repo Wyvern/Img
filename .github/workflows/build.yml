@@ -512,7 +512,7 @@ jobs:
           } &
 
           for target in "${targets[@]:5}"; do
-            time cargo s "$target" &
+            time RUSTC_WRAPPER= cargo s "$target" &
           done
 
           wait
