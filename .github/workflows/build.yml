@@ -494,12 +494,6 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          cargo s aarch64_be-unknown-linux-musl
-          cargo s mips64-openwrt-linux-musl
-          cargo s riscv32gc-unknown-linux-musl
-          cargo s hexagon-unknown-linux-musl
-            exit
-
           for target in "${targets[@]}"; do
             time cargo s "$target" &
           done
