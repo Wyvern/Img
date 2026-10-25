@@ -363,9 +363,9 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-powerpc64-linux-gnu -qy &>/dev/null &
-          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
-          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
+          sudo apt install gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-powerpc64-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
+          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish &
+          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish &
 
       - name: GHCR Setup
         uses: ./.github/actions/ghcr
@@ -493,6 +493,8 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
+
+          time waitfor ~/apt.finish ~/ppc64gnu.finish ~/ppc64musl.finish
 
           for target in "${targets[@]}"; do
             time cargo s "$target" &
