@@ -730,7 +730,7 @@ linker = "rv32-musl/bin/riscv32-unknown-linux-musl-clang"
 # rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
 
 [target.'cfg(target_os="l4re")']
-linker = "l4re/bin/aarch64-l4re-gcc"
+linker = "l4re/bin/x86_64-l4re-gcc"
 
 [target.wasm32-wali-linux-musl]
 linker = "WALI/build/llvm/bin/clang"

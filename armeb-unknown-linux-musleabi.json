@@ -1,0 +1,39 @@
+{
+  "abi": "eabi",
+  "arch": "arm",
+  "crt-objects-fallback": "false",
+  "crt-static-respected": true,
+  "data-layout": "E-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64",
+  "default-uwtable": true,
+  "dynamic-linking": true,
+  "env": "musl",
+  "features": "+strict-align,+v8,+crc",
+  "has-rpath": false,
+  "has-thread-local": true,
+  "linker-flavor": "gnu-cc",
+  "llvm-floatabi": "soft",
+  "llvm-mcount-intrinsic": "llvm.arm.gnu.eabi.mcount",
+  "llvm-target": "armeb-unknown-linux-musleabi",
+  "max-atomic-width": 64,
+  "metadata": {
+    "description": "Arm BE8 big-endian Linux with musl and EABI",
+    "host_tools": null,
+    "std": true,
+    "tier": 3
+  },
+  "os": "linux",
+  "position-independent-executables": true,
+  "relro-level": "full",
+  "static-position-independent-executables": true,
+  "supported-split-debuginfo": [
+    "packed",
+    "unpacked",
+    "off"
+  ],
+  "target-endian": "big",
+  "target-family": [
+    "unix"
+  ],
+  "target-mcount": "\u0001__gnu_mcount_nc",
+  "target-pointer-width": 32
+}
