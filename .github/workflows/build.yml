@@ -363,9 +363,9 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-powerpc64-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
-          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64-gnu.finish &
-          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64-musl.finish &
+          sudo apt install gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-powerpc64-linux-gnu -qy &>/dev/null &
+          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc &
+          nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc &
 
       - name: GHCR Setup
         uses: ./.github/actions/ghcr
@@ -380,7 +380,7 @@ jobs:
           mkdir -p $path
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:aarch64be-${aarch64be}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path && touch ~/aarch64be.finish &
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
             ln -sfn $path/glibc $path-glibc
             ln -sfn $path/musl $path-musl
           else
@@ -390,7 +390,6 @@ jobs:
               ln -sfn $path/$abi $path-$abi
             done
             wait
-            touch ~/aarch64be.finish
             source .github/scripts/util.sh
             push_docker $path "${IMAGE}:aarch64be-${aarch64be}" aarch64be &
 
@@ -406,7 +405,7 @@ jobs:
           mkdir -p $path
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:riscv32-${riscv32}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path && touch ~/rv32.finish &
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
             ln -sfn $path/gnu $path-gnu
             ln -sfn $path/musl $path-musl
           else
@@ -416,7 +415,6 @@ jobs:
               ln -sfn $path/$abi $path-$abi
             done
             wait
-            touch ~/rv32.finish
             source .github/scripts/util.sh
             push_docker $path "${IMAGE}:riscv32-${riscv32}" riscv32 &
 
@@ -432,11 +430,10 @@ jobs:
           mkdir -p $path
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:hexagon-${hexagon}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path && touch ~/hexagon.finish &
+            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
           else
             echo "Downloading hexagon SDK ..."
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C $path
-            touch ~/hexagon.finish
             source .github/scripts/util.sh
             push_docker $path "${IMAGE}:hexagon-${hexagon}" hexagon &
 
@@ -497,43 +494,15 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          {
-            time waitfor ~/ppc64-musl.finish
-            time cargo s "${targets[0]}"
-          } &
+          cargo s aarch64_be-unknown-linux-musl
+          cargo s mips64-openwrt-linux-musl
+          cargo s riscv32gc-unknown-linux-musl
+          cargo s hexagon-unknown-linux-musl
+            exit
 
-          {
-            time waitfor ~/ppc64-gnu.finish
-            time cargo s "${targets[1]}"
-          } &
-
-          {
-            time waitfor ~/aarch64be.finish
-            for target in "${targets[@]:2:4}"; do
-              time cargo s "$target" &
-            done
-          } &
-
-          {
-            time waitfor ~/apt.finish
-            for target in "${targets[@]:4:7}"; do
-              time cargo s "$target" &
-            done
-          } &
-
-          time cargo s "${targets[7]}" &
-
-          {
-            time waitfor ~/hexagon.finish
-            time cargo s "${targets[8]}"
-          } &
-
-          {
-            time waitfor ~/rv32.finish
-            for target in "${targets[@]:9}"; do
-              time cargo s "$target" &
-            done
-          } &
+          for target in "${targets[@]}"; do
+            time cargo s "$target" &
+          done
 
           wait
 
