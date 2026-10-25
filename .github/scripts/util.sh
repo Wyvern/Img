@@ -12,11 +12,11 @@ targets_from_env() {
 waitfor() {
   { set +x; } &>/dev/null
   while :; do
-    local file
+    local file ready=1
     for file in "$@"; do
-      [[ -f "$file" ]] || break
+      [[ -f "$file" ]] || { ready=0; break; }
     done
-    [[ -f "$file" ]] && break
+    (( ready )) && break
     sleep 1
   done
   { set -x; } &>/dev/null

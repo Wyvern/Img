@@ -474,11 +474,11 @@ jobs:
           targets: |
             powerpc64-unknown-linux-musl
             powerpc64-unknown-linux-gnuelfv2
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
             sparc64-unknown-linux-gnu
             sparc-unknown-linux-gnu
             powerpc64-unknown-linux-gnu
+            aarch64_be-unknown-linux-gnu
+            aarch64_be-unknown-linux-musl
             hexagon-unknown-linux-musl
             mips64-openwrt-linux-musl
             riscv32gc-unknown-linux-gnu
@@ -494,9 +494,24 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          time waitfor ~/apt.finish ~/ppc64gnu.finish ~/ppc64musl.finish
+          {
+            time waitfor ~/ppc64musl.finish
+            time cargo s "$targets[0]"
+          } &
 
-          for target in "${targets[@]}"; do
+          {
+            time waitfor ~/ppc64gnu.finish
+            time cargo s "$targets[1]"
+          } &
+
+          {
+            time waitfor ~/apt.finish
+            for target in "${targets[@]:2:5}"; do
+              time cargo s "$target" &
+            done
+          } &
+
+          for target in "${targets[@]:5}"; do
             time cargo s "$target" &
           done
 
