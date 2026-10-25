@@ -364,9 +364,9 @@ jobs:
       - name: Ubuntu apt update and install
         run: |
           sudo apt install gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-powerpc64-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
-          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish &
-          nix build -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish &
-          exit
+          nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish
+          nix build -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish
+          exit 1
 
       - name: GHCR Setup
         uses: ./.github/actions/ghcr
