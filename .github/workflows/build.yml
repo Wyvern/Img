@@ -14,6 +14,51 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
+  Test:
+      name: Test
+      if: ${{ vars.TEST == '1'}}
+      runs-on: ubuntu-26.04-arm
+
+      permissions:
+        contents: write
+        packages: write
+
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v7
+
+        - name: Toolchain Setup
+          uses: ./.github/actions/toolchain
+          # with:
+          #   zig: true
+
+        - name: Set targets
+          id: targets
+          uses: ./.github/actions/targets
+          with:
+            targets: |
+
+        - name: Build Release
+          env:
+            TARGETS: ${{ steps.targets.outputs.targets }}
+          run: |
+            cargo update
+            set +e -x
+
+            source .github/scripts/util.sh
+            targets_from_env
+
+            for entry in "${targets[@]}"; do
+              time cargo s $target
+            done
+
+            wait
+
+        - name: Upload release binaries
+          uses: ./.github/actions/upload
+          with:
+            targets:
+
   Android:
     name: Android
     if: ${{ vars.TEST != '1' || vars.android == '1'  }}
@@ -1914,8 +1959,7 @@ jobs:
           targets_from_env
 
           read -r target zig <<< "${targets[@]:9}"
-          time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']"
-          exit
+          time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
 
           for target in "${targets[@]:0:9}"; do
             time cargo s $target &
@@ -1954,6 +1998,7 @@ jobs:
             x86_64-unknown-linux-musl x86_64-linux-musl
             x86_64-unknown-linux-muslx32.json x86_64-linux-muslx32
             powerpc64le-unknown-linux-musl powerpc64le-linux-musl
+            powerpc-unknown-linux-musl powerpc-linux-musleabi
             riscv64gc-unknown-linux-musl riscv64-linux-musl
             s390x-unknown-linux-musl s390x-linux-musl
             loongarch64-unknown-linux-musl loongarch64-linux-musl
@@ -2008,7 +2053,6 @@ jobs:
             targets: |
               i586-unknown-linux-musl x86-linux-musl
               i686-unknown-linux-musl x86-linux-musl
-              powerpc-unknown-linux-musl powerpc-linux-musleabi
               armv5te-unknown-linux-musleabi arm-linux-musleabi
               arm-unknown-linux-musleabi arm-linux-musleabi
               arm-unknown-linux-musleabihf arm-linux-musleabihf
