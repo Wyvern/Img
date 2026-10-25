@@ -498,6 +498,7 @@ jobs:
             time waitfor ~/ppc64musl.finish
             time cargo s "${targets[0]}"
           } &
+          wait
           exit
           {
             time waitfor ~/ppc64gnu.finish
