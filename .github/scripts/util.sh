@@ -17,16 +17,15 @@ waitfor() {
     for file in "$@"; do
       [[ -f "$file" ]] || { ready=0; break; }
     done
-    if (( ready )); then
-      { set -x; } &>/dev/null
-      return 0
-    fi
+    (( ready )) && break
     if (( SECONDS - start >= timeout )); then
+      echo "Timed out for ${timeout}s waiting for: $*" >&2
       { set -x; } &>/dev/null
       return 1
     fi
     sleep 1
   done
+  { set -x; } &>/dev/null
 }
 
 cr()
