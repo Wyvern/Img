@@ -14,7 +14,7 @@ waitfor() {
   while :; do
     local file ready=1
     for file in "$@"; do
-      [[ -f "$file" ]] || { ready=0; break; }
+      [[ -e "$file" ]] || { ready=0; break; }
     done
     (( ready )) && break
     sleep 1
