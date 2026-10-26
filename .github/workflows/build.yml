@@ -377,15 +377,24 @@ jobs:
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:ppc64"); then
             {
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C ppc64
-            mv ppc64/ppc64-gnu ./ppc64-gnu && touch ~/ppc64gnu.finish
-            mv ppc64/ppc64-musl ./ppc64-musl && touch ~/ppc64musl.finish
+            for variant in gnu musl; do
+              archive="ppc64/ppc64-${variant}.nar.zst"
+              root=$(cat "ppc64/ppc64-${variant}.root")
+              zstd -dc "$archive" | nix-store --import
+              ln -sfn "$root" "./ppc64-${variant}"
+            done
             }&
           else
             nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish
             nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish
-            mkdir -p ppc64/ppc-gnu ppc64/ppc-musl
-            cp -rL ppc64-gnu/. ppc64/ppc-gnu/
-            cp -rL ppc64-musl/. ppc64/ppc-musl/
+
+            for variant in gnu musl; do
+              root=$(readlink -f "ppc64-${variant}")
+              printf '%s\n' "$root" > "ppc64/ppc64-${variant}.root"
+              nix-store --export $(nix-store -qR "$root") |
+                zstd -T0 -19 -o "ppc64/ppc64-${variant}.nar.zst"
+            done
+
             source .github/scripts/util.sh
             push_docker ppc64 "${IMAGE}:ppc64" ppc64
           fi
