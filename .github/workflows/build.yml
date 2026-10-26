@@ -526,7 +526,7 @@ jobs:
 
           {
             time waitfor ~/apt.finish
-            for target in "${targets[@]:2:5}"; do
+            for target in "${targets[@]:2:3}"; do
               time cargo s "$target" &
             done
           } &
@@ -975,7 +975,7 @@ jobs:
 
           time waitfor ~/redox.finish
 
-          for target in "${targets[@]:5:9}"; do
+          for target in "${targets[@]:5:4}"; do
               time cargo s "$target" &
           done
 

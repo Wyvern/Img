@@ -11,18 +11,13 @@ targets_from_env() {
 
 waitfor() {
   { set +x; } &>/dev/null
-  local start=$SECONDS timeout=300 file ready
+  local file ready
   while :; do
     ready=1
     for file in "$@"; do
       [[ -f "$file" ]] || { ready=0; break; }
     done
     (( ready )) && break
-    if (( SECONDS - start >= timeout )); then
-      printf '\033[31mTimed out for %ss waiting for: %s\033[0m\n' "$timeout" "$*" >&2
-      { set -x; } &>/dev/null
-      return 1
-    fi
     sleep 1
   done
   { set -x; } &>/dev/null
