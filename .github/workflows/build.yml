@@ -383,11 +383,11 @@ jobs:
           else
             nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish
             nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish
-            mv ppc64-gnu ppc64/ppc64-gnu
-            mv ppc64-musl ppc64/ppc64-musl
-            ls -hl ppc64/
+            mkdir -p ppc64/ppc-gnu ppc64/ppc-musl
+            cp -rL ppc64-gnu/. ppc64/ppc-gnu/
+            cp -rL ppc64-musl/. ppc64/ppc-musl/
             source .github/scripts/util.sh
-            push_docker ppc64 ${IMAGE}:ppc64 ppc64
+            push_docker ppc64 "${IMAGE}:ppc64" ppc64
           fi
 
           exit 1
