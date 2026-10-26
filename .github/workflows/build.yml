@@ -1924,12 +1924,14 @@ jobs:
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
             {
+              set +x &>/dev/null
               source $sdk/$env &>/dev/null
               unset RUST_TARGET_PATH
               for v in ${!CARGO_TARGET_@}; do
                   unset "$v"
               done
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
+              set -x &>/dev/null
               time cargo s $target
             } &
           done
