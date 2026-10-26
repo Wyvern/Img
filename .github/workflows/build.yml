@@ -363,7 +363,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          # sudo apt install gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-powerpc64-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
+          sudo apt install gcc-sparc64-linux-gnu libc6-dev-sparc-sparc64-cross gcc-multilib-sparc64-linux-gnu gcc-powerpc64-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
 
       - name: GHCR Setup
         uses: ./.github/actions/ghcr
@@ -384,7 +384,7 @@ jobs:
               ln -sfn "$root" "./ppc64-${variant}"
             done
             touch ~/ppc64gnu.finish ~/ppc64musl.finish
-            }
+            } &
           else
             nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish &
             nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish &
@@ -523,8 +523,7 @@ jobs:
 
           time waitfor ~/ppc64musl.finish && time cargo s "${targets[0]}" &
           time waitfor ~/ppc64gnu.finish && time cargo s "${targets[1]}" &
-          wait
-          exit 1
+
           {
             time waitfor ~/apt.finish
             for target in "${targets[@]:2:5}"; do
