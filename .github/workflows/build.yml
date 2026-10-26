@@ -383,23 +383,21 @@ jobs:
               zstd -dc "$archive" | nix-store --import
               ln -sfn "$root" "./ppc64-${variant}"
             done
-            }&
+            touch ~/ppc64gnu.finish ~/ppc64musl.finish
+            }
           else
-            nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish
-            nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish
-
+            nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish &
+            nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish &
+            wait
             for variant in gnu musl; do
               root=$(readlink -f "ppc64-${variant}")
               printf '%s\n' "$root" > "ppc64/ppc64-${variant}.root"
               nix-store --export $(nix-store -qR "$root") |
                 zstd -T0 -19 -o "ppc64/ppc64-${variant}.nar.zst"
             done
-
             source .github/scripts/util.sh
-            push_docker ppc64 "${IMAGE}:ppc64" ppc64
+            push_docker ppc64 "${IMAGE}:ppc64" ppc64 &
           fi
-
-          exit 1
 
       - name: Cache aarch64be
         run: |
@@ -523,14 +521,10 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          {
-            time waitfor ~/ppc64musl.finish && time cargo s "${targets[0]}"
-          } &
-
-          {
-            time waitfor ~/ppc64gnu.finish && time cargo s "${targets[1]}"
-          } &
-
+          time waitfor ~/ppc64musl.finish && time cargo s "${targets[0]}" &
+          time waitfor ~/ppc64gnu.finish && time cargo s "${targets[1]}" &
+          wait
+          exit 1
           {
             time waitfor ~/apt.finish
             for target in "${targets[@]:2:5}"; do
