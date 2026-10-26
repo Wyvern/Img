@@ -19,7 +19,7 @@ waitfor() {
     done
     (( ready )) && break
     if (( SECONDS - start >= timeout )); then
-      echo "Timed out for ${timeout}s waiting for: $*" >&2
+      printf '\033[31mTimed out for %ss waiting for: %s\033[0m\n' "$timeout" "$*" >&2
       { set -x; } &>/dev/null
       return 1
     fi
