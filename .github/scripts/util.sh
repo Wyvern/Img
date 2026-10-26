@@ -11,7 +11,7 @@ targets_from_env() {
 
 waitfor() {
   { set +x; } &>/dev/null
-  local start=$SECONDS timeout=100 file ready
+  local start=$SECONDS timeout=300 file ready
   while :; do
     ready=1
     for file in "$@"; do
