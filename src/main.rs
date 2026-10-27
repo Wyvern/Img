@@ -1231,7 +1231,7 @@ fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        all(unix, not(embedded_unix)) => {
+        all(unix, not(embedded_unix), not(target_family = "wasm")) => {
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
         windows => run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz")),
