@@ -521,8 +521,8 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          # time waitfor ~/ppc64musl.finish && time cargo s "${targets[0]}" &
-          # time waitfor ~/ppc64gnu.finish && time cargo s "${targets[1]}" &
+          time waitfor ~/ppc64musl.finish && time cargo s "${targets[0]}" &
+          time waitfor ~/ppc64gnu.finish && time cargo s "${targets[1]}" &
 
           {
             time waitfor ~/apt.finish
@@ -532,9 +532,9 @@ jobs:
             wait
           } &
 
-          # for target in "${targets[@]:5}"; do
-          #   time cargo s "$target" &
-          # done
+          for target in "${targets[@]:5}"; do
+            time cargo s "$target" &
+          done
 
           wait
 
