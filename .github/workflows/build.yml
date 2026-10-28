@@ -524,12 +524,12 @@ jobs:
           # time waitfor ~/ppc64musl.finish && time cargo s "${targets[0]}" &
           # time waitfor ~/ppc64gnu.finish && time cargo s "${targets[1]}" &
 
-          {
+          (
             time waitfor ~/apt.finish
             for target in "${targets[@]:2:3}"; do
               time cargo s "$target" &
             done
-          } &
+          )
 
           # for target in "${targets[@]:5}"; do
           #   time cargo s "$target" &
