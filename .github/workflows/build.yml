@@ -970,7 +970,7 @@ jobs:
           {
             time waitfor ~/kraft.finish
             docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
-            target="${targets[@]:9}"
+            target="${targets[9]}"
             time cargo s $target --config "target.${target}.linker = './unikraft'"
           } &
 
