@@ -60,19 +60,6 @@ debug-assertions = false
 # rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 
-# test
-[profile.test]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
-inherits = "dev"
-
-[profile.test.package."*"]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "dev"
-
-[profile.test.build-override]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "dev"
-
 # release
 [profile.release]
 # rustflags = ["-Cprefer-dynamic"]
