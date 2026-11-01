@@ -191,7 +191,7 @@ rustflags = [
   "-Cdebuginfo=0",
   "-Cstrip=symbols",
   "-Ccollapse-macro-debuginfo=y",
-  "-Cpanic=immediate-abort",
+  # "-Cpanic=immediate-abort",
 
   "-Zunstable-options",
   # "-Zembed-metadata=no",
