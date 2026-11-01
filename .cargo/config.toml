@@ -48,7 +48,7 @@ rpath = true
 debug = false
 strip = true
 opt-level = "s"
-trim-paths = "all"
+# trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.dev.package."*"]
@@ -77,7 +77,7 @@ inherits = "dev"
 [profile.release]
 # rustflags = ["-Cprefer-dynamic"]
 rpath = true
-trim-paths = "all"
+# trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.release.build-override]

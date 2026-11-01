@@ -400,7 +400,8 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: x86_64-apple-darwin,aarch64-apple-ios,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos,wasm32-wasip2,wasm32-wasip3,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,i686-pc-windows-gnullvm
+          targets: x86_64-apple-darwin,aarch64-apple-ios,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,i686-pc-windows-gnullvm,wasm32-wasip2
+          # wasm32-wasip3
 
       - name: Set targets
         id: targets
