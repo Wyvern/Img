@@ -33,9 +33,7 @@ fn curl_args() -> impl Iterator<Item = &'static str> {
     let o = run_cmd("curl", &["--help", "all"], &[]);
     let str = str::from_utf8(&o);
     let (http3, tcp_fastopen) = *CURL_EXTRA.get_or_init(|| {
-        str.map_or_else(
-            |_| (false, false),
-            |s| {
+        str.map_or((false, false), |s| {
                 let (mut http3, mut tcp_fastopen) = (false, false);
                 for line in s.lines() {
                     let l = line.trim_start();
@@ -46,8 +44,7 @@ fn curl_args() -> impl Iterator<Item = &'static str> {
                     }
                 }
                 (http3, tcp_fastopen)
-            },
-        )
+            })
     });
     CURL_ARGS
         .iter()
@@ -828,7 +825,9 @@ fn normarlize(url: &str, addr: &str) -> String {
 fn sanitize_path(name: &str) -> String {
     cfg_select! {
         target_vendor = "apple" => name.replace(":", "|"),
-        any(all(unix, not(target_vendor = "apple")), target_family = "wasm") => name.replace("/", "_"),
+        any(all(unix, not(target_vendor = "apple")), target_family = "wasm") => {
+            name.replace("/", "_")
+        }
         target_family = "windows" => name
             .chars()
             .map(|c| match c {
@@ -861,21 +860,24 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
     }
 
     let mut no_ext = collections::HashMap::new();
-    #[cfg(not(all(unix, not(target_os = "espidf"))))]
-    let mut no_ext_curl = process::Command::new("curl");
-    #[cfg(not(all(unix, not(target_os = "espidf"))))]
-    no_ext_curl.args([
-        "-Z",
-        "--parallel-immediate",
-        "-sILo",
-        if cfg!(target_os = "windows") {
-            "NUL"
-        } else {
-            "/dev/null"
-        },
-        "-w",
-        "\n%{url} |-> %{content_type}\n",
-    ]);
+    cfg_select! {
+        not(all(unix, not(embedded_unix))) => {
+            let mut no_ext_curl = process::Command::new("curl");
+            no_ext_curl.args([
+                "-Z",
+                "--parallel-immediate",
+                "-sILo",
+                if cfg!(target_os = "windows") {
+                    "NUL"
+                } else {
+                    "/dev/null"
+                },
+                "-w",
+                "\n%{url} |-> %{content_type}\n",
+            ]);
+        }
+        _ => (),
+    }
     static NAN: sync::OnceLock<percent_encoding::AsciiSet> = sync::OnceLock::new();
     let nan = NAN.get_or_init(|| {
         let remove = b".:/-_?=%";
@@ -919,7 +921,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
         if has_ext.is_none() {
             lr.map_or_else(
                 || {
-                    #[cfg(not(all(unix, not(target_os = "espidf"))))]
+                    #[cfg(not(all(unix, not(embedded_unix))))]
                     no_ext_curl.arg(&url);
                     no_ext.insert(url.clone(), name.to_owned());
                 },
@@ -967,7 +969,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             curl.current_dir(path);
         }
 
-        #[cfg(all(unix, not(target_os = "espidf")))]
+        #[cfg(all(unix, not(embedded_unix)))]
         {
             fn fork() -> io::Result<libc::pid_t> {
                 let pid = unsafe { libc::fork() };
@@ -980,7 +982,10 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
             match fork() {
                 Ok(0) => {
                     curl.args(no_ext.iter().flat_map(|(u, f)| [u, "-o", f]));
-                    curl.args(curl_args()).args(opts).status().unwrap();
+                    curl.args(curl_args())
+                        .args(opts)
+                        .status()
+                        .unwrap_or_else(|e| quit!("curl: {e}"));
                     for (_, f) in no_ext {
                         let file = path.join(&f);
                         if file.is_file() {
@@ -993,7 +998,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
                 Err(e) => quit!("Fork process failed: {e}"),
             }
         }
-        #[cfg(not(all(unix, not(target_os = "espidf"))))]
+        #[cfg(not(all(unix, not(embedded_unix))))]
         {
             no_ext_curl.output().map_or_else(
                 |e| pl!("Query content-type info failed: {}", e),
@@ -1034,7 +1039,7 @@ fn download(dir: &str, urls: impl Iterator<Item = String>, host: &str) {
 }
 
 /// Infer file type through magic number
-#[cfg(all(unix, not(target_os = "espidf")))]
+#[cfg(all(unix, not(embedded_unix)))]
 fn magic_number_type(pb: path::PathBuf) {
     let t = file_format::FileFormat::from_file(&pb);
     fs::rename(
@@ -1206,7 +1211,7 @@ fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
         .stdin(process::Stdio::piped())
         .stdout(process::Stdio::piped())
         .spawn()
-        .unwrap_or_else(|e| quit!("Command {} error: {}", cmd, e));
+        .unwrap_or_else(|e| quit!("Run {} error: {}", cmd, e));
 
     if !input.is_empty() {
         use std::io::Write;
@@ -1223,7 +1228,7 @@ fn run_cmd(cmd: &str, args: &[&str], input: &[u8]) -> Box<[u8]> {
 ///WebSites `Json` config data
 fn website() -> serde_json::Value {
     let data = cfg_select! {
-        all(unix, not(target_os = "espidf")) => {
+        all(unix, not(embedded_unix), not(target_family = "wasm")) => {
             run_cmd("gzip", &["-dc"], include_bytes!("../web.cbor.gz"))
         }
         windows => run_cmd("tar", &["-xOzf", "-"], include_bytes!("../web.tar.gz")),
