@@ -13,18 +13,17 @@ for a in "$@"; do
   fi
 
   case "$a" in
-    -Wl,--dynamic-list)
-      skip_next=1   # also drop following list file
-      ;;
-    -Wl,--dynamic-list=*)
-      ;;
-    -Wl,-plugin-opt*)
-      ;;
-    -Wl,-z,pack-relative-relocs)
-      ;;
+    -Wl,-melf_i386)
+    ;;
+    -Wl,--fix-cortex-a53-843419)
+    ;;
+    -Wl,--no-rosegment)
+    ;;
+    -Wl,-O*)
+    ;;
     *)
-      filtered+=("$a")
-      ;;
+    filtered+=("$a")
+    ;;
   esac
 done
 
