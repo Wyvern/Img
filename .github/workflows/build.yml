@@ -747,8 +747,8 @@ jobs:
             x86_64-apple-ios
             x86_64-apple-ios-macabi
             aarch64-apple-ios
-            arm64e-apple-ios
             aarch64-apple-ios-macabi
+            arm64e-apple-ios
             x86_64-apple-tvos
             aarch64-apple-tvos
             arm64e-apple-tvos
@@ -1993,12 +1993,12 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          read -r target zig <<< "${targets[@]:9}"
-          time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
-
           for target in "${targets[@]:0:9}"; do
             time cargo s $target &
           done
+
+          read -r target zig <<< "${targets[@]:9}"
+          time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
 
           wait
 
