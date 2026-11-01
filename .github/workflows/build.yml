@@ -418,7 +418,7 @@ jobs:
             x86_64-pc-windows-gnullvm
             i686-pc-windows-gnullvm
             wasm32-wasip2
-            wasm32-wasip3
+            # wasm32-wasip3
 
       - name: Build Release
         env:
