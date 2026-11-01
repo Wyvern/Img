@@ -16,7 +16,7 @@ all = "r --all-features"
 tn = "tree -e normal"
 ti = "t -- --exact --nocapture"
 
-l = "b -q --profile lto"
+l = "b -q --profile lto --target"
 
 h = "s x86_64h-apple-darwin"
 e = "s arm64e-apple-darwin"

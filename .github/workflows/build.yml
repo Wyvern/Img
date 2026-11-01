@@ -94,7 +94,7 @@ jobs:
           targets: ${{ steps.targets.outputs.targets }}
 
   Fuchsia:
-    name: Hermit+Fuchsia
+    name: Fuchsia
     if: ${{ vars.TEST != '1' || vars.fuchsia == '1'  }}
     runs-on: ubuntu-26.04
 
@@ -413,11 +413,11 @@ jobs:
             aarch64-apple-visionos
             aarch64-apple-darwin
             x86_64h-apple-darwin
-            wasm32-wasip2
-            wasm32-wasip3
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             i686-pc-windows-gnullvm
+            wasm32-wasip2
+            wasm32-wasip3
 
       - name: Build Release
         env:
@@ -824,7 +824,7 @@ jobs:
         uses: ./.github/actions/toolchain
         with:
           zig: true
-          targets: x86_64-unknown-linux-musl,powerpc64le-unknown-linux-musl,riscv64gc-unknown-linux-musl,s390x-unknown-linux-musl,loongarch64-unknown-linux-musl,aarch64-unknown-linux-musl
+          targets: x86_64-unknown-linux-musl,powerpc64le-unknown-linux-musl,riscv64gc-unknown-linux-musl,loongarch64-unknown-linux-musl,aarch64-unknown-linux-musl
 
       - name: Set targets
         id: targets
@@ -834,7 +834,6 @@ jobs:
             x86_64-unknown-linux-musl x86_64-linux-musl
             powerpc64le-unknown-linux-musl powerpc64le-linux-musl
             riscv64gc-unknown-linux-musl riscv64-linux-musl
-            s390x-unknown-linux-musl s390x-linux-musl
             loongarch64-unknown-linux-musl loongarch64-linux-musl
             aarch64-unknown-linux-musl aarch64-linux-musl
 
