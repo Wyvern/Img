@@ -1531,11 +1531,11 @@ jobs:
             aarch64-unknown-uefi
             i586-unknown-linux-gnu
             i686-unknown-linux-gnu
-            wasm32-wali-linux-musl
             i686-pc-windows-gnu
             i686-win7-windows-gnu
             x86_64-pc-windows-gnu
             x86_64-win7-windows-gnu
+            wasm32-wali-linux-musl
             wasm32-wasip2
             wasm32-wasip3
 
