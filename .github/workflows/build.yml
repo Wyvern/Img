@@ -625,7 +625,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: aarch64-unknown-freebsd,x86_64-unknown-freebsd,x86_64-unknown-netbsd
+          targets: aarch64-unknown-freebsd,x86_64-unknown-freebsd,i686-unknown-freebsd,x86_64-unknown-netbsd
 
       - name: Set targets
         id: targets
@@ -634,6 +634,7 @@ jobs:
           targets: |
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
+            i686-unknown-freebsd
             x86_64-unknown-netbsd
 
       - name: Build Release
