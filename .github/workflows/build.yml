@@ -587,10 +587,10 @@ jobs:
           targets_from_env
 
           for target in "${targets[@]}"; do
-            time cr $target &
+            time cr $target
           done
 
-          wait
+          # wait
 
       - name: Upload release binaries
         uses: ./.github/actions/upload
