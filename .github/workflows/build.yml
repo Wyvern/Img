@@ -723,8 +723,6 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-          targets: wasm32-wasip2,wasm32-wasip3
 
       - name: Cache llvm-mingw
         uses: actions/cache@v6
@@ -747,17 +745,17 @@ jobs:
         with:
           targets: |
             aarch64-apple-ios
+            x86_64-apple-ios
             arm64e-apple-ios
             aarch64-apple-tvos
             arm64e-apple-tvos
+            x86_64-apple-tvos
             aarch64-apple-watchos
             arm64_32-apple-watchos
             aarch64-apple-visionos
             aarch64-apple-darwin
             arm64e-apple-darwin
             x86_64h-apple-darwin
-            wasm32-wasip2
-            wasm32-wasip3
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             i686-pc-windows-gnullvm
@@ -1523,7 +1521,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: i686-pc-windows-gnu
+          targets: i686-pc-windows-gnu,wasm32-wasip2,wasm32-wasip3
 
       - name: Set targets
         id: targets
@@ -1540,6 +1538,8 @@ jobs:
             i686-win7-windows-gnu
             x86_64-pc-windows-gnu
             x86_64-win7-windows-gnu
+            wasm32-wasip2
+            wasm32-wasip3
 
       - name: Build Release
         env:
