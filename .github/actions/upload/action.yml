@@ -110,7 +110,11 @@ runs:
             elif [[ "$os" == *os ]]; then
               os="${os%os}OS"
             fi
-            name=Apple-${os}-${arch}
+            if [[ -n "$abi" ]]; then
+              name=Apple-${os}-${arch}-${abi}
+            else
+              name=Apple-${os}-${arch}
+            fi
           elif [[ -n "$abi" ]]; then
             if [[ "$vendor" == "openwrt" ]]; then
                 name="$(cap $vendor)-${arch}-${abi}"
