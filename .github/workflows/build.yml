@@ -535,6 +535,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Docker Cache
+        run: |
+          targets=(
+            x86_64-unknown-illumos
+            sparcv9-sun-solaris
+            x86_64-pc-solaris
+          )
+
+          for target in ${targets[@]}; do
+            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
+            docker pull $CROSS_IMAGE &>/dev/null &
+          done
+
       - name: Cache cross-rs
         uses: actions/cache@v6
         with:
