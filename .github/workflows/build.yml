@@ -325,7 +325,7 @@ jobs:
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-gnux32,aarch64-unknown-linux-gnu,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu
+          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-gnux32,aarch64-unknown-linux-gnu,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu,riscv64a23-unknown-linux-gnu
 
       - name: Set targets
         id: targets
@@ -413,7 +413,7 @@ jobs:
             aarch64-apple-watchos
             aarch64-apple-visionos
             aarch64-apple-darwin
-            x86_64h-apple-darwin
+            x86_64-apple-darwin
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             i686-pc-windows-gnullvm
@@ -436,7 +436,7 @@ jobs:
 
           wait
 
-          lipo -create target/arm64e-apple-darwin/lto/img target/x86_64h-apple-darwin/lto/img -output Img-Universal
+          lipo -create target/arm64e-apple-darwin/lto/img target/x86_64-apple-darwin/lto/img -output Img-Universal
 
       - name: Upload release binaries
         uses: ./.github/actions/upload
@@ -535,38 +535,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Checkout rust-cross-toolchain
-        uses: actions/checkout@v7
-        with:
-          repository: taiki-e/rust-cross-toolchain
-          path: rust-cross-toolchain
-
-      - name: GHCR Setup
-        uses: ./.github/actions/ghcr
-        with:
-         token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker cross-toolchain images
-        working-directory: rust-cross-toolchain
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          targets=(
-            x86_64-unknown-illumos
-            sparcv9-sun-solaris
-            x86_64-pc-solaris
-          )
-
-          for target in ${targets[@]}; do
-            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
-            docker pull $CROSS_IMAGE &>/dev/null &
-          done
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-        with:
-          targets: x86_64-unknown-illumos,sparcv9-sun-solaris,x86_64-pc-solaris
-
       - name: Cache cross-rs
         uses: actions/cache@v6
         with:
@@ -580,6 +548,11 @@ jobs:
             cargo install cross --git https://github.com/cross-rs/cross --branch main -q --force &>/dev/null
           fi
           # cross --version
+
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
+        with:
+          targets: x86_64-unknown-illumos,sparcv9-sun-solaris,x86_64-pc-solaris
 
       - name: Set targets
         id: targets
@@ -705,7 +678,7 @@ jobs:
         uses: ./.github/actions/toolchain
         with:
           ccw: false
-          target: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc,x86_64-pc-windows-msvc,i686-pc-windows-msvc
+          targets: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc,x86_64-pc-windows-msvc,i686-pc-windows-msvc
 
       - name: Set targets
         id: targets
