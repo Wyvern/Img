@@ -66,6 +66,7 @@ runs:
         version: ${{ inputs.version }}
 
     - name: Update rust std package
+      if: false
       shell: bash
       run: |
         SYSROOT="$(rustc --print sysroot)"
