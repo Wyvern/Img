@@ -1,0 +1,29 @@
+name: Windows Runner Cleanup
+description: Configure Windows services, telemetry, advertising, error reporting, and scheduled tasks
+
+runs:
+  using: composite
+  steps:
+    - name: Disable and Stop Windows Services
+      if: runner.os == 'Windows'
+      continue-on-error: true
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Ignore'
+
+        $pattern = "maint|diag|exper|search|logs|assist|report|defend";
+        $services = Get-Service|? DisplayName -match $pattern
+
+        $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
+        $services | Stop-Service -Force
+
+        $services | % {$_.DisplayName; $_.Status}
+
+        reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+        reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+        reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" /v Enabled /t REG_DWORD /d 0 /f
+        reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
+
+        Get-ScheduledTask | Disable-ScheduledTask -Confirm:$false
+        Get-ScheduledTask | Unregister-ScheduledTask -Confirm:$false
+        # schtasks /delete /tn * /f >NUL

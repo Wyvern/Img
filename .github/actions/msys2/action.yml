@@ -1,0 +1,35 @@
+name: Install MSYS2 Packages
+description: Install MinGW GCC toolchains and Windows Store compatibility libraries
+
+runs:
+  using: composite
+  steps:
+    - name: Install MSYS2 packages
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        @'
+        Server = https://repo.msys2.org/mingw/$repo/
+        '@ | Set-Content C:\msys64\etc\pacman.d\mirrorlist.mingw
+
+        @'
+        Server = https://repo.msys2.org/msys/$arch/
+        '@ | Set-Content C:\msys64\etc\pacman.d\mirrorlist.msys
+
+        $bash = 'C:\msys64\usr\bin\bash.exe'
+
+        & $bash -lc 'pacman -Syu --noconfirm'
+
+        & $bash -lc 'pacman -S --needed --noconfirm mingw-w64-i686-gcc mingw-w64-x86_64-gcc'
+
+        & $bash -lc '
+          curl -fsSL -o /tmp/winstorecompat.pkg.tar.zst \
+            https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-winstorecompat-14.0.0.r98.g19f5121a2-1-any.pkg.tar.zst &&
+          pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
+        '
+
+        & $bash -lc '
+          curl -fsSL -o /tmp/winstorecompat.pkg.tar.zst \
+            https://repo.msys2.org/mingw/mingw32/mingw-w64-i686-winstorecompat-14.0.0.r92.g818fa6510-1-any.pkg.tar.zst &&
+          pacman -U --noconfirm /tmp/winstorecompat.pkg.tar.zst
+        '

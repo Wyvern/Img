@@ -1,0 +1,74 @@
+name: Rust, Zig toolchain, cache setup and C/C++ wrappers
+description: Set up nightly Rust, Rust cache, sccache Zig and C/C++ wrappers
+
+inputs:
+  toolchain:
+    description: Install Rust toolchain
+    required: false
+    default: nightly
+  targets:
+    description: Install Rust targets
+    required: false
+  zig:
+    description: Whether to install the Zig master toolchain
+    required: false
+  version:
+    description: Zig toolchain version to install
+    required: false
+    default: master
+  ccw:
+    description: Setup C/C++ wrappers
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Rust Toolchain
+      uses: dtolnay/rust-toolchain@nightly
+      with:
+        components: rust-src
+        targets: ${{ inputs.targets }}
+        toolchain: ${{ inputs.toolchain }}
+
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+        cache-all-crates: "true"
+        cache-workspace-crates: "true"
+
+    - name: Sccache cache
+      uses: mozilla-actions/sccache-action@main
+      with:
+          version: "v0.18.0"
+
+    - name: Create C/C++ wrappers
+      if: inputs.ccw == 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        mkdir -p sccache-bin
+
+        for compiler in clang clang++ gcc g++; do
+          cat > "sccache-bin/$compiler" <<EOF
+        #!/bin/bash
+        exec sccache /usr/bin/$compiler "\$@"
+        EOF
+          chmod +x "sccache-bin/$compiler"
+        done
+
+        echo "$GITHUB_WORKSPACE/sccache-bin" >> "$GITHUB_PATH"
+
+    - name: Zig toolchain install
+      if: inputs.zig == 'true'
+      uses: mlugg/setup-zig@v2
+      with:
+        version: ${{ inputs.version }}
+
+    - name: Update rust std package
+      shell: bash
+      run: |
+        SYSROOT="$(rustc --print sysroot)"
+        SRC="$SYSROOT/lib/rustlib/src/rust"
+        cargo update --manifest-path "$SRC/library/Cargo.toml"
