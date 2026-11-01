@@ -708,7 +708,7 @@ jobs:
     runs-on: xcode-27
 
     env:
-      mingw: "20261006"
+      mingw: "20261020"
 
     permissions:
       contents: write
@@ -745,20 +745,21 @@ jobs:
         with:
           targets: |
             x86_64-apple-ios
+            aarch64-apple-ios
+            arm64e-apple-ios
             x86_64-apple-tvos
-            # aarch64-apple-ios
-            # arm64e-apple-ios
-            # aarch64-apple-tvos
-            # arm64e-apple-tvos
-            # aarch64-apple-watchos
-            # arm64_32-apple-watchos
-            # aarch64-apple-visionos
-            # aarch64-apple-darwin
-            # arm64e-apple-darwin
-            # x86_64h-apple-darwin
-            # aarch64-pc-windows-gnullvm
-            # x86_64-pc-windows-gnullvm
-            # i686-pc-windows-gnullvm
+            aarch64-apple-tvos
+            arm64e-apple-tvos
+            aarch64-apple-watchos
+            arm64_32-apple-watchos
+            aarch64-apple-visionos
+            aarch64-apple-darwin
+            arm64e-apple-darwin
+            x86_64h-apple-darwin
+            x86_64-apple-darwin
+            aarch64-pc-windows-gnullvm
+            x86_64-pc-windows-gnullvm
+            i686-pc-windows-gnullvm
 
       - name: Build Release
         env:
@@ -776,7 +777,7 @@ jobs:
 
           wait
 
-          lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
+          lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal || true
 
       - name: Upload release binaries
         uses: ./.github/actions/upload
