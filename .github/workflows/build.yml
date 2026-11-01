@@ -14,51 +14,6 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  Test:
-      name: Test
-      if: ${{ vars.TEST == '1'}}
-      runs-on: ubuntu-26.04-arm
-
-      permissions:
-        contents: write
-        packages: write
-
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v7
-
-        - name: Toolchain Setup
-          uses: ./.github/actions/toolchain
-          # with:
-          #   zig: true
-
-        - name: Set targets
-          id: targets
-          uses: ./.github/actions/targets
-          with:
-            targets: |
-
-        - name: Build Release
-          env:
-            TARGETS: ${{ steps.targets.outputs.targets }}
-          run: |
-            cargo update
-            set +e -x
-
-            source .github/scripts/util.sh
-            targets_from_env
-
-            for entry in "${targets[@]}"; do
-              time cargo l $target
-            done
-
-            wait
-
-        - name: Upload release binaries
-          uses: ./.github/actions/upload
-          with:
-            targets:
-
   Android:
     name: Android
     if: ${{ vars.TEST != '1' || vars.android == '1'  }}
@@ -86,21 +41,12 @@ jobs:
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:android-ndk-${ndk}"); then
             mkdir ~/android-ndk-${ndk} && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C ~/android-ndk-${ndk} &
-          else
-            echo "Downloading Android NDK ${ndk} ..."
-            curl -fsSLO https://dl.google.com/android/repository/android-ndk-${ndk}-linux.zip
-            echo "UnZipping Android NDK ${ndk} ..."
-            unzip -q android-ndk-${ndk}-linux.zip -d ~/
-            file=android-ndk-${ndk}
-            source .github/scripts/util.sh
-            push_docker $file "${IMAGE}:$file" android &
-
-            # tar --zstd -C ./$file -cf /tmp/$file.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:$file" "/tmp/$file.tar.zst:application/vnd.wyvern.android.tar.zstd" &
           fi
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: aarch64-unknown-linux-ohos,armv7-unknown-linux-ohos,x86_64-unknown-linux-ohos,aarch64-linux-android,armv7-linux-androideabi,arm-linux-androideabi,thumbv7neon-linux-androideabi,x86_64-linux-android,i686-linux-android
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
@@ -115,7 +61,6 @@ jobs:
             aarch64-unknown-linux-ohos
             armv7-unknown-linux-ohos
             x86_64-unknown-linux-ohos
-            riscv64-linux-android
             aarch64-linux-android
             armv7-linux-androideabi
             arm-linux-androideabi
@@ -142,95 +87,6 @@ jobs:
           for target in "${targets[@]}"; do
             time cargo l $target
           done
-
-      - name: Upload release binaries
-        uses: ./.github/actions/upload
-        with:
-          targets: ${{ steps.targets.outputs.targets }}
-
-  ESP-IDF:
-    name: ESP-IDF
-    if: ${{ vars.TEST != '1' || vars.espidf == '1'  }}
-    runs-on: ubuntu-26.04-arm
-
-    steps:
-      # - name: Disable macos spotlight index
-      #   run: |
-      #     sudo mdutil -a -i off
-      #     sudo mdutil -a -d
-      #     sudo pmset -a powernap 0
-      #     sudo pmset -a sleep 0
-
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Install ESP-IDF tools
-        run: |
-          {
-          git clone -b v6.1 --depth=1 https://github.com/espressif/esp-idf.git espidf
-          } &>/dev/null &
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-
-      - name: Cache ldproxy
-        uses: actions/cache@v6
-        with:
-          path: ~/.cargo/bin/ldproxy
-          key: ${{ runner.os }}-ldproxy
-          restore-keys: ${{ runner.os }}-ldproxy
-
-      - name: Install ldproxy
-        run: |
-          if [[ ! -f ~/.cargo/bin/ldproxy ]]; then
-            cargo install ldproxy -q &
-          fi
-
-      - name: Rust Toolchain for Xtensa
-        uses: esp-rs/xtensa-toolchain@v1.7.0
-
-      - name: Set targets
-        id: targets
-        uses: ./.github/actions/targets
-        with:
-          targets: |
-            riscv32imac-esp-espidf
-            riscv32imafc-esp-espidf
-            riscv32imc-esp-espidf
-            xtensa-esp32-espidf
-            xtensa-esp32s2-espidf
-            xtensa-esp32s3-espidf
-
-      - name: Build Release
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        run: |
-          cargo update
-          set +e -x
-
-          time {
-          espidf/install.sh all
-          . espidf/export.sh
-          } &>/dev/null
-
-          source .github/scripts/util.sh
-          targets_from_env
-
-          for target in "${targets[@]:0:3}"; do
-            time cargo l "$target" -Fespidf &
-          done
-
-          sleep 1
-
-          mv .cargo/config.toml .cargo/config.toml.bak
-
-          s=(b -q --profile src -Zbuild-std=std,panic_abort --target)
-          for target in "${targets[@]:3}"; do
-            time cargo +esp "${s[@]}" "$target" -Fespidf --config ".cargo/espidf.toml" &
-          done
-
-          unset s
-          wait
 
       - name: Upload release binaries
         uses: ./.github/actions/upload
@@ -267,37 +123,20 @@ jobs:
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:fuchsia"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/Fuchsia" && touch ~/fuchsia.finish &
-          else
-            curl -LsSf 'https://chrome-infra-packages.appspot.com/client?platform=linux-amd64&version=latest' -o cipd
-            chmod +x cipd
-            sudo mv cipd /usr/local/bin/
-            mkdir -p /home/runner/Fuchsia
-            cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
-            touch ~/fuchsia.finish
-            source .github/scripts/util.sh
-            push_docker /home/runner/Fuchsia "${IMAGE}:fuchsia" fuchsia &
-
-            # tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
           fi
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: x86_64-fortanix-unknown-sgx
+          targets: x86_64-fortanix-unknown-sgx,aarch64-unknown-fuchsia,x86_64-unknown-fuchsia
 
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
         with:
           targets: |
-            aarch64-unknown-hermit
-            aarch64_be-unknown-hermit
-            riscv64gc-unknown-hermit
-            x86_64-unknown-hermit
             x86_64-fortanix-unknown-sgx
             aarch64-unknown-fuchsia
-            riscv64gc-unknown-fuchsia
             x86_64-unknown-fuchsia
 
       - name: Build Release
@@ -307,28 +146,14 @@ jobs:
           cargo update
           set +e -x
 
-          mv .cargo/config.toml .cargo/config.toml.bak
-
           source .github/scripts/util.sh
           targets_from_env
 
-          cb() {
-            cargo build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
-          }
-
-          for target in "${targets[@]:0:4}"; do
-            time cb "$target" --config ".cargo/hermit.toml" &
-          done
-
-          sleep 1
-
-          mv .cargo/config.toml.bak .cargo/config.toml
-
-          time cargo l "${targets[4]}" &
+          time cargo l "${targets[0]}" &
 
           time waitfor ~/fuchsia.finish ~/llvm.finish
 
-          for target in "${targets[@]:5}"; do
+          for target in "${targets[@]:1}"; do
             time cargo l "$target" &
           done
 
@@ -385,114 +210,12 @@ jobs:
             done
             touch ~/ppc64gnu.finish ~/ppc64musl.finish
             } &
-          else
-            nix build --quiet -o ppc64-gnu nixpkgs#pkgsCross.ppc64-elfv2.stdenv.cc && touch ~/ppc64gnu.finish &
-            nix build --quiet -o ppc64-musl nixpkgs#pkgsCross.ppc64-musl.stdenv.cc && touch ~/ppc64musl.finish &
-            wait
-            for variant in gnu musl; do
-              root=$(readlink -f "ppc64-${variant}")
-              printf '%s\n' "$root" > "ppc64/ppc64-${variant}.root"
-              nix-store --export $(nix-store -qR "$root") |
-                zstd -T0 -19 -o "ppc64/ppc64-${variant}.nar.zst"
-            done
-            source .github/scripts/util.sh
-            push_docker ppc64 "${IMAGE}:ppc64" ppc64 &
           fi
-
-      - name: Cache aarch64be
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          path=aarch64be
-          mkdir -p $path
-
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:aarch64be-${aarch64be}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
-            ln -sfn $path/glibc $path-glibc
-            ln -sfn $path/musl $path-musl
-          else
-            for abi in glibc musl; do
-              url=https://toolchains.bootlin.com/downloads/releases/toolchains/aarch64be/tarballs/aarch64be--${abi}--stable-${aarch64be}.tar.xz
-              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1 &
-              ln -sfn $path/$abi $path-$abi
-            done
-            wait
-            source .github/scripts/util.sh
-            push_docker $path "${IMAGE}:aarch64be-${aarch64be}" aarch64be &
-
-            # tar --zstd -C $path -cf /tmp/aarch64be-${aarch64be}.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
-          fi
-
-      - name: Cache riscv32
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          path=rv32
-          mkdir -p $path
-
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:riscv32-${riscv32}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
-            ln -sfn $path/gnu $path-gnu
-            ln -sfn $path/musl $path-musl
-          else
-            for abi in gnu musl; do
-              url=https://github.com/cross-tools/clang-cross/releases/download/${riscv32}/riscv32-unknown-linux-${abi}.tar.xz
-              mkdir -p "$path/$abi" && curl -LsSf $url | tar -xJ -C "$path/$abi" --strip-components=1 &
-              ln -sfn $path/$abi $path-$abi
-            done
-            wait
-            source .github/scripts/util.sh
-            push_docker $path "${IMAGE}:riscv32-${riscv32}" riscv32 &
-
-            # tar --zstd -C $path -cf /tmp/riscv32-${riscv32}.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:riscv32-${riscv32}" "/tmp/riscv32-${riscv32}.tar.zst:application/vnd.wyvern.riscv32.tar.zstd" &
-          fi
-
-      - name: Cache hexagon
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          path=/home/runner/hexagon
-          mkdir -p $path
-
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:hexagon-${hexagon}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C $path &
-          else
-            echo "Downloading hexagon SDK ..."
-            curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C $path
-            source .github/scripts/util.sh
-            push_docker $path "${IMAGE}:hexagon-${hexagon}" hexagon &
-
-            # tar --zstd -C $path -cf /tmp/hexagon-${hexagon}.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:hexagon-${hexagon}" "/tmp/hexagon-${hexagon}.tar.zst:application/vnd.wyvern.hexagon.tar.zstd" &
-          fi
-
-          ln -sf $path/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl/x86_64-linux-gnu hexagon
-
-      - name: Cache openwrt
-        uses: actions/cache@v6
-        with:
-          path: /home/runner/openwrt
-          key: openwrt-${{env.openwrt}}
-          restore-keys: openwrt-${{env.openwrt}}
-
-      - name: Openwrt Setup
-        run: |
-          if [ ! -d /home/runner/openwrt ]; then
-            mkdir -p /home/runner/openwrt
-            curl -LsSf https://downloads.openwrt.org/releases/${openwrt}/targets/octeon/generic/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64.tar.zst | tar --zstd -xf - -C /home/runner/openwrt &
-          fi
-          ln -sf /home/runner/openwrt/openwrt-toolchain-${openwrt}-octeon-generic_gcc-14.3.0_musl.Linux-x86_64/toolchain-mips64_octeonplus_64_gcc-14.3.0_musl wrt
-
-      # - name: Install Nix
-      #   uses: DeterminateSystems/nix-installer-action@main
-
-      # - name: Install Nix
-      #   uses: cachix/install-nix-action@31
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: powerpc64-unknown-linux-musl,sparc64-unknown-linux-gnu,powerpc64-unknown-linux-gnu
 
       - name: Set targets
         id: targets
@@ -500,16 +223,8 @@ jobs:
         with:
           targets: |
             powerpc64-unknown-linux-musl
-            powerpc64-unknown-linux-gnuelfv2
             sparc64-unknown-linux-gnu
-            sparc-unknown-linux-gnu
             powerpc64-unknown-linux-gnu
-            aarch64_be-unknown-linux-gnu
-            aarch64_be-unknown-linux-musl
-            hexagon-unknown-linux-musl
-            mips64-openwrt-linux-musl
-            riscv32gc-unknown-linux-gnu
-            riscv32gc-unknown-linux-musl
 
       - name: Build Release
         env:
@@ -522,19 +237,14 @@ jobs:
           targets_from_env
 
           time waitfor ~/ppc64musl.finish && time cargo l "${targets[0]}" &
-          time waitfor ~/ppc64gnu.finish && time cargo l "${targets[1]}" &
 
           {
             time waitfor ~/apt.finish
-            for target in "${targets[@]:2:3}"; do
+            for target in "${targets[@]:1}"; do
               time cargo l "$target" &
             done
             wait
           } &
-
-          for target in "${targets[@]:5}"; do
-            time cargo l "$target" &
-          done
 
           wait
 
@@ -563,6 +273,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: thumbv7neon-unknown-linux-gnueabihf,armv7-unknown-linux-gnueabi,armv7-unknown-linux-gnueabihf,armv5te-unknown-linux-gnueabi,arm-unknown-linux-gnueabi,arm-unknown-linux-gnueabihf
 
       - name: Set targets
         id: targets
@@ -573,7 +285,6 @@ jobs:
             armv7-unknown-linux-gnueabi
             armv7-unknown-linux-gnueabihf
             armv5te-unknown-linux-gnueabi
-            armv4t-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf
 
@@ -613,6 +324,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: x86_64-unknown-linux-gnu,x86_64-unknown-linux-gnux32,aarch64-unknown-linux-gnu,riscv64gc-unknown-linux-gnu,s390x-unknown-linux-gnu,powerpc64le-unknown-linux-gnu,powerpc-unknown-linux-gnu,sparc64-unknown-linux-gnu,loongarch64-unknown-linux-gnu
 
       - name: Set targets
         id: targets
@@ -650,58 +363,6 @@ jobs:
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
-  Linux-Mips:
-    name: Linux-Mips
-    if: ${{ vars.TEST != '1' || vars.mips == '1'  }}
-    runs-on: ubuntu-24.04-arm
-
-    steps:
-      - name: Ubuntu apt update and install
-        run: |
-           sudo apt install gcc-mips64-linux-gnuabi64 gcc-mips64el-linux-gnuabi64 gcc-mipsisa64r6el-linux-gnuabi64 gcc-mipsisa64r6-linux-gnuabi64 gcc-mipsisa32r6el-linux-gnu gcc-mipsisa32r6-linux-gnu gcc-mips-linux-gnu gcc-mipsel-linux-gnu -qy &>/dev/null && touch ~/apt.finish &
-
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-
-      - name: Set targets
-        id: targets
-        uses: ./.github/actions/targets
-        with:
-          targets: |
-            mips64-unknown-linux-gnuabi64
-            mips64el-unknown-linux-gnuabi64
-            mipsel-unknown-linux-gnu
-            mips-unknown-linux-gnu
-            mipsisa64r6-unknown-linux-gnuabi64
-            mipsisa64r6el-unknown-linux-gnuabi64
-            mipsisa32r6-unknown-linux-gnu
-            mipsisa32r6el-unknown-linux-gnu
-
-      - name: Build Release
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        run: |
-          cargo update
-          set +e -x
-
-          time waitfor ~/apt.finish
-
-          source .github/scripts/util.sh
-          targets_from_env
-
-          for target in "${targets[@]}"; do
-            time cargo l $target &
-          done
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/upload
-        with:
-          targets: ${{ steps.targets.outputs.targets }}
-
   macOS:
     name: macOS
     if: ${{ vars.TEST != '1' || vars.macos == '1'  }}
@@ -721,11 +382,6 @@ jobs:
       - name: macOS cleanup
         uses: ./.github/actions/macos-cleanup
 
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-        with:
-          targets: wasm32-wasip2,wasm32-wasip3
-
       - name: Cache llvm-mingw
         uses: actions/cache@v6
         with:
@@ -741,20 +397,21 @@ jobs:
           fi
           echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
+      - name: Toolchain Setup
+        uses: ./.github/actions/toolchain
+        with:
+          targets: x86_64-apple-darwin,aarch64-apple-ios,aarch64-apple-tvos,aarch64-apple-visionos,aarch64-apple-watchos,wasm32-wasip2,wasm32-wasip3,x86_64-pc-windows-gnullvm,aarch64-pc-windows-gnullvm,i686-pc-windows-gnullvm
+
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
         with:
           targets: |
             aarch64-apple-ios
-            arm64e-apple-ios
             aarch64-apple-tvos
-            arm64e-apple-tvos
             aarch64-apple-watchos
-            arm64_32-apple-watchos
             aarch64-apple-visionos
             aarch64-apple-darwin
-            arm64e-apple-darwin
             x86_64h-apple-darwin
             wasm32-wasip2
             wasm32-wasip3
@@ -778,7 +435,7 @@ jobs:
 
           wait
 
-          lipo -create target/arm64e-apple-darwin/src/img target/x86_64h-apple-darwin/src/img -output Img-Universal
+          lipo -create target/arm64e-apple-darwin/lto/img target/x86_64h-apple-darwin/lto/img -output Img-Universal
 
       - name: Upload release binaries
         uses: ./.github/actions/upload
@@ -803,143 +460,36 @@ jobs:
         with:
          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Hurd-i686 cache
-        run: |
-          IMAGE="${IMAGE,,}"
-
-          docker pull kraftkit.sh/base:latest >/dev/null && touch ~/kraft.finish &
-
-          if docker manifest inspect "$IMAGE:hurd-i686" &>/dev/null; then
-            docker pull "$IMAGE:hurd-i686" &>/dev/null && touch ~/hurd.finish &
-          else
-            mkdir hurd
-            cd hurd
-
-            cat > Dockerfile <<'EOF'
-          FROM ubuntu:24.04
-
-          ENV DEBIAN_FRONTEND=noninteractive
-          ENV PATH="/cross-tools-i686/bin:${PATH}"
-
-          RUN apt-get update && apt-get install -y --no-install-recommends \
-              git sudo ca-certificates curl wget \
-              build-essential perl \
-              texinfo autopoint pkg-config libtool \
-              autotools-dev automake autoconf gettext \
-              libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev \
-              flex bison gawk m4 patch xz-utils bzip2 \
-              file python3 \
-              && rm -rf /var/lib/apt/lists/*
-
-          WORKDIR /src/cross-hurd
-
-          RUN git clone --depth=1 https://github.com/flavioc/cross-hurd.git . \
-              && sed -i 's|^ZLIB_VERSION=1\.3\.1$|ZLIB_VERSION=1.3.2|' package-versions.sh \
-              && sed -i 's|^ZLIB_URL=.*|ZLIB_URL=https:\/\/zlib.net\/fossils\/"$ZLIB_PKG"|' download-funcs.sh \
-              && sed -i 's|^MAKE_URL=\$GNU_REPO/"\$MAKE_PKG"|MAKE_URL=$GNU_REPO/make/"$MAKE_PKG"|' download-funcs.sh \
-              && sed -i '/apply_patch .*submitted-AF_LINK\.diff 1/c\    sed -i -e "s|^[[:space:]]*#define[[:space:]]*PF_LINK[[:space:]]*18.*|/* #define PF_LINK 18 Link layer interface. */|" -e "s|^[[:space:]]*#define[[:space:]]*AF_LINK[[:space:]]*PF_LINK|/* #define AF_LINK PF_LINK */|" sysdeps/mach/hurd/bits/socket.h &&' download-funcs.sh \
-              && sed -i 's|^DMIDECODE_URL=http://|DMIDECODE_URL=https://|' download-funcs.sh \
-              && sed -i 's|download\.savannah\.gnu\.org/releases/dmidecode/|download-mirror.savannah.gnu.org/releases/dmidecode/|' download-funcs.sh \
-              && sed -i '/--disable-libgomp \\/a\      --disable-libsanitizer \\' bootstrap-funcs.sh \
-              && export CFLAGS="-O3 -pipe -g0" \
-              && export CXXFLAGS="-O3 -pipe -g0" \
-              && export LDFLAGS="-Wl,-O3" \
-              && CPU=i686 bash -x download.sh \
-              && DISABLE_ADA=1 CPU=i686 bash -x bootstrap.sh \
-              && find /cross-tools-i686 -type d \
-                    \( -name __pycache__ -o -name man -o -name doc -o -name docs \) \
-                    -prune -exec rm -rf {} + \
-              && rm -rf /src/cross-hurd/src \
-                        /src/cross-hurd/build-i686 \
-                        /root/.cache \
-                        /tmp/* \
-                        /var/tmp/* \
-              && test -x /cross-tools-i686/bin/i686-gnu-gcc \
-              && /cross-tools-i686/bin/i686-gnu-gcc -dumpmachine \
-              && apt-get clean \
-              && apt-get purge -y --auto-remove
-
-          ENTRYPOINT ["/cross-tools-i686/bin/i686-gnu-gcc"]
-          EOF
-
-            docker build --platform linux/amd64 \
-                --provenance=false \
-                --load \
-                --progress=plain \
-                -t ghcr.io/wyvern/img:hurd-i686 .
-
-            touch ~/hurd.finish
-
-            docker push ghcr.io/wyvern/img:hurd-i686 &
-          fi
-
       - name: Emscripten Cache
         run: |
           IMAGE="${IMAGE,,}"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:emscripten"); then
             mkdir -p emsdk && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "emsdk" && touch ~/ems.finish &
-          else
-            git clone --depth 1 --single-branch https://github.com/emscripten-core/emsdk.git
-            ./emsdk/emsdk install latest &>/dev/null
-            ./emsdk/emsdk activate latest &>/dev/null
-            touch ~/ems.finish
-            source .github/scripts/util.sh
-            push_docker emsdk "${IMAGE}:emscripten" emscripten &
-
-            # tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
           fi
 
       - name: Redox Cache
         run: |
           IMAGE="${IMAGE,,}"
 
-          targets=(
-            aarch64-unknown-redox
-            riscv64gc-unknown-redox
-            x86_64-unknown-redox
-            i586-unknown-redox
-          )
-
           mkdir -p "redox"
 
           if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:redox"); then
             oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "redox" && touch ~/redox.finish &
-          else
-            file=relibc-install.tar.gz
-            url="https://static.redox-os.org/toolchain/x86_64-unknown-linux-gnu"
-            for target in "${targets[@]}"; do
-              mkdir -p "redox/$target"
-              curl -fsSL "$url/$target/$file" | tar -xz -C "redox/$target" &
-            done
-            wait
-            touch ~/redox.finish
-            source .github/scripts/util.sh
-            push_docker redox "${IMAGE}:redox" redox &
-
-            # tar --zstd -C "redox/" -cf /tmp/redox.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:redox" "/tmp/redox.tar.zst:application/vnd.wyvern.redox.tar.zstd" &
           fi
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: wasm32-unknown-emscripten,x86_64-unknown-redox
 
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
         with:
           targets: |
-            x86_64-unknown-motor
-            riscv32imac-unknown-xous-elf
-            x86_64-unknown-hurd-gnu
             wasm32-unknown-emscripten
-            i686-unknown-hurd-gnu
-            aarch64-unknown-redox
-            riscv64gc-unknown-redox
             x86_64-unknown-redox
-            i586-unknown-redox
-            x86_64-unikraft-linux-musl
 
       - name: Build Release
         env:
@@ -951,34 +501,14 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]:0:3}"; do
-            time cargo l $target &
-          done
-
           {
             time waitfor ~/ems.finish
             source ./emsdk/emsdk_env.sh &>/dev/null
-            time cargo l ${targets[3]}
-          } &
-
-          {
-            time waitfor ~/hurd.finish
-            docker_linker i686-gnu-gcc ghcr.io/wyvern/img:hurd-i686
-            time cargo l ${targets[4]}
-          } &
-
-          {
-            time waitfor ~/kraft.finish
-            docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
-            target="${targets[9]}"
-            time cargo l $target --config "target.${target}.linker = './unikraft'"
+            time cargo l ${targets[0]}
           } &
 
           time waitfor ~/redox.finish
-
-          for target in "${targets[@]:5:4}"; do
-              time cargo l "$target" &
-          done
+          time cargo l ${targets[1]} &
 
           wait
 
@@ -1010,30 +540,6 @@ jobs:
           repository: taiki-e/rust-cross-toolchain
           path: rust-cross-toolchain
 
-      - name: Patch rust-cross-toolchain
-        working-directory: rust-cross-toolchain
-        run: |
-            sed -i 's/\[1-8\]\.\*) ext=tgz ;;/[1-9].*|1[0-9].*) ext=tgz ;;/g' \
-            docker/base/netbsd.Dockerfile
-
-            df=(netbsd openbsd linux-gnu)
-            for file in "${df[@]}"; do
-              dockerfile="docker/$file.Dockerfile"
-              if [[ "$file" == "linux-gnu" ]]; then
-                sed -i '/^FROM ghcr.io\/taiki-e\/build-base:"${DISTRO}-${DISTRO_VERSION}" AS test-base$/,/^FROM "${DISTRO}":"${DISTRO_VERSION}" AS final$/{
-                  /^FROM "${DISTRO}":"${DISTRO_VERSION}" AS final$/!d
-                }' "$dockerfile"
-
-                sed -i 's/COPY --from=test \//COPY --from=builder \//' "$dockerfile"
-              fi
-              sed -i '/RUN \/test\/test.sh/d' "$dockerfile"
-              sed -i '/^RUN apt-get update && apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates && rm -rf \/var\/lib\/apt\/lists\/\*$/d' "$dockerfile"
-
-              sed -i '/^FROM \(ubuntu:"${UBUNTU_VERSION}"\|"${DISTRO}":"${DISTRO_VERSION}"\) AS final$/a\
-              RUN apt-get update \&\& apt-get install -y --no-install-recommends gcc libc6-dev clang ca-certificates \&\& rm -rf /var/lib/apt/lists/*
-              ' "$dockerfile"
-            done
-
       - name: GHCR Setup
         uses: ./.github/actions/ghcr
         with:
@@ -1043,85 +549,6 @@ jobs:
         working-directory: rust-cross-toolchain
         run: |
           IMAGE="${IMAGE,,}"
-
-          if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
-              docker pull "$IMAGE:haiku-cross" &>/dev/null &
-          else
-              mkdir -p haiku
-
-              curl -fsSL -o haiku/Dockerfile https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/Dockerfile \
-              -o haiku/build-toolchain.sh https://github.com/haiku/haiku/raw/refs/heads/master/3rdparty/docker/cross-compiler/build-toolchain.sh
-
-              printf '\nENTRYPOINT ["x86_64-unknown-haiku-gcc"]\n' >> haiku/Dockerfile
-              sed -i '/^RUN apt-get install/ s/$/ \&\& rm -rf \/var\/lib\/apt\/lists\/* \/var\/cache\/apt\/archives\/*/' haiku/Dockerfile
-
-              file="haiku/build-toolchain.sh"
-
-              sed -i '/^git clone --depth=1 --branch \$BUILDTOOLS_REV https:\/\/review.haiku-os.org\/buildtools$/a\
-              \
-              # Patch Haiku source after cloning.\
-              sed -i '\''/^#include "Data.h"$/a #include <cstddef>'\'' "$HAIKU/src/kits/storage/sniffer/RPattern.cpp"\ ' "$file"
-
-              python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path("haiku/build-toolchain.sh")
-          script = path.read_text()
-
-          anchor = "$HAIKU/configure $configureArgs"
-
-          flags_marker = "# Optimize the x86_64 Haiku target."
-          flags = '''# Optimize the x86_64 Haiku target.
-          export CFLAGS="-O3 -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -pipe -g0"
-          export CXXFLAGS="$CFLAGS -fno-exceptions -fno-rtti -fvisibility-inlines-hidden"
-          '''
-
-          if flags_marker in script:
-              print("Optimization flags already present; skipping.")
-          else:
-              if anchor not in script:
-                  raise SystemExit(f"ERROR: insertion point not found: {anchor}")
-              script = script.replace(anchor, flags + anchor, 1)
-              print("Added optimization flags.")
-
-          path.write_text(script)
-          print(f"Patched {path}")
-          PY
-
-              docker buildx build --tag "$IMAGE:haiku-cross" \
-                --platform linux/amd64 \
-                --provenance=false \
-                --progress=quiet \
-                --load ./haiku
-
-              docker push "$IMAGE:haiku-cross" &
-          fi
-
-          targets=(
-            csky-unknown-linux-gnuabiv2
-            csky-unknown-linux-gnuabiv2hf
-          )
-
-          for target in "${targets[@]}"; do
-            if docker manifest inspect "$IMAGE:$target" &>/dev/null; then
-              docker pull "$IMAGE:$target" &>/dev/null &
-            else
-              docker buildx build \
-                --platform linux/amd64 \
-                --provenance=false \
-                --load \
-                --file docker/linux-gnu.Dockerfile \
-                --build-arg RUST_TARGET="$target" \
-                --build-arg HOST_ARCH=amd64 \
-                --build-arg DISTRO_VERSION=24.04 \
-                --progress=quiet \
-                --tag "$IMAGE:$target" \
-                docker
-              docker push "$IMAGE:$target" &>/dev/null &
-            fi
-          done
-
-          # docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
 
           targets=(
             x86_64-unknown-illumos
@@ -1134,60 +561,10 @@ jobs:
             docker pull $CROSS_IMAGE &>/dev/null &
           done
 
-          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null; then
-              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
-          else
-              # NetBSD base image required by docker/netbsd.Dockerfile
-              docker buildx build \
-                --platform linux/amd64 \
-                --provenance=false \
-                --load \
-                --progress=quiet \
-                --file docker/base/netbsd.Dockerfile \
-                --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-                --build-arg HOST_ARCH=amd64 \
-                --build-arg UBUNTU_VERSION=24.04 \
-                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-                --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
-                docker/base
-
-              # NetBSD final image
-              docker buildx build \
-                --platform linux/amd64 \
-                --provenance=false \
-                --load \
-                --progress=quiet \
-                --file docker/netbsd.Dockerfile \
-                --build-arg RUST_TARGET=sparc64-unknown-netbsd \
-                --build-arg HOST_ARCH=amd64 \
-                --build-arg UBUNTU_VERSION=24.04 \
-                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-                --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
-                docker
-              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
-          fi
-
-          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null; then
-              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
-          else
-              # OpenBSD final image
-              docker buildx build \
-                --platform linux/amd64 \
-                --provenance=false \
-                --load \
-                --progress=quiet \
-                --file docker/openbsd.Dockerfile \
-                --build-arg RUST_TARGET=sparc64-unknown-openbsd \
-                --build-arg HOST_ARCH=amd64 \
-                --build-arg UBUNTU_VERSION=24.04 \
-                --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
-                --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
-                docker
-              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
-          fi
-
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: x86_64-unknown-illumos,sparcv9-sun-solaris,x86_64-pc-solaris
 
       - name: Cache cross-rs
         uses: actions/cache@v6
@@ -1208,14 +585,9 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            csky-unknown-linux-gnuabiv2
-            csky-unknown-linux-gnuabiv2hf
-            sparc64-unknown-netbsd
-            sparc64-unknown-openbsd
             x86_64-unknown-illumos
             sparcv9-sun-solaris
             x86_64-pc-solaris
-            x86_64-unknown-haiku
 
       - name: Build Release
         env:
@@ -1227,12 +599,9 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]:0:7}"; do
+          for target in "${targets[@]}"; do
             time cr $target &
           done
-
-          docker_linker x86_64-unknown-haiku-gcc ghcr.io/wyvern/img:haiku-cross
-          time cargo l ${targets[7]} &
 
           wait
 
@@ -1275,118 +644,23 @@ jobs:
             mkdir -p /home/runner/unix;
             ln -sf /home/runner/unix sysroot
 
-            {
-              curl -fsSL "https://download.freebsd.org/releases/arm/armv7/ISO-IMAGES/$FREEBSD/FreeBSD-${FREEBSD}-RELEASE-arm-armv7-GENERICSD.img.xz" | xz -d > armv7.img
-              LOOP=$(sudo losetup --find --show --partscan armv7.img)
-              sudo mkdir -p /mnt/freebsd
-              sudo mount -t ufs -o ro,ufstype=ufs2 ${LOOP}p5 /mnt/freebsd
-              mkdir freebsd
-              ln -s /mnt/freebsd freebsd/armv7
-            } &
-
             if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix"); then
               oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.sysroot &
-            else
-              freebsd=(amd64 arm64 riscv)
-              for arch in "${freebsd[@]}"; do
-                if [ ! -d sysroot/freebsd/$arch ]; then
-                    mkdir -p sysroot/freebsd/$arch
-                    curl -fsSL https://download.freebsd.org/ftp/releases/$arch/${FREEBSD}-RELEASE/base.txz \
-                | tar -xJf - -C sysroot/freebsd/$arch &>/dev/null &
-                fi
-              done
-
-              if [ ! -d sysroot/freebsd/powerpc ]; then
-                mkdir -p sysroot/freebsd/powerpc
-                curl -fsSL https://download.freebsd.org/releases/powerpc/powerpc/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/powerpc &>/dev/null &
-              fi
-
-              if [ ! -d sysroot/freebsd/i386 ]; then
-                mkdir -p sysroot/freebsd/i386
-                curl -fsSL https://download.freebsd.org/releases/i386/14.5-RELEASE/base.txz | tar -xJf - -C sysroot/freebsd/i386 &>/dev/null &
-              fi
-
-              ppc=(powerpc64 powerpc64le)
-              for arch in "${ppc[@]}"; do
-                if [ ! -d sysroot/freebsd/$arch ]; then
-                  mkdir -p sysroot/freebsd/$arch
-                  curl -fsSL https://download.freebsd.org/ftp/releases/powerpc/$arch/${FREEBSD}-RELEASE/base.txz \
-                    | tar -xJf - -C sysroot/freebsd/$arch &>/dev/null &
-                fi
-              done
-
-              openbsd=(amd64 arm64 riscv64 powerpc64)
-              files=(base80 comp80)
-              for arch in "${openbsd[@]}"; do
-                if [ ! -d sysroot/openbsd/$arch ]; then
-                  mkdir -p sysroot/openbsd/$arch
-                  for file in "${files[@]}"; do
-                    curl -fsSL https://cdn.openbsd.org/pub/OpenBSD/$OPENBSD/$arch/$file.tgz | tar -xzf - -C sysroot/openbsd/$arch &>/dev/null &
-                  done
-                fi
-              done
-
-              netbsd=(amd64 evbarm-aarch64 evbarm-aarch64eb riscv-riscv64)
-              files=(base comp etc)
-              for arch in "${netbsd[@]}"; do
-                if [ ! -d sysroot/netbsd/$arch ]; then
-                  mkdir -p sysroot/netbsd/$arch
-                  for file in "${files[@]}"; do
-                    for ext in tar.xz tgz; do
-                            url="https://cdn.netbsd.org/pub/NetBSD/NetBSD-${NETBSD}/$arch/binary/sets/$file.$ext"
-                            out="sysroot/netbsd/$arch"
-                            if curl -fsSI "$url" &>/dev/null; then
-                                if [ "$ext" = "tar.xz" ]; then
-                                    curl -fsSL "$url" | tar -xJf - -C "$out" &>/dev/null &
-                                else
-                                    curl -fsSL "$url" | tar -xzf - -C "$out" &>/dev/null &
-                                fi
-                            fi
-                        done
-                  done
-                fi
-              done
-
-              if [ ! -f sysroot/dfly-x86_64-${DFLY}_REL.iso ]; then
-                curl -fsSL https://mirror-master.dragonflybsd.org/iso-images/dfly-x86_64-${DFLY}_REL.iso.bz2 | bunzip2 -c > sysroot/dfly-x86_64-${DFLY}_REL.iso &
-                mkdir -p sysroot/dfly
-              fi
-
-              wait
-              chmod -R u+rwX sysroot
-              touch ~/unix.sysroot
-              source .github/scripts/util.sh
-              push_docker /home/runner/unix "${IMAGE}:unix" unix &
-
-              # tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
-              # oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
             fi
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          targets: aarch64-unknown-freebsd,x86_64-unknown-freebsd,x86_64-unknown-netbsd
 
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
         with:
           targets: |
-            x86_64-unknown-dragonfly
             x86_64-unknown-freebsd
             aarch64-unknown-freebsd
-            riscv64gc-unknown-freebsd
-            powerpc64-unknown-freebsd
-            powerpc64le-unknown-freebsd
-            powerpc-unknown-freebsd
-            i686-unknown-freebsd
-            armv7-unknown-freebsd
-            x86_64-unknown-openbsd
-            aarch64-unknown-openbsd
-            riscv64gc-unknown-openbsd
-            powerpc64-unknown-openbsd
             x86_64-unknown-netbsd
-            aarch64-unknown-netbsd
-            aarch64_be-unknown-netbsd
-            riscv64gc-unknown-netbsd
 
       - name: Build Release
         env:
@@ -1399,8 +673,6 @@ jobs:
           targets_from_env
 
           time waitfor ~/unix.sysroot ~/llvm.finish
-
-          sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
 
           for target in "${targets[@]}"; do
             time cargo l $target &
@@ -1432,6 +704,7 @@ jobs:
         uses: ./.github/actions/toolchain
         with:
           ccw: false
+          target: aarch64-pc-windows-msvc,arm64ec-pc-windows-msvc,x86_64-pc-windows-msvc,i686-pc-windows-msvc
 
       - name: Set targets
         id: targets
@@ -1439,14 +712,9 @@ jobs:
         with:
           targets: |
             aarch64-pc-windows-msvc
-            aarch64-uwp-windows-msvc
             arm64ec-pc-windows-msvc
             x86_64-pc-windows-msvc
-            x86_64-uwp-windows-msvc
-            x86_64-win7-windows-msvc
             i686-pc-windows-msvc
-            i686-uwp-windows-msvc
-            i686-win7-windows-msvc
 
       - name: Build release
         shell: bash
@@ -1495,35 +763,10 @@ jobs:
             sudo apt install gcc-i686-linux-gnu gcc-mingw-w64 gcc-mingw-w64-i686 && touch ~/apt.finish
           } >/dev/null &
 
-      - name: WALI cache
-        run: |
-          IMAGE="${IMAGE,,}"
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:wali"); then
-            mkdir -p WALI && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "WALI" && touch ~/wali.finish &
-          else
-            export CFLAGS="-O3 -flto -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -pipe -g0 -fvisibility=hidden"
-            export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden -fno-exceptions -fno-rtti"
-            export LDFLAGS="-Wl,-O3 -Wl,--gc-sections -Wl,--strip-all"
-
-            git clone --depth=1 https://github.com/Wasm-Thin-Kernel-Interfaces/WALI.git
-            cd WALI
-            sed -i '/^\[llvm\]/,/^\[/ s/^version = ".*"/version = "22.1.8"/' toolchains/wali.toml
-            sudo ./install-deps.sh
-            ./quick_setup.sh
-            make libcxx
-            cd ..
-            touch ~/wali.finish
-            source .github/scripts/util.sh
-            push_docker WALI "${IMAGE}:wali" wali &
-
-            # tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
-          fi
-
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
         with:
-          targets: i686-pc-windows-gnu
+          targets: i686-unknown-uefi,x86_64-unknown-uefi,aarch64-unknown-uefi,i586-unknown-linux-gnu,i686-unknown-linux-gnu,i686-pc-windows-gnu,x86_64-pc-windows-gnu
 
       - name: Set targets
         id: targets
@@ -1535,11 +778,8 @@ jobs:
             aarch64-unknown-uefi
             i586-unknown-linux-gnu
             i686-unknown-linux-gnu
-            wasm32-wali-linux-musl
             i686-pc-windows-gnu
-            i686-win7-windows-gnu
             x86_64-pc-windows-gnu
-            x86_64-win7-windows-gnu
 
       - name: Build Release
         env:
@@ -1567,443 +807,6 @@ jobs:
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
-  Windows-2025:
-    name: Windows-2025
-    if: ${{ vars.TEST != '1' || vars.win2025 == '1'  }}
-    runs-on: windows-2025-vs2026
-
-    permissions:
-      contents: write
-      packages: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Windows cleanup
-        uses: ./.github/actions/windows-cleanup
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-        with:
-          ccw: false
-
-      - name: Set targets
-        id: targets
-        uses: ./.github/actions/targets
-        with:
-          targets: |
-            aarch64-pc-windows-msvc
-            aarch64-uwp-windows-msvc
-            arm64ec-pc-windows-msvc
-            x86_64-pc-windows-msvc
-            x86_64-uwp-windows-msvc
-            x86_64-win7-windows-msvc
-            i686-pc-windows-msvc
-            i686-uwp-windows-msvc
-            i686-win7-windows-msvc
-
-      - name: Build release
-        shell: bash
-        continue-on-error: true
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        run: |
-          cargo update
-          set +e -x
-
-          source .github/scripts/util.sh
-          targets_from_env
-
-          for target in "${targets[@]}"; do
-            time cargo l $target &
-          done
-
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/upload
-        with:
-          targets: ${{ steps.targets.outputs.targets }}
-
-  Thumb-msys2:
-    name: Thumb-msys2
-    if: ${{ vars.TEST != '1' || vars.thumb == '1'  }}
-    runs-on: windows-2025
-
-    permissions:
-      contents: write
-      packages: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Windows cleanup
-        uses: ./.github/actions/windows-cleanup
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-        with:
-            ccw: false
-
-      - name: Install Windows ARM32 SDK libraries
-        shell: pwsh
-        run: |
-          $version = '10.0.22621.3233'
-          $root = Join-Path $env:RUNNER_TEMP 'windows-sdk-arm'
-          $nupkg = Join-Path $env:RUNNER_TEMP "windows-sdk-arm.$version.zip"
-          $url = "https://api.nuget.org/v3-flatcontainer/microsoft.windows.sdk.cpp.arm/$version/microsoft.windows.sdk.cpp.arm.$version.nupkg"
-
-          Invoke-WebRequest -Uri $url -OutFile $nupkg
-          New-Item -ItemType Directory -Path $root -Force | Out-Null
-          Expand-Archive -Path $nupkg -DestinationPath $root -Force
-
-          $kernel32 = Get-ChildItem $root -Filter kernel32.lib -Recurse |
-            Where-Object { $_.FullName -match '\\um\\arm\\kernel32\.lib$' } |
-            Select-Object -First 1
-
-          if (-not $kernel32) {
-            throw "The NuGet package did not contain ARM32 um\arm\kernel32.lib"
-          }
-
-          $sdkLibRoot = $kernel32.Directory.Parent.Parent.FullName
-          $umArm = $kernel32.Directory.FullName
-          $ucrtArm = Join-Path $sdkLibRoot 'ucrt\arm'
-
-          Write-Host "ARM32 Windows SDK libraries: $sdkLibRoot"
-          Write-Host "kernel32.lib: $($kernel32.FullName)"
-
-          if (-not (Test-Path $ucrtArm)) {
-            throw "ARM32 UCRT libraries not found: $ucrtArm"
-          }
-
-          $env:LIB = "$umArm;$ucrtArm;$env:LIB"
-          "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
-
-      - name: Link and Lib search config
-        shell: pwsh
-        run: |
-          $msvcRoot = "${env:ProgramFiles}\Microsoft Visual Studio\18\Enterprise\VC\Tools\MSVC"
-
-          # Prefer the x64-hosted ARM32 linker; fall back to the x86-hosted linker.
-          $linker = $null
-          $toolsetRoot = $null
-
-          $toolsets = Get-ChildItem $msvcRoot -Directory |
-              Sort-Object {
-                  try { [version]$_.Name }
-                  catch { [version]'0.0' }
-              } -Descending
-
-          foreach ($toolset in $toolsets) {
-              foreach ($hostArch in @('Hostx64', 'HostX86')) {
-                  $candidate = Join-Path $toolset.FullName "bin\$hostArch\arm\link.exe"
-
-                  if (Test-Path $candidate) {
-                      $linker = $candidate
-                      $toolsetRoot = $toolset.FullName
-                      break
-                  }
-              }
-
-              if ($linker) { break }
-          }
-
-          if (-not $linker) {
-              throw "MSVC ARM32 linker not found under $msvcRoot"
-          }
-
-          $vcBin = Split-Path $linker
-          $armCrt = Join-Path $toolsetRoot 'lib\arm\msvcrt.lib'
-
-          if (-not (Test-Path $armCrt)) {
-              throw "MSVC ARM32 CRT not found for toolset $toolsetRoot"
-          }
-
-          $env:PATH = "$vcBin;$env:PATH"
-          $vcBin | Out-File $env:GITHUB_PATH -Append -Encoding utf8
-
-          $armLib = Split-Path $armCrt
-          $env:LIB = "$armLib;$env:LIB"
-          "LIB=$env:LIB" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
-
-          Write-Host "Using MSVC linker: $linker"
-          Write-Host "Using MSVC ARM32 CRT: $armCrt"
-
-      - name: Install MSYS2 packages
-        uses: ./.github/actions/msys2
-
-      - name: Set targets
-        id: targets
-        uses: ./.github/actions/targets
-        with:
-          targets: |
-            thumbv7a-pc-windows-msvc
-            thumbv7a-uwp-windows-msvc
-            i686-uwp-windows-gnu
-            x86_64-uwp-windows-gnu
-
-      - name: Build release
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        run: |
-          cargo update
-
-          $targets = @($env:TARGETS -split '\s+' | Where-Object { $_ })
-          foreach ($target in $targets) {
-            Write-Host "`n+ Building $target"
-            Measure-Command { cargo l $target }
-          }
-
-      - name: Upload release binaries
-        uses: ./.github/actions/upload
-        with:
-          targets: ${{ steps.targets.outputs.targets }}
-
-  Uclibc:
-    name: Uclibc
-    if: ${{ vars.TEST != '1' || vars.uclibc == '1'  }}
-    runs-on: ubuntu-26.04
-
-    env:
-      uclibc: "2026.08-1"
-
-    permissions:
-      contents: write
-      packages: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: GHCR Setup
-        uses: ./.github/actions/ghcr
-        with:
-         token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Cache uclibc
-        run: |
-            IMAGE="${IMAGE,,}"
-            source .github/scripts/util.sh
-
-            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:uclibc-${uclibc}"); then
-              mkdir uclibc && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C uclibc && touch ~/uclibc.finish &
-            else
-              arch=(mips32 mips32el armv5-eabi armv7-eabihf)
-              for a in "${arch[@]}"; do
-                url="https://toolchains.bootlin.com/downloads/releases/toolchains/$a/tarballs/${a}--uclibc--stable-${uclibc}.tar.xz"
-                mkdir -p uclibc/$a && curl -fsSL "$url" | tar -xJ -C "uclibc/$a" --strip-components=1 &
-              done
-              wait
-              touch ~/uclibc.finish
-              push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc &
-            fi
-
-            # mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-x86_64-gcc-15.tar.xz | tar -xJ -C l4re --strip-components=1
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-
-      - name: Set targets
-        id: targets
-        uses: ./.github/actions/targets
-        with:
-          targets: |
-            mipsel-unknown-linux-uclibc
-            mips-unknown-linux-uclibc
-            armv7-unknown-linux-uclibceabi
-            armv7-unknown-linux-uclibceabihf
-            armv5te-unknown-linux-uclibceabi
-            # aarch64-unknown-l4re-uclibc
-            # x86_64-unknown-l4re-uclibc
-
-      - name: Build Release
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        run: |
-          cargo update
-          set +e -x
-
-          source .github/scripts/util.sh
-          targets_from_env
-
-          time waitfor ~/uclibc.finish
-
-          for target in "${targets[@]}"; do
-            time cargo l $target
-          done
-
-      - name: Upload release binaries
-        uses: ./.github/actions/upload
-        with:
-          targets: ${{ steps.targets.outputs.targets }}
-
-  Yocto:
-    name: Yocto
-    if: ${{ vars.TEST != '1' || vars.yocto == '1'  }}
-    runs-on: ubuntu-26.04
-
-    env:
-      YOCTO: "6.1"
-
-    permissions:
-      contents: write
-      packages: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: GHCR Setup
-        uses: ./.github/actions/ghcr
-        with:
-         token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Yocto downloads
-        run: |
-          IMAGE="${IMAGE,,}"
-          url=https://downloads.yoctoproject.org/releases/yocto/yocto-${YOCTO}/toolchain/x86_64
-          files=(
-          poky-glibc-x86_64-core-image-sato-core2-64-genericx86-64-toolchain-${YOCTO}.sh
-          poky-glibc-x86_64-core-image-sato-core2-32-genericx86-toolchain-${YOCTO}.sh
-          poky-glibc-x86_64-core-image-sato-armv8a-genericarm64-toolchain-${YOCTO}.sh
-          poky-glibc-x86_64-core-image-sato-cortexa8t2hf-neon-beaglebone-yocto-toolchain-${YOCTO}.sh
-          poky-glibc-x86_64-core-image-sato-riscv64imafdc_zicsr_zifencei-qemuriscv64-toolchain-${YOCTO}.sh
-          )
-          set -o pipefail
-          mkdir -p "/opt/poky/$YOCTO"
-          if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:yocto${YOCTO}"); then
-            oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/opt/poky/$YOCTO" && touch ~/yocto.finish &
-          else
-            mkdir -p yocto
-            for file in "${files[@]}"; do
-                path="yocto/$file"
-                if [[ ! -f "$path" ]]; then
-                    curl -LsSf "$url/$file" -o "$path" && chmod +x "$path" && echo | "$path"
-                fi
-            done
-            wait
-
-            rm -rf yocto
-            touch ~/yocto.finish
-            source .github/scripts/util.sh
-            push_docker "/opt/poky/$YOCTO" "${IMAGE}:yocto${YOCTO}" yocto &
-
-            # sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
-            # oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
-          fi
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-
-      - name: Set targets
-        id: targets
-        uses: ./.github/actions/targets
-        with:
-          targets: |
-            aarch64-oe-linux-gnu environment-setup-armv8a-poky-linux
-            armv7-oe-linux-gnueabihf environment-setup-cortexa8t2hf-neon-poky-linux-gnueabi
-            riscv64-oe-linux-gnu environment-setup-riscv64imafdc_zicsr_zifencei-poky-linux
-            x86_64-oe-linux-gnu environment-setup-core2-64-poky-linux
-            i686-oe-linux-gnu environment-setup-core2-32-poky-linux
-
-      - name: Build Release
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        run: |
-          cargo update
-          set +e -x
-
-          source .github/scripts/util.sh
-          targets_from_env
-          time waitfor ~/yocto.finish
-          sdk=/opt/poky/${YOCTO}
-          ln -s $sdk/sysroots sysroots
-          set +x
-          for entry in "${targets[@]}"; do
-            read -r target env <<< "$entry"
-            {
-              source $sdk/$env
-              unset RUST_TARGET_PATH
-              for v in ${!CARGO_TARGET_@}; do
-                  unset "$v"
-              done
-              export PATH="$HOME/.cargo/bin:$PATH"
-              set -x
-              time cargo l $target
-              set +x
-            } &
-          done
-
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/upload
-        with:
-          targets: ${{ steps.targets.outputs.targets }}
-
-  Zig-BSD:
-    name: Zig-BSD
-    if: ${{ vars.TEST != '1' || vars.bsd == '1'  }}
-    runs-on: xcode-27
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: macOS cleanup
-        uses: ./.github/actions/macos-cleanup
-
-      - name: Toolchain Setup
-        uses: ./.github/actions/toolchain
-        with:
-            zig: true
-
-      - name: Set targets
-        id: targets
-        uses: ./.github/actions/targets
-        with:
-          targets: |
-            powerpc-unknown-openbsd
-            powerpc-unknown-netbsd
-            mipsel-unknown-netbsd
-            armv7-unknown-netbsd-eabihf
-            armv6-unknown-netbsd-eabihf
-            i586-unknown-netbsd
-            i686-unknown-netbsd
-            i686-unknown-openbsd
-            armeb-unknown-linux-gnueabi
-            armeb-unknown-linux-musleabi.json armeb-linux-musleabi
-
-      - name: Build Release
-        env:
-          TARGETS: ${{ steps.targets.outputs.targets }}
-        run: |
-          cargo update
-          set +e -x
-
-          # cargo l aarch64_be-unknown-linux-gnu_ilp32
-          # cargo l aarch64-unknown-linux-gnu_ilp32
-          # zig cc -target armeb-linux-gnueabi -fuse-ld=lld -Wl,--icf=all -### -x c /dev/null -o /tmp/test
-
-          source .github/scripts/util.sh
-          targets_from_env
-
-          read -r target zig <<< "${targets[@]:9}"
-          time cargo l $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
-
-          for target in "${targets[@]:0:9}"; do
-            time cargo l $target &
-          done
-
-          wait
-
-      - name: Upload release binaries
-        uses: ./.github/actions/upload
-        with:
-          targets: ${{ steps.targets.outputs.targets }}
-
   Zig-Muslx64:
     name: Zig-Muslx64
     if: ${{ vars.TEST != '1' || vars.musl64 == '1'  }}
@@ -2021,6 +824,7 @@ jobs:
         uses: ./.github/actions/toolchain
         with:
           zig: true
+          targets: x86_64-unknown-linux-musl,powerpc64le-unknown-linux-musl,riscv64gc-unknown-linux-musl,s390x-unknown-linux-musl,loongarch64-unknown-linux-musl,aarch64-unknown-linux-musl
 
       - name: Set targets
         id: targets
@@ -2029,13 +833,10 @@ jobs:
           targets: |
             x86_64-unknown-linux-musl x86_64-linux-musl
             powerpc64le-unknown-linux-musl powerpc64le-linux-musl
-            powerpc-unknown-linux-musl powerpc-linux-musleabi
             riscv64gc-unknown-linux-musl riscv64-linux-musl
             s390x-unknown-linux-musl s390x-linux-musl
             loongarch64-unknown-linux-musl loongarch64-linux-musl
             aarch64-unknown-linux-musl aarch64-linux-musl
-            mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
-            mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
 
       - name: Build Release
         env:
@@ -2076,6 +877,7 @@ jobs:
           uses: ./.github/actions/toolchain
           with:
             zig: true
+            targets: i586-unknown-linux-musl,i686-unknown-linux-musl,armv5te-unknown-linux-musleabi,arm-unknown-linux-musleabi,arm-unknown-linux-musleabihf,armv7-unknown-linux-musleabi,armv7-unknown-linux-musleabihf
 
         - name: Set targets
           id: targets
@@ -2087,11 +889,8 @@ jobs:
               armv5te-unknown-linux-musleabi arm-linux-musleabi
               arm-unknown-linux-musleabi arm-linux-musleabi
               arm-unknown-linux-musleabihf arm-linux-musleabihf
-              thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
               armv7-unknown-linux-musleabi arm-linux-musleabi
               armv7-unknown-linux-musleabihf arm-linux-musleabihf
-              mipsel-unknown-linux-musl mipsel-linux-musleabi
-              mips-unknown-linux-musl mips-linux-musleabi
 
         - name: Build Release
           env:

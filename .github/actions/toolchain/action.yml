@@ -1,11 +1,11 @@
 name: Rust, Zig toolchain, cache setup and C/C++ wrappers
-description: Set up nightly Rust, Rust cache, sccache Zig and C/C++ wrappers
+description: Set up stable Rust, Rust cache, sccache Zig and C/C++ wrappers
 
 inputs:
   toolchain:
     description: Install Rust toolchain
     required: false
-    default: nightly
+    default: stable
   targets:
     description: Install Rust targets
     required: false
@@ -25,9 +25,8 @@ runs:
   using: composite
   steps:
     - name: Rust Toolchain
-      uses: dtolnay/rust-toolchain@nightly
+      uses: dtolnay/rust-toolchain@stable
       with:
-        components: rust-src
         targets: ${{ inputs.targets }}
         toolchain: ${{ inputs.toolchain }}
 

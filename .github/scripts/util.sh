@@ -25,7 +25,7 @@ waitfor() {
 
 cr()
 {
-  cross build -q --profile src -Zbuild-std=std,panic_abort --target "$@"
+  cross build -q --profile lto --target "$@"
 }
 
 docker_linker() {
