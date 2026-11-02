@@ -564,12 +564,13 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
 [target.mips64-openwrt-linux-musl]
 linker = "wrt/bin/mips64-openwrt-linux-gcc"
-rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
+rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl","-Ctarget-feature=+crt-static"]
 
 [target.hexagon-unknown-linux-musl]
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=hexagon-linux-musl"]
 linker = "hexagon/bin/hexagon-unknown-linux-musl-clang"
+rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.aarch64-unknown-fuchsia]
 rustflags = [
@@ -617,6 +618,7 @@ linker = "aarch64be-glibc/bin/aarch64_be-linux-gcc"
 
 [target.aarch64_be-unknown-linux-musl]
 linker = "aarch64be-musl/bin/aarch64_be-linux-gcc"
+rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.aarch64_be-unknown-linux-gnu_ilp32]
 linker = "./zig-cc.sh"
@@ -661,6 +663,7 @@ linker = "ppc64-gnu/bin/powerpc64-unknown-linux-gnuabielfv2-gcc"
 
 [target.powerpc64-unknown-linux-musl]
 linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
+rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.armeb-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"
@@ -725,6 +728,7 @@ linker = "rv32-gnu/bin/riscv32gc-unknown-linux-gnu-clang"
 
 [target.riscv32gc-unknown-linux-musl]
 linker = "rv32-musl/bin/riscv32-unknown-linux-musl-clang"
+rustflags = ["-Ctarget-feature=+crt-static"]
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
 
