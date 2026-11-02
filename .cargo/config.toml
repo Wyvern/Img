@@ -16,7 +16,7 @@ all = "r --all-features"
 tn = "tree -e normal"
 ti = "t -- --exact --nocapture"
 
-l = "b -q --profile lto"
+l = "b -q --profile lto --target"
 
 h = "s x86_64h-apple-darwin"
 e = "s arm64e-apple-darwin"
@@ -43,49 +43,36 @@ LDFLAGS = { value = "-Wl,-O3 -Wl,--gc-sections", force = true }
 
 # dev
 [profile.dev]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
+# rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
 rpath = true
 debug = false
 strip = true
 opt-level = "s"
-trim-paths = "all"
+# trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.dev.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
 
 [profile.dev.build-override]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "dev"
-
-# test
-[profile.test]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
-inherits = "dev"
-
-[profile.test.package."*"]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "dev"
-
-[profile.test.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 
 # release
 [profile.release]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 rpath = true
-trim-paths = "all"
+# trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.release.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 
 [profile.release.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 
 # lto
@@ -94,54 +81,54 @@ inherits = "release"
 lto = true
 panic = "abort"
 codegen-units = 1
-rustflags = [
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-  # "-Zvirtual-function-elimination",
-]
+# rustflags = [
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+#   # "-Zvirtual-function-elimination",
+# ]
 
 [profile.lto.build-override]
 inherits = "lto"
-rustflags = [
-  "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 [profile.lto.package."*"]
 inherits = "lto"
-rustflags = [
-  "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 # src
 [profile.src]
 inherits = "lto"
 panic = "immediate-abort"
-rustflags = [
-  "-Zforce-unstable-if-unmarked",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-  # "-Zcross-crate-inline-threshold=yes",
-]
+# rustflags = [
+#   "-Zforce-unstable-if-unmarked",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+#   # "-Zcross-crate-inline-threshold=yes",
+# ]
 
 [profile.src.build-override]
 inherits = "src"
-rustflags = [
-  # "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   # "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 [profile.src.package."*"]
 inherits = "src"
-rustflags = [
-  # "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   # "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 [unstable]
 unstable-options = true
@@ -204,10 +191,10 @@ rustflags = [
   "-Cdebuginfo=0",
   "-Cstrip=symbols",
   "-Ccollapse-macro-debuginfo=y",
-  "-Cpanic=immediate-abort",
+  # "-Cpanic=immediate-abort",
 
   "-Zunstable-options",
-  "-Zembed-metadata=no",
+  # "-Zembed-metadata=no",
   # "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
@@ -229,7 +216,7 @@ rustflags = [
   "-Zstaticlib-allow-rdylib-deps",
   "-Zstaticlib-prefer-dynamic",
   "-Znext-solver=coherence",
-  "-Zpanic-in-drop=abort",
+  # "-Zpanic-in-drop=abort",
   "-Zuse-sync-unwind",
   "-Zgraphviz-dark-mode",
   "-Zshell-argfiles",
@@ -239,8 +226,8 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros",
   "-Zvalidate-mir=no",
-  "-Zmir-move-elimination=y",
-  "-Zasync-panic=y",
+  # "-Zmir-move-elimination=y",
+  # "-Zasync-panic=y",
   # "-Zwasm-proc-macros",
   # "-Zoffload=Device",
   # "-Zassumptions-on-binders",
@@ -564,13 +551,12 @@ rustflags = ["-Clink-arg=--target=x86_64--linux-ohos"]
 
 [target.mips64-openwrt-linux-musl]
 linker = "wrt/bin/mips64-openwrt-linux-gcc"
-rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl","-Ctarget-feature=+crt-static"]
+rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
 
 [target.hexagon-unknown-linux-musl]
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=hexagon-linux-musl"]
 linker = "hexagon/bin/hexagon-unknown-linux-musl-clang"
-rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.aarch64-unknown-fuchsia]
 rustflags = [
@@ -618,7 +604,6 @@ linker = "aarch64be-glibc/bin/aarch64_be-linux-gcc"
 
 [target.aarch64_be-unknown-linux-musl]
 linker = "aarch64be-musl/bin/aarch64_be-linux-gcc"
-rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.aarch64_be-unknown-linux-gnu_ilp32]
 linker = "./zig-cc.sh"
@@ -663,7 +648,6 @@ linker = "ppc64-gnu/bin/powerpc64-unknown-linux-gnuabielfv2-gcc"
 
 [target.powerpc64-unknown-linux-musl]
 linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
-rustflags = ["-Ctarget-feature=+crt-static"]
 
 [target.armeb-unknown-linux-gnueabi]
 linker = "./zig-cc.sh"
@@ -728,7 +712,6 @@ linker = "rv32-gnu/bin/riscv32gc-unknown-linux-gnu-clang"
 
 [target.riscv32gc-unknown-linux-musl]
 linker = "rv32-musl/bin/riscv32-unknown-linux-musl-clang"
-rustflags = ["-Ctarget-feature=+crt-static"]
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
 
