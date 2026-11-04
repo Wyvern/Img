@@ -707,9 +707,6 @@ jobs:
     if: ${{ vars.TEST != '1' || vars.macos == '1'  }}
     runs-on: xcode-27
 
-    env:
-      mingw: "20261020"
-
     permissions:
       contents: write
       packages: write
@@ -723,21 +720,6 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-
-      - name: Cache llvm-mingw
-        uses: actions/cache@v6
-        with:
-          path: llvm-mingw
-          key: ${{ runner.os }}-${{env.mingw}}
-          restore-keys: ${{ runner.os }}-llvm-${{env.mingw}}
-
-      - name: llvm-mingw
-        run: |
-          if [ ! -d llvm-mingw ]; then
-            mkdir llvm-mingw
-            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
-          fi
-          echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
       - name: Set targets
         id: targets
@@ -759,9 +741,6 @@ jobs:
             arm64e-apple-darwin
             x86_64h-apple-darwin
             x86_64-apple-darwin
-            aarch64-pc-windows-gnullvm
-            x86_64-pc-windows-gnullvm
-            i686-pc-windows-gnullvm
 
       - name: Build Release
         env:
@@ -1960,12 +1939,30 @@ jobs:
     if: ${{ vars.TEST != '1' || vars.bsd == '1'  }}
     runs-on: xcode-27
 
+    env:
+      mingw: "20261020"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
       - name: macOS cleanup
         uses: ./.github/actions/macos-cleanup
+
+      - name: Cache llvm-mingw
+        uses: actions/cache@v6
+        with:
+          path: llvm-mingw
+          key: ${{ runner.os }}-${{env.mingw}}
+          restore-keys: ${{ runner.os }}-llvm-${{env.mingw}}
+
+      - name: llvm-mingw
+        run: |
+          if [ ! -d llvm-mingw ]; then
+            mkdir llvm-mingw
+            curl -LsSf https://github.com/mstorsjo/llvm-mingw/releases/download/${mingw}/llvm-mingw-${mingw}-ucrt-macos-universal.tar.xz | tar -xJf - -C llvm-mingw --strip-components=1
+          fi
+          echo "$PWD/llvm-mingw/bin" >> "$GITHUB_PATH"
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
@@ -1986,6 +1983,9 @@ jobs:
             i686-unknown-netbsd
             i686-unknown-openbsd
             armeb-unknown-linux-gnueabi
+            aarch64-pc-windows-gnullvm
+            x86_64-pc-windows-gnullvm
+            i686-pc-windows-gnullvm
             armeb-unknown-linux-musleabi.json armeb-linux-musleabi
 
       - name: Build Release
@@ -2002,11 +2002,11 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]:0:9}"; do
+          for target in "${targets[@]:0:12}"; do
             time cargo s $target &
           done
 
-          read -r target zig <<< "${targets[@]:9}"
+          read -r target zig <<< "${targets[@]:12}"
           time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
 
           wait
