@@ -654,12 +654,6 @@ linker = "csky-unknown-linux-gnuabiv2hf-gcc"
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
 
-[target.x86_64-unknown-haiku]
-linker = "./x86_64-unknown-haiku-gcc"
-
-[target.i686-unknown-hurd-gnu]
-linker = "./i686-gnu-gcc"
-
 [target.i686-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
 [target.x86_64-uwp-windows-gnu]

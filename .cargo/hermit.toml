@@ -16,7 +16,7 @@ all = "r --all-features"
 tn = "tree -e normal"
 ti = "t -- --exact --nocapture"
 
-l = "b -q --profile lto"
+l = "b -q --profile lto --target"
 
 h = "s x86_64h-apple-darwin"
 e = "s arm64e-apple-darwin"
@@ -39,49 +39,36 @@ RUSTC_BOOTSTRAP = "1"
 
 # dev
 [profile.dev]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
+# rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
 rpath = true
 debug = false
 strip = true
 opt-level = "s"
-trim-paths = "all"
+# trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.dev.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 debug-assertions = false
 
 [profile.dev.build-override]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "dev"
-
-# test
-[profile.test]
-rustflags = ["-Cprefer-dynamic", "-Cdebug-assertions"]
-inherits = "dev"
-
-[profile.test.package."*"]
-rustflags = ["-Cprefer-dynamic"]
-inherits = "dev"
-
-[profile.test.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "dev"
 
 # release
 [profile.release]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 rpath = true
-trim-paths = "all"
+# trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.release.build-override]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 
 [profile.release.package."*"]
-rustflags = ["-Cprefer-dynamic"]
+# rustflags = ["-Cprefer-dynamic"]
 inherits = "release"
 
 # lto
@@ -90,54 +77,54 @@ inherits = "release"
 lto = true
 panic = "abort"
 codegen-units = 1
-rustflags = [
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-  # "-Zvirtual-function-elimination",
-]
+# rustflags = [
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+#   # "-Zvirtual-function-elimination",
+# ]
 
 [profile.lto.build-override]
 inherits = "lto"
-rustflags = [
-  "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 [profile.lto.package."*"]
 inherits = "lto"
-rustflags = [
-  "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 # src
 [profile.src]
 inherits = "lto"
 panic = "immediate-abort"
-rustflags = [
-  "-Zforce-unstable-if-unmarked",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-  # "-Zcross-crate-inline-threshold=yes",
-]
+# rustflags = [
+#   "-Zforce-unstable-if-unmarked",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+#   # "-Zcross-crate-inline-threshold=yes",
+# ]
 
 [profile.src.build-override]
 inherits = "src"
-rustflags = [
-  # "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   # "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 [profile.src.package."*"]
 inherits = "src"
-rustflags = [
-  # "-Cprefer-dynamic",
-  "-Zlocation-detail=none",
-  "-Ztrap-unreachable=no",
-]
+# rustflags = [
+#   # "-Cprefer-dynamic",
+#   "-Zlocation-detail=none",
+#   "-Ztrap-unreachable=no",
+# ]
 
 [unstable]
 unstable-options = true
@@ -191,6 +178,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [target."cfg(all())"]
 rustflags = [
+  "-Ctarget-feature=-crt-static",
   "-Csymbol-mangling-version=hashed",
   "-Coverflow-checks=no",
   "-Cforce-frame-pointers=no",
@@ -199,10 +187,10 @@ rustflags = [
   "-Cdebuginfo=0",
   "-Cstrip=symbols",
   "-Ccollapse-macro-debuginfo=y",
-  "-Cpanic=immediate-abort",
+  # "-Cpanic=immediate-abort",
 
   "-Zunstable-options",
-  "-Zembed-metadata=no",
+  # "-Zembed-metadata=no",
   # "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
@@ -224,7 +212,7 @@ rustflags = [
   "-Zstaticlib-allow-rdylib-deps",
   "-Zstaticlib-prefer-dynamic",
   "-Znext-solver=coherence",
-  "-Zpanic-in-drop=abort",
+  # "-Zpanic-in-drop=abort",
   "-Zuse-sync-unwind",
   "-Zgraphviz-dark-mode",
   "-Zshell-argfiles",
@@ -234,8 +222,8 @@ rustflags = [
   "-Zhigher-ranked-assumptions",
   "-Zcache-proc-macros",
   "-Zvalidate-mir=no",
-  "-Zmir-move-elimination=y",
-  "-Zasync-panic=y",
+  # "-Zmir-move-elimination=y",
+  # "-Zasync-panic=y",
   # "-Zwasm-proc-macros",
   # "-Zoffload=Device",
   # "-Zassumptions-on-binders",
@@ -245,10 +233,7 @@ rustflags = [
   "-Dclippy::unused_io_amount",
 ]
 
-[target.'cfg(all(target_family = "unix", crate_type = "staticlib"))']
-rustflags = ["-Zstaticlib-hide-internal-symbols"]
-
-[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_arch="csky",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="aarch64",target_abi="ilp32"),all(target_arch="powerpc64",target_env="gnu"),all(target_arch="arm",target_endian="big"),target_arch="riscv32"))))']
+[target.'cfg(all(target_os="linux",not(any(target_abi="x32",target_abi="ilp32",target_env="musl",target_arch="csky",target_arch="m68k",target_family="wasm",target_arch="sparc64",target_arch="sparc",target_arch="hexagon",target_arch="powerpc",all(target_arch="powerpc64",target_env="gnu"),all(target_arch="arm",target_endian="big")))))']
 rustflags = [
   "-Clink-self-contained=+linker",
   "-Clinker-features=+lld",
@@ -320,82 +305,85 @@ rustflags = [
   "-Clink-arg=-Wl,-no_exported_symbols"
 ]
 
+[target.'cfg(all(target_os="linux",target_env="musl",not(target_vendor="wali"),not(target_vendor="unikraft")))']
+linker = "./zig-cc.sh"
+
 [target.'cfg(target_arch="x86_64")']
 rustflags = ["-Ctarget-cpu=broadwell", "-Ztune-cpu=broadwell"]
 
 [target.'cfg(all(target_arch="aarch64",target_vendor="apple"))']
 rustflags = ["-Ctarget-cpu=apple-m1", "-Ztune-cpu=apple-m1"]
 
-[target.'cfg(all(target_arch="aarch64",target_os="linux",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="aarch64",target_os="linux",not(target_env="musl"),not(target_env="ohos")))']
 linker = "aarch64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="ohos"),not(target_abi="x32")))']
+[target.'cfg(all(target_arch="x86_64",target_os="linux",not(target_env="musl"),not(target_env="ohos"),not(target_abi="x32")))']
 linker = "x86_64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32"))']
+[target.'cfg(all(target_arch="x86_64",target_os="linux",target_abi="x32",not(target_env="musl")))']
 linker = "x86_64-linux-gnux32-gcc"
 
-[target.'cfg(all(target_arch="x86",target_os="linux"))']
+[target.'cfg(all(target_arch="x86",target_os="linux",not(target_env="musl")))']
 linker = "i686-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="arm",target_os="linux",target_abi="eabihf",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="arm",target_os="linux",not(target_env="musl"),target_abi="eabihf",not(target_env="ohos")))']
 linker = "arm-linux-gnueabihf-gcc"
 
-[target.'cfg(all(target_arch="arm",target_os="linux",target_abi="eabi",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="arm",target_os="linux",not(target_env="musl"),target_abi="eabi",not(target_env="ohos")))']
 linker = "arm-linux-gnueabi-gcc"
 
-[target.'cfg(all(target_arch="s390x",target_os="linux"))']
+[target.'cfg(all(target_arch="s390x",target_os="linux",not(target_env="musl")))']
 linker = "s390x-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "little",not(target_env="musl")))']
 linker = "powerpc64le-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="powerpc64",target_os="linux",target_endian = "big",not(target_env="musl")))']
 linker = "powerpc64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "little",not(target_env="musl")))']
 linker = "powerpcle-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="powerpc",target_os="linux",target_endian = "big",not(target_env="musl")))']
 linker = "powerpc-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="riscv64",target_os="linux"))']
+[target.'cfg(all(target_arch="riscv64",target_os="linux",not(target_env="musl")))']
 linker = "riscv64-linux-gnu-gcc"
 
-[target.'cfg(all(any(target_arch="sparc64",target_arch="sparc"),target_os="linux"))']
+[target.'cfg(all(any(target_arch="sparc64",target_arch="sparc"),target_os="linux",not(target_env="musl")))']
 linker = "sparc64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="loongarch64",target_os="linux",not(target_env="ohos")))']
+[target.'cfg(all(target_arch="loongarch64",target_os="linux",not(target_env="musl"),not(target_env="ohos")))']
 linker = "loongarch64-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips64",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mips64-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips64",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips64",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mips64el-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mips-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mipsel-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips",target_os="linux",target_env="musl"))']
+[target.'cfg(all(target_arch="mips",target_os="linux",not(target_env="musl")))']
 rustflags = ["-Ctarget-feature=-soft-float"]
 
-[target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6",target_arch="mips",target_arch="mipsel"),target_os="linux"))']
+[target.'cfg(all(any(target_arch="mips64",target_arch="mips64r6",target_arch="mips32r6",target_arch="mips",target_arch="mipsel"),target_os="linux",not(target_env="musl")))']
 rustflags = ["-Clink-arg=-Wl,-z,execstack"]
 
-[target.'cfg(all(target_arch="mips64r6",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips64r6",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mipsisa64r6-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips64r6",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips64r6",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mipsisa64r6el-linux-gnuabi64-gcc"
 
-[target.'cfg(all(target_arch="mips32r6",target_os="linux",target_endian = "big"))']
+[target.'cfg(all(target_arch="mips32r6",target_os="linux",not(target_env="musl"),target_endian = "big"))']
 linker = "mipsisa32r6-linux-gnu-gcc"
 
-[target.'cfg(all(target_arch="mips32r6",target_os="linux",target_endian = "little"))']
+[target.'cfg(all(target_arch="mips32r6",target_os="linux",not(target_env="musl"),target_endian = "little"))']
 linker = "mipsisa32r6el-linux-gnu-gcc"
 
 [target.'cfg(all(any(target_arch="x86_64",target_arch="x86"),any(target_os="linux",target_os="android")))']
@@ -403,7 +391,13 @@ rustflags = ["-Zrelax-elf-relocations"]
 
 [target.'cfg(any(target_os="freebsd",all(target_os="netbsd",not(any(target_arch="sparc64",target_arch="powerpc",all(target_arch="mips",target_endian="little"),target_arch="arm",target_arch="x86"))),all(target_os="openbsd",not(any(target_arch="sparc64",target_arch="powerpc",target_arch="x86"))),target_os="dragonfly",target_os="fuchsia"))']
 linker = "clang"
-rustflags = ["-Clink-arg=-fuse-ld=lld", "-Clinker-plugin-lto"]
+rustflags = [
+    "-Clink-arg=-fuse-ld=lld",
+    "-Clink-arg=-Wl,--icf=all",
+    "-Clink-arg=-Wl,--relax",
+    "-Clink-arg=-Wl,-z,pack-relative-relocs",
+    "-Clinker-plugin-lto"
+]
 
 [target.x86_64-unknown-freebsd]
 rustflags = [
@@ -510,7 +504,8 @@ rustflags = [
 ]
 
 [target.'cfg(target_os = "android")']
-rustflags = ["-Clink-arg=--sysroot=ndk/sysroot"]
+rustflags = ["-Clink-arg=--sysroot=ndk/sysroot","-Clink-arg=-Wl,--icf=all",
+"-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs"]
 
 [target.riscv64-linux-android]
 linker = "ndk/bin/riscv64-linux-android37-clang"
@@ -521,7 +516,13 @@ linker = "ndk/bin/aarch64-linux-android37-clang"
 [target.x86_64-linux-android]
 linker = "ndk/bin/x86_64-linux-android37-clang"
 
+[target.i686-linux-android]
+linker = "ndk/bin/i686-linux-android37-clang"
+
 [target.armv7-linux-androideabi]
+linker = "ndk/bin/armv7a-linux-androideabi37-clang"
+
+[target.arm-linux-androideabi]
 linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 
 [target.thumbv7neon-linux-androideabi]
@@ -529,7 +530,8 @@ linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 
 [target.'cfg(target_env="ohos")']
 linker = "ohos/bin/clang"
-rustflags = ["-Clink-arg=--sysroot=ohos-root"]
+rustflags = ["-Clink-arg=--sysroot=ohos-root","-Clink-arg=-Wl,--icf=all",
+"-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs"]
 
 [target.aarch64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=aarch64--linux-ohos"]
@@ -551,7 +553,6 @@ rustflags = ["-Clink-arg=--sysroot=wrt/mips64-openwrt-linux-musl"]
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=hexagon-linux-musl"]
 linker = "hexagon/bin/hexagon-unknown-linux-musl-clang"
-rustflags = ["-Clink-arg=--sysroot=hexagon/target/hexagon-unknown-linux-musl"]
 
 [target.aarch64-unknown-fuchsia]
 rustflags = [
@@ -574,41 +575,14 @@ rustflags = [
   "-Lnative=fuchsia/arch/riscv64/lib",
 ]
 
-[target.mipsel-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
-
 [target.powerpc-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-netbsd", "-Crelocation-model=static"]
-
-[target.armv7-unknown-netbsd-eabihf]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=arm-netbsd"]
-
-[target.armv6-unknown-netbsd-eabihf]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=arm-netbsd"]
-
-[target.powerpc-unknown-openbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-openbsd"]
+rustflags = ["-Crelocation-model=static"]
 
 [target.aarch64_be-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64_be-linux-gnu"]
+linker = "aarch64be-glibc/bin/aarch64_be-linux-gcc"
 
 [target.aarch64_be-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64_be-linux-musl"]
-
-[target.aarch64_be-unknown-linux-gnu_ilp32]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64_be-linux-ilp32"]
-
-[target.aarch64-unknown-linux-gnu_ilp32]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64-linux-ilp32"]
+linker = "aarch64be-musl/bin/aarch64_be-linux-gcc"
 
 [target.sparc64-unknown-openbsd]
 linker = "sparc64-unknown-openbsd-clang"
@@ -617,27 +591,25 @@ rustflags = ["-lc"]
 [target.sparc64-unknown-netbsd]
 linker = "sparc64-unknown-netbsd-gcc"
 
-[target.mips-unknown-linux-uclibc]
-rustflags = ["-Ctarget-feature=-soft-float"]
-
-[target.mipsel-unknown-linux-uclibc]
-rustflags = ["-Ctarget-feature=-soft-float"]
-
 [target.aarch64-oe-linux-gnu]
 linker = "aarch64-poky-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=sysroots/armv8a-poky-linux"]
 
 [target.armv7-oe-linux-gnueabihf]
 linker = "arm-poky-linux-gnueabi-gcc"
-rustflags = ["-Clink-arg=--sysroot=sysroots/cortexa8hf-neon-poky-linux-gnueabi"]
+rustflags = ["-Clink-arg=--sysroot=sysroots/cortexa8t2hf-neon-poky-linux-gnueabi"]
 
 [target.riscv64-oe-linux-gnu]
 linker = "riscv64-poky-linux-gcc"
-rustflags = ["-Clink-arg=--sysroot=sysroots/riscv64imafdc-poky-linux"]
+rustflags = ["-Clink-arg=--sysroot=sysroots/riscv64imafdc_zicsr_zifencei-poky-linux"]
 
 [target.x86_64-oe-linux-gnu]
 linker = "x86_64-poky-linux-gcc"
 rustflags = ["-Clink-arg=--sysroot=sysroots/core2-64-poky-linux"]
+
+[target.i686-oe-linux-gnu]
+linker = "i686-poky-linux-gcc"
+rustflags = ["-Clink-arg=--sysroot=sysroots/core2-32-poky-linux"]
 
 [target.'cfg(target_os = "solaris")']
 rustflags = ["-Clink-arg=/compat.o"]
@@ -647,10 +619,6 @@ linker = "ppc64-gnu/bin/powerpc64-unknown-linux-gnuabielfv2-gcc"
 
 [target.powerpc64-unknown-linux-musl]
 linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
-
-[target.armeb-unknown-linux-gnueabi]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
 
 [target.i586-unknown-redox]
 linker = "redox/i586-unknown-redox/bin/i586-unknown-redox-gcc"
@@ -682,22 +650,6 @@ linker = "csky-unknown-linux-gnuabiv2hf-gcc"
 # linker = "./zig-cc.sh"
 # rustflags = ["-Clink-arg=--target=csky-linux-gnueabihf","-Clink-arg=-Lcsky/csky-linux-gnuabiv2/lib"]
 
-[target.x86_64-unknown-haiku]
-linker = "./x86_64-unknown-haiku-gcc"
-
-[target.i686-unknown-hurd-gnu]
-linker = "./i686-gnu-gcc"
-
-[target.i686-unknown-openbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-openbsd"]
-[target.i686-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-netbsd"]
-[target.i586-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-netbsd"]
-
 [target.i686-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
 [target.x86_64-uwp-windows-gnu]
@@ -705,16 +657,37 @@ linker = "C:\\msys64\\mingw64\\bin\\gcc.exe"
 rustflags = ["-lgcc_eh"]
 
 [target.riscv32gc-unknown-linux-gnu]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=riscv32-linux-gnu"]
+linker = "rv32-gnu/bin/riscv32gc-unknown-linux-gnu-clang"
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=riscv32-linux-gnu"]
 
 [target.riscv32gc-unknown-linux-musl]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
+linker = "rv32-musl/bin/riscv32-unknown-linux-musl-clang"
+# linker = "./zig-cc.sh"
+# rustflags = ["-Clink-arg=--target=riscv32-linux-musl"]
 
 [target.'cfg(target_os="l4re")']
-linker = "l4re/bin/aarch64-l4re-gcc"
+linker = "l4re/bin/x86_64-l4re-gcc"
 
 [target.wasm32-wali-linux-musl]
-linker = "WALI/build/llvm/bin/wasm-ld"
-rustflags = ["-LWALI/build/sysroot/lib"]
+linker = "WALI/build/llvm/bin/clang"
+rustflags = ["-LWALI/build/sysroot/lib","-LWALI/build/libcxx/lib/","-Ctarget-feature=+crt-static"]
+
+[target.mipsel-unknown-linux-uclibc]
+linker = "uclibc/mips32el/bin/mipsel-buildroot-linux-uclibc-gcc.br_real"
+# rustflags = ["-Ctarget-feature=-soft-float"]
+[target.mips-unknown-linux-uclibc]
+linker = "uclibc/mips32/bin/mips-buildroot-linux-uclibc-gcc.br_real"
+# rustflags = ["-Ctarget-feature=-soft-float"]
+[target.armv7-unknown-linux-uclibceabi]
+linker = "uclibc/armv7-eabihf/bin/arm-buildroot-linux-uclibcgnueabihf-gcc.br_real"
+
+[target.armv7-unknown-linux-uclibceabihf]
+linker = "uclibc/armv7-eabihf/bin/arm-buildroot-linux-uclibcgnueabihf-gcc.br_real"
+
+[target.armv5te-unknown-linux-uclibceabi]
+linker = "uclibc/armv5-eabi/bin/arm-buildroot-linux-uclibcgnueabi-gcc.br_real"
+
+[target.m68k-unknown-linux-gnu]
+linker = "./zig-cc.sh"
+# rustflags = ["-Crelocation-model=static"]

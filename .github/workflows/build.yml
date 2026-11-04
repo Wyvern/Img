@@ -949,7 +949,7 @@ jobs:
           {
             time waitfor ~/hurd.finish
             docker_linker i686-gnu-gcc ghcr.io/wyvern/img:hurd-i686
-            time cargo s ${targets[4]}
+            time cargo s ${targets[4]} --config "target.${targets[4]}.linker='./i686-gnu-gcc'"
           } &
 
           {
@@ -1216,8 +1216,8 @@ jobs:
             time cr $target &
           done
 
-          docker_linker x86_64-unknown-haiku-gcc ghcr.io/wyvern/img:haiku-cross
-          time cargo s ${targets[7]} &
+          docker_linker x86_64-haiku-gcc ghcr.io/wyvern/img:haiku-cross
+          time cargo s ${targets[7]} --config "target.${targets[7]}.linker='./x86_64-haiku-gcc'" &
 
           wait
 
