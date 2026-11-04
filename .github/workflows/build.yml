@@ -12,6 +12,8 @@ env:
   RUSTC_WRAPPER: "sccache"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   IMAGE: ghcr.io/${{ github.repository }}
+  OPENBSD: "8.0"
+  NETBSD: "11.1"
 
 jobs:
   Test:
@@ -976,10 +978,6 @@ jobs:
       contents: write
       packages: write
 
-    env:
-      NETBSD_VERSION: "11.0"
-      OPENBSD_VERSION: "8.0"
-
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -1114,8 +1112,8 @@ jobs:
             docker pull $CROSS_IMAGE &>/dev/null &
           done
 
-          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null; then
-              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
+          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD}" &>/dev/null; then
+              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD}" &>/dev/null &
           else
               # NetBSD base image required by docker/netbsd.Dockerfile
               docker buildx build \
@@ -1127,8 +1125,8 @@ jobs:
                 --build-arg RUST_TARGET=sparc64-unknown-netbsd \
                 --build-arg HOST_ARCH=amd64 \
                 --build-arg UBUNTU_VERSION=24.04 \
-                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-                --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD_VERSION}-base-dev-amd64 \
+                --build-arg NETBSD="$NETBSD" \
+                --tag ghcr.io/taiki-e/rust-cross-toolchain:sparc64-unknown-netbsd${NETBSD}-base-dev-amd64 \
                 docker/base
 
               # NetBSD final image
@@ -1141,14 +1139,14 @@ jobs:
                 --build-arg RUST_TARGET=sparc64-unknown-netbsd \
                 --build-arg HOST_ARCH=amd64 \
                 --build-arg UBUNTU_VERSION=24.04 \
-                --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-                --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
+                --build-arg NETBSD="$NETBSD" \
+                --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD}" \
                 docker
-              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
+              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD}" &>/dev/null &
           fi
 
-          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null; then
-              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
+          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD}" &>/dev/null; then
+              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD}" &>/dev/null &
           else
               # OpenBSD final image
               docker buildx build \
@@ -1160,10 +1158,10 @@ jobs:
                 --build-arg RUST_TARGET=sparc64-unknown-openbsd \
                 --build-arg HOST_ARCH=amd64 \
                 --build-arg UBUNTU_VERSION=24.04 \
-                --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
-                --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
+                --build-arg OPENBSD="$OPENBSD" \
+                --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD}" \
                 docker
-              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
+              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD}" &>/dev/null &
           fi
 
       - name: Toolchain Setup
@@ -1228,8 +1226,6 @@ jobs:
 
     env:
       FREEBSD: "15.1"
-      OPENBSD: "8.0"
-      NETBSD: "11.0"
       DFLY: "6.4.2"
 
     permissions:
