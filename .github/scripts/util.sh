@@ -97,6 +97,8 @@ print(size, "sha256:" + h.hexdigest())
     return 1
   fi
 
+  echo "Uploading $dir to $image ..."
+
   # Upload the empty OCI config blob.
   printf '{}' |
     oras blob push \
