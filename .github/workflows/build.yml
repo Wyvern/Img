@@ -1265,7 +1265,7 @@ jobs:
             } &
 
             if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix"); then
-              oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.sysroot &
+              oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C "/home/runner/unix" && touch ~/unix.finish &
             else
               freebsd=(amd64 arm64 riscv)
               for arch in "${freebsd[@]}"; do
@@ -1334,10 +1334,10 @@ jobs:
 
               wait
               chmod -R u+rwX sysroot
-              touch ~/unix.sysroot
+              touch ~/unix.finish
               source .github/scripts/util.sh
-              push_docker /home/runner/unix "${IMAGE}:unix" unix &
-
+              push_docker /home/runner/unix "${IMAGE}:unix" unix
+              exit 1
               # tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
               # oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
             fi
@@ -1378,7 +1378,7 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          time waitfor ~/unix.sysroot ~/llvm.finish
+          time waitfor ~/unix.finish ~/llvm.finish
 
           sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
 
