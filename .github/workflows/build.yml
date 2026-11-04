@@ -1979,19 +1979,19 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            powerpc-unknown-openbsd
-            powerpc-unknown-netbsd
-            mipsel-unknown-netbsd
-            armv7-unknown-netbsd-eabihf
-            armv6-unknown-netbsd-eabihf
-            i586-unknown-netbsd
-            i686-unknown-netbsd
-            i686-unknown-openbsd
-            armeb-unknown-linux-gnueabi
+            powerpc-unknown-openbsd powerpc-openbsd
+            powerpc-unknown-netbsd powerpc-netbsd
+            mipsel-unknown-netbsd mipsel-netbsd
+            armv7-unknown-netbsd-eabihf arm-netbsd
+            armv6-unknown-netbsd-eabihf arm-netbsd
+            i586-unknown-netbsd x86-netbsd
+            i686-unknown-netbsd x86-netbsd
+            i686-unknown-openbsd x86-openbsd
+            armeb-unknown-linux-gnueabi armeb-linux-gnueabi
+            armeb-unknown-linux-musleabi.json armeb-linux-musleabi
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             i686-pc-windows-gnullvm
-            armeb-unknown-linux-musleabi.json armeb-linux-musleabi
 
       - name: Build Release
         env:
@@ -2007,12 +2007,14 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]:0:12}"; do
-            time cargo s $target &
+          for item in "${targets[@]:0:10}"; do
+            read -r target zig <<< $item
+            time cargo s $target --config 'target.${target%.json}.linker="./zig-cc.sh"' --config 'target.${target%.json}.rustflags = ["-Clink-arg=--target=${zig}"]' &
           done
 
-          read -r target zig <<< "${targets[@]:12}"
-          time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
+          for target in "${targets[@]:10}"; do
+            time cargo s $target &
+          done
 
           wait
 

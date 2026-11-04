@@ -579,39 +579,14 @@ rustflags = [
   "-Lnative=fuchsia/arch/riscv64/lib",
 ]
 
-[target.mipsel-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=mipsel-netbsd"]
-
 [target.powerpc-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-netbsd", "-Crelocation-model=static"]
-
-[target.armv7-unknown-netbsd-eabihf]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=arm-netbsd"]
-
-[target.armv6-unknown-netbsd-eabihf]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=arm-netbsd"]
-
-[target.powerpc-unknown-openbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=powerpc-openbsd"]
+rustflags = ["-Crelocation-model=static"]
 
 [target.aarch64_be-unknown-linux-gnu]
 linker = "aarch64be-glibc/bin/aarch64_be-linux-gcc"
 
 [target.aarch64_be-unknown-linux-musl]
 linker = "aarch64be-musl/bin/aarch64_be-linux-gcc"
-
-[target.aarch64_be-unknown-linux-gnu_ilp32]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64_be-linux-ilp32"]
-
-[target.aarch64-unknown-linux-gnu_ilp32]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=aarch64-linux-ilp32"]
 
 [target.sparc64-unknown-openbsd]
 linker = "sparc64-unknown-openbsd-clang"
@@ -649,10 +624,6 @@ linker = "ppc64-gnu/bin/powerpc64-unknown-linux-gnuabielfv2-gcc"
 [target.powerpc64-unknown-linux-musl]
 linker = "ppc64-musl/bin/powerpc64-unknown-linux-musl-gcc"
 
-[target.armeb-unknown-linux-gnueabi]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=armeb-linux-gnueabi"]
-
 [target.i586-unknown-redox]
 linker = "redox/i586-unknown-redox/bin/i586-unknown-redox-gcc"
 rustflags = ["-Clink-arg=--sysroot=redox/i586-unknown-redox"]
@@ -688,16 +659,6 @@ linker = "./x86_64-unknown-haiku-gcc"
 
 [target.i686-unknown-hurd-gnu]
 linker = "./i686-gnu-gcc"
-
-[target.i686-unknown-openbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-openbsd"]
-[target.i686-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-netbsd"]
-[target.i586-unknown-netbsd]
-linker = "./zig-cc.sh"
-rustflags = ["-Clink-arg=--target=x86-netbsd"]
 
 [target.i686-uwp-windows-gnu]
 linker = "C:\\msys64\\mingw32\\bin\\gcc.exe"
