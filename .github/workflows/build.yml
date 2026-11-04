@@ -2009,7 +2009,7 @@ jobs:
 
           for item in "${targets[@]:0:10}"; do
             read -r target zig <<< $item
-            time cargo s $target --config 'target.${target%.json}.linker="./zig-cc.sh"' --config 'target.${target%.json}.rustflags = ["-Clink-arg=--target=${zig}"]' &
+            time cargo s $target --config "target.${target%.json}.linker='./zig-cc.sh'" --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
           done
 
           for target in "${targets[@]:10}"; do
