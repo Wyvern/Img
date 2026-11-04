@@ -1,5 +1,5 @@
 [target.sparc64-unknown-netbsd]
-image = "ghcr.io/wyvern/img:sparc64-unknown-netbsd11.0"
+image = "ghcr.io/wyvern/img:sparc64-unknown-netbsd11.1"
 
 [target.sparc64-unknown-openbsd]
 image = "ghcr.io/wyvern/img:sparc64-unknown-openbsd8.0"
@@ -18,6 +18,3 @@ image = "ghcr.io/wyvern/img:csky-unknown-linux-gnuabiv2"
 
 [target.csky-unknown-linux-gnuabiv2hf]
 image = "ghcr.io/wyvern/img:csky-unknown-linux-gnuabiv2hf"
-
-[target.x86_64-unknown-haiku]
-image = "ghcr.io/wyvern/img:haiku-cross"

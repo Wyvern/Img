@@ -93,7 +93,7 @@ jobs:
             unzip -q android-ndk-${ndk}-linux.zip -d ~/
             file=android-ndk-${ndk}
             source .github/scripts/util.sh
-            push_docker $file "${IMAGE}:$file" android &
+            push_docker $file "${IMAGE}:$file" android
 
             # tar --zstd -C ./$file -cf /tmp/$file.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:$file" "/tmp/$file.tar.zst:application/vnd.wyvern.android.tar.zstd" &
@@ -275,7 +275,7 @@ jobs:
             cipd install fuchsia/sdk/core/linux-amd64 latest -root /home/runner/Fuchsia
             touch ~/fuchsia.finish
             source .github/scripts/util.sh
-            push_docker /home/runner/Fuchsia "${IMAGE}:fuchsia" fuchsia &
+            push_docker /home/runner/Fuchsia "${IMAGE}:fuchsia" fuchsia
 
             # tar --zstd -C /home/runner/Fuchsia -cf /tmp/Fuchsia.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:fuchsia" "/tmp/Fuchsia.tar.zst:application/vnd.wyvern.fuchsia.tar.zstd" &
@@ -396,7 +396,7 @@ jobs:
                 zstd -T0 -19 -o "ppc64/ppc64-${variant}.nar.zst"
             done
             source .github/scripts/util.sh
-            push_docker ppc64 "${IMAGE}:ppc64" ppc64 &
+            push_docker ppc64 "${IMAGE}:ppc64" ppc64
           fi
 
       - name: Cache aarch64be
@@ -418,7 +418,7 @@ jobs:
             done
             wait
             source .github/scripts/util.sh
-            push_docker $path "${IMAGE}:aarch64be-${aarch64be}" aarch64be &
+            push_docker $path "${IMAGE}:aarch64be-${aarch64be}" aarch64be
 
             # tar --zstd -C $path -cf /tmp/aarch64be-${aarch64be}.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:aarch64be-${aarch64be}" "/tmp/aarch64be-${aarch64be}.tar.zst:application/vnd.wyvern.aarch64be.tar.zstd" &
@@ -443,7 +443,7 @@ jobs:
             done
             wait
             source .github/scripts/util.sh
-            push_docker $path "${IMAGE}:riscv32-${riscv32}" riscv32 &
+            push_docker $path "${IMAGE}:riscv32-${riscv32}" riscv32
 
             # tar --zstd -C $path -cf /tmp/riscv32-${riscv32}.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:riscv32-${riscv32}" "/tmp/riscv32-${riscv32}.tar.zst:application/vnd.wyvern.riscv32.tar.zstd" &
@@ -462,7 +462,7 @@ jobs:
             echo "Downloading hexagon SDK ..."
             curl -LsSf https://artifacts.codelinaro.org/artifactory/codelinaro-toolchain-for-hexagon/${hexagon}________/clang+llvm-${hexagon}-cross-hexagon-unknown-linux-musl_x86_64-linux-gnu.tar.zst | tar --zstd -xf - -C $path
             source .github/scripts/util.sh
-            push_docker $path "${IMAGE}:hexagon-${hexagon}" hexagon &
+            push_docker $path "${IMAGE}:hexagon-${hexagon}" hexagon
 
             # tar --zstd -C $path -cf /tmp/hexagon-${hexagon}.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:hexagon-${hexagon}" "/tmp/hexagon-${hexagon}.tar.zst:application/vnd.wyvern.hexagon.tar.zstd" &
@@ -865,7 +865,7 @@ jobs:
             ./emsdk/emsdk activate latest &>/dev/null
             touch ~/ems.finish
             source .github/scripts/util.sh
-            push_docker emsdk "${IMAGE}:emscripten" emscripten &
+            push_docker emsdk "${IMAGE}:emscripten" emscripten
 
             # tar --zstd -C emsdk/ -cf /tmp/emscripten.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:emscripten" "/tmp/emscripten.tar.zst:application/vnd.wyvern.emscripten.tar.zstd" &
@@ -896,7 +896,7 @@ jobs:
             wait
             touch ~/redox.finish
             source .github/scripts/util.sh
-            push_docker redox "${IMAGE}:redox" redox &
+            push_docker redox "${IMAGE}:redox" redox
 
             # tar --zstd -C "redox/" -cf /tmp/redox.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:redox" "/tmp/redox.tar.zst:application/vnd.wyvern.redox.tar.zstd" &
@@ -1337,7 +1337,7 @@ jobs:
               touch ~/unix.finish
               source .github/scripts/util.sh
               push_docker /home/runner/unix "${IMAGE}:unix" unix
-              exit 1
+
               # tar --zstd -C /home/runner/unix -cf /tmp/unix.tar.zst .
               # oras push --disable-path-validation "${IMAGE}:unix" "/tmp/unix.tar.zst:application/vnd.wyvern.sysroot.tar.zstd" &
             fi
@@ -1494,7 +1494,7 @@ jobs:
             cd ..
             touch ~/wali.finish
             source .github/scripts/util.sh
-            push_docker WALI "${IMAGE}:wali" wali &
+            push_docker WALI "${IMAGE}:wali" wali
 
             # tar --zstd -C WALI -cf /tmp/WALI.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:wali" "/tmp/WALI.tar.zst:application/vnd.wyvern.wali.tar.zstd" &
@@ -1779,7 +1779,7 @@ jobs:
               done
               wait
               touch ~/uclibc.finish
-              push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc &
+              push_docker uclibc "${IMAGE}:uclibc-${uclibc}" uclibc
             fi
 
             mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-x86_64-gcc-15.tar.xz | tar -xJ -C l4re --strip-components=1 | touch ~/l4re.finish &
@@ -1879,7 +1879,7 @@ jobs:
             rm -rf yocto
             touch ~/yocto.finish
             source .github/scripts/util.sh
-            push_docker "/opt/poky/$YOCTO" "${IMAGE}:yocto${YOCTO}" yocto &
+            push_docker "/opt/poky/$YOCTO" "${IMAGE}:yocto${YOCTO}" yocto
 
             # sudo tar --zstd -C /opt/poky/$YOCTO -cf /tmp/yocto${YOCTO}.tar.zst .
             # oras push --disable-path-validation "${IMAGE}:yocto${YOCTO}" "/tmp/yocto${YOCTO}.tar.zst:application/vnd.wyvern.yocto.tar.zstd" &
