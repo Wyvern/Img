@@ -97,8 +97,9 @@ mod macros {
         }
     }
 
+    /// Get name of enclosing function
     #[macro_export]
-    macro_rules! current_fn {
+    macro_rules! func {
         () => {{
             fn f() {}
             let name = any::type_name_of_val(&f);

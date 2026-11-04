@@ -33,21 +33,18 @@ fn curl_args() -> impl Iterator<Item = &'static str> {
     let o = run_cmd("curl", &["--help", "all"], &[]);
     let str = str::from_utf8(&o);
     let (http3, tcp_fastopen) = *CURL_EXTRA.get_or_init(|| {
-        str.map_or_else(
-            |_| (false, false),
-            |s| {
-                let (mut http3, mut tcp_fastopen) = (false, false);
-                for line in s.lines() {
-                    let l = line.trim_start();
-                    http3 |= l.starts_with("--http3");
-                    tcp_fastopen |= l.starts_with("--tcp-fastopen");
-                    if http3 && tcp_fastopen {
-                        break;
-                    }
+        str.map_or((false, false), |s| {
+            let (mut http3, mut tcp_fastopen) = (false, false);
+            for line in s.lines() {
+                let l = line.trim_start();
+                http3 |= l.starts_with("--http3");
+                tcp_fastopen |= l.starts_with("--tcp-fastopen");
+                if http3 && tcp_fastopen {
+                    break;
                 }
-                (http3, tcp_fastopen)
-            },
-        )
+            }
+            (http3, tcp_fastopen)
+        })
     });
     CURL_ARGS
         .iter()
@@ -1446,7 +1443,7 @@ mod img {
 
     #[test]
     fn html() {
-        let arg = arg(current_fn!());
+        let arg = arg(func!());
         let addr = arg.as_deref().unwrap_or_else(|| "mmm.red");
         let html = get_html(addr);
         dbg!(&html);
@@ -1454,7 +1451,7 @@ mod img {
 
     #[test]
     fn htmlq() {
-        let arg = arg(current_fn!());
+        let arg = arg(func!());
         let addr = arg.as_deref().unwrap_or_else(|| "https://bisipic.online/");
         let host = check_host(addr);
         let (html, ll) = get_html(addr);
@@ -1509,7 +1506,7 @@ mod img {
 
     #[test]
     fn run() {
-        if let Some(arg) = arg(current_fn!()) {
+        if let Some(arg) = arg(func!()) {
             parse(&arg);
         } else {
             [

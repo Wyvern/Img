@@ -27,6 +27,11 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v7
 
+        - name: GHCR Setup
+          uses: ./.github/actions/ghcr
+          with:
+           token: ${{ secrets.GITHUB_TOKEN }}
+
         - name: Toolchain Setup
           uses: ./.github/actions/toolchain
           # with:
@@ -44,6 +49,22 @@ jobs:
           run: |
             cargo update
             set +e -x
+
+            docker pull ghcr.io/wyvern/img:sparc64-unknown-netbsd11.1
+
+            docker tag \
+              ghcr.io/wyvern/img:sparc64-unknown-netbsd11.1 \
+              ghcr.io/wyvern/img:sparc64-unknown-netbsd
+
+            docker push ghcr.io/wyvern/img:sparc64-unknown-netbsd
+
+            docker pull ghcr.io/wyvern/img:sparc64-unknown-openbsd8.0
+
+            docker tag \
+              ghcr.io/wyvern/img:sparc64-unknown-openbsd8.0 \
+              ghcr.io/wyvern/img:sparc64-unknown-openbsd
+
+            docker push ghcr.io/wyvern/img:sparc64-unknown-openbsd
 
             source .github/scripts/util.sh
             targets_from_env
@@ -1114,8 +1135,8 @@ jobs:
             docker pull $CROSS_IMAGE &>/dev/null &
           done
 
-          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null; then
-              docker pull "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
+          if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd" &>/dev/null; then
+              docker pull "$IMAGE:sparc64-unknown-netbsd" &>/dev/null &
           else
               # NetBSD base image required by docker/netbsd.Dockerfile
               docker buildx build \
@@ -1142,13 +1163,13 @@ jobs:
                 --build-arg HOST_ARCH=amd64 \
                 --build-arg UBUNTU_VERSION=24.04 \
                 --build-arg NETBSD_VERSION="$NETBSD_VERSION" \
-                --tag "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" \
+                --tag "$IMAGE:sparc64-unknown-netbsd" \
                 docker
-              docker push "$IMAGE:sparc64-unknown-netbsd${NETBSD_VERSION}" &>/dev/null &
+              docker push "$IMAGE:sparc64-unknown-netbsd" &>/dev/null &
           fi
 
-          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null; then
-              docker pull "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
+          if docker manifest inspect "$IMAGE:sparc64-unknown-openbsd" &>/dev/null; then
+              docker pull "$IMAGE:sparc64-unknown-openbsd" &>/dev/null &
           else
               # OpenBSD final image
               docker buildx build \
@@ -1161,9 +1182,9 @@ jobs:
                 --build-arg HOST_ARCH=amd64 \
                 --build-arg UBUNTU_VERSION=24.04 \
                 --build-arg OPENBSD_VERSION="$OPENBSD_VERSION" \
-                --tag "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" \
+                --tag "$IMAGE:sparc64-unknown-openbsd" \
                 docker
-              docker push "$IMAGE:sparc64-unknown-openbsd${OPENBSD_VERSION}" &>/dev/null &
+              docker push "$IMAGE:sparc64-unknown-openbsd" &>/dev/null &
           fi
 
       - name: Toolchain Setup

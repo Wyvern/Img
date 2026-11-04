@@ -1,8 +1,8 @@
 [target.sparc64-unknown-netbsd]
-image = "ghcr.io/wyvern/img:sparc64-unknown-netbsd11.1"
+image = "ghcr.io/wyvern/img:sparc64-unknown-netbsd"
 
 [target.sparc64-unknown-openbsd]
-image = "ghcr.io/wyvern/img:sparc64-unknown-openbsd8.0"
+image = "ghcr.io/wyvern/img:sparc64-unknown-openbsd"
 
 [target.sparcv9-sun-solaris]
 image = "ghcr.io/cross-rs/sparcv9-sun-solaris:main"
