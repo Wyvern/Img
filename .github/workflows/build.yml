@@ -50,22 +50,6 @@ jobs:
             cargo update
             set +e -x
 
-            docker pull ghcr.io/wyvern/img:sparc64-unknown-netbsd11.1
-
-            docker tag \
-              ghcr.io/wyvern/img:sparc64-unknown-netbsd11.1 \
-              ghcr.io/wyvern/img:sparc64-unknown-netbsd
-
-            docker push ghcr.io/wyvern/img:sparc64-unknown-netbsd
-
-            docker pull ghcr.io/wyvern/img:sparc64-unknown-openbsd8.0
-
-            docker tag \
-              ghcr.io/wyvern/img:sparc64-unknown-openbsd8.0 \
-              ghcr.io/wyvern/img:sparc64-unknown-openbsd
-
-            docker push ghcr.io/wyvern/img:sparc64-unknown-openbsd
-
             source .github/scripts/util.sh
             targets_from_env
 
