@@ -2068,7 +2068,7 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for entry in "${targets[@]:9}"; do
+          for entry in "${targets[@]}"; do
             read -r target zig <<< "$entry"
             time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
           done
@@ -2126,7 +2126,7 @@ jobs:
             source .github/scripts/util.sh
             targets_from_env
 
-            for entry in "${targets[@]:10}"; do
+            for entry in "${targets[@]}"; do
               read -r target zig <<< "$entry"
               time cargo s $target --config "target.${target%.json}.rustflags = ['-Clink-arg=--target=${zig}']" &
             done
