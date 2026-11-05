@@ -1106,8 +1106,8 @@ jobs:
             fi
           done
 
-          # docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
-
+          docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
+          exit
           targets=(
             x86_64-unknown-illumos
             sparcv9-sun-solaris
@@ -1211,6 +1211,10 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
+
+          docker_linker nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest arm-none-eabi-gcc
+          cargo s armv7a-nuttx-eabihf --config "target.armv7a-nuttx-eabihf.linker='./nuttx'"
+          exit
 
           for target in "${targets[@]:0:7}"; do
             time cr $target &

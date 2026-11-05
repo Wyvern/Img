@@ -247,7 +247,7 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs"
 ]
 
-[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
+[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",target_os="nuttx"))))']
 rustflags = [
   "-Clink-arg=-Wl,-O3",
   "-Clink-arg=-Wl,--gc-sections",
