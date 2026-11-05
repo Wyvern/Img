@@ -695,3 +695,6 @@ linker = "uclibc/armv5-eabi/bin/arm-buildroot-linux-uclibcgnueabi-gcc.br_real"
 [target.m68k-unknown-linux-gnu]
 linker = "./zig-cc.sh"
 # rustflags = ["-Crelocation-model=static"]
+
+[target.'cfg(target_os="nuttx")']
+rustflags = ["-Clinker-flavor=gnu-cc"]

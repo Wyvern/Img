@@ -1212,6 +1212,14 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
+          # /tools/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
+          # /tools/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc
+          # /tools/gcc-avr32-gnu/bin/avr32-gcc
+          # /tools/pinguino-compilers/p32/bin/p32-gcc
+          # /tools/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc
+          # /tools/riscv-none-elf-gcc/bin/riscv-none-elf-gcc
+          # /tools/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc
+
           docker_linker nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest arm-none-eabi-gcc
           cargo s armv7a-nuttx-eabihf --config "target.armv7a-nuttx-eabihf.linker='./nuttx'"
           exit
