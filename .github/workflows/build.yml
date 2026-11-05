@@ -1214,11 +1214,21 @@ jobs:
 
           # /tools/gcc-arm-none-eabi/bin/arm-none-eabi-gcc
           # /tools/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc
-          # /tools/gcc-avr32-gnu/bin/avr32-gcc
-          # /tools/pinguino-compilers/p32/bin/p32-gcc
-          # /tools/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc
           # /tools/riscv-none-elf-gcc/bin/riscv-none-elf-gcc
-          # /tools/sparc-gaisler-elf-gcc/bin/sparc-gaisler-elf-gcc
+
+          docker run --rm \
+            -v "$PWD/sources:$PWD/sources" \
+            -w "$PWD/sources/nuttx" \
+            ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest \
+            bash -lc '
+              ./tools/configure.sh -l qemu-armv8a:netnsh
+              make -j"$(nproc)"
+              make export
+            '
+          mkdir -p build/nuttx-export && unzip -q sources/nuttx/nuttx-export-*.zip \
+            -d build/nuttx-export
+          mv build/nuttx-export/nuttx-export-* \
+               build/nuttx-export/export
 
           docker_linker nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./nuttx'"
