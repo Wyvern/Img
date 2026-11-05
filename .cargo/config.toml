@@ -247,7 +247,7 @@ rustflags = [
   "-Clink-arg=-Wl,-z,pack-relative-relocs"
 ]
 
-[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm",target_os="nuttx"))))']
+[target.'cfg(all(unix,not(any(target_vendor="apple",target_family="wasm"))))']
 rustflags = [
   "-Clink-arg=-Wl,-O3",
   "-Clink-arg=-Wl,--gc-sections",
@@ -697,4 +697,4 @@ linker = "./zig-cc.sh"
 # rustflags = ["-Crelocation-model=static"]
 
 [target.'cfg(target_os="nuttx")']
-rustflags = ["-Clinker-flavor=gnu-cc","-Cdefault-linker-libraries=yes"]
+rustflags = ["-Clinker-flavor=gnu-cc","-Cdefault-linker-libraries=yes","-lc"]
