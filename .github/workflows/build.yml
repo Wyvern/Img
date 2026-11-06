@@ -143,7 +143,8 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-
+          cargo s aarch64-linux-gnu
+          exit
           for target in "${targets[@]}"; do
             time cargo s $target
           done

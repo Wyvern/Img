@@ -532,10 +532,13 @@ linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 [target.thumbv7neon-linux-androideabi]
 linker = "ndk/bin/armv7a-linux-androideabi37-clang"
 
-[target.'cfg(target_env="ohos")']
+[target.'cfg(any(target_env="ohos",target_os="teeos"))']
 linker = "ohos/bin/clang"
 rustflags = ["-Clink-arg=--sysroot=ohos-root","-Clink-arg=-Wl,--icf=all",
 "-Clink-arg=-Wl,--relax","-Clink-arg=-Wl,-z,pack-relative-relocs"]
+
+[target.aarch64-unknown-teeos]
+rustflags = ["-Clink-arg=--target=aarch64-linux-gnu"]
 
 [target.aarch64-unknown-linux-ohos]
 rustflags = ["-Clink-arg=--target=aarch64--linux-ohos"]
