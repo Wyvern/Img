@@ -127,6 +127,7 @@ jobs:
             thumbv7neon-linux-androideabi
             x86_64-linux-android
             i686-linux-android
+            aarch64-unknown-teeos
 
       - name: Build Release
         env:
@@ -143,8 +144,7 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-          cargo s aarch64-unknown-teeos
-          exit
+
           for target in "${targets[@]}"; do
             time cargo s $target
           done
