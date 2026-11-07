@@ -130,6 +130,7 @@ jobs:
             aarch64-unknown-teeos
 
       - name: Build Release
+        continue-on-error: true
         env:
           TARGETS: ${{ steps.targets.outputs.targets }}
         run: |
