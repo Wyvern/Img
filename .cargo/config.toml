@@ -701,3 +701,6 @@ linker = "./zig-cc.sh"
 
 [target.'cfg(target_os="nuttx")']
 rustflags = ["-Clinker-flavor=gnu-cc","-Cdefault-linker-libraries=yes","-Lbuild/nuttx-export/export/libs"]
+
+[target.'cfg(target_os="trusty")']
+linker = "trusty/toolchain/clang/bin/ld.lld"
