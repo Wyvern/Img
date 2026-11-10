@@ -1002,7 +1002,7 @@ jobs:
 
       - name: Install ubuntu pkgs
         run: |
-          sudo apt install -qy kconfig-frontends >/dev/null
+          sudo apt install -qy kconfig-frontends >/dev/null &
 
       - name: Checkout rust-cross-toolchain
         uses: actions/checkout@v7
@@ -1233,10 +1233,11 @@ jobs:
 
           git clone --depth=1 https://github.com/apache/nuttx.git
           git clone --depth=1 https://github.com/apache/nuttx-apps.git apps
-          du -sh nuttx apps
           nuttx/tools/configure.sh -l qemu-armv8a:netnsh_smp
+          cd nuttx
           make -j"$(nproc)"
-          find nuttx -type f -name '*.a' -print
+          find . -type f -name '*.a' -print
+          cd ..
           # docker_linker nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./nuttx'"
           exit
