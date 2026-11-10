@@ -1228,6 +1228,7 @@ jobs:
           # /tools/riscv-none-elf-gcc/bin/riscv-none-elf-gcc
 
           git clone --depth=1 https://github.com/apache/nuttx.git
+          git clone --depth=1 https://github.com/apache/nuttx-apps.git apps
           nuttx/tools/configure.sh -l qemu-armv8a:netnsh_smp
           make -j"$(nproc)"
           find nuttx -type f -name '*.a' -print
