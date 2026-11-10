@@ -442,11 +442,23 @@ fn parse(addr: &str) -> String {
         }
     }
     let term_title = if *TERM.get_or_init(|| {
-        std::env::var("TERM").is_ok_and(|o| {
-            ["term", "vt", "crt", "pty", "emu", "virt", "onsole"]
+        env::var_os("NO_HYPERLINK").is_none()
+            && (["WT_SESSION", "KONSOLE_VERSION", "VTE_VERSION"]
                 .iter()
-                .any(|x| o.contains(x))
-        })
+                .any(|&v| env::var_os(v).is_some())
+                || ["TERM_PROGRAM", "TERM", "COLORTERM"]
+                    .iter()
+                    .filter_map(|&v| env::var(v).ok())
+                    .any(|mut o| {
+                        o.make_ascii_lowercase();
+                        [
+                            "tty", "wezterm", "hyper", "code", "zed", "onsole", "foot", "contour",
+                            "rio",
+                        ]
+                        .iter()
+                        .any(|x| o.contains(x))
+                    })
+                || env::var("FORCE_HYPERLINK").is_ok_and(|v| v.trim() != "0"))
     }) {
         format_args!("{G} \x1b]8;;{addr}\x1b\\{t}\x1b]8;;\x1b\\")
     } else {
