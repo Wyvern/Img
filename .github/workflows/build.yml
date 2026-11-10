@@ -1242,9 +1242,8 @@ jobs:
                   set -e
                   ./tools/configure.sh -l qemu-armv8a:netnsh_smp >/dev/null
                   make -j"$(nproc)" >/dev/null
-                  cd /workspace/nuttx
-                  aarch64-none-elf-nm -A --defined-only *.a |
-                    grep -E ' (malloc|free|close|stat|lstat|pthread_getspecific|nx_pthread_exit)$'
+                  aarch64-none-elf-nm -A --defined-only staging/*.a 2>/dev/null |
+                        grep -E " (malloc|free|close|stat|lstat|pthread_getspecific|nx_pthread_exit)$"
               '
           find . -type f -name '*.a' -print
           # docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
