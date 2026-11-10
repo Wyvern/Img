@@ -700,7 +700,7 @@ linker = "./zig-cc.sh"
 # rustflags = ["-Crelocation-model=static"]
 
 [target.'cfg(target_os="nuttx")']
-rustflags = ["-Clinker-flavor=gnu-cc","-Cdefault-linker-libraries=yes","-Lnuttx/staging","-Clink-arg=-Wl,--start-group","-lc","-lxx","-lmm","-lfs","-lsched","-Clink-arg=-Wl,--end-group"]
+rustflags = ["-Clinker-flavor=gnu-cc","-Cdefault-linker-libraries=yes","-Lnuttx/staging","-Clink-arg=-Wl,--start-group","-lc","-lxx","-lmm","-lfs","-lsched","-lapps","-Clink-arg=-Wl,--end-group"]
 
 [target.'cfg(target_os="trusty")']
 linker = "trusty/toolchain/clang/bin/ld.lld"
