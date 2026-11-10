@@ -1117,7 +1117,7 @@ jobs:
             fi
           done
 
-          # docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
+          docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
 
           targets=(
             x86_64-unknown-illumos
@@ -1227,9 +1227,13 @@ jobs:
           # /tools/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc
           # /tools/riscv-none-elf-gcc/bin/riscv-none-elf-gcc
 
+          git clone --depth=1 https://github.com/apache/nuttx.git
+          nuttx/tools/configure.sh -l qemu-armv8a:netnsh_smp
+          make -j"$(nproc)"
+          find nuttx -type f -name '*.a' -print
           # docker_linker nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./nuttx'"
-
+          exit
           for target in "${targets[@]:0:7}"; do
             time cr $target &
           done
