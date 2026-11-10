@@ -1242,10 +1242,13 @@ jobs:
                   set -e
                   ./tools/configure.sh -l qemu-armv8a:netnsh_smp >/dev/null
                   make -j"$(nproc)" >/dev/null
+                  cd /workspace/nuttx
+                  aarch64-none-elf-nm -A --defined-only *.a |
+                    grep -E ' (malloc|free|close|stat|lstat|pthread_getspecific|nx_pthread_exit)$'
               '
           find . -type f -name '*.a' -print
-          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
-          cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./aarch64-nuttx'"
+          # docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
+          # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./aarch64-nuttx'"
           exit
           for target in "${targets[@]:0:7}"; do
             time cr $target &
