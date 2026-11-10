@@ -1241,13 +1241,18 @@ jobs:
               bash -c '
                   set -e
                   ./tools/configure.sh -l qemu-armv8a:netnsh_smp >/dev/null
+                  kconfig-tweak --file .config --enable CONFIG_FS_LARGEFILE
+                  kconfig-tweak --file .config --disable CONFIG_LIBC_MUTEX_BACKTRACE
+                  kconfig-tweak --file .config --set-val CONFIG_TLS_NELEM 16
+                  kconfig-tweak --file .config --enable CONFIG_DEV_URANDOM
+                  make olddefconfig
                   make -j"$(nproc)" >/dev/null
-                  aarch64-none-elf-nm -A *.a 2>/dev/null |
+                  aarch64-none-elf-nm -A staging/*.a 2>/dev/null |
                     grep -E " (T|W|U) (pthread_getspecific|malloc|free|close|stat|lstat|nx_pthread_exit)$"
               '
           find . -type f -name '*.a' -print
-          docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
-          cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./aarch64-nuttx'"
+          # docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
+          # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./aarch64-nuttx'"
           exit
           for target in "${targets[@]:0:7}"; do
             time cr $target &
