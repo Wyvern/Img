@@ -1000,10 +1000,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install ubuntu pkgs
-        run: |
-          sudo apt install -qy kconfig-frontends >/dev/null &
-
       - name: Checkout rust-cross-toolchain
         uses: actions/checkout@v7
         with:
@@ -1122,7 +1118,7 @@ jobs:
           done
 
           docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
-
+          exit
           targets=(
             x86_64-unknown-illumos
             sparcv9-sun-solaris
@@ -1186,6 +1182,13 @@ jobs:
               docker push "$IMAGE:sparc64-unknown-openbsd" &>/dev/null &
           fi
 
+      - name: Clone Nuttx repo
+        run: |
+          {
+            git clone --depth=1 https://github.com/apache/nuttx.git
+            git clone --depth=1 https://github.com/apache/nuttx-apps.git apps
+          } &
+
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
@@ -1231,13 +1234,16 @@ jobs:
           # /tools/gcc-aarch64-none-elf/bin/aarch64-none-elf-gcc
           # /tools/riscv-none-elf-gcc/bin/riscv-none-elf-gcc
 
-          git clone --depth=1 https://github.com/apache/nuttx.git
-          git clone --depth=1 https://github.com/apache/nuttx-apps.git apps
-          nuttx/tools/configure.sh -l qemu-armv8a:netnsh_smp
-          cd nuttx
-          make -j"$(nproc)"
+          docker run --rm \
+              -v "$PWD:/workspace" \
+              -w /workspace/nuttx \
+              ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest \
+              bash -c '
+                  set -e
+                  ./tools/configure.sh -l qemu-armv8a:netnsh_smp
+                  make -j"$(nproc)"
+              '
           find . -type f -name '*.a' -print
-          cd ..
           # docker_linker nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./nuttx'"
           exit
