@@ -177,6 +177,16 @@ jobs:
 
           export PATH="$PWD/trusty-clang/clang-r475365b/bin:$PATH"
 
+          CLANG="$PWD/trusty-clang/clang-r475365b/bin/clang-16"
+
+          "$CLANG" \
+            --target=aarch64-unknown-unknown-musl \
+            --sysroot="$PWD/trusty-sdk/sysroots/generic-arm64" \
+            -fuse-ld=lld \
+            -v -### \
+            -nostartfiles -nodefaultlibs \
+            -static-pie -x c /dev/null -o /tmp/test 2>&1
+
           cargo s aarch64-unknown-trusty
           exit
           source .github/scripts/util.sh
