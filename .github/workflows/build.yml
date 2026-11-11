@@ -128,7 +128,7 @@ jobs:
             x86_64-linux-android
             i686-linux-android
             # aarch64-unknown-teeos
-            # armv7-unknown-trusty
+            armv7-unknown-trusty
             # aarch64-unknown-trusty
 
       - name: Build Release
@@ -148,8 +148,9 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          # git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty
-
+          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty
+          cargo s armv7-unknown-trusty
+          exit
           for target in "${targets[@]}"; do
             time cargo s $target
           done
