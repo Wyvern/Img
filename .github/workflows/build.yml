@@ -140,7 +140,7 @@ jobs:
             curl -fsSL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/5dedfe5cc164ec79ae4f7ac23336727c723f9f38/clang-r450784e.tar.gz | tar -xz -C trusty-clang/clang-r450784e
 
             mkdir -p trusty-sdk/toolchain
-            ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
+            ln -sfn "$PWD/trusty-clang/clang-r450784e" trusty-sdk/toolchain/clang
           fi
 
       - name: Set targets
