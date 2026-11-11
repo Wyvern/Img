@@ -148,7 +148,10 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty
+          git clone https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty
+          cd trusty
+          git checkout 665f94d
+          cd ..
           find trusty -type f \( \
             -name '*ld*' -o \
             -name '*-gcc' -o \
