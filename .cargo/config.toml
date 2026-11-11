@@ -703,4 +703,8 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clinker-flavor=gnu-cc","-Lnuttx/staging"]
 
 [target.'cfg(target_os="trusty")']
-linker = "trusty/clang/bin/ld.lld"
+# linker = "trusty/clang/bin/ld.lld"
+[target.armv7-unknown-trusty]
+rustflags = ["-Clink-arg=--sysroot=trusty/sysroots/generic-arm32"]
+[target.aarch64-unknown-trusty]
+rustflags = ["-Clink-arg=--sysroot=trusty/sysroots/generic-arm64"]

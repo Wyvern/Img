@@ -150,13 +150,9 @@ jobs:
 
           git clone https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty
           cd trusty
-          git checkout 16f09fe
+          git checkout 665f94d
           cd ..
-          find trusty -type f \( \
-            -name '*ld*' -o \
-            -name '*-gcc' -o \
-            -name '*-clang' \
-          \)
+          ls -lh trusty
           cargo s armv7-unknown-trusty
           exit
           for target in "${targets[@]}"; do
