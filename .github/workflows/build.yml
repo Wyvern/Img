@@ -116,6 +116,7 @@ jobs:
           version: "7.0"
 
       - name: Trusty Cache
+        if: false
         uses: actions/cache@v6
         with:
           path: |
@@ -134,9 +135,9 @@ jobs:
 
             git -C trusty-sdk checkout FETCH_HEAD
 
-            mkdir -p trusty-clang/clang-r475365b
+            mkdir -p trusty-clang/clang-r450784e
 
-            curl -fsSL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/d20e409261d6ad80a0c29ac2055bf5c3bb996ef4/clang-r475365b.tar.gz | tar -xz -C trusty-clang/clang-r475365b
+            curl -fsSL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/5dedfe5cc164ec79ae4f7ac23336727c723f9f38/clang-r450784e.tar.gz | tar -xz -C trusty-clang/clang-r450784e
 
             mkdir -p trusty-sdk/toolchain
             ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
@@ -175,20 +176,7 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
-          CLANG="$PWD/trusty-clang/clang-r475365b/bin/clang-16"
-          SYSROOT="$PWD/trusty-sdk/sysroots/generic-arm64"
-
-          "$CLANG" \
-            --target=aarch64-unknown-unknown-musl \
-            --sysroot="$SYSROOT" \
-            -ccc-gcc-name=clang-16 \
-            -fuse-ld=lld \
-            -### -nostartfiles -nodefaultlibs \
-            -static-pie -x c /dev/null -o /tmp/test
-
-
-
-          # cargo s aarch64-unknown-trusty
+          cargo s aarch64-unknown-trusty
           exit
           source .github/scripts/util.sh
           targets_from_env
