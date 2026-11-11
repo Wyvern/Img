@@ -176,19 +176,21 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           CLANG="$PWD/trusty-clang/clang-r475365b/bin/clang-16"
+          SYSROOT="$PWD/trusty-sdk/sysroots/generic-arm64"
 
-          "$CLANG" --target=aarch64-unknown-unknown-musl -print-prog-name=gcc
-          "$CLANG" --target=aarch64-unknown-unknown-musl -print-prog-name=ld
-          "$CLANG" --target=aarch64-unknown-unknown-musl -print-search-dirs
+          "$CLANG" \
+            --target=aarch64-unknown-unknown-musl \
+            --sysroot="$SYSROOT" \
+            -fuse-ld=lld \
+            -Wl,-m,aarch64elf \
+            -### -nostartfiles -nodefaultlibs \
+            -static-pie -x c /dev/null -o /tmp/test 2>&1
 
-          grep -R -n -E 'gcc|ld-path|fuse-ld' \
-            trusty-clang/clang-r475365b/bin/clang.cfg \
-            trusty-clang/clang-r475365b/bin/aarch64-unknown-linux-musl.cfg \
-            trusty-clang/clang-r475365b/bin 2>/dev/null | head -80
-
-          file trusty-sdk/toolchain/clang/bin/ld.lld
-          readlink -f trusty-sdk/toolchain/clang/bin/ld.lld
-          file trusty-clang/clang-r475365b/bin/ld.lld
+          /usr/bin/gcc \
+            -fuse-ld=lld \
+            -Wl,-m,aarch64elf \
+            -### -nostartfiles -static-pie \
+            -x c /dev/null -o /tmp/test 2>&1
 
           # cargo s aarch64-unknown-trusty
           exit
