@@ -106,8 +106,6 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-          ccw: false
 
       - name: Setup OpenHarmony SDK
         uses: openharmony-rs/setup-ohos-sdk@main
@@ -175,6 +173,7 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           cargo s aarch64-unknown-trusty
+          cargo s armv7-unknown-trusty
           exit
           source .github/scripts/util.sh
           targets_from_env
