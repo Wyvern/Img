@@ -703,4 +703,4 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clinker-flavor=gnu-cc","-Lnuttx/staging"]
 
 [target.'cfg(target_os="trusty")']
-linker = "trusty/toolchain/clang/bin/ld.lld"
+linker = "trusty/clang/bin/ld.lld"
