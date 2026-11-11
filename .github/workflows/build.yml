@@ -106,16 +106,14 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
-        with:
-          ccw: false
 
       - name: Setup OpenHarmony SDK
-        if: false
         uses: openharmony-rs/setup-ohos-sdk@main
         with:
           version: "7.0"
 
       - name: Trusty Cache
+        if: false
         uses: actions/cache@v6
         with:
           path: |
@@ -125,7 +123,7 @@ jobs:
           restore-keys: trusty
 
       - name: Trusty SDK config
-        if: true
+        if: false
         run: |
           if [[ ! -d trusty-sdk || ! -d trusty-clang ]]; then
             git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty-sdk
@@ -175,9 +173,6 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
-          cargo s aarch64-unknown-trusty
-          cargo s armv7-unknown-trusty
-          exit
           source .github/scripts/util.sh
           targets_from_env
 
