@@ -176,21 +176,17 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           CLANG="$PWD/trusty-clang/clang-r475365b/bin/clang-16"
+          BIN="$PWD/trusty-clang/clang-r475365b/bin"
           SYSROOT="$PWD/trusty-sdk/sysroots/generic-arm64"
 
           "$CLANG" \
             --target=aarch64-unknown-unknown-musl \
             --sysroot="$SYSROOT" \
             -fuse-ld=lld \
-            -Wl,-m,aarch64elf \
+            -B"$BIN/" \
             -### -nostartfiles -nodefaultlibs \
-            -static-pie -x c /dev/null -o /tmp/test 2>&1
+            -static-pie -x c /dev/null -o /tmp/test
 
-          /usr/bin/gcc \
-            -fuse-ld=lld \
-            -Wl,-m,aarch64elf \
-            -### -nostartfiles -static-pie \
-            -x c /dev/null -o /tmp/test 2>&1
 
           # cargo s aarch64-unknown-trusty
           exit
