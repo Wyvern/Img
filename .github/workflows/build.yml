@@ -115,7 +115,6 @@ jobs:
       - name: Trusty SDK config
         if: true
         run: |
-          {
           git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty-sdk
 
           git -C trusty-sdk fetch --depth=1 origin fb047922bd0758948e48500744ff94528b87c490
@@ -128,7 +127,6 @@ jobs:
 
           mkdir -p trusty-sdk/toolchain
           ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
-          }
 
       - name: Set targets
         id: targets
