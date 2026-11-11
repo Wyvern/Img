@@ -706,6 +706,6 @@ rustflags = ["-Clinker-flavor=gnu-cc","-Lnuttx/staging"]
 linker = "trusty-sdk/toolchain/clang/bin/clang"
 rustflags = ["-Ctarget-feature=+crt-static","-Clink-arg=-fuse-ld=lld"]
 [target.armv7-unknown-trusty]
-rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm32"]
+rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm32","-Clink-arg=--target=armv7-unknown-unknown-gnueabi"]
 [target.aarch64-unknown-trusty]
-rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64"]
+rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64","-Clink-arg=--target=aarch64-unknown-unknown-musl"]
