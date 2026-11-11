@@ -176,6 +176,7 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
           cargo s aarch64-unknown-trusty
+          cargo s armv7-unknown-trusty
           exit
           source .github/scripts/util.sh
           targets_from_env
