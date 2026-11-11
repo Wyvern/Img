@@ -171,7 +171,7 @@ jobs:
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
-
+          export PATH="$PWD/trusty-sdk/toolchain/clang/bin:$PATH"
           cargo s aarch64-unknown-trusty
           exit
           source .github/scripts/util.sh
