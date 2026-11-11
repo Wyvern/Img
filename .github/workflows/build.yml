@@ -148,11 +148,15 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          git clone https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty
-          cd trusty
-          git checkout 665f94d
-          cd ..
-          ls -lh trusty
+          git clone https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty-sdk
+          git -C trusty-sdk checkout fb047922bd0758948e48500744ff94528b87c490
+
+          git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 trusty-clang
+          git -C trusty-clang checkout d20e409261d6ad80a0c29ac2055bf5c3bb996ef4
+
+          mkdir -p trusty-sdk/toolchain
+          ln -s trusty-clang/clang-r475365b trusty-sdk/toolchain/clang
+
           cargo s armv7-unknown-trusty
           exit
           for target in "${targets[@]}"; do
