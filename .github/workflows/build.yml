@@ -112,6 +112,21 @@ jobs:
         with:
           version: "7.0"
 
+      - name: Trusty SDK config
+        if: false
+        run: |
+          git clone https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty-sdk
+          git -C trusty-sdk checkout fb047922bd0758948e48500744ff94528b87c490
+
+          mkdir -p trusty-clang/clang-r475365b
+
+          curl -fsSL \
+            https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/d20e409261d6ad80a0c29ac2055bf5c3bb996ef4/clang-r475365b.tar.gz \
+            | tar -xz -C trusty-clang/clang-r475365b
+
+          mkdir -p trusty-sdk/toolchain
+          ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
+
       - name: Set targets
         id: targets
         uses: ./.github/actions/targets
@@ -148,20 +163,6 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          git clone https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty-sdk
-          git -C trusty-sdk checkout fb047922bd0758948e48500744ff94528b87c490
-
-          mkdir -p trusty-clang/clang-r475365b
-
-          curl -fsSL \
-            https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/d20e409261d6ad80a0c29ac2055bf5c3bb996ef4/clang-r475365b.tar.gz \
-            | tar -xz -C trusty-clang/clang-r475365b
-
-          mkdir -p trusty-sdk/toolchain
-          ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
-
-          cargo s armv7-unknown-trusty
-          exit
           for target in "${targets[@]}"; do
             time cargo s $target
           done

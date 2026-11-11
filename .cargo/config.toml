@@ -705,14 +705,6 @@ rustflags = ["-Clinker-flavor=gnu-cc","-Lnuttx/staging"]
 [target.'cfg(target_os="trusty")']
 linker = "trusty-sdk/toolchain/clang/bin/clang"
 [target.armv7-unknown-trusty]
-rustflags = [
-    "-Clink-self-contained=no",
-    "-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm32",
-    "-Clink-arg=-static",
-    "-Clink-arg=-pie",
-    "-Clink-arg=-Wl,--no-dynamic-linker",
-    "-Clink-arg=-Wl,-z,text",
-    "-Clink-arg=-Wl,-Bsymbolic",
-]
+rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm32"]
 [target.aarch64-unknown-trusty]
 rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64"]
