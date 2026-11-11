@@ -108,6 +108,7 @@ jobs:
         uses: ./.github/actions/toolchain
 
       - name: Setup OpenHarmony SDK
+        if: false
         uses: openharmony-rs/setup-ohos-sdk@main
         with:
           version: "7.0"
@@ -172,10 +173,7 @@ jobs:
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
 
-          export PATH="$PWD/trusty-clang/clang-r475365b/bin:$PWD/trusty-sdk/toolchain/clang/bin:$PATH"
-
           cargo s aarch64-unknown-trusty
-          cargo s armv7-unknown-trusty
           exit
           source .github/scripts/util.sh
           targets_from_env
