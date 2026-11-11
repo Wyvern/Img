@@ -160,7 +160,30 @@ jobs:
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
-          cargo s aarch64-unknown-trusty
+
+          CLANG="$PWD/trusty-sdk/toolchain/clang/bin/clang"
+          BIN="$PWD/trusty-sdk/toolchain/clang/bin"
+
+          file "$CLANG"
+          ls -l "$CLANG" "$BIN/ld.lld"
+
+          "$CLANG" \
+            --target=aarch64-unknown-unknown-musl \
+            --sysroot="$PWD/trusty-sdk/sysroots/generic-arm64" \
+            -fuse-ld=lld \
+            -B"$BIN/" \
+            -### -nostartfiles -nodefaultlibs \
+            -static-pie -x c /dev/null -o /tmp/test
+
+            "$CLANG" \
+              --target=aarch64-unknown-unknown-musl \
+              --sysroot="$PWD/trusty-sdk/sysroots/generic-arm64" \
+              -fuse-ld=lld \
+              -B"$BIN/" \
+              -v -nostartfiles -nodefaultlibs \
+              -static-pie -x c /dev/null -o /tmp/test
+
+          # cargo s aarch64-unknown-trusty
           exit
           source .github/scripts/util.sh
           targets_from_env
