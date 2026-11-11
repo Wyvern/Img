@@ -158,7 +158,7 @@ jobs:
             | tar -xz -C trusty-clang/clang-r475365b
 
           mkdir -p trusty-sdk/toolchain
-          ln -s trusty-clang/clang-r475365b trusty-sdk/toolchain/clang
+          ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
 
           cargo s armv7-unknown-trusty
           exit
