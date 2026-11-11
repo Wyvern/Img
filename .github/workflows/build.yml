@@ -112,21 +112,32 @@ jobs:
         with:
           version: "7.0"
 
+      - name: Trusty Cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            trusty-sdk
+            trusty-clang
+          key: trusty
+          restore-keys: trusty
+
       - name: Trusty SDK config
         if: true
         run: |
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty-sdk
+          if [[ ! -d trusty-sdk || ! -d trusty-clang ]]; then
+            git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty-sdk
 
-          git -C trusty-sdk fetch --depth=1 origin fb047922bd0758948e48500744ff94528b87c490
+            git -C trusty-sdk fetch --depth=1 origin fb047922bd0758948e48500744ff94528b87c490
 
-          git -C trusty-sdk checkout FETCH_HEAD
+            git -C trusty-sdk checkout FETCH_HEAD
 
-          mkdir -p trusty-clang/clang-r475365b
+            mkdir -p trusty-clang/clang-r475365b
 
-          curl -fsSL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/d20e409261d6ad80a0c29ac2055bf5c3bb996ef4/clang-r475365b.tar.gz | tar -xz -C trusty-clang/clang-r475365b
+            curl -fsSL https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/d20e409261d6ad80a0c29ac2055bf5c3bb996ef4/clang-r475365b.tar.gz | tar -xz -C trusty-clang/clang-r475365b
 
-          mkdir -p trusty-sdk/toolchain
-          ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
+            mkdir -p trusty-sdk/toolchain
+            ln -sfn "$PWD/trusty-clang/clang-r475365b" trusty-sdk/toolchain/clang
+          fi
 
       - name: Set targets
         id: targets

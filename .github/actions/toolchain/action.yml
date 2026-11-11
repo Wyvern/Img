@@ -43,7 +43,7 @@ runs:
           version: "v0.18.0"
 
     - name: Create C/C++ wrappers
-      if: inputs.ccw == 'true'
+      if: inputs.ccw == 'true' && false
       shell: bash
       run: |
         set -euo pipefail
