@@ -106,6 +106,8 @@ jobs:
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
+        with:
+          ccw: false
 
       - name: Setup OpenHarmony SDK
         if: false
@@ -172,6 +174,8 @@ jobs:
 
           ln -sf $OHOS_SDK_NATIVE/llvm ohos
           ln -sf $OHOS_SDK_NATIVE/sysroot ohos-root
+
+          export PATH="$PWD/trusty-clang/clang-r475365b/bin:$PATH"
 
           cargo s aarch64-unknown-trusty
           exit
