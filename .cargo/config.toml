@@ -703,9 +703,9 @@ linker = "./zig-cc.sh"
 rustflags = ["-Clinker-flavor=gnu-cc","-Lnuttx/staging"]
 
 [target.'cfg(target_os="trusty")']
-linker = "trusty-sdk/toolchain/clang/bin/clang"
-rustflags = ["-Ctarget-feature=+crt-static","-Clink-arg=-fuse-ld=lld",    "-Clink-arg=--ld-path=trusty-sdk/toolchain/clang/bin/ld.lld"]
+linker = "trusty-sdk/toolchain/clang/bin/ld.lld"
+rustflags = ["-Ctarget-feature=+crt-static","-Clinker-flavor=gnu-lld"]
 [target.armv7-unknown-trusty]
-rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm32","-Clink-arg=--target=armv7-unknown-unknown-gnueabi"]
+rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm32"]
 [target.aarch64-unknown-trusty]
-rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64","-Clink-arg=--target=aarch64-unknown-unknown-musl"]
+rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64"]
