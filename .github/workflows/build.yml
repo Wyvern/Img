@@ -149,7 +149,11 @@ jobs:
           targets_from_env
 
           git clone --depth=1 https://android.googlesource.com/platform/prebuilts/trusty/sysroot trusty
-          find trusty -type f \( -name ld.lld -o -name ld -o -name *-gcc -o -name *-clang\)
+          find trusty -type f \( \
+            -name 'ld*' -o \
+            -name '*-gcc' -o \
+            -name '*-clang' \
+          \)
           cargo s armv7-unknown-trusty
           exit
           for target in "${targets[@]}"; do
