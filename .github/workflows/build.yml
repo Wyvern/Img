@@ -797,7 +797,7 @@ jobs:
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
-  iOS+tvOS:
+  iOS-tvOS:
       name: iOS+tvOS
       if: ${{ vars.TEST != '1' || vars.ios == '1'  }}
       runs-on: xcode-27
