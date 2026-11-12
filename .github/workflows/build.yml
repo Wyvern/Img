@@ -763,26 +763,16 @@ jobs:
         uses: ./.github/actions/targets
         with:
           targets: |
-            x86_64-apple-ios
-            x86_64-apple-ios-macabi
-            aarch64-apple-ios
-            aarch64-apple-ios-macabi
-            aarch64-apple-ios-sim
-            arm64e-apple-ios
-            x86_64-apple-tvos
-            aarch64-apple-tvos
-            arm64e-apple-tvos
-            aarch64-apple-tvos-sim
             aarch64-apple-watchos
             arm64_32-apple-watchos
             aarch64-apple-watchos-sim
+            x86_64-apple-watchos-sim
             aarch64-apple-visionos
             aarch64-apple-visionos-sim
             aarch64-apple-darwin
             arm64e-apple-darwin
             x86_64h-apple-darwin
             x86_64-apple-darwin
-            x86_64-apple-watchos-sim
 
       - name: Build Release
         env:
@@ -806,6 +796,62 @@ jobs:
         uses: ./.github/actions/upload
         with:
           targets: ${{ steps.targets.outputs.targets }}
+
+  iOS+tvOS:
+      name: iOS+tvOS
+      if: ${{ vars.TEST != '1' || vars.ios == '1'  }}
+      runs-on: xcode-27
+
+      permissions:
+        contents: write
+        packages: write
+
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v7
+
+        - name: macOS cleanup
+          uses: ./.github/actions/macos-cleanup
+
+        - name: Toolchain Setup
+          uses: ./.github/actions/toolchain
+
+        - name: Set targets
+          id: targets
+          uses: ./.github/actions/targets
+          with:
+            targets: |
+              x86_64-apple-ios
+              x86_64-apple-ios-macabi
+              aarch64-apple-ios
+              aarch64-apple-ios-macabi
+              aarch64-apple-ios-sim
+              arm64e-apple-ios
+              x86_64-apple-tvos
+              aarch64-apple-tvos
+              arm64e-apple-tvos
+              aarch64-apple-tvos-sim
+
+        - name: Build Release
+          env:
+            TARGETS: ${{ steps.targets.outputs.targets }}
+          run: |
+            cargo update
+            set +e -x
+
+            source .github/scripts/util.sh
+            targets_from_env
+
+            for target in "${targets[@]}"; do
+              time cargo s $target &
+            done
+
+            wait
+
+        - name: Upload release binaries
+          uses: ./.github/actions/upload
+          with:
+            targets: ${{ steps.targets.outputs.targets }}
 
   Redox:
     name: Redox
