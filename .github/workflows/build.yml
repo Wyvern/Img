@@ -2088,9 +2088,9 @@ jobs:
           targets: |
             powerpc-unknown-openbsd powerpc-openbsd
             powerpc-unknown-netbsd powerpc-netbsd
-            mipsel-unknown-netbsd mipsel-netbsd-eabihf
-            armv7-unknown-netbsd-eabihf arm-netbsd-eabihf
-            armv6-unknown-netbsd-eabihf arm-netbsd-eabihf
+            mipsel-unknown-netbsd mipsel-netbsd-eabi
+            armv7-unknown-netbsd-eabihf arm-netbsd
+            armv6-unknown-netbsd-eabihf arm-netbsd
             i586-unknown-netbsd x86-netbsd
             i686-unknown-netbsd x86-netbsd
             i686-unknown-openbsd x86-openbsd
@@ -2113,6 +2113,9 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
+
+          time cargo s mipsel-unknown-netbsd --config "target.mipsel-unknown-netbsd.linker='./zig-cc.sh'" --config "target.mipsel-unknown-netbsd.rustflags = ['-Clink-arg=--target=mipsel-netbsd-eabi']"
+          exit
 
           for item in "${targets[@]:0:10}"; do
             read -r target zig <<< $item
