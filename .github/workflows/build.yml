@@ -2088,7 +2088,7 @@ jobs:
           targets: |
             powerpc-unknown-openbsd powerpc-openbsd
             powerpc-unknown-netbsd powerpc-netbsd
-            mipsel-unknown-netbsd mipsel-netbsd-eabi
+            mipsel-unknown-netbsd mipsel-netbsd
             armv7-unknown-netbsd-eabihf arm-netbsd
             armv6-unknown-netbsd-eabihf arm-netbsd
             i586-unknown-netbsd x86-netbsd

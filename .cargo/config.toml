@@ -709,3 +709,6 @@ rustflags = ["-Ctarget-feature=+crt-static"]
 rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm32"]
 [target.aarch64-unknown-trusty]
 rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64"]
+
+[target.mipsel-unknown-netbsd]
+rustflags = ["-Ctarget-feature=-soft-float"]
