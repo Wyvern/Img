@@ -2088,14 +2088,14 @@ jobs:
           targets: |
             powerpc-unknown-openbsd powerpc-openbsd
             powerpc-unknown-netbsd powerpc-netbsd
-            mipsel-unknown-netbsd mipsel-netbsd
-            armv7-unknown-netbsd-eabihf arm-netbsd
-            armv6-unknown-netbsd-eabihf arm-netbsd
+            mipsel-unknown-netbsd mipsel-netbsd-eabihf
+            armv7-unknown-netbsd-eabihf arm-netbsd-eabihf
+            armv6-unknown-netbsd-eabihf arm-netbsd-eabihf
             i586-unknown-netbsd x86-netbsd
             i686-unknown-netbsd x86-netbsd
             i686-unknown-openbsd x86-openbsd
-            armeb-unknown-linux-gnueabi armeb-linux-gnueabi
-            armeb-unknown-linux-musleabi.json armeb-linux-musleabi
+            armeb-unknown-linux-gnueabi armeb-linux-gnusf
+            armeb-unknown-linux-musleabi.json armeb-linux-muslsf
             aarch64-pc-windows-gnullvm
             x86_64-pc-windows-gnullvm
             i686-pc-windows-gnullvm
@@ -2155,15 +2155,15 @@ jobs:
           targets: |
             x86_64-unknown-linux-musl x86_64-linux-musl
             powerpc64le-unknown-linux-musl powerpc64le-linux-musl
-            powerpc-unknown-linux-musl powerpc-linux-musleabi
+            powerpc-unknown-linux-musl powerpc-linux-muslsf
             riscv64gc-unknown-linux-musl riscv64-linux-musl
             s390x-unknown-linux-musl s390x-linux-musl
             loongarch64-unknown-linux-musl loongarch64-linux-musl
             aarch64-unknown-linux-musl aarch64-linux-musl
-            mips64-unknown-linux-muslabi64 mips64-linux-muslabi64
-            mips64el-unknown-linux-muslabi64 mips64el-linux-muslabi64
-            mipsisa64r6-unknown-linux-musl.json	mips64-linux-muslabi64
-            mipsisa64r6el-unknown-linux-musl.json	mips64el-linux-muslabi64
+            mips64-unknown-linux-muslabi64 mips64-linux-musl
+            mips64el-unknown-linux-muslabi64 mips64el-linux-musl
+            mipsisa64r6-unknown-linux-musl.json	mips64-linux-musl
+            mipsisa64r6el-unknown-linux-musl.json	mips64el-linux-musl
 
       - name: Build Release
         env:
@@ -2212,16 +2212,16 @@ jobs:
             targets: |
               i586-unknown-linux-musl x86-linux-musl
               i686-unknown-linux-musl x86-linux-musl
-              armv5te-unknown-linux-musleabi arm-linux-musleabi
-              arm-unknown-linux-musleabi arm-linux-musleabi
-              arm-unknown-linux-musleabihf arm-linux-musleabihf
-              thumbv7neon-unknown-linux-musleabihf thumb-linux-musleabihf
-              armv7-unknown-linux-musleabi arm-linux-musleabi
-              armv7-unknown-linux-musleabihf arm-linux-musleabihf
-              mipsel-unknown-linux-musl mipsel-linux-musleabi
-              mips-unknown-linux-musl mips-linux-musleabi
-              mipsisa32r6-unknown-linux-musl.json	mips-linux-musleabi
-              mipsisa32r6el-unknown-linux-musl.json	mipsel-linux-musleabi
+              armv5te-unknown-linux-musleabi arm-linux-muslsf
+              arm-unknown-linux-musleabi arm-linux-muslsf
+              arm-unknown-linux-musleabihf arm-linux-musl
+              thumbv7neon-unknown-linux-musleabihf thumb-linux-musl
+              armv7-unknown-linux-musleabi arm-linux-muslsf
+              armv7-unknown-linux-musleabihf arm-linux-musl
+              mipsel-unknown-linux-musl mipsel-linux-muslsf
+              mips-unknown-linux-musl mips-linux-muslsf
+              mipsisa32r6-unknown-linux-musl.json	mips-linux-muslsf
+              mipsisa32r6el-unknown-linux-musl.json	mipsel-linux-muslsf
 
         - name: Build Release
           env:
