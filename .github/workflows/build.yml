@@ -2114,7 +2114,7 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          time cargo s mipsel-unknown-netbsd --config "target.mipsel-unknown-netbsd.linker='./zig-cc.sh'" --config "target.mipsel-unknown-netbsd.rustflags = ['-Clink-arg=--target=mipsel-netbsd-eabi']"
+          time cargo s mipsel-unknown-netbsd --config "target.mipsel-unknown-netbsd.linker='./zig-cc.sh'" --config "target.mipsel-unknown-netbsd.rustflags = ['-Clink-arg=--target=mipsel-netbsd']"
           exit
 
           for item in "${targets[@]:0:10}"; do
