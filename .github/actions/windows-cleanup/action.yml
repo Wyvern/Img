@@ -11,7 +11,7 @@ runs:
       run: |
         $ErrorActionPreference = 'Ignore'
 
-        $pattern = "maint|diag|exper|search|logs|assist|report|defend";
+        $pattern = "aggre|maint|diag|exper|search|logs|assist|report|defend";
         $services = Get-Service|? DisplayName -match $pattern
 
         $services | Set-Service -StartMode Disabled -ErrorAction SilentlyContinue
