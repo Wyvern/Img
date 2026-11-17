@@ -1000,6 +1000,7 @@ jobs:
             riscv32imac-unknown-xous-elf
             x86_64-unknown-hurd-gnu
             wasm32-unknown-emscripten
+            # wasm64-unknown-emscripten
             i686-unknown-hurd-gnu
             aarch64-unknown-redox
             riscv64gc-unknown-redox

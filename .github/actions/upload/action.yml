@@ -23,18 +23,18 @@ runs:
 
     - name: Set lowercase repository name
       shell: bash
-      run: echo "PROJECT=$(printf '%s' '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+      run: echo "repo=$(printf '%s' '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
     - name: Detect Rust package name
       id: project
       shell: bash
       run: |
-        echo "name=$(cargo metadata --no-deps --format-version 1 \
+        echo "pkg=$(cargo metadata --no-deps --format-version 1 \
           | jq -r '.packages[0].name')" >> "$GITHUB_OUTPUT"
 
     - name: Show project name
       shell: bash
-      run: echo "${{ steps.project.outputs.name }}"
+      run: echo "${{ steps.project.outputs.pkg }}"
 
     - name: Linux System Info
       if: runner.os == 'Linux'
@@ -66,7 +66,7 @@ runs:
     - name: Show build target binaries
       shell: bash
       run: |
-        bin=${{ steps.project.outputs.name }}
+        bin=${{ steps.project.outputs.pkg }}
         if [[ -d ./target ]]; then
           find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | perl -pe 's{(target/)([^/]*)(/src/)}{$1 . "\e[1;32m" . $2 . "\e[0m" . $3}ge; s{(\Q'"$bin"'\E[^\s]*)}{"\e[1;93m$1\e[0m"}ge' || true
         fi
@@ -75,7 +75,7 @@ runs:
       with:
         name: ${{ inputs.artifact }}
         path: |
-          target/**/${{ env.PROJECT }}*
+          target/**/${{ env.repo }}*
           !target/**/*.d
           !target/**/*.pdb
         if-no-files-found: ignore
@@ -159,8 +159,8 @@ runs:
             fi
           fi
 
-          # PROJECT=${{ env.PROJECT }}
-          bin=${{ steps.project.outputs.name }}
+          # repo=${{ env.repo }}
+          bin=${{ steps.project.outputs.pkg }}
           tag=${{ inputs.tag }}
 
           echo -e "\033[32m::Uploading:: \033[93m $name \033[0m"
@@ -172,8 +172,8 @@ runs:
             mv target/$target/src/{$bin.efi,$name.efi} || true
             gh release upload $tag "target/$target/src/$name.efi" --clobber || true
           elif [[ "$os" == "emscripten" ]]; then
-            tar -cJf Wasm32-emscripten.tar.xz -C target/$target/src $bin.wasm $bin.js || true
-            gh release upload $tag Wasm32-emscripten.tar.xz --clobber || true
+            tar -cJf $(cap $arch)-emscripten.tar.xz -C target/$target/src $bin.wasm $bin.js || true
+            gh release upload $tag $(cap $arch)-emscripten.tar.xz --clobber || true
           elif [[ "$target" == wasm* ]]; then
             mv target/$target/src/{$bin.wasm,$name.wasm} || true
             gh release upload $tag "target/$target/src/$name.wasm" --clobber || true
@@ -183,7 +183,7 @@ runs:
           fi
         done <<< "$TARGETS"
 
-        if [[ -f Img-Universal ]]; then
+        if [[ -f $(cap $bin)-Universal ]]; then
           echo -e "\033[32m::Uploading:: \033[93m Apple-macOS-universal \033[0m"
-          gh release upload $tag Img-Universal#Apple-macOS-universal --clobber || true
+          gh release upload $tag $(cap $bin)-Universal#Apple-macOS-universal --clobber || true
         fi
