@@ -210,7 +210,7 @@ rustflags = [
   "-Zterminal-urls",
   "-Zstaticlib-allow-rdylib-deps",
   "-Zstaticlib-prefer-dynamic",
-  "-Znext-solver=coherence",
+  "-Znext-solver=globally",
   # "-Zpanic-in-drop=abort",
   "-Zuse-sync-unwind",
   "-Zgraphviz-dark-mode",
