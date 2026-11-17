@@ -26,15 +26,11 @@ runs:
       run: echo "repo=$(printf '%s' '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
     - name: Detect Rust package name
-      id: project
+      id: package
       shell: bash
       run: |
         echo "pkg=$(cargo metadata --no-deps --format-version 1 \
           | jq -r '.packages[0].name')" >> "$GITHUB_OUTPUT"
-
-    - name: Show project name
-      shell: bash
-      run: echo "${{ steps.project.outputs.pkg }}"
 
     - name: Linux System Info
       if: runner.os == 'Linux'
@@ -66,7 +62,7 @@ runs:
     - name: Show build target binaries
       shell: bash
       run: |
-        bin=${{ steps.project.outputs.pkg }}
+        bin=${{ steps.package.outputs.pkg }}
         if [[ -d ./target ]]; then
           find ./target -type f \( -iname "$bin" -o -iname "$bin.*" \) ! -iname "$bin.d" -exec ls -hl {} + | perl -pe 's{(target/)([^/]*)(/src/)}{$1 . "\e[1;32m" . $2 . "\e[0m" . $3}ge; s{(\Q'"$bin"'\E[^\s]*)}{"\e[1;93m$1\e[0m"}ge' || true
         fi
@@ -160,7 +156,7 @@ runs:
           fi
 
           # repo=${{ env.repo }}
-          bin=${{ steps.project.outputs.pkg }}
+          bin=${{ steps.package.outputs.pkg }}
           tag=${{ inputs.tag }}
 
           echo -e "\033[32m::Uploading:: \033[93m $name \033[0m"
