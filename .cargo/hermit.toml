@@ -224,7 +224,7 @@ rustflags = [
   "-Zchecksum-hash-algorithm=blake3",
   "-Zmir-strip-debuginfo=all-locals",
   "-Zexperimental-default-bounds",
-  "-Zassumptions-on-binders",
+  # "-Zassumptions-on-binders",
   "-Zcache-proc-macros",
   "-Zvalidate-mir=no",
   "-Zmir-move-elimination=y",
