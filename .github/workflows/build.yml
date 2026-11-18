@@ -1073,14 +1073,13 @@ jobs:
               docker build --platform linux/amd64 \
                 --provenance=false \
                 --load \
-                --progress=plain \
+                --progress=quiet \
                 -f ../Docker/serenity.Dockerfile \
                 -t $IMAGE:serenity-toolchain .
 
             touch ~/serenity.finish
-            docker push $IMAGE:serenity-toolchain
+            docker push $IMAGE:serenity-toolchain &
           fi
-          exit 1
 
       - name: Haiku docker image
         run: |
@@ -1272,6 +1271,8 @@ jobs:
             sparcv9-sun-solaris
             x86_64-pc-solaris
             x86_64-unknown-haiku
+            # aarch64-unknown-serenity
+            # x86_64-unknown-serenity
 
       - name: Build Release
         env:
@@ -1303,6 +1304,12 @@ jobs:
           #     '
           # docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./aarch64-nuttx'"
+
+          # docker_linker aarch64-serenity ghcr.io/wyvern/img:serenity-toolchain $SERENITY_TOOLCHAIN/aarch64/bin/aarch64-serenity-gcc
+          # cargo s aarch64-unknown-serenity --config "target.aarch64-unknown-serenity.linker='./aarch64-serenity'"
+
+          # docker_linker x86_64-serenity ghcr.io/wyvern/img:serenity-toolchain $SERENITY_TOOLCHAIN/x86_64/bin/x86_64-serenity-gcc
+          # cargo s x86_64-unknown-serenity --config "target.x86_64-unknown-serenity.linker='./x86_64-serenity'"
 
           for target in "${targets[@]:0:7}"; do
             time cr $target &
