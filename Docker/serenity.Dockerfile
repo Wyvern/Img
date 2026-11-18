@@ -8,6 +8,7 @@ ENV CXX=g++-14
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
+    build-essential \
     gcc-14 \
     g++-14 \
     cmake \
