@@ -884,7 +884,7 @@ jobs:
             docker build --platform linux/amd64 \
                 --provenance=false \
                 --load \
-                --progress=plain \
+                --progress=quiet \
                 -f ../Docker/hurd-i686.Dockerfile
                 -t ghcr.io/wyvern/img:hurd-i686 .
 
@@ -1064,6 +1064,25 @@ jobs:
         working-directory: rust-cross-toolchain
         run: |
           IMAGE="${IMAGE,,}"
+
+          if docker manifest inspect "$IMAGE:serenity-toolchain" &>/dev/null; then
+              docker pull "$IMAGE:serenity-toolchain" &>/dev/null &
+          else
+              mkdir serenity
+              cd serenity
+
+              docker build --platform linux/amd64 \
+                --provenance=false \
+                --load \
+                --progress=plain \
+                -f ../Docker/serenity.Dockerfile
+                -t $IMAGE:serenity-toolchain .
+
+            touch ~/serenity.finish
+            docker push $IMAGE:serenity-toolchain
+          fi
+
+          exit 1
 
           if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
               docker pull "$IMAGE:haiku-cross" &>/dev/null &

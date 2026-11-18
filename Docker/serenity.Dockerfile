@@ -7,7 +7,6 @@ ENV CC=gcc-14
 ENV CXX=g++-14
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
     gcc-14 \
     g++-14 \
     cmake \
@@ -19,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgmp-dev \
     libmpfr-dev \
     libmpc-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 1000 builder
