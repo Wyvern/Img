@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m -u 1000 builder
+RUN useradd --create-home --user-group builder
 
 USER builder
 WORKDIR /src
