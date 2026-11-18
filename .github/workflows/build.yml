@@ -1060,8 +1060,7 @@ jobs:
         with:
          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker cross-toolchain images
-        working-directory: rust-cross-toolchain
+      - name: Serenity docker image
         run: |
           IMAGE="${IMAGE,,}"
 
@@ -1081,8 +1080,11 @@ jobs:
             touch ~/serenity.finish
             docker push $IMAGE:serenity-toolchain
           fi
-
           exit 1
+
+      - name: Haiku docker image
+        run: |
+          IMAGE="${IMAGE,,}"
 
           if docker manifest inspect "$IMAGE:haiku-cross" &>/dev/null; then
               docker pull "$IMAGE:haiku-cross" &>/dev/null &
@@ -1137,6 +1139,24 @@ jobs:
               docker push "$IMAGE:haiku-cross" &
           fi
 
+      - name: Solaris/Illumos docker image
+        run: |
+          targets=(
+            x86_64-unknown-illumos
+            sparcv9-sun-solaris
+            x86_64-pc-solaris
+          )
+
+          for target in ${targets[@]}; do
+            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
+            docker pull $CROSS_IMAGE &>/dev/null &
+          done
+
+      - name: Docker cross-toolchain images
+        working-directory: rust-cross-toolchain
+        run: |
+          IMAGE="${IMAGE,,}"
+
           targets=(
             csky-unknown-linux-gnuabiv2
             csky-unknown-linux-gnuabiv2hf
@@ -1159,19 +1179,6 @@ jobs:
                 docker
               docker push "$IMAGE:$target" &>/dev/null &
             fi
-          done
-
-          # docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
-
-          targets=(
-            x86_64-unknown-illumos
-            sparcv9-sun-solaris
-            x86_64-pc-solaris
-          )
-
-          for target in ${targets[@]}; do
-            CROSS_IMAGE=ghcr.io/cross-rs/${target}:main
-            docker pull $CROSS_IMAGE &>/dev/null &
           done
 
           if docker manifest inspect "$IMAGE:sparc64-unknown-netbsd" &>/dev/null; then
@@ -1226,8 +1233,10 @@ jobs:
               docker push "$IMAGE:sparc64-unknown-openbsd" &>/dev/null &
           fi
 
-      - name: Clone Nuttx repo
+      - name: Nuttx docker image and repo clone
+        if: false
         run: |
+          docker pull ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest &>/dev/null &
           {
             git clone --depth=1 https://github.com/apache/nuttx.git
             git clone --depth=1 https://github.com/apache/nuttx-apps.git apps
