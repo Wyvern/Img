@@ -156,6 +156,10 @@ rustc-unicode = true
 fine-grain-locking = true
 any-build-script-metadata = true
 json-target-spec = true
+term-graphics = true
+
+[term]
+graphics = true
 
 # build-std = [
 #     "core",
