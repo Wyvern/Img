@@ -7,6 +7,7 @@ ENV CC=gcc-14
 ENV CXX=g++-14
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    sudo \
     gcc-14 \
     g++-14 \
     cmake \
@@ -21,7 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd --create-home --user-group builder
+RUN useradd -m -U builder \
+    && echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder \
+    && chmod 0440 /etc/sudoers.d/builder
 
 USER builder
 WORKDIR /src
