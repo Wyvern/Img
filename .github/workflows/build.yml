@@ -1077,7 +1077,6 @@ jobs:
                 -f ../Docker/serenity.Dockerfile \
                 -t $IMAGE:serenity-toolchain .
 
-            touch ~/serenity.finish
             docker push $IMAGE:serenity-toolchain &
           fi
 
@@ -1366,6 +1365,7 @@ jobs:
               sudo mount -t ufs -o ro,ufstype=ufs2 ${LOOP}p5 /mnt/freebsd
               mkdir freebsd
               ln -s /mnt/freebsd freebsd/armv7
+              touch ~/armv7.finish
             } &
 
             if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:unix"); then
@@ -1482,7 +1482,7 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          time waitfor ~/unix.finish ~/llvm.finish
+          time waitfor ~/unix.finish ~/llvm.finish ~/armv7.finish
 
           sudo mount -o loop sysroot/dfly-x86_64-${DFLY}_REL.iso sysroot/dfly &>/dev/null
 
