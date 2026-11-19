@@ -869,7 +869,7 @@ jobs:
         with:
          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Hurd-i686 cache
+      - name: Hurd and Kraft cache
         run: |
           IMAGE="${IMAGE,,}"
 
@@ -988,7 +988,7 @@ jobs:
           {
             time waitfor ~/hurd.finish
             docker_linker i686-gnu-gcc ghcr.io/wyvern/img:hurd-i686
-            time cargo s ${targets[5]} --config "target.${targets[4]}.linker='./i686-gnu-gcc'"
+            time cargo s ${targets[5]} --config "target.${targets[5]}.linker='./i686-gnu-gcc'"
           } &
 
           {
@@ -1064,6 +1064,7 @@ jobs:
          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Serenity docker image
+        if: false
         run: |
           IMAGE="${IMAGE,,}"
 
@@ -1273,8 +1274,8 @@ jobs:
             sparcv9-sun-solaris
             x86_64-pc-solaris
             x86_64-unknown-haiku
-            aarch64-unknown-serenity
-            x86_64-unknown-serenity
+            # aarch64-unknown-serenity
+            # x86_64-unknown-serenity
 
       - name: Build Release
         env:
@@ -1307,23 +1308,20 @@ jobs:
           # docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./aarch64-nuttx'"
 
-          for target in "${targets[@]:8:2}"; do
-            arch=${target%%-*}
-            linker="$arch-serenity"
-
-            docker_linker "$linker" ghcr.io/wyvern/img:serenity-toolchain \
-              "\$(printenv SERENITY_TOOLCHAIN)/$arch/bin/$linker-gcc"
-
-            cargo s "$target" --config "target.$target.linker='./$linker'"
-          done
-
-          exit
           for target in "${targets[@]:0:7}"; do
             time cr $target &
           done
 
           docker_linker x86_64-haiku-gcc ghcr.io/wyvern/img:haiku-cross
           time cargo s ${targets[7]} --config "target.${targets[7]}.linker='./x86_64-haiku-gcc'" &
+
+          # for target in "${targets[@]:8:2}"; do
+          #   arch=${target%%-*}
+          #   linker="$arch-serenity"
+          #   docker_linker "$linker" ghcr.io/wyvern/img:serenity-toolchain \
+          #     "\$(printenv SERENITY_TOOLCHAIN)/$arch/bin/$linker-gcc"
+          #   cargo s "$target" --config "target.$target.linker='./$linker'" &
+          # done
 
           wait
 
