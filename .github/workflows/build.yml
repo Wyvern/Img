@@ -972,6 +972,12 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
+          time waitfor ~/ems.finish
+          source ./emsdk/emsdk_env.sh >/dev/null
+          cargo s wasm64-unknown-emscripten
+          ls -hl target/wasm64-unknown-emscripten/*
+          exit
+
           for target in "${targets[@]:0:3}"; do
             time cargo s $target &
           done
