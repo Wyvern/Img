@@ -973,7 +973,7 @@ jobs:
           targets_from_env
 
           time waitfor ~/ems.finish
-          source ./emsdk/emsdk_env.sh >/dev/null
+          source ./emsdk/emsdk_env.sh &>/dev/null
           cargo s wasm64-unknown-emscripten
           ls -hl target/wasm64-unknown-emscripten/*
           exit
