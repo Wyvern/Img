@@ -229,6 +229,7 @@ rustflags = [
   "-Zvalidate-mir=no",
   "-Zmir-move-elimination=y",
   "-Zasync-panic=y",
+  "-Zpack-coroutine-layout=classic",
   # "-Zwasm-proc-macros",
   # "-Zoffload=Device",
   # "-Zllvm-writable",

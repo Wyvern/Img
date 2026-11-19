@@ -954,7 +954,7 @@ jobs:
             riscv32imac-unknown-xous-elf
             x86_64-unknown-hurd-gnu
             wasm32-unknown-emscripten
-            # wasm64-unknown-emscripten
+            wasm64-unknown-emscripten
             i686-unknown-hurd-gnu
             aarch64-unknown-redox
             riscv64gc-unknown-redox
@@ -979,25 +979,28 @@ jobs:
           {
             time waitfor ~/ems.finish
             source ./emsdk/emsdk_env.sh &>/dev/null
-            time cargo s ${targets[3]}
+            for target in "${targets[@]:3:2}"; do
+              time cargo s $target &
+            done
+            wait
           } &
 
           {
             time waitfor ~/hurd.finish
             docker_linker i686-gnu-gcc ghcr.io/wyvern/img:hurd-i686
-            time cargo s ${targets[4]} --config "target.${targets[4]}.linker='./i686-gnu-gcc'"
+            time cargo s ${targets[5]} --config "target.${targets[4]}.linker='./i686-gnu-gcc'"
           } &
 
           {
             time waitfor ~/kraft.finish
             docker_linker unikraft kraftkit.sh/base:latest x86_64-linux-gnu-gcc-12
-            target="${targets[9]}"
+            target="${targets[10]}"
             time cargo s $target --config "target.${target}.linker = './unikraft'"
           } &
 
           time waitfor ~/redox.finish
 
-          for target in "${targets[@]:5:4}"; do
+          for target in "${targets[@]:6:4}"; do
               time cargo s "$target" &
           done
 
@@ -1270,8 +1273,8 @@ jobs:
             sparcv9-sun-solaris
             x86_64-pc-solaris
             x86_64-unknown-haiku
-            # aarch64-unknown-serenity
-            # x86_64-unknown-serenity
+            aarch64-unknown-serenity
+            x86_64-unknown-serenity
 
       - name: Build Release
         env:
@@ -1304,12 +1307,17 @@ jobs:
           # docker_linker aarch64-nuttx ghcr.io/apache/nuttx/apache-nuttx-ci-linux:latest aarch64-none-elf-gcc
           # cargo s aarch64-unknown-nuttx --config "target.aarch64-unknown-nuttx.linker='./aarch64-nuttx'"
 
-          # docker_linker aarch64-serenity ghcr.io/wyvern/img:serenity-toolchain $SERENITY_TOOLCHAIN/aarch64/bin/aarch64-serenity-gcc
-          # cargo s aarch64-unknown-serenity --config "target.aarch64-unknown-serenity.linker='./aarch64-serenity'"
+          for target in "${targets[@]:8:2}"; do
+            arch=${target%%-*}
+            linker="$arch-serenity"
 
-          # docker_linker x86_64-serenity ghcr.io/wyvern/img:serenity-toolchain $SERENITY_TOOLCHAIN/x86_64/bin/x86_64-serenity-gcc
-          # cargo s x86_64-unknown-serenity --config "target.x86_64-unknown-serenity.linker='./x86_64-serenity'"
+            docker_linker "$linker" ghcr.io/wyvern/img:serenity-toolchain \
+              "\$(printenv SERENITY_TOOLCHAIN)/$arch/bin/$linker-gcc"
 
+            cargo s "$target" --config "target.$target.linker='./$linker'"
+          done
+
+          exit
           for target in "${targets[@]:0:7}"; do
             time cr $target &
           done
