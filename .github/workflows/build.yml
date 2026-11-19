@@ -975,21 +975,10 @@ jobs:
           time waitfor ~/ems.finish
           source ./emsdk/emsdk_env.sh &>/dev/null
 
-          cat >/tmp/test.c <<'EOF'
-          #include <stdio.h>
-          int main(void) {
-              printf("wasm64\n");
-              return 0;
-          }
-          EOF
-
-          emcc --target=wasm64-unknown-emscripten \
-              /tmp/test.c -o /tmp/test.js -v
-
-          ls -lh /tmp/test.*
-
-          # cargo s wasm64-unknown-emscripten
-          # ls -hl target/wasm64-unknown-emscripten/*
+          cargo vv wasm64-unknown-emscripten 2>&1 | grep -E 'Running.*rustc|emcc|WASM=|MEMORY64|SINGLE_FILE|wasm-ld|rust-lld'
+          grep -nE 'wasmBinaryFile|wasmBinary|\.wasm|wasmBase64' \
+            target/wasm64-unknown-emscripten/src/img.js | head -20
+          ls -hl target/wasm64-unknown-emscripten/*
           exit
 
           for target in "${targets[@]:0:3}"; do
