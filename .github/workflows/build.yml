@@ -975,10 +975,6 @@ jobs:
           time waitfor ~/ems.finish
           source ./emsdk/emsdk_env.sh &>/dev/null
 
-          cargo s wasm64-unknown-emscripten
-          ls -hl target/wasm64-unknown-emscripten/*
-          exit
-
           for target in "${targets[@]:0:3}"; do
             time cargo s $target &
           done
@@ -995,7 +991,8 @@ jobs:
           {
             time waitfor ~/hurd.finish
             docker_linker i686-gnu-gcc ghcr.io/wyvern/img:hurd-i686
-            time cargo s ${targets[5]} --config "target.${targets[5]}.linker='./i686-gnu-gcc'"
+            target="${targets[5]}"
+            time cargo s $target --config "target.$target.linker='./i686-gnu-gcc'"
           } &
 
           {
