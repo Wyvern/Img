@@ -1855,7 +1855,7 @@ jobs:
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
-  Uclibc+VxWorks:
+  Uclibc-VxWorks:
     name: Uclibc+VxWorks
     if: ${{ vars.TEST != '1' || vars.uclibc == '1'  }}
     runs-on: ubuntu-26.04
