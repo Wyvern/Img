@@ -3,6 +3,12 @@ name = "img"
 version = "1.0.0"
 edition = "2024"
 
+[features]
+default = []
+color = []
+download = []
+espidf = ["dep:embuild"]
+
 [[example]]
 name = "color"
 path = "src/color.rs"
@@ -27,7 +33,7 @@ cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 embuild = { version = "*", features = ["espidf"], optional = true }
 serde_json = "*"
 
-[target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "nuttx",target_os = "tvos", target_os = "watchos"))))'.dependencies]
+[target.'cfg(all(unix, not(any(target_os = "espidf", target_os = "nuttx", target_os = "tvos", target_os = "watchos", target_os="vxworks"))))'.dependencies]
 file-format = "*"
 
 [target.'cfg(all(unix, not(any(target_os = "espidf",target_os="nuttx"))))'.dependencies]
@@ -41,9 +47,3 @@ esp-idf-sys = "*"
 
 [target.'cfg(target_os = "hermit")'.dependencies]
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
-
-[features]
-default = []
-color = []
-download = []
-espidf = ["dep:embuild"]
