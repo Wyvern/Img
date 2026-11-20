@@ -1905,8 +1905,6 @@ jobs:
               mkdir wrsdk && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C wrsdk && touch ~/vxworks.finish &
             else
               mkdir -p wrsdk/{x86_64,arm,riscv}
-              sudo ln -sf /bin/bash /bin/sh
-
               for entry in \
                 "x86_64 qemu-1.18.0" \
                 "arm raspberrypi4b-1.10.0" \
@@ -1915,6 +1913,7 @@ jobs:
                 curl -fsSL "https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-${sdk}.tar.bz2" | tar -xj -C "wrsdk/$dir" --strip-components=1 &
               done
               wait
+              dir -hl wrsdk/
               touch ~/vxworks.finish
               push_docker wrsdk "${IMAGE}:vxworks" vxworks
             fi
@@ -1955,14 +1954,15 @@ jobs:
           #   done
           #   wait
           # } &
-          find wrsdk -type f -name 'wr-c++' -print
+
           {
             time waitfor ~/vxworks.finish
             for entry in "${targets[@]:5:3}"; do
               read -r target dir <<< "$entry"
               time (
               set +x
-              source wrsdk/$dir/sdkenv.sh &>/dev/null
+              sudo ln -sf /bin/bash /bin/sh
+              source wrsdk/$dir/sdkenv.sh
               unset RUSTC RUSTDOC SYSROOT
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
               set -x
