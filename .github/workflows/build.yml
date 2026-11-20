@@ -1855,8 +1855,8 @@ jobs:
         with:
           targets: ${{ steps.targets.outputs.targets }}
 
-  Uclibc:
-    name: Uclibc
+  Uclibc+VxWorks:
+    name: Uclibc+VxWorks
     if: ${{ vars.TEST != '1' || vars.uclibc == '1'  }}
     runs-on: ubuntu-26.04
 
@@ -1896,6 +1896,29 @@ jobs:
 
             mkdir -p l4re && curl -fsSL https://l4re.org/download/snapshots/toolchain/toolchain-l4re-x86_64-gcc-15.tar.xz | tar -xJ -C l4re --strip-components=1 | touch ~/l4re.finish &
 
+      - name: Cache VxWorks
+        run: |
+            IMAGE="${IMAGE,,}"
+            source .github/scripts/util.sh
+
+            if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:vxworks"); then
+              mkdir wrsdk && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C wrsdk && touch ~/vxworks.finish &
+            else
+              mkdir -p wrsdk/{x86_64,arm,riscv}
+              sudo ln -sf /bin/bash /bin/sh
+
+              for entry in \
+                "x86_64 qemu-1.18.0" \
+                "arm raspberrypi4b-1.10.0" \
+                "riscv sifive-hifive-1.4"; do
+                read -r dir sdk <<< "$entry"
+                curl -fsSL "https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-${sdk}.tar.bz2" | tar -xj -C "wrsdk/$dir" --strip-components=1 &
+              done
+              wait
+              touch ~/vxworks.finish
+              push_docker wrsdk "${IMAGE}:vxworks" vxworks
+            fi
+
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain
 
@@ -1909,9 +1932,11 @@ jobs:
             armv7-unknown-linux-uclibceabi
             armv7-unknown-linux-uclibceabihf
             armv5te-unknown-linux-uclibceabi
+            aarch64-wrs-vxworks arm
+            x86_64-wrs-vxworks x86_64
+            riscv64-wrs-vxworks riscv
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
-            x86_64-wrs-vxworks
 
       - name: Build Release
         env:
@@ -1923,46 +1948,30 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          mkdir -p wrsdk/x86_64 wrsdk/arm wrsdk/riscv
-          curl -fsSL https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-qemu-1.18.0.tar.bz2 | tar -xj -C wrsdk/x86_64 --strip-components=1
-          curl -fsSL https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-raspberrypi4b-1.10.0.tar.bz2 | tar -xj -C wrsdk/arm --strip-components=1
-          curl -fsSL https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-sifive-hifive-1.4.tar.bz2 | tar -xj -C wrsdk/riscv --strip-components=1
-          sudo ln -sf /bin/bash /bin/sh
+          # {
+          #   time waitfor ~/uclibc.finish
+          #   for target in "${targets[@]:0:5}"; do
+          #     time cargo s $target &
+          #   done
+          #   wait
+          # } &
 
-          (
-          source wrsdk/x86_64/sdkenv.sh &>/dev/null
-          unset RUSTC RUSTDOC SYSROOT
-          export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-          # cargo s x86_64-wrs-vxworks
-          )
-
-          (
-          source wrsdk/arm/sdkenv.sh &>/dev/null
-          unset RUSTC RUSTDOC SYSROOT
-          export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-          cargo s aarch64-wrs-vxworks
-          cargo s armv7-wrs-vxworks-eabihf
-          )
-
-          (
-          source wrsdk/riscv/sdkenv.sh &>/dev/null
-          unset RUSTC RUSTDOC SYSROOT
-          export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-          cargo s riscv32-wrs-vxworks
-          cargo s riscv64-wrs-vxworks
-          )
-
-          exit
           {
-            time waitfor ~/uclibc.finish
-            for target in "${targets[@]:0:5}"; do
-              time cargo s $target &
+            time waitfor ~/vxworks.finish
+            for entry in "${targets[@]:5:3}"; do
+              read -r target dir <<< "$entry"
+              (
+              source wrsdk/$dir/sdkenv.sh &>/dev/null
+              unset RUSTC RUSTDOC SYSROOT
+              export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
+              time cargo s $target
+              ) &
             done
             wait
           } &
 
           # time waitfor ~/l4re.finish
-          # for target in "${targets[@]:5}"; do
+          # for target in "${targets[@]:8}"; do
           #   time cargo s $target &
           # done
 
