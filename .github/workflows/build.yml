@@ -1960,11 +1960,11 @@ jobs:
             time waitfor ~/vxworks.finish
             for entry in "${targets[@]:5:3}"; do
               read -r target dir <<< "$entry"
-              (
+              time (
               source wrsdk/$dir/sdkenv.sh &>/dev/null
               unset RUSTC RUSTDOC SYSROOT
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-              time cargo s $target
+              cargo s $target
               ) &
             done
             wait
