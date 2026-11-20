@@ -1929,22 +1929,29 @@ jobs:
           curl -fsSL https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-sifive-hifive-1.4.tar.bz2 | tar -xj -C wrsdk/riscv --strip-components=1
           sudo ln -sf /bin/bash /bin/sh
 
+          (
           source wrsdk/x86_64/sdkenv.sh &>/dev/null
           unset RUSTC RUSTDOC SYSROOT
           export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
           # cargo s x86_64-wrs-vxworks
+          )
 
+          (
           source wrsdk/arm/sdkenv.sh &>/dev/null
           unset RUSTC RUSTDOC SYSROOT
           export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
           cargo s aarch64-wrs-vxworks
           cargo s armv7-wrs-vxworks-eabihf
+          )
 
+          (
           source wrsdk/riscv/sdkenv.sh &>/dev/null
           unset RUSTC RUSTDOC SYSROOT
           export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
           cargo s riscv32-wrs-vxworks
           cargo s riscv64-wrs-vxworks
+          )
+
           exit
           {
             time waitfor ~/uclibc.finish
