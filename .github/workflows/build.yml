@@ -1913,6 +1913,7 @@ jobs:
             # x86_64-unknown-l4re-uclibc
 
       - name: Build Release
+        shell: bash
         env:
           TARGETS: ${{ steps.targets.outputs.targets }}
         run: |
