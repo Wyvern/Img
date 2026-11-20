@@ -1927,6 +1927,7 @@ jobs:
           sudo ln -sf /bin/bash /bin/sh
           source wrsdk/x86_64/sdkenv.sh &>/dev/null
           unset RUSTC RUSTDOC SYSROOT
+          export PATH="$HOME/.cargo/bin:$PATH"
           cargo s x86_64-wrs-vxworks
           exit
           {
