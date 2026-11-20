@@ -19,7 +19,7 @@ fn main() {
     println!("cargo::rustc-check-cfg=cfg(embedded_unix)");
     let embed_unix = matches!(
         target_os.as_deref(),
-        Ok("espidf") | Ok("nuttx") | Ok("tvos") | Ok("watchos")
+        Ok("espidf") | Ok("nuttx") | Ok("tvos") | Ok("watchos") | Ok("vxworks")
     );
     if embed_unix {
         println!("cargo::rustc-cfg=embedded_unix")

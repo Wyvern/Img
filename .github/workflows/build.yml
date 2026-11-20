@@ -1924,7 +1924,7 @@ jobs:
 
           mkdir -p wrsdk/x86_64
           curl -fsSL https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-qemu-1.18.0.tar.bz2 | tar -xj -C wrsdk/x86_64 --strip-components=1
-          source wrsdk/x86_64/toolkit/wind_sdk_env.linux
+          source wrsdk/x86_64/sdkenv.sh
           cargo s x86_64-wrs-vxworks
           exit
           {
