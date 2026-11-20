@@ -1913,7 +1913,6 @@ jobs:
                 curl -fsSL "https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-${sdk}.tar.bz2" | tar -xj -C "wrsdk/$dir" --strip-components=1 &
               done
               wait
-              dir -hl wrsdk/
               touch ~/vxworks.finish
               push_docker wrsdk "${IMAGE}:vxworks" vxworks
             fi
@@ -1957,17 +1956,19 @@ jobs:
 
           {
             time waitfor ~/vxworks.finish
+            sudo ln -sf /bin/bash /bin/sh
             for entry in "${targets[@]:5:3}"; do
               read -r target dir <<< "$entry"
-              time (
+              {
+              (
               set +x
-              sudo ln -sf /bin/bash /bin/sh
-              source wrsdk/$dir/sdkenv.sh
+              source wrsdk/$dir/sdkenv.sh &>/dev/null
               unset RUSTC RUSTDOC SYSROOT
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
               set -x
-              cargo s $target
-              ) &
+              time cargo s $target
+              )
+              } &
             done
             wait
           } &
