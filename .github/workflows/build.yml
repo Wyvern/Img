@@ -1946,13 +1946,13 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          # {
-          #   time waitfor ~/uclibc.finish
-          #   for target in "${targets[@]:0:5}"; do
-          #     time cargo s $target &
-          #   done
-          #   wait
-          # } &
+          {
+            time waitfor ~/uclibc.finish
+            for target in "${targets[@]:0:5}"; do
+              time cargo s $target &
+            done
+            wait
+          } &
 
           {
             time waitfor ~/vxworks.finish
@@ -2066,10 +2066,11 @@ jobs:
           time waitfor ~/yocto.finish
           sdk=/opt/poky/${YOCTO}
           ln -s $sdk/sysroots sysroots
-          set +x
           for entry in "${targets[@]}"; do
             read -r target env <<< "$entry"
             {
+            (
+              set +x
               source $sdk/$env
               unset RUST_TARGET_PATH
               for v in ${!CARGO_TARGET_@}; do
@@ -2078,7 +2079,7 @@ jobs:
               export PATH="$HOME/.cargo/bin:$PATH"
               set -x
               time cargo s $target
-              set +x
+            )
             } &
           done
 
