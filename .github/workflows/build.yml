@@ -1911,6 +1911,7 @@ jobs:
             armv5te-unknown-linux-uclibceabi
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
+            x86_64-wrs-vxworks
 
       - name: Build Release
         env:
@@ -1924,11 +1925,14 @@ jobs:
 
           mkdir -p wrsdk/x86_64
           curl -fsSL https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-qemu-1.18.0.tar.bz2 | tar -xj -C wrsdk/x86_64 --strip-components=1
+
           sudo ln -sf /bin/bash /bin/sh
+
           source wrsdk/x86_64/sdkenv.sh &>/dev/null
           unset RUSTC RUSTDOC SYSROOT
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cargo s x86_64-wrs-vxworks
+          export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
+          # cargo s x86_64-wrs-vxworks
+          cargo s i686-wrs-vxworks
           exit
           {
             time waitfor ~/uclibc.finish
