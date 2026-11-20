@@ -1955,7 +1955,7 @@ jobs:
           #   done
           #   wait
           # } &
-          find -L wrsdk -name 'wr-c++' -print
+          ls -hl wrsdk
           {
             time waitfor ~/vxworks.finish
             for entry in "${targets[@]:5:3}"; do
