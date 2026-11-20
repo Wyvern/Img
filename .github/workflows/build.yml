@@ -1955,15 +1955,17 @@ jobs:
           #   done
           #   wait
           # } &
-
+          find -L wrsdk -name 'wr-c++' -print
           {
             time waitfor ~/vxworks.finish
             for entry in "${targets[@]:5:3}"; do
               read -r target dir <<< "$entry"
               time (
+              set +x
               source wrsdk/$dir/sdkenv.sh &>/dev/null
               unset RUSTC RUSTDOC SYSROOT
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
+              set -x
               cargo s $target
               ) &
             done
