@@ -596,7 +596,7 @@ jobs:
 
       - name: Ubuntu apt update and install
         run: |
-          sudo apt install gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-arm-none-eabi -qy &>/dev/null && touch ~/apt.finish  &
+          sudo apt install gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf -qy &>/dev/null && touch ~/apt.finish &
 
       - name: Toolchain Setup
         uses: ./.github/actions/toolchain

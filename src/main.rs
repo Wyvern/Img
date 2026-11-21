@@ -2,6 +2,8 @@
 use esp_idf_sys as _;
 #[cfg(target_os = "hermit")]
 use hermit as _;
+#[cfg(target_os = "vexos")]
+use vex_sdk_jumptable as _;
 
 mod util;
 use dom_query::{self as dom, NodeRef};

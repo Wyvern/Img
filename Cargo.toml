@@ -47,3 +47,6 @@ esp-idf-sys = "*"
 
 [target.'cfg(target_os = "hermit")'.dependencies]
 hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
+
+[target.'cfg(target_os = "vexos")'.dependencies]
+vex-sdk-jumptable = "*"
