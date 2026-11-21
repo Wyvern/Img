@@ -717,3 +717,10 @@ rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64"]
 
 [target.mipsel-unknown-netbsd]
 rustflags = ["-Ctarget-feature=-soft-float"]
+
+[target.thumbv7a-vex-v5]
+linker = "clang"
+rustflags = [
+    "-Clink-arg=--target=thumbv7a-none-eabihf",
+    "-Clink-arg=-fuse-ld=lld",
+]

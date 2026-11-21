@@ -613,6 +613,7 @@ jobs:
             armv4t-unknown-linux-gnueabi
             arm-unknown-linux-gnueabi
             arm-unknown-linux-gnueabihf
+            thumbv7a-vex-v5
 
       - name: Build Release
         env:
@@ -624,6 +625,9 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
           time waitfor ~/apt.finish
+
+          cargo s thumbv7a-vex-v5
+          exit
 
           for target in ${targets[@]}; do
             time cargo s $target &
