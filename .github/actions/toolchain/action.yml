@@ -62,7 +62,7 @@ runs:
 
     - name: Zig toolchain install
       if: inputs.zig == 'true'
-      uses: mlugg/setup-zig@v2
+      uses: xyzzylabs/setup-zig@v1
       with:
         version: ${{ inputs.version }}
 

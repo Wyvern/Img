@@ -2096,7 +2096,7 @@ jobs:
     runs-on: xcode-27
 
     env:
-      mingw: "20261020"
+      mingw: "20261117"
 
     steps:
       - name: Checkout
