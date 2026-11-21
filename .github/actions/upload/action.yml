@@ -148,6 +148,8 @@ runs:
                 name="$(cap $arch)-${vendor}-${os}"
             elif [[ "$os" == "unknown" ]]; then
                 name="$(cap $arch)-${os}"
+            elif [[ "$vendor" == "vex" ]]; then
+                name="$(cap $vendor)-${arch}"
             elif [[ -z "$os" ]]; then
                 name="$(cap $arch)-${vendor}"
             else
