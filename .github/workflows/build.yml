@@ -625,8 +625,7 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
           time waitfor ~/apt.finish
-          cargo s thumbv7a-vex-v5
-          exit
+
           for target in ${targets[@]}; do
             time cargo s $target &
           done
