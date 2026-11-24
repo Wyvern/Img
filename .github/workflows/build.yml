@@ -1905,7 +1905,7 @@ jobs:
             if digest=$(oras manifest fetch --format go-template --template '{{ (index .content.layers 0).digest }}' "${IMAGE}:vxworks"); then
               mkdir wrsdk && oras blob fetch --output=- "${IMAGE}@${digest}" | tar --zstd -xf - -C wrsdk && touch ~/vxworks.finish &
             else
-              mkdir -p wrsdk/{x86_64,arm,riscv}
+              mkdir -p wrsdk/{Qemu,Apollo,arm,riscv}
               for entry in \
                 "Qemu qemu-1.18.0" \
                 "Apollo up2-1.15.0" \
