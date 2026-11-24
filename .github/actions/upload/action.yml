@@ -176,19 +176,16 @@ runs:
             mv target/$target/src/{$bin.wasm,$name.wasm} || true
             gh release upload $tag "target/$target/src/$name.wasm" --clobber || true
           elif [[ "$os" == "vxworks" ]]; then
-          for file in target/$target/$tag/*.vxe; do
-            [[ -e $file ]] || continue
-
+          for file in target/$target/src/*.vxe; do
             base=${file##*/}
             if [[ $base == "$bin".vxe ]]; then
-              mv target/$target/src/{$bin.vxe,$name.vxe} || true
+              mv target/$target/src/{$base,$name.vxe} || true
             elif [[ $base == "$bin"-*.vxe ]]; then
-              mv target/$target/src/{$bin.vxe,$name.vxe} || true
-              mv -- "$file" "target/$target/src/${name}-${base#"$bin"-}"
+              mv target/$target/src/{$base,${name}-${base#"$bin"-}} || true
             fi
           done
-            mv target/$target/src/{${bin}*.vxe,$name.vxe} || true
-            gh release upload $tag "target/$target/src/$name.vxe" --clobber || true
+            shopt -s nullglob
+            gh release upload $tag target/$target/src/${name}*.vxe --clobber || true
           else
             mv target/$target/src/{$bin,$name} || true
             gh release upload $tag "target/$target/src/$name" --clobber || true

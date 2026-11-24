@@ -1949,13 +1949,13 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          {
-            time waitfor ~/uclibc.finish
-            for target in "${targets[@]:0:5}"; do
-              time cargo s $target &
-            done
-            wait
-          } &
+          # {
+          #   time waitfor ~/uclibc.finish
+          #   for target in "${targets[@]:0:5}"; do
+          #     time cargo s $target &
+          #   done
+          #   wait
+          # } &
 
           {
             time waitfor ~/vxworks.finish
