@@ -253,9 +253,9 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]:0:3}"; do
+          # for target in "${targets[@]:0:3}"; do
             # time cargo s "$target" -Fespidf &
-          done
+          # done
 
           sleep 1
 
