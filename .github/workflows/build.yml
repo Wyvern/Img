@@ -1932,7 +1932,8 @@ jobs:
             armv7-unknown-linux-uclibceabihf
             armv5te-unknown-linux-uclibceabi
             aarch64-wrs-vxworks arm
-            x86_64-wrs-vxworks x86_64
+            x86_64-wrs-vxworks Qemu
+            x86_64-wrs-vxworks Apollo
             riscv64-wrs-vxworks riscv
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
@@ -1948,6 +1949,7 @@ jobs:
           targets_from_env
           mkdir -p wrsdk/Apollo && curl -fsSL "https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-up2-1.15.0.tar.bz2" | tar -xj -C "wrsdk/Apollo" --strip-components=1
           set +x
+          sudo ln -sf /bin/bash /bin/sh
               source wrsdk/Apollo/sdkenv.sh &>/dev/null
               unset RUSTC RUSTDOC SYSROOT
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
