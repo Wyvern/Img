@@ -1907,7 +1907,8 @@ jobs:
             else
               mkdir -p wrsdk/{x86_64,arm,riscv}
               for entry in \
-                "x86_64 qemu-1.18.0" \
+                "Qemu qemu-1.18.0" \
+                "Apollo up2-1.15.0" \
                 "arm raspberrypi4b-1.10.0" \
                 "riscv sifive-hifive-1.4"; do
                 read -r dir sdk <<< "$entry"
@@ -1947,15 +1948,7 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-          mkdir -p wrsdk/Apollo && curl -fsSL "https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-up2-1.15.0.tar.bz2" | tar -xj -C "wrsdk/Apollo" --strip-components=1
-          set +x
-          sudo ln -sf /bin/bash /bin/sh
-              source wrsdk/Apollo/sdkenv.sh &>/dev/null
-              unset RUSTC RUSTDOC SYSROOT
-              export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
-              set -x
-              time cargo s x86_64-wrs-vxworks
-              exit
+
           {
             time waitfor ~/uclibc.finish
             for target in "${targets[@]:0:5}"; do
@@ -1967,7 +1960,7 @@ jobs:
           {
             time waitfor ~/vxworks.finish
             sudo ln -sf /bin/bash /bin/sh
-            for entry in "${targets[@]:5:3}"; do
+            for entry in "${targets[@]:5:4}"; do
               read -r target dir <<< "$entry"
               {
               (
@@ -1977,6 +1970,9 @@ jobs:
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
               set -x
               time cargo s $target
+              if [[ $target == x86_64* ]]; then
+                mv target/$target/src/{img.vxe,img-$dir.vxe}
+              fi
               )
               } &
             done
@@ -1984,7 +1980,7 @@ jobs:
           } &
 
           # time waitfor ~/l4re.finish
-          # for target in "${targets[@]:8}"; do
+          # for target in "${targets[@]:9}"; do
           #   time cargo s $target &
           # done
 
