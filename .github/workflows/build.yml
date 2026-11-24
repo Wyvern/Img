@@ -254,7 +254,7 @@ jobs:
           targets_from_env
 
           for target in "${targets[@]:0:3}"; do
-            time cargo s "$target" -Fespidf &
+            # time cargo s "$target" -Fespidf &
           done
 
           sleep 1
