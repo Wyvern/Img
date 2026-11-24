@@ -27,6 +27,7 @@ fn main() {
 
     #[cfg(feature = "espidf")]
     if target_os.as_deref() == Ok("espidf") {
+        println!("cargo::rustc-cfg=espidf_picolibc");
         embuild::espidf::sysenv::output();
     }
 
