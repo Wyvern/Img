@@ -253,9 +253,9 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          # for target in "${targets[@]:0:3}"; do
-            # time cargo s "$target" -Fespidf &
-          # done
+          for target in "${targets[@]:0:3}"; do
+            time cargo s "$target" -Fespidf &
+          done
 
           sleep 1
 
@@ -1946,7 +1946,14 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-
+          curl -fsSL "https://d13321s3lxgewa.cloudfront.net/wrsdk-vxworks7-up2-1.15.0.tar.bz2" | tar -xj -C "wrsdk/Apollo" --strip-components=1
+          set +x
+              source wrsdk/Apollo/sdkenv.sh &>/dev/null
+              unset RUSTC RUSTDOC SYSROOT
+              export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
+              set -x
+              time cargo s x86_64-wrs-vxworks
+              exit
           {
             time waitfor ~/uclibc.finish
             for target in "${targets[@]:0:5}"; do
