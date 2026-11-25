@@ -1951,7 +1951,7 @@ jobs:
 
           docker_linker vita vitasdk/vitasdk:latest arm-vita-eabi-gcc
           target=armv7-sony-vita-newlibeabihf
-          cargo s $target --config "target.$target.linker='vita'"
+          cargo s $target --config "target.$target.linker='./vita'"
           exit
           {
             time waitfor ~/uclibc.finish
