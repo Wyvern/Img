@@ -166,6 +166,9 @@ runs:
           if [[ "$os" == "windows" ]]; then
             mv target/$target/src/{$bin.exe,$name.exe} || true
             gh release upload $tag "target/$target/src/$name.exe" --clobber || true
+          if [[ "$os" == "vita" ]]; then
+            mv target/$target/src/{$bin.vpk,Sony-vita.vpk} || true
+            gh release upload $tag "target/$target/src/Sony-vita.vpk" --clobber || true
           elif [[ "$os" == "uefi" ]]; then
             mv target/$target/src/{$bin.efi,$name.efi} || true
             gh release upload $tag "target/$target/src/$name.efi" --clobber || true
