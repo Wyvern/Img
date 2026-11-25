@@ -1948,10 +1948,13 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-
-          docker_linker vita vitasdk/vitasdk:latest arm-vita-eabi-gcc
+          curl -fsSL https://github.com/vita-rust/cargo-vita/releases/download/v0.2.2/cargo-vita-v0.2.2-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C "$HOME/.local/bin" cargo-vita-v0.2.2-x86_64-unknown-linux-gnu/cargo-vita --strip-components=1
+          for tool in arm-vita-eabi-gcc vita-elf-create vita-make-fself vita-mksfoex; do
+            docker_linker "$tool" vitasdk/vitasdk:2026.08 "$tool"
+          done
+          export PATH="$PWD:$PATH"
           target=armv7-sony-vita-newlibeabihf
-          cargo s $target --config "target.$target.linker='./vita'"
+          cargo vita build vpk -q -- --profile src -Zbuild-std=std,panic_abort --target $target --config "target.$target.linker='./arm-vita-eabi-gcc'"
           exit
           {
             time waitfor ~/uclibc.finish

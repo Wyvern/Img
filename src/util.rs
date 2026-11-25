@@ -206,29 +206,6 @@ pub trait Dbg: fmt::Debug {
 }
 impl<T: fmt::Debug> Dbg for T {}
 
-#[cfg(all(
-    unix,
-    not(any(target_os = "espidf", target_os = "nuttx", target_os = "vita"))
-))]
-mod raw {
-    use super::*;
-    pub fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) {
-        unsafe {
-            libc::tcgetattr(fd, old.as_mut_ptr());
-            let old = old.assume_init();
-            let mut new = old;
-            new.c_lflag &= !(libc::ICANON | libc::ECHO);
-            libc::tcsetattr(fd, libc::TCSANOW, &new);
-        }
-    }
-
-    pub fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
-        unsafe {
-            libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
-        }
-    }
-}
-
 pub fn terminal_input(o: &mut io::StdoutLock) -> Mode {
     use io::*;
     let input = {
@@ -246,13 +223,29 @@ pub fn terminal_input(o: &mut io::StdoutLock) -> Mode {
                 unix,
                 not(any(target_os = "espidf", target_os = "nuttx", target_os = "vita"))
             ) => {
+                fn begin_raw_mode(fd: os::raw::c_int, mut old: mem::MaybeUninit<libc::termios>) {
+                    unsafe {
+                        libc::tcgetattr(fd, old.as_mut_ptr());
+                        let old = old.assume_init();
+                        let mut new = old;
+                        new.c_lflag &= !(libc::ICANON | libc::ECHO);
+                        libc::tcsetattr(fd, libc::TCSANOW, &new);
+                    }
+                }
+
+                fn end_raw_mode(fd: os::raw::c_int, old: mem::MaybeUninit<libc::termios>) {
+                    unsafe {
+                        libc::tcsetattr(fd, libc::TCSANOW, old.as_ptr());
+                    }
+                }
+
                 let fd = libc::STDIN_FILENO;
                 let old = mem::MaybeUninit::<libc::termios>::uninit();
                 let mut key = [0u8; 1];
                 let mut i = stdin().lock();
-                raw::begin_raw_mode(fd, old);
+                begin_raw_mode(fd, old);
                 i.read_exact(&mut key).unwrap();
-                raw::end_raw_mode(fd, old);
+                end_raw_mode(fd, old);
                 key.make_ascii_lowercase();
                 Mode::Raw(key[0])
             }
