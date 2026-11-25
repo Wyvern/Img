@@ -1961,7 +1961,7 @@ jobs:
           export VITASDK="$PWD/.vitasdk"
           export PATH="$VITASDK/bin:$PWD:$PATH"
           target=armv7-sony-vita-newlibeabihf
-          cargo vita build vpk -q -- --profile src -Zbuild-std=std,panic_abort --target $target --config "target.$target.linker='./arm-vita-eabi-gcc'"
+          cargo vita build vpk -q --profile src -Zbuild-std=std,panic_abort --target $target --config "target.$target.linker='./arm-vita-eabi-gcc'"
           exit
 
           {
