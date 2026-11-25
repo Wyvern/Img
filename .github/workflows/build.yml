@@ -1949,6 +1949,10 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
+          docker_linker vita vitasdk/vitasdk:latest arm-vita-eabi-gcc
+          target=armv7-sony-vita-newlibeabihf
+          cargo s $target --config "target.$target.linker='vita'"
+          exit
           {
             time waitfor ~/uclibc.finish
             for target in "${targets[@]:0:5}"; do
