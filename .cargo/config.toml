@@ -717,7 +717,3 @@ rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64"]
 
 [target.mipsel-unknown-netbsd]
 rustflags = ["-Ctarget-feature=-soft-float"]
-
-[package.metadata.vita]
-title_id = "IMG000001"
-title_name = "Img"
