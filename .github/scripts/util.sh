@@ -34,6 +34,8 @@ docker_linker() {
 #!/bin/sh
 exec docker run --rm \\
   -v "\$PWD:\$PWD" \\
+  -v "$PWD/.vitasdk:/usr/local/vitasdk" \\
+  -e VITASDK=/usr/local/vitasdk \\
   -w "\$PWD" \\
   ${exec_cmd:+--entrypoint "$exec_cmd" \\
   }"$image" \\
