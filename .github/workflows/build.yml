@@ -1936,6 +1936,7 @@ jobs:
             x86_64-wrs-vxworks Qemu
             x86_64-wrs-vxworks Apollo
             riscv64-wrs-vxworks riscv
+            armv7-sony-vita-newlibeabihf
             # aarch64-unknown-l4re-uclibc
             # x86_64-unknown-l4re-uclibc
 
@@ -1963,7 +1964,7 @@ jobs:
           export VITASDK="$PWD/.vitasdk"
           export PATH="$VITASDK/bin:$PWD:$PATH"
           set -x
-          target=armv7-sony-vita-newlibeabihf
+          target=${targets[9]}
           cargo vita build vpk -q --profile src -Zbuild-std=std,panic_abort --target $target --config "target.$target.linker='./arm-vita-eabi-gcc'"
           exit
 
@@ -1998,7 +1999,7 @@ jobs:
           } &
 
           # time waitfor ~/l4re.finish
-          # for target in "${targets[@]:9}"; do
+          # for target in "${targets[@]:10}"; do
           #   time cargo s $target &
           # done
 
