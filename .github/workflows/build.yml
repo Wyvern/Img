@@ -253,11 +253,11 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          for target in "${targets[@]:0:3}"; do
-            time cargo s "$target" -Fespidf &
-          done
+          # for target in "${targets[@]:0:3}"; do
+          #   time cargo s "$target" -Fespidf &
+          # done
 
-          sleep 1
+          # sleep 1
 
           mv .cargo/config.toml .cargo/config.toml.bak
 

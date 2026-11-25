@@ -643,4 +643,4 @@ rustflags = ["-Clink-arg=--sysroot=redox/aarch64-unknown-redox"]
 
 [target.'cfg(target_os="espidf")']
 linker = "ldproxy"
-rustflags = ["-Cdefault-linker-libraries=yes"]
+rustflags = ["-Cdefault-linker-libraries=yes","--cfg=espidf_picolibc"]
