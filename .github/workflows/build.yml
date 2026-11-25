@@ -1950,24 +1950,6 @@ jobs:
           source .github/scripts/util.sh
           targets_from_env
 
-          curl -fsSL https://github.com/vita-rust/cargo-vita/releases/download/v0.2.2/cargo-vita-v0.2.2-x86_64-unknown-linux-gnu.tar.gz | tar -xzOf - --wildcards '*/cargo-vita' > "$HOME/.cargo/bin/cargo-vita" && chmod +x "$HOME/.cargo/bin/cargo-vita"
-
-          mkdir -p "$PWD/.vitasdk"
-          image=vitasdk/vitasdk:latest
-          docker run --rm -v "$PWD/.vitasdk:/sdk" --entrypoint sh $image \
-            -c 'cp -a "$VITASDK"/. /sdk/'
-          set +x
-          for tool in arm-vita-eabi-gcc vita-elf-create vita-make-fself vita-mksfoex; do
-            docker_linker $tool $image $tool
-          done
-          export VITASDK="$PWD/.vitasdk"
-          export PATH="$VITASDK/bin:$PWD:$PATH"
-          set -x
-          target=${targets[9]}
-          time cargo vita build vpk -q --profile src -Zbuild-std=std,panic_abort --target $target --config "target.$target.linker='./arm-vita-eabi-gcc'" &
-          wait
-          exit
-
           {
             time waitfor ~/uclibc.finish
             for target in "${targets[@]:0:5}"; do
@@ -1996,6 +1978,24 @@ jobs:
               } &
             done
             wait
+          } &
+
+          {
+          curl -fsSL https://github.com/vita-rust/cargo-vita/releases/download/v0.2.2/cargo-vita-v0.2.2-x86_64-unknown-linux-gnu.tar.gz | tar -xzOf - --wildcards '*/cargo-vita' > "$HOME/.cargo/bin/cargo-vita" && chmod +x "$HOME/.cargo/bin/cargo-vita"
+
+          mkdir -p "$PWD/.vitasdk"
+          image=vitasdk/vitasdk:latest
+          docker run --rm -v "$PWD/.vitasdk:/sdk" --entrypoint sh $image \
+            -c 'cp -a "$VITASDK"/. /sdk/'
+          set +x
+          for tool in arm-vita-eabi-gcc vita-elf-create vita-make-fself vita-mksfoex; do
+            docker_linker $tool $image $tool
+          done
+          export VITASDK="$PWD/.vitasdk"
+          export PATH="$VITASDK/bin:$PWD:$PATH"
+          set -x
+          target=${targets[9]}
+          time cargo vita build vpk -q --profile src -Zbuild-std=std,panic_abort --target $target --config "target.$target.linker='./arm-vita-eabi-gcc'"
           } &
 
           # time waitfor ~/l4re.finish
