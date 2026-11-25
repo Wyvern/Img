@@ -29,15 +29,18 @@ cr()
 }
 
 docker_linker() {
-  local linker="$1" image="$2" exec_cmd="$3"
+  local linker="$1" image="$2" exec_cmd="$3" sdk_args=
+  if [[ "$image" == vitasdk/vitasdk:* ]]; then
+      sdk_args='-v "$PWD/.vitasdk:/usr/local/vitasdk" \
+-e VITASDK=/usr/local/vitasdk'
+  fi
   cat > "$linker" <<EOF
 #!/bin/sh
 exec docker run --rm \\
   -v "\$PWD:\$PWD" \\
-  -v "$PWD/.vitasdk:/usr/local/vitasdk" \\
-  -e VITASDK=/usr/local/vitasdk \\
   -w "\$PWD" \\
-  ${exec_cmd:+--entrypoint "$exec_cmd" \\
+  ${sdk_args:+$sdk_args \\
+  }${exec_cmd:+--entrypoint "$exec_cmd" \\
   }"$image" \\
   "\$@"
 EOF
