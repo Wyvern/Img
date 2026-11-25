@@ -1948,7 +1948,7 @@ jobs:
 
           source .github/scripts/util.sh
           targets_from_env
-          mkdir -p "$HOME/.local/bin" && curl -fsSL https://github.com/vita-rust/cargo-vita/releases/download/v0.2.2/cargo-vita-v0.2.2-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C "$HOME/.local/bin" --strip-components=1 --wildcards '*/cargo-vita'
+          curl -fsSL https://github.com/vita-rust/cargo-vita/releases/download/v0.2.2/cargo-vita-v0.2.2-x86_64-unknown-linux-gnu.tar.gz | tar -xz -C "~/.cargo/bin/" --strip-components=1 --wildcards '*/cargo-vita'
           for tool in arm-vita-eabi-gcc vita-elf-create vita-make-fself vita-mksfoex; do
             docker_linker "$tool" vitasdk/vitasdk:2026.08 "$tool"
           done
