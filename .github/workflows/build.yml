@@ -1648,12 +1648,12 @@ jobs:
           time waitfor ~/apt.finish
 
           for target in "${targets[@]:0:2}"; do
-            time RUSTC_WRAPPER= cargo s $target &
-          done
-
-          for target in "${targets[@]:2}"; do
             time cargo s $target &
           done
+
+          # for target in "${targets[@]:2}"; do
+          #   time cargo s $target &
+          # done
 
           wait
 
