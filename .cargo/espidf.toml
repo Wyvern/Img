@@ -217,7 +217,7 @@ rustflags = [
   "-Zthinlto",
   "-Zdylib-lto",
   "-Zno-generate-arange-section",
-  # "-Zdep-info-omit-d-target",
+  "-Zdep-info-omit-d-target",
   "-Zpolonius=next",
   "-Ztrim-diagnostic-paths",
   "-Zshare-generics",
