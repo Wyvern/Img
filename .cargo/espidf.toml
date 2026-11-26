@@ -212,6 +212,7 @@ rustflags = [
   # "-Zexport-executable-symbols",
   "-Zno-profiler-runtime",
   "-Zlocation-detail=none",
+  "-Zfmt-debug=none",
   "-Ztrap-unreachable=no",
   "-Zplt",
   "-Zthinlto",
