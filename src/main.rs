@@ -1281,9 +1281,8 @@ fn save_to_file(data: &str) {
         let content = &data[data.find(',').unwrap() + 1..];
         {
             if ctx.contains(";base64") {
-                let data = base64_turbo::STANDARD
-                    .decode(content)
-                    .unwrap_or_else(|e| quit!("{e}"));
+                use base64::{Engine as _, engine::general_purpose::STANDARD};
+                let data = STANDARD.decode(content).unwrap_or_else(|e| quit!("{e}"));
                 fs::write(&full_name, data)
             } else {
                 fs::write(

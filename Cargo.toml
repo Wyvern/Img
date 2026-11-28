@@ -18,7 +18,7 @@ test = false
 [dependencies]
 alphanumeric-sort = "*"
 argh = "*"
-base64-turbo = "*"
+base64 = "*"
 cbor4ii = { version = "*", features = ["serde1", "use_std"] }
 dom_query = { version = "*", default-features = false }
 fastrand = "*"
@@ -50,7 +50,3 @@ hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 
 [target.'cfg(target_os = "vexos")'.dependencies]
 vex-sdk-jumptable = "*"
-
-[package.metadata.vita]
-title_id = "IMG000001"
-title_name = "Img"

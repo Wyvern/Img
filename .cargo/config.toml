@@ -718,9 +718,3 @@ rustflags = ["-Clink-arg=--sysroot=trusty-sdk/sysroots/generic-arm64"]
 
 [target.mipsel-unknown-netbsd]
 rustflags = ["-Ctarget-feature=-soft-float"]
-
-[target.i686-unknown-uefi]
-rustflags = ["-Ctarget-feature=+sse2"]
-
-[target.x86_64-unknown-uefi]
-rustflags = ["-Ctarget-feature=+sse2"]
