@@ -50,3 +50,7 @@ hermit = { git = "https://github.com/hermit-os/hermit-rs.git", branch = "main" }
 
 [target.'cfg(target_os = "vexos")'.dependencies]
 vex-sdk-jumptable = "*"
+
+[package.metadata.vita]
+title_id = "IMG000001"
+title_name = "Img"
