@@ -1970,9 +1970,10 @@ jobs:
               unset RUSTC RUSTDOC SYSROOT
               export PATH="$HOME/.cargo/bin:$PATH" &>/dev/null
               set -x
-              time cargo s $target
               if [[ $target == x86_64* ]]; then
-                mv target/$target/src/{img.vxe,img-$dir.vxe}
+                time cargo s $target --target-dir target/$target-$dir
+              else
+                time cargo s $target
               fi
               )
               } &
