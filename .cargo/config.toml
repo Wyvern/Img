@@ -48,7 +48,7 @@ rpath = true
 debug = false
 strip = true
 opt-level = "s"
-# trim-paths = "all"
+trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.dev.package."*"]
@@ -64,7 +64,7 @@ inherits = "dev"
 [profile.release]
 # rustflags = ["-Cprefer-dynamic"]
 rpath = true
-# trim-paths = "all"
+trim-paths = "all"
 # hint-mostly-unused = true
 
 [profile.release.build-override]
@@ -111,13 +111,13 @@ panic = "immediate-abort"
 #   "-Zforce-unstable-if-unmarked",
 #   "-Zlocation-detail=none",
 #   "-Ztrap-unreachable=no",
-#   # "-Zcross-crate-inline-threshold=yes",
+#   "-Zcross-crate-inline-threshold=yes",
 # ]
 
 [profile.src.build-override]
 inherits = "src"
 # rustflags = [
-#   # "-Cprefer-dynamic",
+#   "-Cprefer-dynamic",
 #   "-Zlocation-detail=none",
 #   "-Ztrap-unreachable=no",
 # ]
@@ -125,7 +125,7 @@ inherits = "src"
 [profile.src.package."*"]
 inherits = "src"
 # rustflags = [
-#   # "-Cprefer-dynamic",
+#   "-Cprefer-dynamic",
 #   "-Zlocation-detail=none",
 #   "-Ztrap-unreachable=no",
 # ]
